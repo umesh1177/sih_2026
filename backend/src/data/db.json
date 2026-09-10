@@ -415,9 +415,126 @@
       "certificates": [],
       "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=250",
       "createdAt": "2025-02-10T13:00:00.000Z"
+    },
+    {
+      "id": "u_admin_ebc00138",
+      "name": "umesh pal",
+      "email": "umesh@gmail.com",
+      "passwordHash": "$2a$10$bdIWD3lWoTyfZeSjkGdUX.cK0ZUbTfRFLU2Cf3XmnGEKoETY49yG6",
+      "role": "admin",
+      "department": "NWP Division",
+      "designation": "Director",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [
+        "M.s.c. physics"
+      ],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-10T05:29:47.542Z"
+    },
+    {
+      "id": "u_admin_b60ebcb5",
+      "name": "umesh pal",
+      "email": "hp1707697@gmail.com",
+      "passwordHash": "$2a$10$xUJaAMDI4295hiOm0q6lCeNMlExNmUCo67/kdxGrZrvgtsAF6aon6",
+      "role": "admin",
+      "department": "NWP Division",
+      "designation": "Director",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [
+        "M.s.c. physics"
+      ],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-10T05:30:13.380Z"
+    },
+    {
+      "id": "u_admin_58f8e8af",
+      "name": "Umesh1177puvgec",
+      "email": "umesh1177puvgec@gmail.com",
+      "passwordHash": null,
+      "role": "admin",
+      "department": "India Meteorological Department",
+      "designation": "Officer",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-10T06:49:20.717Z"
     }
   ],
   "courses": [
+    {
+      "id": "crs_f37fa2df",
+      "code": "MOES-IMD-890",
+      "title": "Radar Interpration",
+      "category": "Numerical Weather Prediction",
+      "level": "Intermediate",
+      "duration": "4 Weeks",
+      "creditHours": 3,
+      "maxEnrollment": 50,
+      "department": "India Meteorological Department",
+      "leadTrainerId": "",
+      "leadTrainerName": "Dr. Sunita Kulkarni",
+      "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+      "description": "Operational curriculum for meteorologists and scientific officers.",
+      "prerequisites": [
+        "Atmospheric Dynamics",
+        "Synoptic Observations"
+      ],
+      "enrolledTraineeIds": [],
+      "competenciesGained": [],
+      "subjects": [
+        {
+          "id": "sub_ti5yuava",
+          "name": "Atmospheric Dynamics & Data Modeling",
+          "description": "Core physical foundations and synoptic analysis framework.",
+          "requiredSkills": "NWP, WRF Modeling, Numerical Prediction",
+          "assignedTrainerId": "u_trainer_2",
+          "assignedTrainerName": "Dr. Sunita Kulkarni",
+          "modules": [
+            {
+              "id": "mod_y0m0roa3",
+              "title": "Module 1: Governing Equations of Atmosphere",
+              "duration": "1 Week",
+              "materials": []
+            },
+            {
+              "id": "mod_wmb4n9pi",
+              "title": "Module 2: 4D-Var Data Assimilation",
+              "duration": "1 Week",
+              "materials": []
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-09-10T08:01:26.065Z",
+      "isNew": true
+    },
     {
       "id": "crs_nwp_101",
       "code": "MOES-IMD-NWP-2025",
@@ -1710,6 +1827,114 @@
   ],
   "quizzes": [
     {
+      "id": "quiz_fca188f5",
+      "title": "Subject 1: Governing Equations & Atmospheric Dynamics Assessment",
+      "courseId": "crs_nwp_101",
+      "courseName": "Advanced Numerical Weather Prediction (NWP) & Data Assimilation",
+      "trainerId": "u_trainer_1",
+      "trainerName": "Dr. Amit Sengupta",
+      "department": "Numerical Weather Prediction Division, New Delhi",
+      "totalMarks": 20,
+      "passMarks": 20,
+      "durationMinutes": 30,
+      "scheduledStartTime": "2026-09-10T00:29:00.000Z",
+      "deadlineTime": "2026-09-17T00:29:00.000Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "questions": [
+        {
+          "id": "ai_q_f38b141c",
+          "question": "In the context of horizontal grid staggering for atmospheric primitive equations, why is the Arakawa C-grid predominantly chosen over the Arakawa A-grid and B-grid for high-resolution mesoscale Numerical Weather Prediction (NWP) models where the grid spacing satisfies $\\Delta x \\ll R_d$ (Rossby radius of deformation)?",
+          "options": [
+            "The C-grid completely eliminates non-linear aliasing errors in the advection terms without requiring spatial filtering.",
+            "The C-grid accurately simulates the dispersion of inertia-gravity waves at scales shorter than the Rossby deformation radius by computing horizontal divergence over a single grid interval without spatial averaging of velocity components.",
+            "The C-grid collocates mass and momentum at cell vertices, allowing exact conservation of potential enstrophy under pure geostrophic balance.",
+            "The C-grid prevents the formation of spurious high-frequency acoustic waves by implicitly transforming the Navier-Stokes system into an anelastic system."
+          ],
+          "correctAnswer": 1,
+          "marks": 4,
+          "difficulty": "Medium",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1: Navier-Stokes & Primitive Equation Systems",
+          "explanation": "On the Arakawa C-grid, velocity components normal to cell faces flank the central mass/pressure variable. Consequently, divergence and pressure gradient terms are evaluated across a single spatial step ($\\Delta x$) without spatial averaging. When the grid length is smaller than the Rossby deformation radius ($\\Delta x \\ll R_d$, typical of high-resolution mesoscale models), the geostrophic adjustment process is dominated by gravity-wave dynamics. The C-grid yields the most faithful numerical dispersion relation for inertia-gravity waves, avoiding the grid-scale energy traps and vanishing group velocities seen on A- and D-grids.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.8-flash)"
+        },
+        {
+          "id": "ai_q_2a3b2c36",
+          "question": "For the linearized shallow-water equations discretized on a 1D Arakawa C-grid with grid spacing $\\Delta x$, mean fluid depth $H$, reduced gravity $g$, and Coriolis parameter $f$ (with four-point Coriolis averaging $\\overline{v}^x$), the numerical dispersion relation for inertia-gravity waves is given by $\\omega^2 = f^2 \\cos^2\\left(\\frac{k \\Delta x}{2}\\right) + \\frac{4 g H}{\\Delta x^2} \\sin^2\\left(\\frac{k \\Delta x}{2}\\right)$. What is the critical dynamical consequence of this dispersion relation at the Nyquist limit ($k = \\pi / \\Delta x$)?",
+          "options": [
+            "The group velocity becomes infinite, leading to immediate linear numerical instability (CFL violation).",
+            "The effective Coriolis restoring force vanishes, meaning shortest resolved waves behave purely as unrotated gravity waves.",
+            "The frequency $\\omega$ drops identically to zero, generating a completely stationary, non-propagating checkerboard mode.",
+            "The phase speed matches the analytical gravity wave phase speed $\\sqrt{gH}$ exactly, eliminating all phase dispersion."
+          ],
+          "correctAnswer": 1,
+          "marks": 4,
+          "difficulty": "Medium",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1: Navier-Stokes & Primitive Equation Systems",
+          "explanation": "At the grid cutoff (Nyquist wavenumber $k = \\pi / \\Delta x$), the factor $k \\Delta x / 2 = \\pi / 2$. Thus, $\\cos^2(\\pi/2) = 0$, causing the Coriolis term in the dispersion relation to vanish completely, while the gravity wave term reaches its maximum $\\sin^2(\\pi/2) = 1$. Consequently, the $2\\Delta x$ waves do not feel rotation and behave as pure non-rotating gravity waves. This feature prevents spurious inertial oscillations at the grid scale, though it alters rotational adjustment at marginal resolutions.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.8-flash)"
+        },
+        {
+          "id": "ai_q_bed1fcb2",
+          "question": "Operational NWP models over complex orography (such as the Himalayas in IMD's domains) often transform the vertical coordinate of the primitive equations into a terrain-following $\\sigma$-coordinate ($\\sigma = p/p_s$). What primary numerical challenge arises when evaluating the horizontal pressure gradient force (PGF) in this coordinate system?",
+          "options": [
+            "The vertical advection term becomes non-conservative and generates negative mass densities.",
+            "The geostrophic balance equation becomes mathematically elliptic, requiring an expensive global iterative solver.",
+            "The PGF splits into two large terms of opposite sign ($-\\nabla_\\sigma \\Phi$ and $-\\alpha \\nabla_\\sigma p$), causing severe truncation errors and spurious accelerations over steep slopes.",
+            "The hydrostatic approximation is formally violated whenever the slope of the $\\sigma$-surface exceeds 45 degrees."
+          ],
+          "correctAnswer": 2,
+          "marks": 4,
+          "difficulty": "Medium",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1: Navier-Stokes & Primitive Equation Systems",
+          "explanation": "In terrain-following coordinates, the true isobaric pressure gradient force $-\\nabla_p \\Phi$ transforms into two components: $-\\nabla_\\sigma \\Phi - \\frac{R T}{p_s}\\nabla_\\sigma p_s$ (or $-\\nabla_\\sigma \\Phi - \\alpha \\nabla_\\sigma p$). Over steep terrain, both terms can become exceedingly large and must nearly cancel to produce the small net physical meteorological forcing. In finite-difference approximations, spatial discretization errors in these two large terms do not cancel perfectly, producing catastrophic truncation error that generates artificial winds along the mountain slopes.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.8-flash)"
+        },
+        {
+          "id": "ai_q_a7335c96",
+          "question": "In strong-constraint Four-Dimensional Variational Data Assimilation (4D-Var), the cost function is defined as $J(\\mathbf{x}_0) = \\frac{1}{2}(\\mathbf{x}_0 - \\mathbf{x}_b)^T \\mathbf{B}^{-1}(\\mathbf{x}_0 - \\mathbf{x}_b) + \\frac{1}{2}\\sum_{k=0}^{K} [\\mathcal{H}_k(\\mathbf{x}_k) - \\mathbf{y}_k]^T \\mathbf{R}_k^{-1}[\\mathcal{H}_k(\\mathbf{x}_k) - \\mathbf{y}_k]$, where $\\mathbf{x}_k = \\mathcal{M}_{0\\to k}(\\mathbf{x}_0)$. Which statement correctly describes the mathematical role and operational execution of the adjoint operator $\\mathbf{M}^T$ in calculating $\\nabla_{\\mathbf{x}_0} J$?",
+          "options": [
+            "The adjoint model integrates backward in time from $t_K$ to $t_0$, pulling observational innovations/sensitivities backward to compute the exact gradient of $J$ with respect to the initial state $\\mathbf{x}_0$.",
+            "The adjoint model runs forward in time alongside the non-linear model to update the background error covariance matrix $\\mathbf{B}$ at every time step.",
+            "The adjoint operator inverts the non-linear model dynamics $\\mathcal{M}^{-1}$ to retrieve the past trajectory directly from the final state observations.",
+            "The adjoint model is used exclusively to diagonalize the observation error covariance matrix $\\mathbf{R}_k$ in spectral space."
+          ],
+          "correctAnswer": 0,
+          "marks": 4,
+          "difficulty": "Medium",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1: Navier-Stokes & Primitive Equation Systems",
+          "explanation": "The gradient of $J$ with respect to the initial state $\\mathbf{x}_0$ is given by $\\nabla_{\\mathbf{x}_0} J = \\mathbf{B}^{-1}(\\mathbf{x}_0 - \\mathbf{x}_b) + \\sum_{k=0}^{K} \\mathbf{M}_{0 \\to k}^T \\mathbf{H}_k^T \\mathbf{R}_k^{-1} [\\mathcal{H}_k(\\mathbf{x}_k) - \\mathbf{y}_k]$. Here, $\\mathbf{M}_{0 \\to k}^T = \\mathbf{M}_1^T \\mathbf{M}_2^T \\dots \\mathbf{M}_k^T$ represents the transposed tangent linear model. Because matrix transposition reverses the operator sequence, the adjoint model integrates backwards in time from the end of the assimilation window ($t_K$) back to $t_0$, continuously accumulating the projection of observational innovations onto the gradient at $t_0$.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.8-flash)"
+        },
+        {
+          "id": "ai_q_9dc6fc06",
+          "question": "A key theoretical advantage of 4D-Var over standard 3D-Var in operational NWP is its treatment of background error covariances. How does 4D-Var introduce flow-dependency into the effective background error covariances across the assimilation window?",
+          "options": [
+            "By utilizing an ensemble of independent Kalman filters to randomly sample the model attractor at every observation time.",
+            "By propagating the initial static background error covariance $\\mathbf{B}$ implicitly through time using the tangent linear model $\\mathbf{M}$ and its adjoint $\\mathbf{M}^T$, such that $\\mathbf{B}(t) \\approx \\mathbf{M}_{0 \\to t} \\mathbf{B} \\mathbf{M}_{0 \\to t}^T$.",
+            "By adding an empirical stochastic forcing term to the right-hand side of the primitive momentum equations.",
+            "By updating the background error covariance strictly as a function of the local hydrostatic geopotential height thickness."
+          ],
+          "correctAnswer": 1,
+          "marks": 4,
+          "difficulty": "Medium",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1: Navier-Stokes & Primitive Equation Systems",
+          "explanation": "While standard 3D-Var assumes a stationary, isotropic, and static background error covariance matrix $\\mathbf{B}$, 4D-Var incorporates the governing dynamic equations (tangent linear model $\\mathbf{M}$ and its adjoint $\\mathbf{M}^T$) within the assimilation window. This implicit time-propagation evolves the background error structure according to the prevailing atmospheric flow (e.g., stretching along fronts or shear zones via $\\mathbf{M} \\mathbf{B} \\mathbf{M}^T$), producing dynamically consistent, flow-dependent increments.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.8-flash)"
+        }
+      ]
+    },
+    {
       "id": "quiz_nwp_2025_01",
       "title": "NWP & Data Assimilation — Level 2 Proficiency Assessment",
       "courseId": "crs_nwp_101",
@@ -2732,6 +2957,14 @@
     }
   ],
   "announcements": [
+    {
+      "id": "ann_7c94640c",
+      "title": "New Operational Course Launched: Radar Interpration",
+      "category": "National Academy",
+      "date": "2026-09-10",
+      "urgent": false,
+      "author": "MoES Directorate"
+    },
     {
       "id": "ann_01",
       "title": "MoES Launches Digital Capacity Building Initiative — All RMC Officers to Complete Level-1 Assessment by Q2 2025",

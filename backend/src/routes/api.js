@@ -18,6 +18,8 @@ router.post("/auth/register", authController.register);
 router.get("/announcements", adminController.getAnnouncements);
 router.get("/courses", courseController.getCourses);
 router.get("/courses/:id", courseController.getCourseById);
+router.get("/certificates/verify/:certId", courseController.verifyCertificate);
+router.post("/certificates/verify", courseController.verifyCertificate);
 
 // --- PROTECTED: Profile ---
 router.get("/users/profile/:id", requireAuth, authController.getProfile);
@@ -26,7 +28,11 @@ router.post("/users/profile/:id/submit-approval", requireAuth, authController.su
 
 // --- PROTECTED: Course & Trainer management ---
 router.post("/courses", requireAuth, requireRole("trainer", "admin"), courseController.createCourse);
+router.put("/courses/:id", requireAuth, requireRole("trainer", "admin"), courseController.updateCourse);
 router.post("/courses/:id/enroll", requireAuth, courseController.enrollCourse);
+router.delete("/courses/:id/trainees/:traineeId", requireAuth, requireRole("admin"), courseController.removeTraineeFromCourse);
+router.post("/courses/:id/bulk-certificates", requireAuth, requireRole("admin"), courseController.generateBulkCertificates);
+router.get("/trainers/workload", requireAuth, requireRole("admin", "trainer"), courseController.getTrainersWorkload);
 router.post("/courses/:courseId/subjects/:subjectId/modules", requireAuth, requireRole("trainer", "admin"), courseController.addModuleToSubject);
 router.delete("/courses/:courseId/subjects/:subjectId/modules/:moduleId", requireAuth, requireRole("trainer", "admin"), courseController.deleteModuleFromSubject);
 router.post("/courses/:courseId/subjects/:subjectId/modules/:moduleId/materials", requireAuth, requireRole("trainer", "admin"), courseController.uploadLearningMaterial);
@@ -55,6 +61,7 @@ router.post("/ai/generate-questions", requireAuth, requireRole("trainer", "admin
 router.post("/ai/generate-pattern-questions", requireAuth, aiController.generatePatternQuestionsWithAI);
 router.post("/ai/recommend-courses", requireAuth, aiController.recommendCoursesWithAI);
 router.post("/ai/generate-summary", requireAuth, aiController.generateMaterialSummaryWithAI);
+router.post("/ai/synthesize-paper", requireAuth, requireRole("trainer", "admin"), aiController.synthesizeAssessmentPaperWithAI);
 
 // --- PROTECTED: Quizzes, Kiosk Mode, Submissions & Analytics ---
 router.get("/quizzes", requireAuth, quizController.getQuizzes);
@@ -77,5 +84,6 @@ router.get("/admin/users/pending", requireAuth, requireRole("admin"), adminContr
 router.get("/admin/users", requireAuth, requireRole("admin"), adminController.getAllUsers);
 router.post("/admin/users/:id/verify", requireAuth, requireRole("admin"), adminController.verifyUser);
 router.post("/announcements", requireAuth, requireRole("admin"), adminController.publishAnnouncement);
+router.delete("/announcements/:id", requireAuth, requireRole("admin"), adminController.deleteAnnouncement);
 
 export default router;

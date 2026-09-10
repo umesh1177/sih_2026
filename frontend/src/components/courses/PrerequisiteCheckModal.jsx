@@ -221,24 +221,50 @@ export const PrerequisiteCheckModal = ({
             </div>
           </div>
 
-          {/* Status Alert Message */}
-          {isEligible ? (
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>
-                <b>Ready for Enrollment:</b> Your scientific background and qualifications qualify you for this program.
-              </span>
-            </div>
-          ) : (
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold">Prerequisite Skill Gap Detected:</p>
-                <p className="text-[11px] text-amber-800 mt-0.5">
-                  This course requires prior meteorological background. You can submit an Officer Waiver Request or update your verified qualifications.
-                </p>
+          {/* Administrative Approval Gating Alert */}
+          {currentUser?.role === "trainee" && currentUser?.status !== "approved" && (
+            <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-2xl text-rose-950 text-xs space-y-2">
+              <div className="flex items-center gap-2 font-black text-rose-900">
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+                <span>Administrative Verification Required to Enroll</span>
               </div>
+              <p className="text-xs leading-relaxed">
+                Ministry of Earth Sciences regulations mandate that only officers with <b>Administrative Approval</b> can enroll in operational LMS courses.
+              </p>
+              {currentUser?.status === "rejected" && (
+                <div className="p-3 bg-white/90 rounded-xl border border-rose-200 font-medium">
+                  <span className="font-bold text-rose-900 block mb-0.5">Admin Rejection Feedback:</span>
+                  "{currentUser.rejectionReason || 'Incomplete qualifications or credential verification failure.'}"
+                </div>
+              )}
+              {currentUser?.status === "pending" && (
+                <p className="text-[11px] text-amber-800 bg-amber-100/80 p-2.5 rounded-xl border border-amber-200">
+                  ⏳ Your officer registration dossier is currently in the review queue. Please wait for Admin concurrence.
+                </p>
+              )}
             </div>
+          )}
+
+          {/* Status Alert Message (When approved) */}
+          {(!currentUser || currentUser.status === "approved") && (
+            isEligible ? (
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  <b>Ready for Enrollment:</b> Your scientific background and qualifications qualify you for this program.
+                </span>
+              </div>
+            ) : (
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">Prerequisite Skill Gap Detected:</p>
+                  <p className="text-[11px] text-amber-800 mt-0.5">
+                    This course requires prior meteorological background. You can submit an Officer Waiver Request or update your verified qualifications.
+                  </p>
+                </div>
+              </div>
+            )
           )}
 
         </div>
@@ -252,30 +278,45 @@ export const PrerequisiteCheckModal = ({
             Cancel
           </button>
 
-          {!isEligible && (
+          {currentUser?.role === "trainee" && currentUser?.status !== "approved" ? (
             <button
-              onClick={handleRequestWaiver}
-              disabled={isProcessing || waiverRequested}
-              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+              onClick={() => {
+                if (onOpenProfile) onOpenProfile();
+                else onClose();
+              }}
+              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-2"
             >
-              <Award className="w-4 h-4" />
-              <span>{waiverRequested ? "Waiver Approved!" : "Request Officer Waiver & Enroll"}</span>
+              <User className="w-4 h-4" />
+              <span>Go to Officer Profile & Resubmit</span>
             </button>
-          )}
-
-          {isEligible && (
-            <button
-              onClick={handleConfirmEnroll}
-              disabled={isProcessing}
-              className="px-6 py-2.5 rounded-xl bg-[#0a2558] hover:bg-[#071c42] text-white text-xs font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
-            >
-              {isProcessing ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <ShieldCheck className="w-4 h-4 text-emerald-300" />
+          ) : (
+            <>
+              {!isEligible && (
+                <button
+                  onClick={handleRequestWaiver}
+                  disabled={isProcessing || waiverRequested}
+                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <Award className="w-4 h-4" />
+                  <span>{waiverRequested ? "Waiver Approved!" : "Request Officer Waiver & Enroll"}</span>
+                </button>
               )}
-              <span>{isProcessing ? "Verifying..." : "Confirm & Enroll in Course"}</span>
-            </button>
+
+              {isEligible && (
+                <button
+                  onClick={handleConfirmEnroll}
+                  disabled={isProcessing}
+                  className="px-6 py-2.5 rounded-xl bg-[#0a2558] hover:bg-[#071c42] text-white text-xs font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
+                >
+                  {isProcessing ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                  )}
+                  <span>{isProcessing ? "Verifying..." : "Confirm & Enroll in Course"}</span>
+                </button>
+              )}
+            </>
           )}
         </div>
 

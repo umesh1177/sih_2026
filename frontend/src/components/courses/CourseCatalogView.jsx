@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { 
   Search, 
   Filter, 
-  Sparkles, 
   BookOpen, 
   Clock, 
   Layers, 
@@ -12,20 +11,36 @@ import {
   GraduationCap,
   Award,
   ChevronRight,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Plus,
+  Settings,
+  Edit3,
+  Users,
+  Sparkles,
+  BarChart3,
+  FileCheck2
 } from "lucide-react";
+import { CreateCourseModal } from "./CreateCourseModal";
+import { CourseManagementHubModal } from "./CourseManagementHubModal";
 
 export const CourseCatalogView = ({ 
-  courses, 
+  courses = [], 
   currentUser, 
   onSelectCourse, 
   onEnrollClick,
-  onOpenAiAdvisor
+  onOpenCertificate,
+  onOpenTrainerStudio,
+  onRefreshCourses
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
-  const [selectedStatus, setSelectedStatus] = useState("All"); // "All" | "Enrolled" | "Available"
+  const [selectedStatus, setSelectedStatus] = useState("All"); // "All" | "Enrolled" | "Available" | "Recent"
+
+  // Admin Modals state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [courseToEdit, setCourseToEdit] = useState(null);
+  const [courseToManage, setCourseToManage] = useState(null);
 
   const categories = [
     "All",
@@ -51,6 +66,10 @@ export const CourseCatalogView = ({
           if (uName.includes("roy") && cName.includes("roy")) return true;
         }
         if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
+        // Check if assigned to any subject
+        if (c.subjects && Array.isArray(c.subjects)) {
+          return c.subjects.some(s => s.assignedTrainerId === currentUser?.id || (currentUser?.name && s.assignedTrainerName?.toLowerCase().includes(currentUser.name.toLowerCase())));
+        }
         return false;
       })
     : courses;
@@ -79,39 +98,51 @@ export const CourseCatalogView = ({
     // Status filter
     const matchesStatus = selectedStatus === "All" || 
       (selectedStatus === "Enrolled" && isEnrolled) ||
-      (selectedStatus === "Available" && !isEnrolled);
+      (selectedStatus === "Available" && !isEnrolled) ||
+      (selectedStatus === "Recent" && (Date.now() - new Date(course.createdAt || 0).getTime() < 14 * 86400000 || course.isRecent));
 
     return matchesSearch && matchesCategory && matchesLevel && matchesStatus;
   });
 
+  const handleCourseCreatedOrUpdated = (updatedCourse) => {
+    if (onRefreshCourses) onRefreshCourses();
+    // Also if courseToManage was active, update it
+    if (courseToManage && courseToManage.id === updatedCourse?.id) {
+      setCourseToManage(updatedCourse);
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       
-      {/* Header Banner with AI Recommendation Trigger */}
-      <div className="bg-gradient-to-r from-[#0a2558] via-blue-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-white/10">
-        <div className="space-y-1.5 max-w-2xl">
+      {/* Header Banner with Admin Create Course Trigger */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 text-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-200/90 relative overflow-hidden">
+        <div className="space-y-1.5 max-w-2xl z-10">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-400/20 border border-blue-400/30 text-blue-200 text-[10px] font-black uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0a2558] text-[10px] font-black uppercase tracking-wider">
               MoES / IMD National Curricula
             </span>
-            <span className="text-xs text-blue-200/80">• {courses.length} Standardized Programs</span>
+            <span className="text-xs text-slate-400 font-medium">• {courses.length} Standardized Programs</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
             Digital Capacity Building Course Library
           </h1>
-          <p className="text-xs sm:text-sm text-blue-200/90 font-medium">
+          <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
             Explore operational training tracks, numerical models, Doppler radar, and satellite meteorology syllabi.
           </p>
         </div>
 
-        {/* AI Course Advisor Button (Only for Trainees) */}
-        {currentUser?.role !== "trainer" && onOpenAiAdvisor && (
+        {/* Admin Action: Publish New Course */}
+        {currentUser?.role === "admin" && (
           <button
-            onClick={onOpenAiAdvisor}
-            className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-yellow-500 text-slate-900 font-extrabold rounded-2xl text-xs shadow-lg transition-all transform hover:scale-105 active:scale-95 shrink-0"
+            onClick={() => {
+              setCourseToEdit(null);
+              setIsCreateModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95 shrink-0 z-10"
           >
-            <Sparkles className="w-4 h-4 text-slate-900 animate-spin" />
-            <span>AI Course Advisor (Gemini)</span>
+            <Plus className="w-4 h-4 text-blue-200" />
+            <span>+ Publish New Operational Course</span>
           </button>
         )}
       </div>
@@ -165,6 +196,18 @@ export const CourseCatalogView = ({
                 <option value="Available">Available to Enroll</option>
               </select>
             )}
+
+            {/* Filter for Admin */}
+            {currentUser?.role === "admin" && (
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                <option value="All">All Curricula</option>
+                <option value="Recent">Recently Added Courses</option>
+              </select>
+            )}
           </div>
 
         </div>
@@ -195,6 +238,8 @@ export const CourseCatalogView = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => {
           const isEnrolled = (course.enrolledTraineeIds || []).includes(currentUser?.id);
+          const enrolledCount = course.enrolledTraineeIds?.length || 0;
+          const maxCap = course.maxEnrollment || 50;
 
           return (
             <div
@@ -218,13 +263,20 @@ export const CourseCatalogView = ({
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0a2558]/90 text-white shadow backdrop-blur-sm">
                       {course.code}
                     </span>
-                    {isEnrolled ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white shadow flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Enrolled
-                      </span>
+                    {currentUser?.role === "trainee" ? (
+                      isEnrolled ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white shadow flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Enrolled
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-slate-800 shadow">
+                          {course.level || "Intermediate"}
+                        </span>
+                      )
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-slate-800 shadow">
-                        {course.level || "Intermediate"}
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/95 text-slate-800 shadow flex items-center gap-1">
+                        <Users className="w-3 h-3 text-blue-600" />
+                        <span>{enrolledCount}/{maxCap}</span>
                       </span>
                     )}
                   </div>
@@ -284,6 +336,28 @@ export const CourseCatalogView = ({
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>Resume Learning</span>
                     </button>
+                  ) : currentUser?.status === "rejected" ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        alert(`❌ Enrollment Blocked: Your officer profile verification was rejected by MoES Administrator.\n\nReason: "${currentUser.rejectionReason || 'Incomplete credentials.'}"\n\nPlease visit your Officer Profile tab to update details and resubmit.`);
+                      }}
+                      className="px-3.5 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold rounded-xl text-xs transition-colors flex items-center gap-1"
+                      title="Enrollment Locked: Profile Rejected"
+                    >
+                      <span>🔒 Verification Rejected</span>
+                    </button>
+                  ) : currentUser?.status === "pending" ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        alert("⏳ Enrollment Restricted: Your officer profile is currently awaiting MoES administrative verification. Once approved, you can enroll in this course.");
+                      }}
+                      className="px-3.5 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-xl text-xs transition-colors flex items-center gap-1"
+                      title="Enrollment Restricted: Awaiting Approval"
+                    >
+                      <span>⏳ Pending Approval</span>
+                    </button>
                   ) : (
                     <button
                       onClick={(e) => {
@@ -297,6 +371,30 @@ export const CourseCatalogView = ({
                       <span>Enroll in Course</span>
                     </button>
                   )
+                ) : currentUser?.role === "admin" ? (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCourseToEdit(course);
+                        setIsCreateModalOpen(true);
+                      }}
+                      className="p-2 hover:bg-slate-100 text-slate-600 hover:text-blue-700 rounded-lg transition-colors border border-slate-200"
+                      title="Edit Course Structure"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCourseToManage(course);
+                      }}
+                      className="px-3.5 py-1.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow transition-all flex items-center gap-1.5"
+                    >
+                      <Settings className="w-3.5 h-3.5 text-blue-200" />
+                      <span>Manage</span>
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={(e) => {
@@ -332,6 +430,39 @@ export const CourseCatalogView = ({
             Reset Filters
           </button>
         </div>
+      )}
+
+      {/* ─── MODAL: CREATE / EDIT COURSE MODAL ─── */}
+      {isCreateModalOpen && (
+        <CreateCourseModal
+          isOpen={isCreateModalOpen}
+          onClose={() => {
+            setIsCreateModalOpen(false);
+            setCourseToEdit(null);
+          }}
+          courseToEdit={courseToEdit}
+          onCourseCreated={handleCourseCreatedOrUpdated}
+        />
+      )}
+
+      {/* ─── MODAL: ADMIN COURSE MANAGEMENT HUB ─── */}
+      {courseToManage && (
+        <CourseManagementHubModal
+          isOpen={!!courseToManage}
+          course={courseToManage}
+          onClose={() => setCourseToManage(null)}
+          onCourseUpdated={handleCourseCreatedOrUpdated}
+          onOpenEditCourse={(c) => {
+            setCourseToManage(null);
+            setCourseToEdit(c);
+            setIsCreateModalOpen(true);
+          }}
+          onOpenStudio={(course, subjectId) => {
+            setCourseToManage(null);
+            if (onOpenTrainerStudio) onOpenTrainerStudio(course, subjectId);
+          }}
+          onOpenCertificate={onOpenCertificate}
+        />
       )}
 
     </div>

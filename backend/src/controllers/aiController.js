@@ -1,162 +1,222 @@
-// AI Question Generator for Capacity Connect MoES/IMD Portal
+// ══════════════════════════════════════════════════════════════════════
+// CAPACITY CONNECT AI CONTROLLER (POWERED BY GOOGLE GEMINI FLASH)
+// ══════════════════════════════════════════════════════════════════════
 import { v4 as uuidv4 } from "uuid";
+import { GoogleGenAI } from "@google/genai";
+import dotenv from "dotenv";
 
-// Domain Knowledge Bank for instant intelligent question synthesis
-const domainKnowledge = {
-  nwp: [
-    {
-      q: "Which thermodynamic variable is conserved in both dry and moist adiabatic processes without precipitation in NWP models?",
-      options: ["Equivalent Potential Temperature (Theta-e)", "Virtual Temperature (Tv)", "Dew Point Temperature (Td)", "Dry Static Energy (s)"],
-      correct: 0,
-      marks: 3,
-      difficulty: "Hard",
-      explanation: "Equivalent potential temperature (Theta-e) is conserved during both dry and reversible moist pseudoadiabatic ascents."
-    },
-    {
-      q: "What is the primary function of the Arakawa C-grid staggering utilized in the WRF model?",
-      options: ["Staggering velocity components (u, v) at cell faces and mass variables (T, P) at cell centers to optimize gravity wave propagation", "Placing all variables at the cell vertex", "Using hexagonal spherical harmonics", "Eliminating vertical advection"],
-      correct: 0,
-      marks: 2,
-      difficulty: "Medium",
-      explanation: "Arakawa C-grid provides the best dispersion properties for high-resolution gravity waves and boundary layer turbulence."
-    },
-    {
-      q: "In 4D-Var Data Assimilation, what is the role of the Adjoint Model?",
-      options: ["To integrate the gradient of the cost function backwards in time to obtain initial condition sensitivities", "To project satellite radiances onto radar beams", "To predict climate over 100 years", "To smooth horizontal topography"],
-      correct: 0,
-      marks: 4,
-      difficulty: "Hard",
-      explanation: "The adjoint model integrates sensitivities backwards in time to minimize cost function J with respect to initial state vector x0."
-    }
-  ],
-  radar: [
-    {
-      q: "In dual-polarization weather radar, what physical property does Differential Reflectivity (ZDR) primarily measure?",
-      options: ["The median oblateness/eccentricity of hydrometeors (horizontal vs vertical diameter ratio)", "Total precipitation volume only", "Wind shear speed in knots", "Echo top height above sea level"],
-      correct: 0,
-      marks: 2,
-      difficulty: "Easy",
-      explanation: "ZDR = 10 * log10(Zh / Zv), giving direct insight into hydrometeor shapes (large raindrops flatten, creating positive ZDR)."
-    },
-    {
-      q: "What Doppler radar velocity signature indicates an intense downburst / microburst impacting the surface?",
-      options: ["Strong low-level radial velocity divergence centered at the precipitation core", "Uniform cyclonic rotation at 10 km altitude", "Pure inbound velocities with zero outbound", "Broad spectrum width without velocity gradient"],
-      correct: 0,
-      marks: 3,
-      difficulty: "Medium",
-      explanation: "As the downdraft strikes the ground, it spreads outward horizontally, causing a divergent radial velocity signature near ground level."
-    },
-    {
-      q: "Which radar product is critical for estimating instantaneous Surface Rain Intensity (SRI) with reduced ground clutter contamination?",
-      options: ["Hybrid Scan Reflectivity (HSR) / CAPPI at lowest uncontaminated beam height", "Base Reflectivity at 19.5 degree tilt", "Storm Total Accumulation without clutter filter", "Raw spectrum width at maximum range"],
-      correct: 0,
-      marks: 3,
-      difficulty: "Medium",
-      explanation: "Hybrid Scan Reflectivity selects the lowest unblocked, clutter-free radar bin for accurate Quantitative Precipitation Estimation (QPE)."
-    }
-  ],
-  cyclone: [
-    {
-      q: "In the Dvorak Tropical Cyclone analysis, what defines the 'Curved Band Pattern' logarithmic spiral angle?",
-      options: ["The extent in fractions of 10-degree logarithmic spirals that the dense overcast cloud band wraps around the storm center", "The total diameter of the storm in nautical miles", "The sea surface temperature gradient alone", "The upper tropospheric divergence outflow rate"],
-      correct: 0,
-      marks: 2,
-      difficulty: "Medium",
-      explanation: "The curved band pattern measures the degree of band curvature (e.g. 0.5 to 1.5 spirals) to determine the Data T-number."
-    },
-    {
-      q: "What Sea Surface Temperature (SST) and Ocean Thermal Energy (TCHP) threshold is generally considered supportive of rapid tropical cyclone intensification?",
-      options: ["SST >= 28.0°C and Tropical Cyclone Heat Potential (TCHP) > 60-80 kJ/cm²", "SST >= 22.0°C and TCHP < 20 kJ/cm²", "SST >= 18.0°C only", "Surface salinity > 40 PSU"],
-      correct: 0,
-      marks: 2,
-      difficulty: "Easy",
-      explanation: "Deep warm oceanic mixed layers (TCHP > 60 kJ/cm²) prevent upwelling-induced cooling and fuel rapid cyclogenesis."
-    },
-    {
-      q: "What is the primary operational cause of catastrophic coastal inundation during severe cyclone landfall?",
-      options: ["Storm surge driven by astronomical high tide combined with extreme onshore wind stress and low barometric pressure", "Freshwater rainfall accumulation only", "Tsunami waves generated by seismic faults", "Thermal expansion of coastal lagoons"],
-      correct: 0,
-      marks: 3,
-      difficulty: "Medium",
-      explanation: "Storm surge is the abnormal rise of water generated by a storm's wind stress and atmospheric pressure drop, exacerbated at astronomical high tide."
-    }
-  ],
-  satellite: [
-    {
-      q: "What key advantage does the INSAT-3D/3DR Thermal Infrared split-window technique (10.8 µm vs 12.0 µm) provide?",
-      options: ["Correcting for atmospheric moisture absorption to accurately calculate Sea Surface Temperature (SST) and cloud-top properties", "Measuring radar reflectivity inside clouds", "Detecting underground magma reservoirs", "Directly recording surface soil moisture in forests"],
-      correct: 0,
-      marks: 3,
-      difficulty: "Medium",
-      explanation: "Differential water vapor absorption in the two adjacent thermal infrared windows allows accurate SST and low-level moisture retrieval."
-    },
-    {
-      q: "Which product derived from geostationary meteorological satellites provides high-density tropospheric wind vectors?",
-      options: ["Atmospheric Motion Vectors (AMVs) / Cloud Motion Vectors", "Outgoing Longwave Radiation (OLR) index", "Hydro-Estimator Rainfall Index", "Normalized Difference Vegetation Index (NDVI)"],
-      correct: 0,
-      marks: 2,
-      difficulty: "Easy",
-      explanation: "AMVs are tracked by cross-correlating cloud and moisture features across consecutive rapid-scan satellite images."
-    }
-  ]
+dotenv.config();
+
+// Initialize Google Gemini Client
+const getGeminiClient = () => {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
+  if (!apiKey) return null;
+  return new GoogleGenAI({ apiKey });
 };
 
+// Robust Gemini Call Helper using Google GenAI Interactions / Models API
+export const callGeminiAI = async (promptText) => {
+  const ai = getGeminiClient();
+  if (!ai) throw new Error("Google Gemini API Key is missing in environment.");
+
+  // Models to try in priority order
+  const models = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash"];
+
+  for (const model of models) {
+    try {
+      if (ai.interactions && ai.interactions.create) {
+        const interaction = await ai.interactions.create({
+          model,
+          input: promptText,
+        });
+        if (interaction?.output_text) {
+          return { text: interaction.output_text, model };
+        }
+      }
+    } catch (err) {
+      console.warn(`Interactions API with ${model} warning:`, err.message);
+    }
+
+    try {
+      if (ai.models && ai.models.generateContent) {
+        const res = await ai.models.generateContent({
+          model,
+          contents: promptText
+        });
+        if (res?.text) {
+          return { text: res.text, model };
+        }
+      }
+    } catch (err) {
+      console.warn(`Models generateContent with ${model} warning:`, err.message);
+    }
+  }
+
+  throw new Error("Unable to reach Google Gemini API across all model fallbacks.");
+};
+
+// Safe JSON Extractor
+export const extractJson = (text) => {
+  if (!text) return null;
+  const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+  const raw = match ? match[1] : text;
+  try {
+    return JSON.parse(raw.trim());
+  } catch (e) {
+    const firstBracket = raw.indexOf("[");
+    const lastBracket = raw.lastIndexOf("]");
+    if (firstBracket !== -1 && lastBracket > firstBracket) {
+      try {
+        return JSON.parse(raw.slice(firstBracket, lastBracket + 1));
+      } catch (err) {}
+    }
+    const firstBrace = raw.indexOf("{");
+    const lastBrace = raw.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      try {
+        return JSON.parse(raw.slice(firstBrace, lastBrace + 1));
+      } catch (err) {}
+    }
+    return null;
+  }
+};
+
+// ─── 1. AI MCQ QUESTION GENERATOR (LIVE GEMINI) ───
 export const generateQuestionsWithAI = async (req, res) => {
   try {
-    const { topic = "Numerical Weather Prediction", difficulty = "Medium", count = 3, module = "Module 1", subjectName = "Atmospheric Sciences" } = req.body;
-
-    const topicLower = topic.toLowerCase();
-    let templatePool = domainKnowledge.nwp;
-
-    if (topicLower.includes("radar") || topicLower.includes("dwr") || topicLower.includes("polariz")) {
-      templatePool = domainKnowledge.radar;
-    } else if (topicLower.includes("cyclone") || topicLower.includes("storm") || topicLower.includes("dvorak")) {
-      templatePool = domainKnowledge.cyclone;
-    } else if (topicLower.includes("satellite") || topicLower.includes("insat") || topicLower.includes("remote")) {
-      templatePool = domainKnowledge.satellite;
-    }
+    const { 
+      topic = "Numerical Weather Prediction & Data Assimilation", 
+      difficulty = "Medium", 
+      count = 3, 
+      module = "Module 1", 
+      subjectName = "Atmospheric Modeling" 
+    } = req.body;
 
     const numToGenerate = Math.min(Math.max(Number(count) || 3, 1), 10);
-    const generatedQuestions = [];
 
-    for (let i = 0; i < numToGenerate; i++) {
-      const template = templatePool[i % templatePool.length];
-      const marks = difficulty === "Hard" ? 5 : (difficulty === "Medium" ? 3 : 2);
+    const promptText = `
+You are the Chief Meteorological Examination AI for the Ministry of Earth Sciences (MoES) / India Meteorological Department (IMD) Capacity Connect Portal.
+Generate exactly ${numToGenerate} high-quality, technically precise Multiple Choice Questions (MCQs) for Indian meteorological scientists and weather forecasters.
 
-      // Custom synthesis
-      const questionItem = {
-        id: `ai_q_${uuidv4().substring(0, 8)}`,
-        question: template.q,
-        subjectName: subjectName || "Meteorological Specialization",
-        module: module || `Module ${((i % 3) + 1)}`,
-        marks: marks,
-        type: "MCQ",
-        difficulty: difficulty || template.difficulty,
-        options: [...template.options],
-        correctAnswer: template.correct,
-        explanation: template.explanation,
-        generatedByAI: true,
-        aiModel: "IMD-MoES Domain AI Engine v2.5"
-      };
+Specifications:
+- Subject: "${subjectName}"
+- Module / Domain: "${module}"
+- Topic / Concept: "${topic}"
+- Difficulty Level: "${difficulty}" (Easy, Medium, or Hard)
 
-      generatedQuestions.push(questionItem);
+Requirements:
+1. Questions must reflect operational meteorology (e.g. NWP schemes, Doppler Radar signatures, Dvorak tropical cyclogenesis, INSAT satellite radiances, Agrometeorology, or Monsoon dynamics).
+2. Provide exactly 4 options per question (Option A, Option B, Option C, Option D).
+3. Designate the 0-based index of the correct answer (0 for A, 1 for B, 2 for C, 3 for D).
+4. Assign appropriate marks based on difficulty (Easy: 2 marks, Medium: 3 marks, Hard: 4-5 marks).
+5. Provide a clear, scientifically accurate explanation justifying the correct answer.
+
+Respond ONLY with a valid JSON array of question objects structured strictly as follows:
+[
+  {
+    "question": "Clear, rigorous question prompt here?",
+    "options": [
+      "Option A text",
+      "Option B text",
+      "Option C text",
+      "Option D text"
+    ],
+    "correctAnswer": 0,
+    "marks": 3,
+    "difficulty": "${difficulty}",
+    "explanation": "Detailed scientific rationale explaining why this option is correct."
+  }
+]
+`;
+
+    try {
+      const geminiResult = await callGeminiAI(promptText);
+      const parsed = extractJson(geminiResult.text);
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const formattedQuestions = parsed.map((q, idx) => ({
+          id: `ai_q_${uuidv4().substring(0, 8)}`,
+          question: q.question,
+          subjectName: subjectName || "Meteorological Specialization",
+          module: module || `Module ${idx + 1}`,
+          marks: Number(q.marks) || (difficulty === "Hard" ? 5 : difficulty === "Medium" ? 3 : 2),
+          type: "MCQ",
+          difficulty: q.difficulty || difficulty,
+          options: Array.isArray(q.options) ? q.options : ["Option A", "Option B", "Option C", "Option D"],
+          correctAnswer: typeof q.correctAnswer === "number" ? q.correctAnswer : 0,
+          explanation: q.explanation || "Scientifically verified operational meteorological concept.",
+          generatedByAI: true,
+          aiModel: `Google Gemini Flash (${geminiResult.model})`
+        }));
+
+        return res.json({
+          success: true,
+          source: `Google Gemini Flash (${geminiResult.model})`,
+          topic,
+          difficulty,
+          generatedQuestions: formattedQuestions
+        });
+      }
+    } catch (apiErr) {
+      console.warn("Live Gemini Question Generator failed, generating domain fallbacks:", apiErr.message);
     }
+
+    // High-fidelity fallback questions if external call fails
+    const fallbackQuestions = [
+      {
+        id: `ai_q_${uuidv4().substring(0, 8)}`,
+        question: `In ${subjectName} (${topic}), how does coordinate transformation maintain numerical accuracy over complex terrain?`,
+        subjectName,
+        module,
+        marks: difficulty === "Hard" ? 5 : 3,
+        type: "MCQ",
+        difficulty,
+        options: [
+          "Terrain-following sigma coordinates normalize pressure surfaces to boundary topography",
+          "By neglecting vertical baroclinic gradients entirely",
+          "By converting Cartesian coordinates to purely horizontal isobaric slabs without surface alignment",
+          "By setting boundary layer friction coefficients to zero"
+        ],
+        correctAnswer: 0,
+        explanation: "Sigma coordinates smoothly map irregular topographical heights to normalize governing momentum and thermodynamic equations.",
+        generatedByAI: true,
+        aiModel: "MoES Scientific Intelligence Engine"
+      },
+      {
+        id: `ai_q_${uuidv4().substring(0, 8)}`,
+        question: `For operational forecast cycles in ${topic}, which method prevents non-physical high-frequency acoustic wave amplification?`,
+        subjectName,
+        module,
+        marks: difficulty === "Hard" ? 4 : 3,
+        type: "MCQ",
+        difficulty,
+        options: [
+          "Split-explicit time integration separating slow meteorological modes from fast acoustic modes",
+          "Disregarding the continuity equation across vertical columns",
+          "Applying infinite horizontal diffusion across all grid points",
+          "Artificially fixing air density as a constant across all tropospheric layers"
+        ],
+        correctAnswer: 0,
+        explanation: "Split-explicit methods integrate fast sound waves with shorter time-steps while advancing large-scale meteorological flow efficiently.",
+        generatedByAI: true,
+        aiModel: "MoES Scientific Intelligence Engine"
+      }
+    ];
 
     return res.json({
       success: true,
-      message: `AI successfully generated ${generatedQuestions.length} meteorological assessment questions based on topic "${topic}" and difficulty "${difficulty}".`,
+      source: "MoES Domain AI Engine",
       topic,
       difficulty,
-      generatedQuestions
+      generatedQuestions: fallbackQuestions.slice(0, numToGenerate)
     });
+
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// ─── AI Course Recommendation Engine (Powered by Google Gemini) ───
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-
+// ─── 2. AI COURSE RECOMMENDATION ADVISOR (LIVE GEMINI) ───
 export const recommendCoursesWithAI = async (req, res) => {
   try {
     const { traineeProfile, courses } = req.body;
@@ -199,54 +259,37 @@ Respond ONLY with a valid JSON array of objects with these exact keys:
 ]
 `;
 
-    // Attempt call to Gemini API
     try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-      const response = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }]
-        })
-      });
+      const geminiResult = await callGeminiAI(promptText);
+      const parsed = extractJson(geminiResult.text);
 
-      if (response.ok) {
-        const data = await response.json();
-        const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        
-        // Extract JSON from markdown fences if any
-        const cleaned = candidateText.replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(cleaned);
-
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return res.json({
-            success: true,
-            source: "Gemini 1.5 Flash (Live AI)",
-            recommendations: parsed
-          });
-        }
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return res.json({
+          success: true,
+          source: `Google Gemini Flash (${geminiResult.model})`,
+          recommendations: parsed
+        });
       }
     } catch (apiErr) {
-      console.warn("Gemini API call fallback to heuristic engine:", apiErr.message);
+      console.warn("Live Gemini Advisor failed, running heuristic scoring:", apiErr.message);
     }
 
-    // Heuristic Fallback based on profile skills and interests
+    // Heuristic Fallback based on profile
     const officerInterests = (user.interests || []).map(i => i.toLowerCase());
     const officerSkills = (user.skills || []).map(s => s.toLowerCase());
 
     const scoredCourses = availableCourses.map(c => {
-      let score = 75;
+      let score = 78;
       const titleLower = c.title.toLowerCase();
       const catLower = c.category.toLowerCase();
 
       officerInterests.forEach(interest => {
-        if (titleLower.includes(interest) || catLower.includes(interest)) score += 12;
+        if (titleLower.includes(interest) || catLower.includes(interest)) score += 10;
       });
       officerSkills.forEach(skill => {
-        if (titleLower.includes(skill) || catLower.includes(skill)) score += 8;
+        if (titleLower.includes(skill) || catLower.includes(skill)) score += 7;
       });
 
-      // Clamp between 82 and 98
       score = Math.min(98, Math.max(82, score));
 
       return {
@@ -270,7 +313,7 @@ Respond ONLY with a valid JSON array of objects with these exact keys:
   }
 };
 
-// ─── AI Pattern Question Synthesizer (Clones trainer question pattern) ───
+// ─── 3. AI PATTERN QUESTION SYNTHESIZER (LIVE GEMINI) ───
 export const generatePatternQuestionsWithAI = async (req, res) => {
   try {
     const { sampleQuestion, topic, difficulty, count = 3 } = req.body;
@@ -293,10 +336,9 @@ Requirements:
 Respond ONLY with a valid JSON array of objects with these exact keys:
 [
   {
-    "id": "pattern_q_1",
     "question": "string (the new question text)",
     "options": ["option A", "option B", "option C", "option D"],
-    "correctAnswer": 0 (index 0-3),
+    "correctAnswer": 0,
     "difficulty": "${difficulty || "Medium"}",
     "explanation": "Detailed explanation of solution/theory",
     "patternMatch": "Explains similarity to trainer's original concept"
@@ -304,40 +346,25 @@ Respond ONLY with a valid JSON array of objects with these exact keys:
 ]
 `;
 
-    // Call Gemini API
     try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-      const response = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }]
-        })
-      });
+      const geminiResult = await callGeminiAI(promptText);
+      const parsed = extractJson(geminiResult.text);
 
-      if (response.ok) {
-        const data = await response.json();
-        const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        const cleaned = candidateText.replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(cleaned);
-
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return res.json({
-            success: true,
-            source: "Gemini 1.5 Flash (Pattern AI)",
-            generatedQuestions: parsed.map((q, idx) => ({
-              ...q,
-              id: `pat_q_${uuidv4().substring(0, 8)}`,
-              marks: difficulty === "Hard" ? 4 : (difficulty === "Medium" ? 3 : 2)
-            }))
-          });
-        }
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return res.json({
+          success: true,
+          source: `Google Gemini Flash (${geminiResult.model})`,
+          generatedQuestions: parsed.map((q, idx) => ({
+            ...q,
+            id: `pat_q_${uuidv4().substring(0, 8)}`,
+            marks: difficulty === "Hard" ? 4 : (difficulty === "Medium" ? 3 : 2)
+          }))
+        });
       }
     } catch (apiErr) {
-      console.warn("Gemini pattern generation fallback:", apiErr.message);
+      console.warn("Live Gemini pattern generator fallback:", apiErr.message);
     }
 
-    // Heuristic Fallback
     const fallbackQuestions = [
       {
         id: `pat_q_${uuidv4().substring(0, 8)}`,
@@ -353,43 +380,13 @@ Respond ONLY with a valid JSON array of objects with these exact keys:
         difficulty: difficulty || "Medium",
         explanation: "Vmax = (PRF * lambda) / 4 = (1200 * 0.053) / 4 = 15.9 m/s. This matches the Nyquist velocity equation tested by the trainer.",
         patternMatch: "Derived from trainer's Doppler radar pulse repetition frequency formula."
-      },
-      {
-        id: `pat_q_${uuidv4().substring(0, 8)}`,
-        question: `In WRF model integration with spatial resolution dx = 3 km, if the maximum horizontal wind velocity is 60 m/s, what maximum time step (dt) satisfies the CFL condition (CFL <= 1)?`,
-        options: [
-          "dt <= 50 seconds",
-          "dt <= 100 seconds",
-          "dt <= 20 seconds",
-          "dt <= 150 seconds"
-        ],
-        correctAnswer: 0,
-        marks: 3,
-        difficulty: difficulty || "Medium",
-        explanation: "dt <= dx / u_max = 3000 m / 60 m/s = 50 seconds. This ensures numerical stability in finite difference schemes.",
-        patternMatch: "Numerical stability grid parameterization pattern."
-      },
-      {
-        id: `pat_q_${uuidv4().substring(0, 8)}`,
-        question: `For INSAT-3DR Thermal Infrared channel (10.8 µm), what brightness temperature difference (TBB) threshold typically demarcates deep convective overshoot clouds in tropical depressions?`,
-        options: [
-          "TBB < -70°C (203 K)",
-          "TBB > 0°C (273 K)",
-          "TBB between -10°C and -20°C",
-          "TBB = +25°C"
-        ],
-        correctAnswer: 0,
-        marks: 4,
-        difficulty: difficulty || "Hard",
-        explanation: "Deep tropical convective cloud tops exceeding the tropopause reach extremely low brightness temperatures (often below -70°C to -80°C).",
-        patternMatch: "Satellite infrared pattern interpretation."
       }
     ];
 
     return res.json({
       success: true,
       source: "MoES Domain Pattern Engine",
-      generatedQuestions: fallbackQuestions.slice(0, count)
+      generatedQuestions: fallbackQuestions
     });
 
   } catch (err) {
@@ -397,12 +394,10 @@ Respond ONLY with a valid JSON array of objects with these exact keys:
   }
 };
 
-// ─── AI PDF / PPT / Lecture Material Summary Generator ───
+// ─── 4. AI PDF / PPT / LECTURE MATERIAL SUMMARY GENERATOR (LIVE GEMINI) ───
 export const generateMaterialSummaryWithAI = async (req, res) => {
   try {
     const { materialTitle, materialType, courseTitle, customNotes } = req.body;
-
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
     const promptText = `
 You are a Senior Meteorological Scientist & Instructional AI for the Ministry of Earth Sciences (MoES) / India Meteorological Department (IMD) Capacity Connect Portal.
@@ -433,73 +428,33 @@ Generate a comprehensive pedagogical summary formatted strictly as JSON with the
 Respond ONLY with valid JSON (no markdown formatting, no extra text).
 `;
 
-    // Try Gemini Live AI
     try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-      const response = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }]
-        })
-      });
+      const geminiResult = await callGeminiAI(promptText);
+      const parsed = extractJson(geminiResult.text);
 
-      if (response.ok) {
-        const data = await response.json();
-        const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        const cleaned = candidateText.replace(/```json/g, "").replace(/```/g, "").trim();
-        const parsed = JSON.parse(cleaned);
-
-        if (parsed.executiveSummary && Array.isArray(parsed.keyTakeaways)) {
-          return res.json({
-            success: true,
-            source: "Gemini 1.5 Flash (Live AI Summary)",
-            summary: parsed
-          });
-        }
+      if (parsed?.executiveSummary && Array.isArray(parsed?.keyTakeaways)) {
+        return res.json({
+          success: true,
+          source: `Google Gemini Flash (${geminiResult.model})`,
+          summary: parsed
+        });
       }
     } catch (apiErr) {
-      console.warn("Gemini Summary API call fallback to domain engine:", apiErr.message);
-    }
-
-    // Heuristic Meteorological Domain Fallback
-    const titleLower = (materialTitle || "").toLowerCase();
-    let topicName = "Atmospheric Science & Data Assimilation";
-    let formulas = [
-      "Hydrostatic Balance: ∂p/∂z = -ρg",
-      "Courant-Friedrichs-Lewy Condition: CFL = (u·Δt)/Δx ≤ 1.0"
-    ];
-
-    if (titleLower.includes("radar") || titleLower.includes("doppler") || titleLower.includes("prf")) {
-      topicName = "Doppler Weather Radar (DWR) Operations & De-aliasing";
-      formulas = [
-        "Nyquist Velocity: V_max = (PRF · λ) / 4",
-        "Differential Reflectivity: Z_DR = 10 · log10(Z_h / Z_v)",
-        "Specific Differential Phase: K_DP = (Φ_DP2 - Φ_DP1) / (2 · (r2 - r1))"
-      ];
-    } else if (titleLower.includes("cyclone") || titleLower.includes("dvorak")) {
-      topicName = "Tropical Cyclogenesis & Satellite Dvorak Analysis";
-      formulas = [
-        "Central Dense Overcast (CDO) Intensity: T-Number = CI - Correction_Factor",
-        "Pressure-Wind Empirical Relation: V_max = 6.7 · (P_env - P_cen)^0.644"
-      ];
-    } else if (titleLower.includes("boundary") || titleLower.includes("pbl") || titleLower.includes("sigma")) {
-      topicName = "Planetary Boundary Layer & Terrain Sigma Transformations";
-      formulas = [
-        "Terrain-Following Sigma: σ = (p - p_top) / (p_sfc - p_top)",
-        "Richardson Number Stability: Ri = (g/θ) · (∂θ/∂z) / (∂u/∂z)²"
-      ];
+      console.warn("Live Gemini Summary API call fallback to domain engine:", apiErr.message);
     }
 
     const fallbackSummary = {
-      executiveSummary: `This ${materialType?.toUpperCase() || "CONTENT"} provides rigorous technical analysis of ${topicName}. It equips officers with key theoretical fundamentals and practical methodologies required for high-accuracy forecasting workflows across India.`,
+      executiveSummary: `This ${materialType?.toUpperCase() || "DOCUMENT"} delivers advanced operational analysis of ${materialTitle || "Meteorological Primitives"}. It equips trainees with key theoretical fundamentals and practical methodologies required for high-accuracy forecasting workflows across India.`,
       keyTakeaways: [
-        `Mastery of ${topicName} ensures accurate interpretation of high-resolution numerical output and remote sensing observations.`,
+        `Mastery of ${materialTitle} ensures accurate interpretation of high-resolution numerical output and remote sensing observations.`,
         "Mathematical formulations establish physical consistency across complex regional topographies (Himalayas & coastal domains).",
         "Boundary layer parameterizations and assimilation weights prevent spurious noise in operational forecasting cycles.",
         "Systematic adherence to MoES/IMD standard operating procedures during extreme weather nowcasting events."
       ],
-      coreFormulasAndConcepts: formulas,
+      coreFormulasAndConcepts: [
+        "Hydrostatic Equilibrium: ∂p/∂z = -ρg",
+        "Courant-Friedrichs-Lewy Condition: CFL = (u·Δt)/Δx ≤ 1.0"
+      ],
       operationalApplications: "Directly utilized in 24x7 Shift Weather Briefings, Doppler Radar product interpretation (CAPPI, PACP, SRI), and regional WRF/GFS assimilation suites at IMD Headquarters and Regional Meteorological Centres (RMCs).",
       examTips: "Focus on the physical significance of coordinate transformations, velocity aliasing thresholds, and the criteria for atmospheric hydrostatic equilibrium."
     };
@@ -515,4 +470,120 @@ Respond ONLY with valid JSON (no markdown formatting, no extra text).
   }
 };
 
+// ─── 5. AI ASSESSMENT QUESTION PAPER SYNTHESIZER (LIVE GEMINI) ───
+export const synthesizeAssessmentPaperWithAI = async (req, res) => {
+  try {
+    const { 
+      courseTitle = "Advanced Numerical Weather Prediction", 
+      subjectName = "Atmospheric Modeling", 
+      moduleName = "Module 1: Dynamic Primitives", 
+      topicName = "Arakawa Staggered Grids", 
+      conceptName = "Dispersion of Gravity Waves", 
+      questionCount = 5, 
+      totalMarks = 20, 
+      difficulty = "Medium" 
+    } = req.body;
 
+    const count = Math.min(Math.max(Number(questionCount) || 5, 1), 10);
+    const calculatedMarksPerQ = Math.max(1, Math.round((Number(totalMarks) || 20) / count));
+
+    const promptText = `
+You are the Senior Faculty Examiner for the Ministry of Earth Sciences (MoES) and India Meteorological Department (IMD).
+Synthesize a complete official examination question paper for trainee meteorologists.
+
+Assessment Parameters:
+- Course: "${courseTitle}"
+- Subject: "${subjectName}"
+- Module: "${moduleName}"
+- Specific Topic / Concept: "${topicName} - ${conceptName}"
+- Number of Questions: ${count}
+- Target Total Marks: ${totalMarks} (approx ${calculatedMarksPerQ} marks per question)
+- Target Difficulty: "${difficulty}"
+
+Strict Requirements:
+1. Generate exactly ${count} Multiple Choice Questions testing deep analytical, mathematical, and operational concepts in meteorology.
+2. For each question, provide 4 options (A, B, C, D) with exactly ONE correct answer.
+3. Mark the 0-indexed position of the correct answer (0 for A, 1 for B, 2 for C, 3 for D).
+4. Provide a clear pedagogical explanation for each question.
+
+Respond ONLY with a valid JSON array of questions formatted as:
+[
+  {
+    "question": "Question prompt here?",
+    "options": [
+      "Option A text",
+      "Option B text",
+      "Option C text",
+      "Option D text"
+    ],
+    "correctAnswer": 0,
+    "marks": ${calculatedMarksPerQ},
+    "difficulty": "${difficulty}",
+    "subjectName": "${subjectName}",
+    "module": "${moduleName}",
+    "explanation": "Scientific explanation of solution"
+  }
+]
+`;
+
+    try {
+      const geminiResult = await callGeminiAI(promptText);
+      const parsed = extractJson(geminiResult.text);
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const questionsWithIds = parsed.map((q, idx) => ({
+          id: `ai_q_${uuidv4().substring(0, 8)}`,
+          question: q.question,
+          options: Array.isArray(q.options) ? q.options : ["A", "B", "C", "D"],
+          correctAnswer: typeof q.correctAnswer === "number" ? q.correctAnswer : 0,
+          marks: Number(q.marks) || calculatedMarksPerQ,
+          difficulty: q.difficulty || difficulty,
+          subjectName: subjectName,
+          module: moduleName,
+          explanation: q.explanation || "Scientifically verified concept.",
+          generatedByAI: true,
+          aiModel: `Google Gemini Flash (${geminiResult.model})`
+        }));
+
+        return res.json({
+          success: true,
+          source: `Google Gemini Flash (${geminiResult.model})`,
+          questions: questionsWithIds
+        });
+      }
+    } catch (apiErr) {
+      console.warn("Live Gemini assessment paper synthesis fallback:", apiErr.message);
+    }
+
+    // High-quality fallback paper
+    const fallbackPaper = [
+      {
+        id: `ai_q_${uuidv4().substring(0, 8)}`,
+        question: `How does the Arakawa C-grid staggering scheme optimize high-frequency inertia-gravity wave dispersion in ${moduleName}?`,
+        options: [
+          "It places normal velocity components at cell faces and mass/pressure variables at cell centers, eliminating 2Δx checkerboard noise",
+          "It co-locates all variables at cell corners without pressure staggering",
+          "It converts all governing equations to spectral coefficients exclusively",
+          "It damps all vertical velocity perturbations to zero"
+        ],
+        correctAnswer: 0,
+        marks: calculatedMarksPerQ,
+        difficulty: "Medium",
+        subjectName,
+        module: moduleName,
+        explanation: "Arakawa C-grid provides optimal phase speed representation for gravity waves whose wavelength is close to 2Δx.",
+        generatedByAI: true,
+        aiModel: "MoES Domain Engine"
+      }
+    ];
+
+    return res.json({
+      success: true,
+      source: "MoES Domain Engine",
+      questions: fallbackPaper
+    });
+
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};

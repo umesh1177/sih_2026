@@ -384,18 +384,18 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
   const progressPct = totalMaterials > 0 ? Math.min(Math.round((completedCount / totalMaterials) * 100), 100) : 50;
 
   return (
-    <div className="flex flex-col h-full bg-[#0b1329] text-slate-100 overflow-hidden select-none font-sans">
+    <div className="flex flex-col h-full bg-slate-50 text-slate-800 overflow-hidden select-none font-sans">
       
       {/* ═════════ RESPONSIVE STUDIO CONTROL HEADER ═════════ */}
-      <header className="min-h-[56px] py-2 bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-800 px-3 sm:px-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2.5 shrink-0 shadow-lg z-30">
+      <header className="min-h-[56px] py-2 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2.5 shrink-0 shadow-sm z-30">
         
         {/* Left Section: Back, Collapse Sidebar & Course Title */}
         <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all border border-slate-700/60 shadow-sm shrink-0"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all border border-slate-200 shadow-sm shrink-0"
           >
-            <ArrowLeft className="w-4 h-4 text-blue-400" />
+            <ArrowLeft className="w-4 h-4 text-blue-600" />
             <span className="hidden sm:inline">Exit Studio</span>
           </button>
 
@@ -403,7 +403,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             title={isSidebarCollapsed ? "Show Curriculum Navigator" : "Hide Curriculum Navigator"}
-            className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition-colors shrink-0"
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition-colors shrink-0"
           >
             {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
           </button>
@@ -413,7 +413,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
             <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-600 text-white shrink-0 hidden xs:inline-block">
               {course.code || "NWP-401"}
             </span>
-            <h1 className="font-bold text-white text-xs sm:text-sm truncate max-w-[140px] xs:max-w-[200px] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl">
+            <h1 className="font-bold text-slate-900 text-xs sm:text-sm truncate max-w-[140px] xs:max-w-[200px] sm:max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl">
               {course.title}
             </h1>
           </div>
@@ -423,19 +423,19 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
         <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end ml-auto">
           
           {/* Progress Bar (Visible on large screens) */}
-          <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-800/80 border border-slate-700/60 text-xs shrink-0">
-            <span className="text-slate-400 text-[11px]">Progress:</span>
-            <div className="w-20 h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
+          <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-xs shrink-0">
+            <span className="text-slate-500 text-[11px] font-medium">Progress:</span>
+            <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all"
+                className="h-full bg-gradient-to-r from-blue-600 to-emerald-500 rounded-full transition-all"
                 style={{ width: `${progressPct}%` }}
               ></div>
             </div>
-            <span className="font-extrabold text-emerald-400 text-[11px]">{progressPct}%</span>
+            <span className="font-extrabold text-emerald-700 text-[11px]">{progressPct}%</span>
           </div>
 
           {/* View Mode Selector Group */}
-          <div className="flex items-center bg-slate-900/90 p-0.5 sm:p-1 rounded-xl border border-slate-800 shrink-0">
+          <div className="flex items-center bg-slate-100 p-0.5 sm:p-1 rounded-xl border border-slate-200 shrink-0">
             {/* 1. Standard View */}
             <button
               onClick={() => {
@@ -445,8 +445,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               title="Standard View (Navigator + Viewer)"
               className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 viewMode === "standard"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-white text-blue-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -462,8 +462,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               title="Split View (Stage + Notes / AI / Quiz)"
               className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 viewMode === "split"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-white text-blue-700 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <Columns className="w-3.5 h-3.5" />
@@ -484,8 +484,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               title={viewMode === "fullscreen" ? "Exit Fullscreen Stage" : "Expanded Fullscreen Stage"}
               className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                 viewMode === "fullscreen"
-                  ? "bg-amber-500 text-slate-950 font-black shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-white font-black shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               {viewMode === "fullscreen" ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -503,9 +503,9 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               }
               if (!aiSummary) handleGenerateAiSummary();
             }}
-            className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap"
+            className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap"
           >
-            <Sparkles className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span>AI Summary</span>
           </button>
 
@@ -518,9 +518,9 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 setIsSidebarCollapsed(true);
               }
             }}
-            className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold rounded-xl text-xs shadow-md transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap"
+            className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 whitespace-nowrap"
           >
-            <Target className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+            <Target className="w-3.5 h-3.5 text-white shrink-0" />
             <span>Practice Quiz</span>
           </button>
 
@@ -532,20 +532,20 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
         
         {/* ─── LEFT: CURRICULUM NAVIGATOR ─── */}
         {!isSidebarCollapsed && (
-          <aside className="w-full md:w-76 lg:w-80 bg-[#0d1527] border-r border-slate-800/90 flex flex-col shrink-0 overflow-y-auto shadow-2xl z-20 transition-all duration-300 max-h-48 md:max-h-none">
-            <div className="p-3 sm:p-4 border-b border-slate-800 bg-[#111c35]/80 flex items-center justify-between sticky top-0 z-10">
+          <aside className="w-full md:w-76 lg:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto shadow-sm z-20 transition-all duration-300 max-h-48 md:max-h-none">
+            <div className="p-3 sm:p-4 border-b border-slate-200 bg-slate-50/90 flex items-center justify-between sticky top-0 z-10">
               <div>
-                <h2 className="font-extrabold text-white text-xs uppercase tracking-wider flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-blue-400" />
+                <h2 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-blue-600" />
                   <span>Curriculum Content</span>
                 </h2>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
                   {subjects.length} Subjects • {totalMaterials} Interactive Modules
                 </p>
               </div>
               <button
                 onClick={() => setIsSidebarCollapsed(true)}
-                className="p-1 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white hidden md:block"
+                className="p-1 rounded-lg hover:bg-slate-200 text-slate-500 hover:text-slate-800 hidden md:block"
                 title="Collapse Navigator"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -557,33 +557,33 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               {subjects.map((subject, sIdx) => {
                 const isExpanded = !!expandedSubjects[subject.id];
                 return (
-                  <div key={subject.id} className="border border-slate-800/80 rounded-2xl overflow-hidden bg-[#101a33] shadow-md">
+                  <div key={subject.id} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
                     {/* Subject Title Bar */}
                     <button
                       onClick={() => toggleSubjectExpand(subject.id)}
-                      className="w-full p-3 bg-gradient-to-r from-[#142244] to-[#101a33] hover:from-[#192b57] hover:to-[#142244] flex items-center justify-between text-left transition-colors"
+                      className="w-full p-3 bg-slate-50/70 hover:bg-slate-100 flex items-center justify-between text-left transition-colors border-b border-slate-100"
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-blue-600/90 text-white flex items-center justify-center font-black text-[10px] shadow">
+                        <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-[10px] shadow-sm">
                           S{sIdx + 1}
                         </div>
-                        <span className="font-bold text-slate-200 text-xs line-clamp-1">{subject.name}</span>
+                        <span className="font-bold text-slate-800 text-xs line-clamp-1">{subject.name}</span>
                       </div>
                       {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                        <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                        <ChevronRight className="w-4 h-4 text-slate-500 shrink-0" />
                       )}
                     </button>
 
                     {/* Modules & Materials list */}
                     {isExpanded && (
-                      <div className="p-2 space-y-2 bg-[#0d1527]/90">
+                      <div className="p-2 space-y-2 bg-white">
                         {subject.modules && subject.modules.map(mod => (
-                          <div key={mod.id} className="p-2 bg-[#111d38] rounded-xl border border-slate-800/60">
+                          <div key={mod.id} className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/80">
                             <div className="flex items-center justify-between px-1 mb-1.5">
-                              <span className="font-bold text-blue-200 text-[11px]">{mod.title}</span>
-                              <span className="text-[10px] font-mono text-slate-400">{mod.duration}</span>
+                              <span className="font-bold text-slate-700 text-[11px]">{mod.title}</span>
+                              <span className="text-[10px] font-mono text-slate-500">{mod.duration}</span>
                             </div>
 
                             <div className="space-y-1">
@@ -597,29 +597,29 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                                     onClick={() => handleSelectMaterial(subject.id, mod.id, mat)}
                                     className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all text-xs ${
                                       isActive
-                                        ? "bg-blue-600 text-white font-bold shadow-lg ring-1 ring-blue-400 transform scale-[1.01]"
-                                        : "hover:bg-slate-800 text-slate-300 font-medium"
+                                        ? "bg-blue-600 text-white font-bold shadow-md ring-1 ring-blue-400 transform scale-[1.01]"
+                                        : "hover:bg-slate-100 text-slate-700 font-medium"
                                     }`}
                                   >
                                     <div className="flex items-center gap-2.5 truncate">
                                       {mat.type === "video" ? (
-                                        <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-rose-400"}`} />
+                                        <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-rose-600"}`} />
                                       ) : mat.type === "presentation" ? (
-                                        <Layers className={`w-4 h-4 shrink-0 ${isActive ? "text-yellow-200" : "text-amber-400"}`} />
+                                        <Layers className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-amber-600"}`} />
                                       ) : (
-                                        <FileText className={`w-4 h-4 shrink-0 ${isActive ? "text-cyan-200" : "text-sky-400"}`} />
+                                        <FileText className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-sky-600"}`} />
                                       )}
                                       <span className="truncate text-[11px]">{mat.title}</span>
                                     </div>
 
                                     <div className="flex items-center gap-1.5 shrink-0">
                                       {mat.allowDownload ? (
-                                        <Download className={`w-3 h-3 ${isActive ? "text-blue-100" : "text-slate-500"}`} />
+                                        <Download className={`w-3 h-3 ${isActive ? "text-blue-100" : "text-slate-400"}`} />
                                       ) : (
-                                        <Lock className={`w-3 h-3 ${isActive ? "text-amber-200" : "text-slate-500"}`} />
+                                        <Lock className={`w-3 h-3 ${isActive ? "text-blue-200" : "text-slate-400"}`} />
                                       )}
                                       {isDone && (
-                                        <CheckCircle2 className={`w-3.5 h-3.5 ${isActive ? "text-emerald-200" : "text-emerald-400"}`} />
+                                        <CheckCircle2 className={`w-3.5 h-3.5 ${isActive ? "text-emerald-200" : "text-emerald-600"}`} />
                                       )}
                                     </div>
                                   </button>
@@ -638,40 +638,40 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
         )}
 
         {/* ─── CENTER: IMMERSIVE MATERIAL STAGE ─── */}
-        <div className={`flex-1 flex flex-col bg-[#080e1e] overflow-y-auto ${viewMode === "split" ? "lg:w-1/2" : "w-full"}`}>
+        <div className={`flex-1 flex flex-col bg-slate-100/60 overflow-y-auto ${viewMode === "split" ? "lg:w-1/2" : "w-full"}`}>
           
           {/* Top Stage Metadata & Action Banner */}
-          <div className="bg-[#0f1a35] border-b border-slate-800/90 px-4 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shrink-0 shadow-md">
+          <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shrink-0 shadow-sm">
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 border border-blue-400/40 text-blue-300">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 text-blue-700">
                   {(selectedMaterial?.type || "learning").toUpperCase()} MASTERCLASS
                 </span>
 
                 {selectedMaterial?.allowDownload ? (
-                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 border border-emerald-400/40 text-emerald-300">
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
                     <Download className="w-3 h-3" /> Download Enabled
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 border border-amber-400/40 text-amber-300">
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 border border-amber-200 text-amber-800">
                     <Lock className="w-3 h-3" /> In-Portal Protected View Only
                   </span>
                 )}
               </div>
 
-              <h2 className="text-base sm:text-lg font-black text-white leading-snug">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
                 {selectedMaterial?.title}
               </h2>
 
-              <p className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-2">
-                <span className="flex items-center gap-1 font-semibold text-slate-300">
-                  <User className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Uploaded by: <b className="text-white">{selectedMaterial?.uploadedBy || course?.leadTrainerName || "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')"}</b></span>
+              <p className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-2">
+                <span className="flex items-center gap-1 font-semibold text-slate-700">
+                  <User className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Uploaded by: <b className="text-slate-900">{selectedMaterial?.uploadedBy || course?.leadTrainerName || "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')"}</b></span>
                 </span>
                 <span>•</span>
                 <span>{selectedMaterial?.uploadedAt || "Uploaded on: Jan 15, 2025"}</span>
                 <span>•</span>
-                <span className="text-slate-400">{selectedMaterial?.duration || selectedMaterial?.size || "45 mins"}</span>
+                <span className="text-slate-500">{selectedMaterial?.duration || selectedMaterial?.size || "45 mins"}</span>
               </p>
             </div>
 
@@ -683,14 +683,14 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 <button
                   onClick={handleMarkComplete}
                   disabled={markingComplete}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg transition-all disabled:opacity-60"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all disabled:opacity-60"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>{markingComplete ? "Saving..." : "Mark Complete"}</span>
                 </button>
               ) : (
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold rounded-xl text-xs">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Completed
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-xl text-xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Completed
                 </span>
               )}
 
@@ -702,9 +702,9 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     setViewMode("split");
                     setIsSidebarCollapsed(true);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold rounded-xl text-xs transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold rounded-xl text-xs transition-colors shadow-sm"
                 >
-                  <StickyNote className="w-3.5 h-3.5 text-amber-400" />
+                  <StickyNote className="w-3.5 h-3.5 text-amber-500" />
                   <span>Notes</span>
                 </button>
               )}
@@ -712,7 +712,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               {selectedMaterial?.allowDownload && (
                 <button
                   onClick={() => alert(`Downloading resource: ${selectedMaterial?.title}`)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md"
+                  className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download</span>
@@ -727,7 +727,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
             
             {/* 1. 🎬 VIDEO MASTERCLASS STAGE */}
             {selectedMaterial?.type === "video" && (
-              <div className="w-full max-w-5xl bg-[#0d172e] rounded-3xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col">
+              <div className="w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200 flex flex-col">
                 <div className="aspect-video w-full bg-black flex items-center justify-center relative shadow-inner">
                   <iframe
                     className="w-full h-full"
@@ -738,14 +738,14 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   ></iframe>
                 </div>
 
-                <div className="p-4 sm:p-5 bg-[#111e3b] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-800">
+                <div className="p-4 sm:p-5 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center font-bold text-white shadow-lg shrink-0">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center font-bold text-white shadow-sm shrink-0">
                       <PlayCircle className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-extrabold text-sm text-white">{selectedMaterial.title}</h3>
-                      <p className="text-xs text-slate-400">
+                      <h3 className="font-extrabold text-sm text-slate-900">{selectedMaterial.title}</h3>
+                      <p className="text-xs text-slate-500">
                         Duration: {selectedMaterial.duration || "45 mins"} • IMD Operational Capacity Series
                       </p>
                     </div>
@@ -753,14 +753,14 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                   {/* Timestamp Quick Tags */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Markers:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Markers:</span>
                     <button
                       onClick={() => {
                         setLectureNote(prev => prev + "\n- [04:15] Sigma Coordinate transformation & boundary conditions");
                         setRightPanelTab("notes");
                         if (viewMode !== "split") setViewMode("split");
                       }}
-                      className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-300 font-mono text-[10px] border border-slate-700"
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-700 font-mono text-[10px] font-bold border border-slate-200"
                     >
                       + 04:15
                     </button>
@@ -770,7 +770,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                         setRightPanelTab("notes");
                         if (viewMode !== "split") setViewMode("split");
                       }}
-                      className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-300 font-mono text-[10px] border border-slate-700"
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-700 font-mono text-[10px] font-bold border border-slate-200"
                     >
                       + 18:30
                     </button>
@@ -781,10 +781,10 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
             {/* 2. 📊 PRESENTATION / SLIDE DECK STAGE */}
             {selectedMaterial?.type === "presentation" && (
-              <div className="w-full max-w-5xl bg-[#0f1b38] rounded-3xl shadow-2xl border border-slate-800 overflow-hidden flex flex-col">
-                <div className="p-3 sm:p-4 bg-[#142347] text-white flex items-center justify-between border-b border-slate-800">
+              <div className="w-full max-w-5xl bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+                <div className="p-3 sm:p-4 bg-slate-50 text-slate-800 flex items-center justify-between border-b border-slate-200">
                   <div className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-amber-400" />
+                    <Layers className="w-4 h-4 text-amber-500" />
                     <span className="font-bold text-xs">Slide Deck Viewer</span>
                   </div>
 
@@ -792,24 +792,24 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     <button
                       disabled={currentSlidePage <= 1}
                       onClick={() => setCurrentSlidePage(prev => Math.max(1, prev - 1))}
-                      className="p-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 rounded-lg text-white"
+                      className="p-1.5 bg-white border border-slate-200 hover:bg-slate-100 disabled:opacity-40 rounded-lg text-slate-700 shadow-sm"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <span className="text-xs font-bold text-slate-200 font-mono bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                    <span className="text-xs font-bold text-slate-700 font-mono bg-white px-2.5 py-1 rounded-lg border border-slate-200">
                       Slide {currentSlidePage} / {selectedMaterial.pages || 28}
                     </span>
                     <button
                       disabled={currentSlidePage >= (selectedMaterial.pages || 28)}
                       onClick={() => setCurrentSlidePage(prev => Math.min(selectedMaterial.pages || 28, prev + 1))}
-                      className="p-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 rounded-lg text-white"
+                      className="p-1.5 bg-white border border-slate-200 hover:bg-slate-100 disabled:opacity-40 rounded-lg text-slate-700 shadow-sm"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className="p-6 sm:p-10 bg-gradient-to-br from-[#0b1429] via-[#0f214a] to-[#122b63] text-white min-h-[380px] flex flex-col justify-between relative overflow-hidden border-b border-slate-800">
+                <div className="p-6 sm:p-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-[380px] flex flex-col justify-between relative overflow-hidden border-b border-slate-200">
                   <div className="flex items-center justify-between border-b border-white/10 pb-3">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-blue-300" />
@@ -817,7 +817,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                         IMD Directorate of NWP & Radar Operations
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-400 bg-white/10 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-mono text-slate-300 bg-white/10 px-2 py-0.5 rounded-full">
                       SLIDE_#0{currentSlidePage}
                     </span>
                   </div>
@@ -848,15 +848,15 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-[#0a1224] flex items-center gap-2 overflow-x-auto">
+                <div className="p-2.5 bg-slate-50 flex items-center gap-2 overflow-x-auto">
                   {[1, 2, 3, 4, 5, 6].map(page => (
                     <button
                       key={page}
                       onClick={() => setCurrentSlidePage(page)}
                       className={`px-3 py-1 rounded-xl text-xs font-bold font-mono transition-all shrink-0 ${
                         currentSlidePage === page
-                          ? "bg-blue-600 text-white shadow"
-                          : "bg-slate-800/80 hover:bg-slate-700 text-slate-400"
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "bg-white hover:bg-slate-100 text-slate-700 border border-slate-200"
                       }`}
                     >
                       Slide {page}
@@ -868,22 +868,22 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
             {/* 3. 📄 SCIENTIFIC STUDY NOTES / PDF HANDBOOK STAGE */}
             {selectedMaterial?.type === "pdf" && (
-              <div className="w-full max-w-5xl bg-[#0f1b38] rounded-3xl shadow-2xl border border-slate-800 p-5 sm:p-8 space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="w-full max-w-5xl bg-white rounded-3xl shadow-md border border-slate-200 p-5 sm:p-8 space-y-5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-500/20 border border-blue-400/40 text-blue-300 flex items-center justify-center font-bold shadow">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-bold shadow-sm">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-extrabold text-white text-sm sm:text-base">{selectedMaterial.title}</h3>
-                      <p className="text-xs text-slate-400">IMD Technical Reference Handbook • {selectedMaterial.size || "4.2 MB"}</p>
+                      <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">{selectedMaterial.title}</h3>
+                      <p className="text-xs text-slate-500">IMD Technical Reference Handbook • {selectedMaterial.size || "4.2 MB"}</p>
                     </div>
                   </div>
 
                   {selectedMaterial.allowDownload && (
                     <button
                       onClick={() => alert(`Downloading: ${selectedMaterial.title}`)}
-                      className="flex items-center gap-2 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow"
+                      className="flex items-center gap-2 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm"
                     >
                       <Download className="w-4 h-4" />
                       <span>Download</span>
@@ -891,26 +891,26 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   )}
                 </div>
 
-                <div className="space-y-4 text-xs leading-relaxed text-slate-300">
-                  <div className="p-3.5 bg-blue-950/70 rounded-2xl border border-blue-800/60 text-blue-200">
-                    <h4 className="font-extrabold text-xs mb-1 text-blue-300">Executive Technical Summary for Shift Forecasters:</h4>
+                <div className="space-y-4 text-xs leading-relaxed text-slate-700">
+                  <div className="p-3.5 bg-blue-50 rounded-2xl border border-blue-200 text-blue-900">
+                    <h4 className="font-extrabold text-xs mb-1 text-blue-800">Executive Technical Summary for Shift Forecasters:</h4>
                     This handbook establishes the mathematical basis for planetary boundary layer (PBL) parameterization in high-resolution regional weather forecast domains over the Indian subcontinent.
                   </div>
 
-                  <h3 className="text-xs font-extrabold text-white pt-1 border-b border-slate-800 pb-1">
+                  <h3 className="text-xs font-extrabold text-slate-900 pt-1 border-b border-slate-200 pb-1">
                     1. Governing Planetary Boundary Layer Equations
                   </h3>
                   <p>
                     The turbulent momentum flux divergence in the atmospheric surface layer is parameterized via eddy diffusivity (Km) formulations:
                   </p>
-                  <div className="p-3 bg-black/40 rounded-xl font-mono text-blue-300 text-xs border border-slate-800">
+                  <div className="p-3 bg-slate-900 rounded-xl font-mono text-blue-300 text-xs border border-slate-800">
                     τ_x = ρ · K_m · (∂u/∂z),   τ_y = ρ · K_m · (∂v/∂z)
                   </div>
                   <p>
                     Where K_m = l² · |∂V/∂z| · f(Ri), and Ri is the gradient Richardson number denoting dynamic stability versus buoyant production of convective turbulence.
                   </p>
 
-                  <h3 className="text-xs font-extrabold text-white pt-1 border-b border-slate-800 pb-1">
+                  <h3 className="text-xs font-extrabold text-slate-900 pt-1 border-b border-slate-200 pb-1">
                     2. Dual-Polarization Radar Ingestion Guidelines
                   </h3>
                   <p>
@@ -925,21 +925,21 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
         {/* ─── RIGHT: 3-TAB SPLIT PANEL (Notes | AI Summary | Practice Quiz) ─── */}
         {viewMode === "split" && (
-          <aside className="w-full lg:w-1/2 bg-[#0c1426] border-l border-slate-800 flex flex-col shrink-0 shadow-2xl z-20 max-h-[50vh] lg:max-h-none overflow-y-auto">
+          <aside className="w-full lg:w-1/2 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-xl z-20 max-h-[50vh] lg:max-h-none overflow-y-auto">
             
             {/* Panel Tabs (Lecture Notes | AI Summary | Practice Quiz) */}
-            <div className="p-2.5 sm:p-3 bg-[#101b33] border-b border-slate-800 flex items-center justify-between sticky top-0 z-20">
-              <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 sm:p-1 rounded-xl border border-slate-800 overflow-x-auto max-w-full">
+            <div className="p-2.5 sm:p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between sticky top-0 z-20">
+              <div className="flex items-center gap-1 bg-slate-200/80 p-0.5 sm:p-1 rounded-xl border border-slate-300/60 overflow-x-auto max-w-full">
                 {/* Tab 1: Notes */}
                 <button
                   onClick={() => setRightPanelTab("notes")}
                   className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
                     rightPanelTab === "notes"
-                      ? "bg-amber-500 text-slate-950 font-black shadow"
-                      : "text-slate-400 hover:text-white"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  <StickyNote className="w-3.5 h-3.5" />
+                  <StickyNote className="w-3.5 h-3.5 text-amber-500" />
                   <span>My Notes</span>
                 </button>
 
@@ -948,8 +948,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   onClick={() => setRightPanelTab("ai_summary")}
                   className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
                     rightPanelTab === "ai_summary"
-                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black shadow"
-                      : "text-slate-400 hover:text-white"
+                      ? "bg-blue-600 text-white font-bold shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
@@ -961,11 +961,11 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   onClick={() => setRightPanelTab("practice_quiz")}
                   className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
                     rightPanelTab === "practice_quiz"
-                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black shadow"
-                      : "text-slate-400 hover:text-white"
+                      ? "bg-emerald-600 text-white font-bold shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  <Target className="w-3.5 h-3.5 text-emerald-300" />
+                  <Target className="w-3.5 h-3.5 text-emerald-200" />
                   <span>Practice Quiz (AI)</span>
                 </button>
               </div>
@@ -973,7 +973,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               {/* Close Split View Button */}
               <button
                 onClick={() => setViewMode("standard")}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold shrink-0 ml-2"
+                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 text-xs font-bold shrink-0 ml-2 border border-slate-200"
                 title="Return to Standard View"
               >
                 <X className="w-4 h-4" />
@@ -985,46 +985,46 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               <div className="p-4 sm:p-5 flex-1 flex flex-col space-y-3 overflow-y-auto">
                 <div className="flex items-center justify-between text-xs">
                   <div>
-                    <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
-                      <StickyNote className="w-4 h-4 text-amber-400" />
+                    <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                      <StickyNote className="w-4 h-4 text-amber-500" />
                       <span>Module Personal Notes</span>
                     </h3>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       Auto-saved per module for {selectedMaterial?.title}
                     </p>
                   </div>
 
                   {lastSavedTime && (
-                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                    <span className="text-[10px] text-emerald-700 font-mono flex items-center gap-1 font-bold">
                       <Check className="w-3 h-3" /> {lastSavedTime}
                     </span>
                   )}
                 </div>
 
                 {/* Quick Helper Formatting Toolbar */}
-                <div className="flex items-center gap-1.5 flex-wrap p-2 bg-[#121e38] rounded-xl border border-slate-800 text-xs">
+                <div className="flex items-center gap-1.5 flex-wrap p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
                   <button
                     onClick={() => setLectureNote(prev => prev + `\n- [${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}] `)}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-lg text-[11px] font-bold"
+                    className="px-2 py-1 bg-white hover:bg-slate-100 text-blue-700 rounded-lg text-[11px] font-bold border border-slate-200 shadow-sm"
                   >
                     + Timestamp
                   </button>
                   <button
                     onClick={() => setLectureNote(prev => prev + "\n- **Key Formula:** `CFL = u*dt/dx <= 1.0`")}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-lg text-[11px] font-bold"
+                    className="px-2 py-1 bg-white hover:bg-slate-100 text-blue-700 rounded-lg text-[11px] font-bold border border-slate-200 shadow-sm"
                   >
                     + Formula
                   </button>
                   <button
                     onClick={() => setLectureNote(prev => prev + "\n- **Observation:** ")}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-lg text-[11px] font-bold"
+                    className="px-2 py-1 bg-white hover:bg-slate-100 text-blue-700 rounded-lg text-[11px] font-bold border border-slate-200 shadow-sm"
                   >
                     + Bullet
                   </button>
                   <button
                     onClick={handleDownloadNote}
                     disabled={!lectureNote}
-                    className="px-2 py-1 bg-blue-600/80 hover:bg-blue-600 text-white rounded-lg text-[11px] font-bold disabled:opacity-40 ml-auto flex items-center gap-1"
+                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold disabled:opacity-40 ml-auto flex items-center gap-1 shadow-sm"
                   >
                     <Download className="w-3 h-3" /> Export (.md)
                   </button>
@@ -1035,7 +1035,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   value={lectureNote}
                   onChange={(e) => setLectureNote(e.target.value)}
                   placeholder="Write your personal lecture observations, numerical derivations, meteorological questions, and key takeaways here..."
-                  className="flex-1 w-full p-4 rounded-2xl bg-[#09101f] border border-slate-800 text-slate-100 text-xs font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[220px] resize-none"
+                  className="flex-1 w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-mono leading-relaxed focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[220px] resize-none"
                 />
 
                 {/* Bottom Save */}
@@ -1049,7 +1049,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       }
                     }}
                     disabled={!lectureNote}
-                    className="flex items-center gap-1 text-slate-500 hover:text-rose-400 text-xs font-bold disabled:opacity-30"
+                    className="flex items-center gap-1 text-slate-500 hover:text-rose-600 text-xs font-bold disabled:opacity-30"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Clear</span>
@@ -1057,7 +1057,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                   <button
                     onClick={handleSaveNote}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md flex items-center gap-1.5"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center gap-1.5"
                   >
                     <Save className="w-3.5 h-3.5" />
                     <span>Save Notes</span>
@@ -1071,10 +1071,10 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               <div className="p-4 sm:p-5 flex-1 flex flex-col space-y-4 overflow-y-auto">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="px-2 py-0.5 rounded bg-yellow-400 text-slate-950 font-black text-[9px] uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 font-bold text-[9px] uppercase tracking-wider">
                       Gemini 1.5 Flash
                     </span>
-                    <h3 className="font-extrabold text-white text-sm mt-1">
+                    <h3 className="font-extrabold text-slate-900 text-sm mt-1">
                       AI Material Summary & Key Takeaways
                     </h3>
                   </div>
@@ -1082,7 +1082,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   <button
                     onClick={handleGenerateAiSummary}
                     disabled={generatingSummary}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs flex items-center gap-1 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 disabled:opacity-50 shadow-sm"
                   >
                     <Sparkles className={`w-3.5 h-3.5 ${generatingSummary ? "animate-spin" : ""}`} />
                     <span>{generatingSummary ? "Synthesizing..." : "Regenerate"}</span>
@@ -1090,15 +1090,15 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 </div>
 
                 {!aiSummary && !generatingSummary && (
-                  <div className="p-8 text-center bg-[#101b33] rounded-2xl border border-dashed border-slate-700 space-y-3">
-                    <BrainCircuit className="w-10 h-10 text-blue-400 mx-auto" />
-                    <h4 className="font-bold text-white text-sm">No Summary Generated Yet</h4>
-                    <p className="text-slate-400 text-xs max-w-sm mx-auto">
+                  <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300 space-y-3">
+                    <BrainCircuit className="w-10 h-10 text-blue-600 mx-auto" />
+                    <h4 className="font-bold text-slate-800 text-sm">No Summary Generated Yet</h4>
+                    <p className="text-slate-500 text-xs max-w-sm mx-auto">
                       Click below to analyze this {selectedMaterial?.type?.toUpperCase()} with Gemini AI and generate key takeaways and governing equations.
                     </p>
                     <button
                       onClick={handleGenerateAiSummary}
-                      className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black rounded-xl text-xs shadow-lg"
+                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm"
                     >
                       ✨ Generate AI Summary Now
                     </button>
@@ -1107,9 +1107,9 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                 {generatingSummary && (
                   <div className="p-12 text-center space-y-4">
-                    <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    <h4 className="font-bold text-white text-sm">Analyzing {selectedMaterial?.type?.toUpperCase()} Material...</h4>
-                    <p className="text-slate-400 text-xs font-mono">
+                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <h4 className="font-bold text-slate-900 text-sm">Analyzing {selectedMaterial?.type?.toUpperCase()} Material...</h4>
+                    <p className="text-slate-500 text-xs font-mono">
                       Extracting governing formulas, key takeaways, and operational applications...
                     </p>
                   </div>
@@ -1117,20 +1117,20 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                 {aiSummary && !generatingSummary && (
                   <div className="space-y-4 text-xs animate-in fade-in duration-200">
-                    <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-950/80 to-[#122248] border border-blue-500/30 text-blue-100 space-y-1.5 shadow-md">
-                      <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider block">Executive Summary</span>
+                    <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 text-blue-950 space-y-1.5 shadow-sm">
+                      <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">Executive Summary</span>
                       <p className="leading-relaxed text-xs">{aiSummary.executiveSummary}</p>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-[#0f1b36] border border-slate-800 space-y-2">
-                      <h4 className="font-extrabold text-white text-xs flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 shadow-sm">
+                      <h4 className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                         <span>Core Key Takeaways</span>
                       </h4>
                       <ul className="space-y-2">
                         {(aiSummary.keyTakeaways || []).map((t, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-slate-300 text-[11px] leading-relaxed">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0"></span>
+                          <li key={idx} className="flex items-start gap-2 text-slate-700 text-[11px] leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 shrink-0"></span>
                             <span>{t}</span>
                           </li>
                         ))}
@@ -1138,14 +1138,14 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     </div>
 
                     {aiSummary.coreFormulasAndConcepts && (
-                      <div className="p-4 rounded-2xl bg-[#0f1b36] border border-slate-800 space-y-2">
-                        <h4 className="font-extrabold text-amber-300 text-xs flex items-center gap-1.5">
-                          <FileCode className="w-4 h-4 text-amber-400" />
+                      <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2 shadow-sm">
+                        <h4 className="font-extrabold text-amber-700 text-xs flex items-center gap-1.5">
+                          <FileCode className="w-4 h-4 text-amber-600" />
                           <span>Governing Formulas & Theoretical Definitions</span>
                         </h4>
                         <div className="space-y-1.5">
                           {aiSummary.coreFormulasAndConcepts.map((f, idx) => (
-                            <div key={idx} className="p-2.5 bg-black/40 rounded-xl font-mono text-blue-300 text-[11px] border border-slate-800">
+                            <div key={idx} className="p-2.5 bg-slate-900 rounded-xl font-mono text-blue-300 text-[11px] border border-slate-800">
                               <code>{f}</code>
                             </div>
                           ))}
@@ -1154,28 +1154,28 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     )}
 
                     {aiSummary.operationalApplications && (
-                      <div className="p-4 rounded-2xl bg-[#0f1b36] border border-slate-800 space-y-1.5">
-                        <h4 className="font-extrabold text-white text-xs flex items-center gap-1.5">
-                          <Building2 className="w-4 h-4 text-sky-400" />
+                      <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1.5 shadow-sm">
+                        <h4 className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                          <Building2 className="w-4 h-4 text-blue-600" />
                           <span>Operational Forecasting Applications</span>
                         </h4>
-                        <p className="text-slate-300 text-[11px] leading-relaxed">
+                        <p className="text-slate-700 text-[11px] leading-relaxed">
                           {aiSummary.operationalApplications}
                         </p>
                       </div>
                     )}
 
                     {aiSummary.examTips && (
-                      <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-amber-200 text-[11px]">
+                      <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px]">
                         <b>💡 Certification Exam Highlight:</b> {aiSummary.examTips}
                       </div>
                     )}
 
                     <button
                       onClick={handleInsertSummaryIntoNotes}
-                      className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center justify-center gap-2"
                     >
-                      <Plus className="w-4 h-4 text-slate-950" />
+                      <Plus className="w-4 h-4 text-white" />
                       <span>Insert AI Summary into My Lecture Notes</span>
                     </button>
                   </div>
@@ -1186,24 +1186,24 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
             {/* ═════════ TAB 3: 🎯 PRACTICE QUIZ & PATTERN CLONER ═════════ */}
             {rightPanelTab === "practice_quiz" && (
               <div className="p-4 sm:p-5 flex-1 flex flex-col space-y-4 overflow-y-auto">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
                   <div>
-                    <span className="px-2 py-0.5 rounded bg-yellow-400 text-slate-950 font-black text-[9px] uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 font-bold text-[9px] uppercase tracking-wider">
                       Gemini Powered
                     </span>
-                    <h3 className="font-extrabold text-white text-sm mt-0.5">
+                    <h3 className="font-extrabold text-slate-900 text-sm mt-0.5">
                       Interactive Practice Quiz Engine
                     </h3>
                   </div>
 
                   {/* Mode Selector */}
-                  <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                     <button
                       onClick={() => setPracticeMode("ai_topic")}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                         practiceMode === "ai_topic"
-                          ? "bg-blue-600 text-white shadow"
-                          : "text-slate-400 hover:text-white"
+                          ? "bg-white text-blue-700 shadow-sm"
+                          : "text-slate-600 hover:text-slate-900"
                       }`}
                     >
                       Topic AI
@@ -1212,8 +1212,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       onClick={() => setPracticeMode("pattern_clone")}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                         practiceMode === "pattern_clone"
-                          ? "bg-blue-600 text-white shadow"
-                          : "text-slate-400 hover:text-white"
+                          ? "bg-white text-blue-700 shadow-sm"
+                          : "text-slate-600 hover:text-slate-900"
                       }`}
                     >
                       Pattern Cloner
@@ -1223,14 +1223,14 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                 {/* MODE 1: Topic Generator Controls */}
                 {practiceMode === "ai_topic" && (
-                  <div className="space-y-3 bg-[#111d38] p-3.5 rounded-2xl border border-slate-800">
+                  <div className="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-300 uppercase">Target Difficulty</label>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase">Target Difficulty</label>
                         <select
                           value={quizDifficulty}
                           onChange={(e) => setQuizDifficulty(e.target.value)}
-                          className="w-full p-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-white focus:ring-1 focus:ring-blue-500"
+                          className="w-full p-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800 focus:ring-1 focus:ring-blue-500"
                         >
                           <option value="Easy">Easy (Foundational)</option>
                           <option value="Medium">Medium (Operational)</option>
@@ -1239,11 +1239,11 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-300 uppercase">Question Count</label>
+                        <label className="text-[10px] font-bold text-slate-600 uppercase">Question Count</label>
                         <select
                           value={questionCount}
                           onChange={(e) => setQuestionCount(Number(e.target.value))}
-                          className="w-full p-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-white focus:ring-1 focus:ring-blue-500"
+                          className="w-full p-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-800 focus:ring-1 focus:ring-blue-500"
                         >
                           <option value={3}>3 Quick Practice MCQs</option>
                           <option value={5}>5 Standard MCQs</option>
@@ -1255,9 +1255,9 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     <button
                       onClick={handleGeneratePracticeQuiz}
                       disabled={generatingQuiz}
-                      className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                      className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-sm transition-all flex items-center justify-center gap-2"
                     >
-                      <Sparkles className="w-4 h-4 text-yellow-300" />
+                      <Sparkles className="w-4 h-4 text-white" />
                       <span>{generatingQuiz ? "Gemini is Synthesizing MCQs..." : `Generate AI Quiz for "${selectedMaterial?.title?.slice(0, 30)}..."`}</span>
                     </button>
                   </div>
@@ -1265,14 +1265,14 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                 {/* MODE 2: Pattern Cloner Controls */}
                 {practiceMode === "pattern_clone" && (
-                  <div className="space-y-3 bg-[#111d38] p-3.5 rounded-2xl border border-slate-800">
+                  <div className="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-300 uppercase">Paste Trainer Question to Clone:</label>
+                      <label className="text-[10px] font-bold text-slate-600 uppercase">Paste Trainer Question to Clone:</label>
                       <textarea
                         rows={2}
                         value={sampleQuestionText}
                         onChange={(e) => setSampleQuestionText(e.target.value)}
-                        className="w-full p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        className="w-full p-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500"
                       />
                     </div>
 
@@ -1280,7 +1280,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       <select
                         value={quizDifficulty}
                         onChange={(e) => setQuizDifficulty(e.target.value)}
-                        className="w-full p-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        className="w-full p-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500"
                       >
                         <option value="Medium">Medium Rigor</option>
                         <option value="Hard">Hard Rigor</option>
@@ -1290,7 +1290,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       <select
                         value={questionCount}
                         onChange={(e) => setQuestionCount(Number(e.target.value))}
-                        className="w-full p-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white"
+                        className="w-full p-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 focus:ring-1 focus:ring-blue-500"
                       >
                         <option value={3}>3 Questions</option>
                         <option value={5}>5 Questions</option>
@@ -1300,9 +1300,9 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     <button
                       onClick={handleGeneratePatternQuiz}
                       disabled={generatingQuiz}
-                      className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black rounded-xl text-xs shadow-md flex items-center justify-center gap-2"
+                      className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center justify-center gap-2"
                     >
-                      <Sparkles className="w-4 h-4 text-slate-950" />
+                      <Sparkles className="w-4 h-4 text-white" />
                       <span>{generatingQuiz ? "Cloning Pattern with Gemini..." : "⚡ Generate Pattern Variants"}</span>
                     </button>
                   </div>
@@ -1312,11 +1312,11 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 {practiceQuestions.length > 0 && (
                   <div className="space-y-4 pt-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-blue-300">
+                      <span className="font-bold text-blue-700">
                         {practiceQuestions.length} Questions Ready
                       </span>
                       {quizFinished && (
-                        <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
+                        <span className="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
                           Score: {calculateScore().correct}/{calculateScore().total} ({calculateScore().percentage}%)
                         </span>
                       )}
@@ -1328,12 +1328,12 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                         const isCorrect = userAnswers[qIndex] === q.correctAnswer;
 
                         return (
-                          <div key={q.id || qIndex} className="p-4 rounded-2xl bg-[#0f1b36] border border-slate-800 space-y-2.5">
+                          <div key={q.id || qIndex} className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2.5 shadow-sm">
                             <div className="flex items-start justify-between gap-2">
-                              <h4 className="font-bold text-xs text-white leading-snug">
+                              <h4 className="font-bold text-xs text-slate-900 leading-snug">
                                 {qIndex + 1}. {q.question}
                               </h4>
-                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 shrink-0 border border-slate-200">
                                 {q.difficulty || "Medium"}
                               </span>
                             </div>
@@ -1342,16 +1342,16 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                             <div className="space-y-1.5">
                               {q.options.map((opt, optIndex) => {
                                 const isSelected = userAnswers[qIndex] === optIndex;
-                                let btnStyle = "bg-slate-900/80 border-slate-700/80 text-slate-300 hover:border-blue-500";
+                                let btnStyle = "bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-400 hover:bg-blue-50/40";
 
                                 if (quizFinished) {
                                   if (optIndex === q.correctAnswer) {
-                                    btnStyle = "bg-emerald-950/80 border-emerald-500 text-emerald-200 font-bold";
+                                    btnStyle = "bg-emerald-50 border-emerald-500 text-emerald-900 font-bold";
                                   } else if (isSelected && !isCorrect) {
-                                    btnStyle = "bg-rose-950/80 border-rose-500 text-rose-200";
+                                    btnStyle = "bg-rose-50 border-rose-400 text-rose-900 font-medium";
                                   }
                                 } else if (isSelected) {
-                                  btnStyle = "bg-blue-900/60 border-blue-400 text-white font-bold ring-1 ring-blue-400";
+                                  btnStyle = "bg-blue-50 border-blue-600 text-blue-900 font-bold ring-2 ring-blue-400";
                                 }
 
                                 return (
@@ -1366,7 +1366,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                                   >
                                     <span>{String.fromCharCode(65 + optIndex)}. {opt}</span>
                                     {quizFinished && optIndex === q.correctAnswer && (
-                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                     )}
                                   </button>
                                 );
@@ -1375,8 +1375,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
                             {/* Solution */}
                             {quizFinished && (
-                              <div className="p-2.5 rounded-xl bg-blue-950/80 border border-blue-800/60 text-[11px] space-y-1 text-blue-200">
-                                <p className="font-bold text-blue-300">Pedagogical Solution:</p>
+                              <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-[11px] space-y-1 text-blue-900">
+                                <p className="font-bold text-blue-800">Pedagogical Solution:</p>
                                 <p className="leading-relaxed">{q.explanation}</p>
                               </div>
                             )}
@@ -1391,7 +1391,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                         <button
                           onClick={() => setQuizFinished(true)}
                           disabled={Object.keys(userAnswers).length === 0}
-                          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-[1.01]"
+                          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-[1.01]"
                         >
                           Submit & Evaluate ({Object.keys(userAnswers).length}/{practiceQuestions.length})
                         </button>
@@ -1401,7 +1401,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                             setUserAnswers({});
                             setQuizFinished(false);
                           }}
-                          className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5"
+                          className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200"
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
                           <span>Retry Practice Quiz</span>

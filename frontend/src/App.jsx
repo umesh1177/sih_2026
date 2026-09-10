@@ -21,6 +21,8 @@ import { CertificateModal } from "./components/profile/CertificateModal";
 import { CompetencyMatrixView } from "./components/admin/CompetencyMatrixView";
 import { UserApprovalQueue } from "./components/admin/UserApprovalQueue";
 import { BroadcastManagerModal } from "./components/admin/BroadcastManagerModal";
+import { NationalBroadcastsView } from "./components/admin/NationalBroadcastsView";
+import { PlatformAnalyticsView } from "./components/admin/PlatformAnalyticsView";
 import { TraineeDashboardView } from "./components/dashboard/TraineeDashboardView";
 import { TrainerDashboardView } from "./components/dashboard/TrainerDashboardView";
 import { AdminDashboardView } from "./components/dashboard/AdminDashboardView";
@@ -50,7 +52,11 @@ const MainApp = () => {
   const { currentUser, switchAccount, demoAccounts } = useAuth();
   
   // Navigation & Page views
-  const [viewMode, setViewMode] = useState("portal"); // "landing" | "login" | "portal"
+  const [viewMode, setViewMode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("verify") || params.get("id")) return "landing";
+    return "portal";
+  });
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // Course Overview (Matching iGOT style) and Learning Studio
@@ -109,9 +115,13 @@ const MainApp = () => {
             enrolledTraineeIds: [...(prev.enrolledTraineeIds || []), currentUser?.id]
           }));
         }
+        alert("✅ " + res.message);
+      } else {
+        alert("❌ " + (res.message || "Enrollment failed. Administrative approval is required."));
       }
     } catch (err) {
       console.error("Enrollment failed:", err);
+      alert("Enrollment failed: " + err.message);
     }
   };
 
@@ -303,8 +313,7 @@ const MainApp = () => {
               {currentUser?.role === "admin" && (
                 <AdminDashboardView
                   onOpenApprovals={() => setActiveTab("approvals")}
-                  onOpenCompetency={() => setActiveTab("competency")}
-                  onOpenAnnouncements={() => setIsBroadcastModalOpen(true)}
+                  onOpenBroadcastModal={() => setActiveTab("announcements")}
                   onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
                   onOpenAnalytics={() => setActiveTab("analytics")}
                 />
@@ -414,24 +423,37 @@ const MainApp = () => {
             )
           )}
 
-          {/* 4. COURSES & SUBJECTS CATALOG (Rich Filtered View) */}
+          {/* 4. COURSES & SUBJECTS CATALOG (Rich Filtered View with Admin Management) */}
           {(activeTab === "courses" || activeTab === "subjects" || activeTab === "my-learning") && (
             <CourseCatalogView
               courses={courses}
               currentUser={currentUser}
               onSelectCourse={(course) => setSelectedOverviewCourse(course)}
               onEnrollClick={(course) => setPrereqModalCourse(course)}
-              onOpenAiAdvisor={() => setIsAiCourseAdvisorOpen(true)}
+              onOpenCertificate={(submission, courseTitle, traineeName) => {
+                setCertificateData({ submission, courseTitle, traineeName });
+              }}
+              onOpenTrainerStudio={(course, subjectId) => {
+                setActiveTrainerStudioCourse({ course, subjectId });
+              }}
+              onRefreshCourses={refreshGlobalData}
             />
           )}
 
-          {/* 5. COMPETENCY MAPPING */}
-          {activeTab === "competency" && <CompetencyMatrixView />}
-
-          {/* 6. USER APPROVALS */}
+          {/* 5. USER APPROVALS */}
           {activeTab === "approvals" && <UserApprovalQueue />}
 
-          {/* 7. CERTIFICATIONS & CREDENTIALS SHOWCASE */}
+          {/* 6. NATIONAL BROADCASTS & CIRCULARS HUB */}
+          {activeTab === "announcements" && (
+            <NationalBroadcastsView onRefreshData={refreshGlobalData} />
+          )}
+
+          {/* 7. PLATFORM ANALYTICS & REPORTING */}
+          {activeTab === "analytics" && (
+            <PlatformAnalyticsView />
+          )}
+
+          {/* 8. CERTIFICATIONS & CREDENTIALS SHOWCASE */}
           {activeTab === "certificates" && (
             <CredentialsCertificationsView
               currentUser={currentUser}
@@ -441,7 +463,7 @@ const MainApp = () => {
             />
           )}
 
-          {/* 8. OFFICER PROFESSIONAL PROFILE (DIRECT PAGE VIEW - NO MODAL REQUIRED) */}
+          {/* 9. OFFICER PROFESSIONAL PROFILE */}
           {activeTab === "profile" && (
             <OfficerProfileView
               onOpenCertificate={(submission, courseTitle, traineeName) => {

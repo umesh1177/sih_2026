@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Bell, AlertTriangle, CheckCircle2, Sparkles, Building2 } from "lucide-react";
+import { Bell, AlertTriangle, CheckCircle2, Sparkles, Building2, Globe, ChevronDown, Languages } from "lucide-react";
 
 export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator }) => {
   const { currentUser } = useAuth();
+  const [selectedLang, setSelectedLang] = useState("EN");
+  const [isBhashiniOpen, setIsBhashiniOpen] = useState(false);
+
+  const languages = [
+    { code: "EN", name: "English", native: "English" },
+    { code: "HI", name: "Hindi", native: "हिन्दी" },
+    { code: "BN", name: "Bengali", native: "বাংলা" },
+    { code: "TE", name: "Telugu", native: "తెలుగు" },
+    { code: "TA", name: "Tamil", native: "தமிழ்" },
+    { code: "MR", name: "Marathi", native: "मराठी" },
+    { code: "GU", name: "Gujarati", native: "ગુજરાતી" },
+    { code: "KN", name: "Kannada", native: "ಕನ್ನಡ" },
+    { code: "ML", name: "Malayalam", native: "മലയാളം" },
+    { code: "PA", name: "Punjabi", native: "ਪੰਜਾਬੀ" },
+    { code: "OR", name: "Odia", native: "ଓଡ଼ିଆ" },
+    { code: "AS", name: "Assamese", native: "অসমীয়া" }
+  ];
 
   const getBreadcrumbTitle = () => {
     switch (activeTab) {
@@ -12,6 +29,8 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator })
       case "subjects": return "Subject Modules";
       case "questions": return "Questions";
       case "quizzes": return "Assessments & Quizzes";
+      case "schedule-assessment": return "Schedule Assessments";
+      case "content-library": return "Trainer Content Library";
       case "trainee-quizzes": return "Scheduled Assessments";
       case "my-learning": return "Enrolled Programs";
       case "certificates": return "Certified Credentials";
@@ -24,8 +43,13 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator })
     }
   };
 
+  const handleSelectLang = (code) => {
+    setSelectedLang(code);
+    setIsBhashiniOpen(false);
+  };
+
   return (
-    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 flex items-center justify-between z-20 shrink-0 shadow-sm">
+    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 flex items-center justify-between z-20 shrink-0 shadow-sm relative">
       {/* Breadcrumb matching Screenshot 1 & 3 */}
       <div className="flex items-center gap-2.5 text-xs">
         <div className="flex items-center gap-1.5 text-slate-400">
@@ -37,11 +61,59 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator })
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-3">
+        {/* BHASHINI AI Multilingual Dropdown (Govt of India Initiative) */}
+        <div className="relative">
+          <button
+            onClick={() => setIsBhashiniOpen(!isBhashiniOpen)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/80 rounded-xl text-xs font-bold text-slate-800 shadow-xs transition-all"
+            title="Bhashini - National Language Translation Mission"
+          >
+            <div className="w-4 h-4 rounded-full bg-[#0a2558] flex items-center justify-center text-[8px] text-white font-black">
+              भा
+            </div>
+            <span className="font-bold text-[11px] text-[#0a2558]">BHASHINI</span>
+            <span className="px-1.5 py-0.5 bg-white text-blue-900 border border-blue-200 rounded text-[9px] font-mono font-bold">
+              {selectedLang}
+            </span>
+            <ChevronDown className="w-3 h-3 text-slate-400" />
+          </button>
+
+          {isBhashiniOpen && (
+            <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="p-2 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Languages className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="text-[11px] font-extrabold text-slate-900">Bhashini AI Translator</span>
+                </div>
+                <span className="text-[9px] font-black uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                  Active
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-1 p-1 max-h-56 overflow-y-auto">
+                {languages.map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => handleSelectLang(l.code)}
+                    className={`flex flex-col items-start px-2 py-1.5 rounded-lg text-left transition-colors ${
+                      selectedLang === l.code ? "bg-[#0a2558] text-white" : "hover:bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    <span className="text-xs font-bold">{l.native}</span>
+                    <span className={`text-[9px] ${selectedLang === l.code ? "text-blue-200" : "text-slate-400"}`}>
+                      {l.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Trainee Pending Approval Warning Pill */}
         {currentUser?.role === "trainee" && currentUser?.status === "pending" && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-xs font-bold animate-pulse shadow-sm">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-900 rounded-full text-xs font-bold animate-pulse shadow-xs">
+            <AlertTriangle className="w-3.5 h-3.5 text-blue-600" />
             <span>Profile In Administrative Review</span>
           </div>
         )}

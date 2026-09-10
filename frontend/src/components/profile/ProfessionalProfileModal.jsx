@@ -101,6 +101,8 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                   currentUser?.status === "approved"
                     ? "bg-emerald-100 text-emerald-800"
+                    : currentUser?.status === "rejected"
+                    ? "bg-rose-100 text-rose-800"
                     : "bg-amber-100 text-amber-800"
                 }`}>
                   Status: {currentUser?.status || "Pending"}
@@ -118,14 +120,30 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
 
         {/* Form Body */}
         <div className="py-4 space-y-4 text-xs">
-          {/* Status Banner */}
+          {/* Rejection Alert Banner */}
+          {currentUser?.status === "rejected" && (
+            <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-2xl flex items-start gap-3 text-rose-950">
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div className="space-y-1 flex-1">
+                <p className="font-bold text-rose-900">Profile Verification Rejected by Administrator</p>
+                <div className="bg-white/90 p-2.5 rounded-xl border border-rose-200 text-xs font-medium text-rose-950">
+                  <b>Reason:</b> {currentUser.rejectionReason || currentUser.approvalNotes || "Incomplete credentials or document verification failure."}
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Please update your credentials below and click <b>"Submit for Administrative Approval"</b>.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Pending Banner */}
           {currentUser?.status === "pending" && (
             <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-900">
               <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
               <div>
                 <p className="font-bold">Profile Pending Administrative Approval</p>
                 <p className="text-[11px] text-amber-700">
-                  You can browse all courses. Complete your profile details and submit for verification to unlock full certifications and exams.
+                  Your officer registration dossier is currently under review by the MoES Central Administration. Course enrollments will unlock once approved.
                 </p>
               </div>
             </div>

@@ -4,7 +4,6 @@ import {
   LayoutDashboard, 
   BookOpen, 
   FileText, 
-  HelpCircle, 
   ClipboardList, 
   Layers, 
   BarChart3, 
@@ -12,7 +11,6 @@ import {
   UserCheck, 
   GraduationCap,
   Award,
-  Compass,
   LogOut,
   Building2,
   FolderKanban
@@ -33,7 +31,6 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
         ...baseItems,
         { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
         { id: "content-library", label: "Content Library", icon: FolderKanban },
-        { id: "questions", label: "Question Bank", icon: HelpCircle },
         { id: "certificates", label: "Certified Credentials", icon: Award },
         { id: "profile", label: "Officer Profile", icon: FileText },
       ];
@@ -43,9 +40,6 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
       return [
         ...baseItems,
         { id: "approvals", label: "Officer Approvals", icon: UserCheck },
-        { id: "competency", label: "Competency Matrix", icon: Compass },
-        { id: "questions", label: "Question Bank", icon: HelpCircle },
-        { id: "quizzes", label: "Assessments Engine", icon: ClipboardList },
         { id: "announcements", label: "National Broadcasts", icon: BellRing },
         { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
       ];

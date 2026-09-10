@@ -144,12 +144,21 @@ export const updateProfile = (req, res) => {
 export const submitProfileForApproval = (req, res) => {
   try {
     const { id } = req.params;
-    const updated = db.updateUser(id, { status: "pending", submittedAt: new Date().toISOString() });
+    const updated = db.updateUser(id, { 
+      status: "pending", 
+      rejectionReason: null, 
+      approvalNotes: "", 
+      submittedAt: new Date().toISOString() 
+    });
     if (!updated) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     const { passwordHash, ...safeUser } = updated;
-    return res.json({ success: true, message: "Profile submitted for administrative verification and approval!", user: safeUser });
+    return res.json({ 
+      success: true, 
+      message: "Profile submitted for administrative verification and approval!", 
+      user: safeUser 
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

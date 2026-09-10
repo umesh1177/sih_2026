@@ -29,10 +29,38 @@ export const enrollCourse = (req, res) => {
     if (!traineeId) {
       return res.status(400).json({ success: false, message: "Trainee ID is required" });
     }
-    const course = db.enrollTrainee(id, traineeId);
-    if (!course) {
+
+    // Strict Access Control: Trainee must be approved by Admin
+    const user = db.findUserById(traineeId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Trainee profile not found." });
+    }
+
+    if (user.role === "trainee" && user.status !== "approved") {
+      const statusText = user.status === "rejected" ? "rejected" : "pending review";
+      const rejectionNote = user.rejectionReason ? ` Reason: "${user.rejectionReason}"` : "";
+      return res.status(403).json({
+        success: false,
+        message: `Course enrollment restricted. Your officer profile is currently ${statusText}.${rejectionNote} Only MoES verified officers with Administrative Approval can enroll in operational programs.`,
+        userStatus: user.status,
+        rejectionReason: user.rejectionReason || null
+      });
+    }
+
+    // Max enrollment capacity check
+    const existingCourse = db.getCourseById(id);
+    if (!existingCourse) {
       return res.status(404).json({ success: false, message: "Course not found" });
     }
+    const maxCapacity = existingCourse.maxEnrollment || 50;
+    if ((existingCourse.enrolledTraineeIds || []).length >= maxCapacity && !existingCourse.enrolledTraineeIds?.includes(traineeId)) {
+      return res.status(400).json({
+        success: false,
+        message: `Course batch capacity limit (${maxCapacity} cadets) has been reached. Please contact administration for waitlist.`
+      });
+    }
+
+    const course = db.enrollTrainee(id, traineeId);
     return res.json({ success: true, message: "Successfully enrolled in course!", course });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -42,7 +70,59 @@ export const enrollCourse = (req, res) => {
 export const createCourse = (req, res) => {
   try {
     const course = db.createCourse(req.body);
-    return res.status(201).json({ success: true, message: "Course created successfully", course });
+    return res.status(201).json({ success: true, message: "Course published and notification broadcast to all officers successfully!", course });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const updateCourse = (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = db.updateCourse(id, req.body);
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    return res.json({ success: true, message: "Course updated successfully!", course });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const removeTraineeFromCourse = (req, res) => {
+  try {
+    const { id, traineeId } = req.params;
+    const course = db.removeTraineeFromCourse(id, traineeId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    return res.json({ success: true, message: "Trainee removed from course enrollment list.", course });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getTrainersWorkload = (req, res) => {
+  try {
+    const workloads = db.getTrainersWorkload();
+    return res.json({ success: true, count: workloads.length, workloads });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const generateBulkCertificates = (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = db.generateBulkCertificates(id, req.body);
+    if (!result) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    return res.json({
+      success: true,
+      message: `Bulk certification completed! Generated and issued ${result.totalIssued} accredited certificates for trainees and instructors.`,
+      result
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -116,22 +196,22 @@ export const deleteLearningMaterial = (req, res) => {
   }
 };
 
-export const getFeedbacks = (req, res) => {
-  try {
-    const { courseId } = req.query;
-    const feedbacks = db.getFeedbacks(courseId);
-    return res.json({ success: true, feedbacks });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
-
 export const getTrainerEnrolledTrainees = (req, res) => {
   try {
     const trainerName = req.query.trainerName || req.user?.name;
     const trainerId = req.query.trainerId || req.user?.id;
     const trainees = db.getEnrolledTraineesForTrainer(trainerName, trainerId);
     return res.json({ success: true, count: trainees.length, trainees });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getFeedbacks = (req, res) => {
+  try {
+    const { courseId } = req.query;
+    const feedbacks = db.getFeedbacks(courseId);
+    return res.json({ success: true, count: feedbacks.length, feedbacks });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -202,6 +282,29 @@ export const attachContentLibraryItem = (req, res) => {
       return res.status(400).json({ success: false, message: "Failed to map content item to course/module" });
     }
     return res.json({ success: true, message: "Material mapped to subject module successfully!" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// --- Public Certificate Verification Controller ---
+export const verifyCertificate = (req, res) => {
+  try {
+    const query = req.params.certId || req.body.query || req.query.id || req.query.verify;
+    if (!query) {
+      return res.status(400).json({ success: false, message: "Please enter a Certificate ID or URL to verify." });
+    }
+    const cert = db.verifyCertificate(query);
+    if (!cert) {
+      return res.status(404).json({
+        success: false,
+        message: "No certificate record found matching this credential identifier. Please check the Certificate ID."
+      });
+    }
+    return res.json({
+      success: true,
+      certificate: cert
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

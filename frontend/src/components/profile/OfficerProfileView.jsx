@@ -202,10 +202,25 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                   {form.name}
                 </h1>
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-black flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>MoES Verified Officer</span>
-                </span>
+                
+                {currentUser?.status === "approved" && (
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-black flex items-center gap-1 shadow-sm">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>MoES Verified Officer</span>
+                  </span>
+                )}
+                {currentUser?.status === "pending" && (
+                  <span className="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 rounded-full text-xs font-black flex items-center gap-1 shadow-sm animate-pulse">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Pending Administrative Review</span>
+                  </span>
+                )}
+                {currentUser?.status === "rejected" && (
+                  <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full text-xs font-black flex items-center gap-1 shadow-sm">
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Verification Rejected</span>
+                  </span>
+                )}
               </div>
 
               <p className="text-xs sm:text-sm font-extrabold text-blue-900 flex items-center gap-1.5">
@@ -263,6 +278,69 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
         </div>
 
       </div>
+
+      {/* ═════════ VERIFICATION STATUS & REJECTION REASON ALERT BANNER ═════════ */}
+      {currentUser?.status === "rejected" && (
+        <div className="bg-rose-50 border-2 border-rose-300 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5 animate-in fade-in">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white uppercase tracking-wider">
+                  Verification Action Required
+                </span>
+                <span className="text-xs font-bold text-rose-900">MoES Central Administration Review</span>
+              </div>
+              <h3 className="text-base font-black text-slate-900">
+                Officer Profile Registration Rejected by Administrator
+              </h3>
+              <div className="bg-white/90 p-3.5 rounded-2xl border border-rose-200 text-xs text-rose-950 font-medium">
+                <span className="font-bold text-rose-900 block mb-0.5">Admin Feedback & Required Corrections:</span>
+                "{currentUser.rejectionReason || currentUser.approvalNotes || "Incomplete credentials or document verification mismatch. Please review and update your qualifications and certifications."}"
+              </div>
+              <p className="text-[11px] text-slate-500">
+                * Note: Course enrollments and active capacity features are locked until your revised profile is approved by Admin.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => handleSaveProfile(true)}
+            disabled={loading}
+            className="w-full md:w-auto px-6 py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-2xl text-xs shadow-lg transition-transform hover:scale-105 shrink-0 flex items-center justify-center gap-2"
+          >
+            <Send className="w-4 h-4" />
+            <span>Resubmit Profile for Approval</span>
+          </button>
+        </div>
+      )}
+
+      {currentUser?.status === "pending" && (
+        <div className="bg-amber-50 border border-amber-300 rounded-3xl p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-amber-950 text-sm">
+                Officer Profile Under Administrative Verification Review
+              </h3>
+              <p className="text-xs text-amber-800 mt-0.5">
+                Your credentials, qualifications, and cadre posting documents are queued for MoES administrator sign-off. Full course enrollment access will unlock immediately upon verification.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => handleSaveProfile(true)}
+            disabled={loading}
+            className="px-4 py-2 bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold rounded-xl text-xs transition-colors shrink-0 whitespace-nowrap"
+          >
+            Sync & Re-Verify
+          </button>
+        </div>
+      )}
 
       {/* ═════════ SECTION 1: METEOROLOGICAL COMPETENCIES & OPERATIONAL SKILLS (EXACT MATCH SHARED PHOTO) ═════════ */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">

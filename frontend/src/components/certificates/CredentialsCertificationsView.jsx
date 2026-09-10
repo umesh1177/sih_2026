@@ -200,43 +200,32 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate }
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
-      {/* ═════════ TOP HERO ACCREDITATION BANNER ═════════ */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-blue-900/50">
-        
-        {/* Background Decorative Seals */}
-        <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
-          <ShieldCheck className="w-80 h-80 text-white" />
-        </div>
-        <div className="absolute right-40 top-0 opacity-15 pointer-events-none">
-          <Award className="w-48 h-48 text-amber-300" />
-        </div>
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/20 text-amber-300 rounded-full text-xs font-bold border border-amber-400/30 backdrop-blur-md">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span>Ministry of Earth Sciences • Official Digital Credential Registry</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Certified Professional Accreditations
-            </h1>
-            <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed">
-              Cryptographically verified competency certifications issued under the National Capacity Building Program for Operational Meteorology & Geoscience.
-            </p>
+      {/* ═════════ TOP HERO ACCREDITATION BANNER (CLEAN LIGHT THEME) ═════════ */}
+      <div className="relative overflow-hidden bg-white rounded-3xl p-6 sm:p-8 text-slate-800 shadow-sm border border-slate-200/90 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-2xl z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-bold border border-blue-200">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
+            <span>Ministry of Earth Sciences • Official Digital Credential Registry</span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+            Certified Professional Accreditations
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+            Cryptographically verified competency certifications issued under the National Capacity Building Program for Operational Meteorology & Geoscience.
+          </p>
+        </div>
 
-          {/* Officer Verification Stamp */}
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex items-center gap-3.5 shrink-0 shadow-lg">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-400 to-amber-200 text-[#0a2558] flex items-center justify-center font-black text-xl shadow-md">
-              <Award className="w-7 h-7 text-[#0a2558]" />
-            </div>
-            <div>
-              <p className="text-[11px] text-blue-200 font-bold uppercase tracking-wider">Accredited Officer</p>
-              <p className="font-extrabold text-sm text-white">{currentUser?.name || "Rahul Sharma"}</p>
-              <p className="text-[10px] text-emerald-300 font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Digital Signature Verified
-              </p>
-            </div>
+        {/* Officer Verification Stamp */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3.5 shrink-0 shadow-xs z-10">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center font-black text-xl shadow-xs">
+            <Award className="w-7 h-7 text-blue-700" />
+          </div>
+          <div>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Accredited Officer</p>
+            <p className="font-extrabold text-sm text-slate-900">{currentUser?.name || "Rahul Sharma"}</p>
+            <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Digital Signature Verified
+            </p>
           </div>
         </div>
       </div>

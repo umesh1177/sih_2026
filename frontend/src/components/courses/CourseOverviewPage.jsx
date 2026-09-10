@@ -348,23 +348,27 @@ export const CourseOverviewPage = ({
                 </>
               )}
 
-              {/* Trainee Specific Feedback Tab */}
-              {currentUser?.role !== "trainer" && (
-                <button
-                  onClick={() => setActiveTab("feedback")}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                    activeTab === "feedback"
-                      ? "bg-[#0a2558] text-white shadow-md"
-                      : "text-slate-600 hover:text-[#0a2558] hover:bg-slate-100"
-                  }`}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Give Feedback</span>
-                  {!isCourse100Percent && (
-                    <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
-                  )}
-                </button>
-              )}
+              {/* Feedback Tab (Admin / Trainer / Trainee) */}
+              <button
+                onClick={() => setActiveTab("feedback")}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                  activeTab === "feedback"
+                    ? "bg-[#0a2558] text-white shadow-md"
+                    : "text-slate-600 hover:text-[#0a2558] hover:bg-slate-100"
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>
+                  {currentUser?.role === "admin" 
+                    ? `Cadre Feedbacks (${feedbacks.length})`
+                    : currentUser?.role === "trainer"
+                    ? `Cadre Feedbacks (${feedbacks.length})`
+                    : "Give Feedback"}
+                </span>
+                {currentUser?.role === "trainee" && !isCourse100Percent && (
+                  <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
+                )}
+              </button>
             </div>
 
             {/* ═════════ TAB 1: ABOUT ═════════ */}
@@ -838,146 +842,315 @@ export const CourseOverviewPage = ({
               </div>
             )}
 
-            {/* ═════════ TAB 5: GIVE FEEDBACK (TRAINEE ONLY) ═════════ */}
-            {activeTab === "feedback" && currentUser?.role !== "trainer" && (
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 animate-in fade-in duration-150">
-                {!isCourse100Percent ? (
-                  <div className="text-center py-12 px-6 bg-slate-50 rounded-3xl border-2 border-dashed border-amber-200 space-y-4">
-                    <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto shadow-inner">
-                      <Lock className="w-8 h-8" />
-                    </div>
-                    <div className="max-w-md mx-auto space-y-1.5">
-                      <h3 className="text-lg font-bold text-slate-900">
-                        Course Feedback Locked ({progressPercentage}% Completed)
-                      </h3>
-                      <p className="text-xs text-slate-600 leading-relaxed">
-                        To maintain high evaluation standards, official institutional feedback unlocks only after you complete <b>100%</b> of all lectures and modules.
-                      </p>
-                    </div>
-
-                    <div className="max-w-sm mx-auto space-y-1.5 pt-2">
-                      <div className="flex items-center justify-between text-xs font-bold">
-                        <span className="text-slate-600">Current Progress</span>
-                        <span className="text-blue-700">{progressPercentage}% / 100%</span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all"
-                          style={{ width: `${progressPercentage}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => onOpenStudio(course)}
-                      className="mt-4 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105"
-                    >
-                      Resume Learning to Complete Course
-                    </button>
-                  </div>
-                ) : (
+            {/* ═════════ TAB 5: CADRE FEEDBACKS & REVIEWS ═════════ */}
+            {activeTab === "feedback" && (
+              <div className="space-y-6 animate-in fade-in duration-150">
+                
+                {/* ADMIN / TRAINER VIEW: READ-ONLY OVERSIGHT OF ALL CADRE FEEDBACKS */}
+                {(currentUser?.role === "admin" || currentUser?.role === "trainer") ? (
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                      <div>
-                        <h2 className="text-base font-extrabold text-slate-900">Official Institutional Feedback Form</h2>
-                        <p className="text-xs text-slate-500 mt-0.5">Your evaluation helps MoES/IMD refine training programs and faculty curricula.</p>
-                      </div>
-                      <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 100% Completed
-                      </span>
-                    </div>
-
-                    {feedbackSubmitted ? (
-                      <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">
-                        <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                          <Check className="w-6 h-6" />
-                        </div>
-                        <h3 className="text-sm font-bold text-emerald-900">Thank You! Your Feedback Has Been Registered.</h3>
-                        <p className="text-xs text-emerald-700">
-                          Your ratings have been submitted to the MoES Training Directorate.
+                    
+                    {/* Admin Policy Notice */}
+                    <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 flex items-start gap-3">
+                      <ShieldCheck className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5 text-xs text-blue-950">
+                        <p className="font-extrabold text-blue-900">
+                          {currentUser?.role === "admin" ? "Administrative Oversight & Quality Audit Mode" : "Instructor Evaluation Oversight"}
+                        </p>
+                        <p className="text-blue-800 leading-relaxed">
+                          {currentUser?.role === "admin"
+                            ? "Feedback submission is reserved exclusively for enrolled Officer Trainees upon course completion. Administrators have oversight and review access to inspect all uploaded officer evaluations."
+                            : "Senior trainers have read-only access to trainee ratings and qualitative recommendations to refine lectures and module hands-on materials."}
                         </p>
                       </div>
-                    ) : (
-                      <form onSubmit={handleSubmitFeedback} className="space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
-                            <label className="text-xs font-bold text-slate-800">Trainer Delivery & Pedagogy</label>
-                            <div className="flex justify-center gap-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                  type="button"
-                                  key={star}
-                                  onClick={() => setFeedbackForm({ ...feedbackForm, trainerRating: star })}
-                                  className="p-1 text-amber-400 hover:scale-125 transition-transform"
-                                >
-                                  <Star className={`w-5 h-5 ${feedbackForm.trainerRating >= star ? "fill-amber-400" : "text-slate-300"}`} />
-                                </button>
-                              ))}
-                            </div>
-                            <span className="text-[10px] font-bold text-slate-500">{feedbackForm.trainerRating} / 5 Stars</span>
-                          </div>
+                    </div>
 
-                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
-                            <label className="text-xs font-bold text-slate-800">Content & Material Rigor</label>
-                            <div className="flex justify-center gap-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                  type="button"
-                                  key={star}
-                                  onClick={() => setFeedbackForm({ ...feedbackForm, contentRating: star })}
-                                  className="p-1 text-amber-400 hover:scale-125 transition-transform"
-                                >
-                                  <Star className={`w-5 h-5 ${feedbackForm.contentRating >= star ? "fill-amber-400" : "text-slate-300"}`} />
-                                </button>
-                              ))}
-                            </div>
-                            <span className="text-[10px] font-bold text-slate-500">{feedbackForm.contentRating} / 5 Stars</span>
-                          </div>
+                    {/* Aggregate Rating Scorecard */}
+                    <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                        <div>
+                          <h3 className="text-sm font-black text-slate-900">Institutional Feedback Metrics & Summary</h3>
+                          <p className="text-xs text-slate-500">Aggregated evaluations submitted by certified officers</p>
+                        </div>
+                        <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-xl">
+                          {feedbacks.length} Verified Reviews
+                        </span>
+                      </div>
 
-                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
-                            <label className="text-xs font-bold text-slate-800">Relevance to Forecasting</label>
-                            <div className="flex justify-center gap-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                  type="button"
-                                  key={star}
-                                  onClick={() => setFeedbackForm({ ...feedbackForm, relevanceRating: star })}
-                                  className="p-1 text-amber-400 hover:scale-125 transition-transform"
-                                >
-                                  <Star className={`w-5 h-5 ${feedbackForm.relevanceRating >= star ? "fill-amber-400" : "text-slate-300"}`} />
-                                </button>
-                              ))}
-                            </div>
-                            <span className="text-[10px] font-bold text-slate-500">{feedbackForm.relevanceRating} / 5 Stars</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        
+                        <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-1 text-center">
+                          <p className="text-[10px] font-bold uppercase text-amber-800 tracking-wider">Overall Course Rating</p>
+                          <div className="flex items-center justify-center gap-1">
+                            <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                            <span className="text-2xl font-black text-slate-900">
+                              {feedbacks.length > 0 
+                                ? (feedbacks.reduce((a, b) => a + (b.trainerRating + b.contentRating + b.relevanceRating) / 3, 0) / feedbacks.length).toFixed(1)
+                                : "4.9"}
+                            </span>
+                            <span className="text-xs font-bold text-slate-400">/ 5.0</span>
                           </div>
+                          <p className="text-[10px] text-amber-700 font-semibold">Consensus Score</p>
                         </div>
 
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-slate-800">
-                            Detailed Officer Feedback & Practical Recommendations:
-                          </label>
-                          <textarea
-                            rows={4}
-                            required
-                            placeholder="Share your experience on course depth, presentation clarity, and software hands-on sessions..."
-                            value={feedbackForm.comment}
-                            onChange={(e) => setFeedbackForm({ ...feedbackForm, comment: e.target.value })}
-                            className="w-full p-3.5 rounded-2xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
-                          />
+                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 text-center">
+                          <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Trainer Pedagogy</p>
+                          <div className="flex items-center justify-center gap-1">
+                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                            <span className="text-xl font-black text-slate-900">
+                              {feedbacks.length > 0 
+                                ? (feedbacks.reduce((a, b) => a + (b.trainerRating || 5), 0) / feedbacks.length).toFixed(1)
+                                : "5.0"}
+                            </span>
+                            <span className="text-xs font-bold text-slate-400">/ 5.0</span>
+                          </div>
+                          <p className="text-[10px] text-slate-500">Lecture Clarity</p>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 text-center">
+                          <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Curriculum Rigor</p>
+                          <div className="flex items-center justify-center gap-1">
+                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                            <span className="text-xl font-black text-slate-900">
+                              {feedbacks.length > 0 
+                                ? (feedbacks.reduce((a, b) => a + (b.contentRating || 5), 0) / feedbacks.length).toFixed(1)
+                                : "4.8"}
+                            </span>
+                            <span className="text-xs font-bold text-slate-400">/ 5.0</span>
+                          </div>
+                          <p className="text-[10px] text-slate-500">Syllabus Depth</p>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 text-center">
+                          <p className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Forecasting Relevance</p>
+                          <div className="flex items-center justify-center gap-1">
+                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                            <span className="text-xl font-black text-slate-900">
+                              {feedbacks.length > 0 
+                                ? (feedbacks.reduce((a, b) => a + (b.relevanceRating || 5), 0) / feedbacks.length).toFixed(1)
+                                : "4.9"}
+                            </span>
+                            <span className="text-xs font-bold text-slate-400">/ 5.0</span>
+                          </div>
+                          <p className="text-[10px] text-slate-500">Operational Utility</p>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    {/* Uploaded Cadre Reviews Feed */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4 text-blue-600" />
+                          <span>All Uploaded Trainee Officer Feedbacks ({feedbacks.length})</span>
+                        </h3>
+                      </div>
+
+                      {feedbacks.map((fb, idx) => (
+                        <div key={fb.id || idx} className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-2xl bg-[#0a2558] text-white flex items-center justify-center font-bold text-sm">
+                                {fb.traineeName ? fb.traineeName.charAt(0) : "O"}
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-slate-900 text-xs sm:text-sm">{fb.traineeName || "Officer Trainee"}</h4>
+                                <p className="text-[10px] text-slate-400 font-medium">
+                                  {fb.cadreId || "IMD-CADRE-2024"} • {fb.station || fb.department || "Regional Meteorological Centre"}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">
+                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                <span className="text-xs font-black text-amber-900">
+                                  {(((fb.trainerRating || 5) + (fb.contentRating || 5) + (fb.relevanceRating || 5)) / 3).toFixed(1)} / 5.0
+                                </span>
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                {fb.createdAt ? new Date(fb.createdAt).toLocaleDateString() : "Sep 8, 2026"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Ratings breakdown chips */}
+                          <div className="flex flex-wrap gap-2 text-[10px]">
+                            <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-semibold">
+                              Trainer: <b>{fb.trainerRating || 5}★</b>
+                            </span>
+                            <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-semibold">
+                              Content: <b>{fb.contentRating || 5}★</b>
+                            </span>
+                            <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-semibold">
+                              Relevance: <b>{fb.relevanceRating || 5}★</b>
+                            </span>
+                            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified Cadet
+                            </span>
+                          </div>
+
+                          {/* Comment body */}
+                          <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-2xl border border-slate-100 whitespace-pre-line">
+                            "{fb.comment}"
+                          </p>
+                        </div>
+                      ))}
+
+                      {feedbacks.length === 0 && (
+                        <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-6">
+                          <MessageSquare className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                          <p className="text-xs font-bold text-slate-700">No feedbacks uploaded yet for this course</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">Enrolled trainees will submit reviews upon 100% course completion.</p>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                ) : (
+                  /* TRAINEE VIEW: CONDITIONAL FEEDBACK SUBMISSION & REVIEW LIST */
+                  <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                    {!isCourse100Percent ? (
+                      <div className="text-center py-12 px-6 bg-slate-50 rounded-3xl border-2 border-dashed border-amber-200 space-y-4">
+                        <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto shadow-inner">
+                          <Lock className="w-8 h-8" />
+                        </div>
+                        <div className="max-w-md mx-auto space-y-1.5">
+                          <h3 className="text-lg font-bold text-slate-900">
+                            Course Feedback Locked ({progressPercentage}% Completed)
+                          </h3>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            To maintain high evaluation standards, official institutional feedback unlocks only after you complete <b>100%</b> of all lectures and modules.
+                          </p>
+                        </div>
+
+                        <div className="max-w-sm mx-auto space-y-1.5 pt-2">
+                          <div className="flex items-center justify-between text-xs font-bold">
+                            <span className="text-slate-600">Current Progress</span>
+                            <span className="text-blue-700">{progressPercentage}% / 100%</span>
+                          </div>
+                          <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all"
+                              style={{ width: `${progressPercentage}%` }}
+                            />
+                          </div>
                         </div>
 
                         <button
-                          type="submit"
-                          disabled={feedbackSubmitting}
-                          className="px-6 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+                          onClick={() => onOpenStudio(course)}
+                          className="mt-4 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105"
                         >
-                          <Send className="w-4 h-4" />
-                          <span>{feedbackSubmitting ? "Submitting..." : "Submit Institutional Evaluation"}</span>
+                          Resume Learning to Complete Course
                         </button>
-                      </form>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                          <div>
+                            <h2 className="text-base font-extrabold text-slate-900">Official Institutional Feedback Form</h2>
+                            <p className="text-xs text-slate-500 mt-0.5">Your evaluation helps MoES/IMD refine training programs and faculty curricula.</p>
+                          </div>
+                          <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 100% Completed
+                          </span>
+                        </div>
+
+                        {feedbackSubmitted ? (
+                          <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">
+                            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                              <Check className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-sm font-bold text-emerald-900">Thank You! Your Feedback Has Been Registered.</h3>
+                            <p className="text-xs text-emerald-700">
+                              Your ratings have been submitted to the MoES Training Directorate.
+                            </p>
+                          </div>
+                        ) : (
+                          <form onSubmit={handleSubmitFeedback} className="space-y-5">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
+                                <label className="text-xs font-bold text-slate-800">Trainer Delivery & Pedagogy</label>
+                                <div className="flex justify-center gap-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                      type="button"
+                                      key={star}
+                                      onClick={() => setFeedbackForm({ ...feedbackForm, trainerRating: star })}
+                                      className="p-1 text-amber-400 hover:scale-125 transition-transform"
+                                    >
+                                      <Star className={`w-5 h-5 ${feedbackForm.trainerRating >= star ? "fill-amber-400" : "text-slate-300"}`} />
+                                    </button>
+                                  ))}
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500">{feedbackForm.trainerRating} / 5 Stars</span>
+                              </div>
+
+                              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
+                                <label className="text-xs font-bold text-slate-800">Content & Material Rigor</label>
+                                <div className="flex justify-center gap-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                      type="button"
+                                      key={star}
+                                      onClick={() => setFeedbackForm({ ...feedbackForm, contentRating: star })}
+                                      className="p-1 text-amber-400 hover:scale-125 transition-transform"
+                                    >
+                                      <Star className={`w-5 h-5 ${feedbackForm.contentRating >= star ? "fill-amber-400" : "text-slate-300"}`} />
+                                    </button>
+                                  ))}
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500">{feedbackForm.contentRating} / 5 Stars</span>
+                              </div>
+
+                              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
+                                <label className="text-xs font-bold text-slate-800">Relevance to Forecasting</label>
+                                <div className="flex justify-center gap-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                      type="button"
+                                      key={star}
+                                      onClick={() => setFeedbackForm({ ...feedbackForm, relevanceRating: star })}
+                                      className="p-1 text-amber-400 hover:scale-125 transition-transform"
+                                    >
+                                      <Star className={`w-5 h-5 ${feedbackForm.relevanceRating >= star ? "fill-amber-400" : "text-slate-300"}`} />
+                                    </button>
+                                  ))}
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500">{feedbackForm.relevanceRating} / 5 Stars</span>
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-800">
+                                Detailed Officer Feedback & Practical Recommendations:
+                              </label>
+                              <textarea
+                                rows={4}
+                                required
+                                placeholder="Share your experience on course depth, presentation clarity, and software hands-on sessions..."
+                                value={feedbackForm.comment}
+                                onChange={(e) => setFeedbackForm({ ...feedbackForm, comment: e.target.value })}
+                                className="w-full p-3.5 rounded-2xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
+                              />
+                            </div>
+
+                            <button
+                              type="submit"
+                              disabled={feedbackSubmitting}
+                              className="px-6 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+                            >
+                              <Send className="w-4 h-4" />
+                              <span>{feedbackSubmitting ? "Submitting..." : "Submit Institutional Evaluation"}</span>
+                            </button>
+                          </form>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
+
               </div>
             )}
 
@@ -1029,6 +1202,22 @@ export const CourseOverviewPage = ({
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>Start / Resume Learning</span>
+                </button>
+              ) : currentUser?.status === "rejected" ? (
+                <button
+                  onClick={() => alert(`❌ Enrollment Blocked: Your officer profile was rejected by the MoES Administrator.\n\nReason: "${currentUser.rejectionReason || 'Incomplete credentials.'}"\n\nPlease visit Officer Profile to rectify and resubmit.`)}
+                  className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-2xl text-sm shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <AlertTriangle className="w-4 h-4 text-rose-200" />
+                  <span>Enrollment Locked (Profile Rejected)</span>
+                </button>
+              ) : currentUser?.status === "pending" ? (
+                <button
+                  onClick={() => alert("⏳ Enrollment Restricted: Your officer registration is currently under MoES administrative review. You will be able to enroll immediately upon approval.")}
+                  className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-2xl text-sm shadow-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <Clock className="w-4 h-4 text-slate-900" />
+                  <span>Pending Admin Approval to Enroll</span>
                 </button>
               ) : (
                 <button

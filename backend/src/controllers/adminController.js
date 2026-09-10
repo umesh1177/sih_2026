@@ -63,15 +63,19 @@ export const getPendingUsers = (req, res) => {
 export const verifyUser = (req, res) => {
   try {
     const { id } = req.params;
-    const { approved, notes } = req.body;
-    const user = db.approveUser(id, approved, notes);
+    const { approved, notes, rejectionReason } = req.body;
+    const finalNotes = rejectionReason || notes || "";
+    const user = db.approveUser(id, approved, finalNotes);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
+    const { passwordHash, ...safeUser } = user;
     return res.json({
       success: true,
-      message: approved ? `User ${user.name} approved successfully!` : `User ${user.name} registration rejected.`,
-      user
+      message: approved 
+        ? `Officer ${user.name} profile verified and approved successfully!` 
+        : `Officer ${user.name} verification rejected. Notification dispatched with reasons.`,
+      user: safeUser
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -80,10 +84,29 @@ export const verifyUser = (req, res) => {
 
 export const getAllUsers = (req, res) => {
   try {
-    const { role, status } = req.query;
-    let users = [...db.users];
-    if (role) users = users.filter(u => u.role === role);
-    if (status) users = users.filter(u => u.status === status);
+    const { role, status, search } = req.query;
+    let users = db.users.map(u => {
+      const { passwordHash, ...safe } = u;
+      return safe;
+    });
+
+    if (role && role !== "all") {
+      users = users.filter(u => u.role === role);
+    }
+    if (status && status !== "all") {
+      users = users.filter(u => u.status === status);
+    }
+    if (search && search.trim().length > 0) {
+      const q = search.toLowerCase();
+      users = users.filter(u => 
+        (u.name && u.name.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.cadreId && u.cadreId.toLowerCase().includes(q)) ||
+        (u.station && u.station.toLowerCase().includes(q)) ||
+        (u.department && u.department.toLowerCase().includes(q))
+      );
+    }
+
     return res.json({ success: true, count: users.length, users });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -107,6 +130,20 @@ export const getAnnouncements = (req, res) => {
   try {
     const list = db.getAnnouncements();
     return res.json({ success: true, count: list.length, announcements: list });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteAnnouncement = (req, res) => {
+  try {
+    const { id } = req.params;
+    const initialLen = db.announcements.length;
+    db.announcements = db.announcements.filter(a => a.id !== id);
+    if (db.announcements.length === initialLen) {
+      return res.status(404).json({ success: false, message: "Announcement not found" });
+    }
+    return res.json({ success: true, message: "Broadcast directive removed successfully." });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
