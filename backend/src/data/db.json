@@ -1827,6 +1827,203 @@
   ],
   "quizzes": [
     {
+      "id": "paper_custom_1789039266151",
+      "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology",
+      "trainerName": "AI Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 24,
+      "passMarks": 12,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-10T11:21:06.157Z",
+      "deadlineTime": "2026-09-17T11:21:06.157Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "questions": [
+        {
+          "id": "qb_f6d294b3",
+          "question": "What is the primary function of the Arakawa C-grid staggering utilized in the WRF model?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Staggering velocity components (u, v) at cell faces and mass variables (T, P) at cell centers to optimize gravity wave propagation",
+            "Placing all variables at the cell vertex",
+            "Using hexagonal spherical harmonics",
+            "Eliminating vertical advection"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Arakawa C-grid provides the best dispersion properties for high-resolution gravity waves and boundary layer turbulence."
+        },
+        {
+          "id": "qb_42a1f78f",
+          "question": "What is the primary function of the Arakawa C-grid staggering utilized in the WRF model?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Staggering velocity components (u, v) at cell faces and mass variables (T, P) at cell centers to optimize gravity wave propagation",
+            "Placing all variables at the cell vertex",
+            "Using hexagonal spherical harmonics",
+            "Eliminating vertical advection"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Arakawa C-grid provides the best dispersion properties for high-resolution gravity waves and boundary layer turbulence."
+        },
+        {
+          "id": "qb_f105792a",
+          "question": "What is the primary function of the Arakawa C-grid staggering utilized in the WRF model?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Staggering velocity components (u, v) at cell faces and mass variables (T, P) at cell centers to optimize gravity wave propagation",
+            "Placing all variables at the cell vertex",
+            "Using hexagonal spherical harmonics",
+            "Eliminating vertical advection"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Arakawa C-grid provides the best dispersion properties for high-resolution gravity waves and boundary layer turbulence."
+        },
+        {
+          "id": "qb_003",
+          "question": "The Courant-Friedrichs-Lewy (CFL) condition in explicit NWP schemes requires the Courant number (C) to be:",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Governing Equations",
+          "module": "Module 2",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "C > 1 for stability",
+            "C = 0 always",
+            "C ≤ 1 for computational stability",
+            "C = 2π for wave solutions"
+          ],
+          "correctAnswer": 2,
+          "explanation": "CFL condition mandates that Courant number ≤ 1, meaning the wave cannot traverse more than one grid cell per timestep."
+        },
+        {
+          "id": "qb_014",
+          "question": "The ADCIRC model used for storm surge forecasting is a:",
+          "subjectId": "sub_cyc_02",
+          "subjectName": "Storm Surge Modeling",
+          "module": "Module 3",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "options": [
+            "Global atmospheric model",
+            "Finite element shallow water equation model",
+            "Coupled ocean-atmosphere GCM",
+            "Statistical regression surge model"
+          ],
+          "correctAnswer": 1,
+          "explanation": "ADCIRC (Advanced Circulation Model) solves depth-integrated shallow water equations on unstructured finite element grids for storm surge."
+        },
+        {
+          "id": "qb_024",
+          "question": "In the context of Indian monsoon forecasting, what does the acronym MMCFS stand for?",
+          "subjectId": "sub_cli_02",
+          "subjectName": "LRF & Climate Projections",
+          "module": "Module 3",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Multi-Model Coupled Forecast System",
+            "Monsoon Model Climate Forecast Suite",
+            "Monthly Maximum Cumulative Forecast Scheme",
+            "Multi-Model Climate Forecast System"
+          ],
+          "correctAnswer": 0,
+          "explanation": "MMCFS (Multi-Model Coupled Forecast System) is IMD's operational seasonal forecast system using coupled ocean-atmosphere model ensembles."
+        },
+        {
+          "id": "qb_011",
+          "question": "The Dvorak technique for tropical cyclone intensity estimation primarily uses:",
+          "subjectId": "sub_cyc_01",
+          "subjectName": "Cyclone Dynamics",
+          "module": "Module 2",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Microwave sea surface temperature",
+            "Infrared satellite imagery cloud patterns",
+            "Ocean heat content (OHC) maps",
+            "Dropsonde wind profiles"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Dvorak technique uses IR (and visible) geostationary satellite imagery to classify cloud pattern and estimate T-number/central pressure."
+        },
+        {
+          "id": "qb_006",
+          "question": "In a dual-polarization Doppler radar, which variable best distinguishes between rain and hail?",
+          "subjectId": "sub_dwr_02",
+          "subjectName": "Severe Storm Signatures",
+          "module": "Module 2",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Reflectivity (Z)",
+            "Radial Velocity (V)",
+            "Differential Reflectivity (ZDR)",
+            "Spectrum Width (W)"
+          ],
+          "correctAnswer": 2,
+          "explanation": "ZDR is near 0 dB for spherical hailstones but is typically 1–3 dB for oblate raindrops, enabling discrimination."
+        },
+        {
+          "id": "qb_008",
+          "question": "Which radar scan product provides the maximum reflectivity in a column at each horizontal location?",
+          "subjectId": "sub_dwr_01",
+          "subjectName": "Radar Hardware & Products",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "PPI (Plan Position Indicator)",
+            "RHI (Range Height Indicator)",
+            "MAX(Z) / CMAX Product",
+            "CAPPI at 3 km"
+          ],
+          "correctAnswer": 2,
+          "explanation": "MAX(Z) or Column Maximum Reflectivity product shows the highest Z value at each map point, useful for convection identification."
+        },
+        {
+          "id": "qb_2d60932a",
+          "question": "Which thermodynamic variable is conserved in both dry and moist adiabatic processes without precipitation in NWP models?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Equivalent Potential Temperature (Theta-e)",
+            "Virtual Temperature (Tv)",
+            "Dew Point Temperature (Td)",
+            "Dry Static Energy (s)"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Equivalent potential temperature (Theta-e) is conserved during both dry and reversible moist pseudoadiabatic ascents."
+        }
+      ]
+    },
+    {
       "id": "paper_qb_1789038687245",
       "title": "Adaptive Question Bank Drill",
       "courseId": "crs_nwp_101",

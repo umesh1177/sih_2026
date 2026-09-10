@@ -26,12 +26,15 @@ import { CourseManagementHubModal } from "./CourseManagementHubModal";
 export const CourseCatalogView = ({ 
   courses = [], 
   currentUser, 
+  activeTab = "courses",
+  onNavigateCourses,
   onSelectCourse, 
   onEnrollClick,
   onOpenCertificate,
   onOpenTrainerStudio,
   onRefreshCourses
 }) => {
+  const isMyLearningMode = activeTab === "my-learning";
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
@@ -54,9 +57,16 @@ export const CourseCatalogView = ({
 
   const levels = ["All", "Beginner", "Intermediate", "Advanced"];
 
-  // Filter courses strictly assigned to Trainer when logged in as Trainer
-  const effectiveBaseCourses = currentUser?.role === "trainer"
-    ? courses.filter(c => {
+  // 1. My Learning Mode: strictly filter to courses where this trainee is enrolled
+  // 2. Trainer Mode: filter courses assigned to this trainer
+  // 3. Admin / General Catalog: all courses
+  const getBaseCourses = () => {
+    if (isMyLearningMode) {
+      return courses.filter(c => (c.enrolledTraineeIds || []).includes(currentUser?.id));
+    }
+
+    if (currentUser?.role === "trainer") {
+      const assigned = courses.filter(c => {
         if (currentUser?.name && c.leadTrainerName) {
           const cName = c.leadTrainerName.toLowerCase();
           const uName = currentUser.name.toLowerCase();
@@ -66,19 +76,20 @@ export const CourseCatalogView = ({
           if (uName.includes("roy") && cName.includes("roy")) return true;
         }
         if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
-        // Check if assigned to any subject
         if (c.subjects && Array.isArray(c.subjects)) {
           return c.subjects.some(s => s.assignedTrainerId === currentUser?.id || (currentUser?.name && s.assignedTrainerName?.toLowerCase().includes(currentUser.name.toLowerCase())));
         }
         return false;
-      })
-    : courses;
+      });
+      return assigned.length > 0 ? assigned : courses.slice(0, 2);
+    }
 
-  const coursesToFilter = (currentUser?.role === "trainer" && effectiveBaseCourses.length > 0)
-    ? effectiveBaseCourses
-    : (currentUser?.role === "trainer" ? courses.slice(0, 2) : courses);
+    return courses;
+  };
 
-  // Filter courses
+  const coursesToFilter = getBaseCourses();
+
+  // Filter courses with search, category, level
   const filteredCourses = coursesToFilter.filter(course => {
     const isEnrolled = (course.enrolledTraineeIds || []).includes(currentUser?.id);
 
@@ -95,8 +106,8 @@ export const CourseCatalogView = ({
     // Level filter
     const matchesLevel = selectedLevel === "All" || (course.level && course.level.includes(selectedLevel));
 
-    // Status filter
-    const matchesStatus = selectedStatus === "All" || 
+    // Status filter (only relevant in general catalog view)
+    const matchesStatus = isMyLearningMode || selectedStatus === "All" || 
       (selectedStatus === "Enrolled" && isEnrolled) ||
       (selectedStatus === "Available" && !isEnrolled) ||
       (selectedStatus === "Recent" && (Date.now() - new Date(course.createdAt || 0).getTime() < 14 * 86400000 || course.isRecent));
@@ -106,7 +117,6 @@ export const CourseCatalogView = ({
 
   const handleCourseCreatedOrUpdated = (updatedCourse) => {
     if (onRefreshCourses) onRefreshCourses();
-    // Also if courseToManage was active, update it
     if (courseToManage && courseToManage.id === updatedCourse?.id) {
       setCourseToManage(updatedCourse);
     }
@@ -115,25 +125,29 @@ export const CourseCatalogView = ({
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       
-      {/* Header Banner with Admin Create Course Trigger */}
+      {/* Header Banner with Admin Create Course Trigger / My Learning Title */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 text-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-200/90 relative overflow-hidden">
         <div className="space-y-1.5 max-w-2xl z-10">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0a2558] text-[10px] font-black uppercase tracking-wider">
-              MoES / IMD National Curricula
+              {isMyLearningMode ? "Enrolled Officer Programs" : "MoES / IMD National Curricula"}
             </span>
-            <span className="text-xs text-slate-400 font-medium">• {courses.length} Standardized Programs</span>
+            <span className="text-xs text-slate-400 font-medium">
+              • {filteredCourses.length} {isMyLearningMode ? "Enrolled Course(s)" : "Standardized Programs"}
+            </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
-            Digital Capacity Building Course Library
+            {isMyLearningMode ? "My Enrolled Courses & Learning Tracks" : "Digital Capacity Building Course Library"}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-            Explore operational training tracks, numerical models, Doppler radar, and satellite meteorology syllabi.
+            {isMyLearningMode 
+              ? "Access your active learning modules, interactive training laboratories, and enrolled subject syllabi."
+              : "Explore operational training tracks, numerical models, Doppler radar, and satellite meteorology syllabi."}
           </p>
         </div>
 
         {/* Admin Action: Publish New Course */}
-        {currentUser?.role === "admin" && (
+        {currentUser?.role === "admin" && !isMyLearningMode && (
           <button
             onClick={() => {
               setCourseToEdit(null);
@@ -143,6 +157,16 @@ export const CourseCatalogView = ({
           >
             <Plus className="w-4 h-4 text-blue-200" />
             <span>+ Publish New Operational Course</span>
+          </button>
+        )}
+
+        {isMyLearningMode && onNavigateCourses && (
+          <button
+            onClick={onNavigateCourses}
+            className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95 shrink-0 z-10"
+          >
+            <BookOpen className="w-4 h-4 text-blue-200" />
+            <span>Browse Full Catalog</span>
           </button>
         )}
       </div>
@@ -414,21 +438,42 @@ export const CourseCatalogView = ({
       </div>
 
       {filteredCourses.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8">
-          <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-slate-800">No matching training courses found</h3>
-          <p className="text-xs text-slate-500 mt-1">Try clearing your filters or changing your search terms.</p>
-          <button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedCategory("All");
-              setSelectedLevel("All");
-              setSelectedStatus("All");
-            }}
-            className="mt-4 px-4 py-2 bg-[#0a2558] text-white rounded-xl text-xs font-bold"
-          >
-            Reset Filters
-          </button>
+        <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-8 space-y-3">
+          {isMyLearningMode ? (
+            <>
+              <GraduationCap className="w-14 h-14 text-blue-300 mx-auto" />
+              <h3 className="text-base font-black text-slate-800">You are not enrolled in any training tracks yet</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Explore the official MoES / IMD Course Catalog to enroll in numerical modeling, Doppler radar nowcasting, and satellite meteorology programs.
+              </p>
+              {onNavigateCourses && (
+                <button
+                  onClick={onNavigateCourses}
+                  className="mt-2 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl text-xs font-bold shadow-md transition-all inline-flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4 text-blue-200" />
+                  <span>Browse Course Catalog</span>
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <h3 className="text-sm font-bold text-slate-800">No matching training courses found</h3>
+              <p className="text-xs text-slate-500 mt-1">Try clearing your filters or changing your search terms.</p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("All");
+                  setSelectedLevel("All");
+                  setSelectedStatus("All");
+                }}
+                className="mt-4 px-4 py-2 bg-[#0a2558] text-white rounded-xl text-xs font-bold"
+              >
+                Reset Filters
+              </button>
+            </>
+          )}
         </div>
       )}
 

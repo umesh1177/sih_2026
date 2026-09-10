@@ -447,6 +447,8 @@ const MainApp = () => {
             <CourseCatalogView
               courses={courses}
               currentUser={currentUser}
+              activeTab={activeTab}
+              onNavigateCourses={() => setActiveTab("courses")}
               onSelectCourse={(course) => setSelectedOverviewCourse(course)}
               onEnrollClick={(course) => setPrereqModalCourse(course)}
               onOpenCertificate={(submission, courseTitle, traineeName) => {
