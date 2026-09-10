@@ -140,7 +140,15 @@ export const TraineeDashboardView = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 z-10">
+        <div className="flex flex-wrap items-center gap-3 shrink-0 z-10">
+          <button
+            onClick={onOpenAiAdvisor}
+            className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-[#0a2558] hover:from-blue-700 hover:via-indigo-700 hover:to-[#081e46] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95 border border-blue-400/30"
+          >
+            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <span>AI Course Advisor</span>
+          </button>
+
           <button
             onClick={() => onNavigateTab("courses")}
             className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"

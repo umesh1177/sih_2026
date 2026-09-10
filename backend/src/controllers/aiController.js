@@ -4,6 +4,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { db } from "../store/dbStore.js";
 
 dotenv.config();
 
@@ -326,14 +327,8 @@ export const recommendCoursesWithAI = async (req, res) => {
     const { traineeProfile, courses } = req.body;
     const user = traineeProfile || req.user || {};
 
-    const availableCourses = courses || [
-      { id: "crs_nwp_101", title: "Advanced Numerical Weather Prediction (NWP) & Data Assimilation", category: "Atmospheric Modeling", prerequisites: ["Fluid Dynamics Fundamentals", "Basic Meteorology"] },
-      { id: "crs_dwr_102", title: "Doppler Weather Radar (DWR) Operational Data Interpretation & Nowcasting", category: "Radar & Remote Sensing", prerequisites: ["Electromagnetic Wave Theory", "Basic Meteorological Observations"] },
-      { id: "crs_cyc_103", title: "Tropical Cyclone Forecasting, Track Prediction & Storm Surge Modeling", category: "Cyclone & Marine Meteorology", prerequisites: ["Tropical Meteorology Basics"] },
-      { id: "crs_sat_104", title: "INSAT-3DR & INSAT-3DS Satellite Meteorology & Product Interpretation", category: "Satellite Meteorology", prerequisites: ["Electromagnetic Spectrum Basics"] },
-      { id: "crs_agro_105", title: "Agromet Advisory Services & Crop Weather Modeling for Indian Agriculture", category: "Agrometeorology", prerequisites: ["Basic Meteorological Observations"] },
-      { id: "crs_cli_106", title: "Indian Summer Monsoon Dynamics, Climate Variability & Long-Range Forecasting", category: "Climate Science", prerequisites: ["Synoptic Meteorology"] }
-    ];
+    const dbCourses = db.getCourses ? db.getCourses() : [];
+    const availableCourses = (Array.isArray(courses) && courses.length > 0) ? courses : dbCourses;
 
     const promptText = `
 You are the Chief AI Training Advisor for India Meteorological Department (IMD) / Ministry of Earth Sciences (MoES), Govt of India.

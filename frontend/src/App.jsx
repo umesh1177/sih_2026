@@ -269,6 +269,7 @@ const MainApp = () => {
         setActiveTab={setActiveTab}
         onOpenLoginPage={() => setViewMode("login")}
         onOpenHomePage={() => setViewMode("landing")}
+        onOpenAiAdvisor={() => setIsAiCourseAdvisorOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -277,6 +278,7 @@ const MainApp = () => {
         <TopNavbar
           activeTab={activeTab}
           onOpenAnnouncements={() => setShowAnnouncementsModal(true)}
+          onOpenAiCourseAdvisor={() => setIsAiCourseAdvisorOpen(true)}
           onOpenAiGenerator={() => setIsAiModalOpen(true)}
           onOpenLoginPage={() => setViewMode("login")}
         />

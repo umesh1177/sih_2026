@@ -17,7 +17,7 @@ import {
   Sparkles
 } from "lucide-react";
 
-export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage }) => {
+export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage, onOpenAiAdvisor }) => {
   const { currentUser, logout } = useAuth();
 
   // Role based navigation links
@@ -50,6 +50,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
     // Trainee view
     return [
       ...baseItems,
+      { id: "ai-course-advisor", label: "AI Course Advisor", icon: Sparkles, isModalTrigger: true },
       { id: "my-learning", label: "My Enrolled Courses", icon: GraduationCap },
       { id: "trainee-quizzes", label: "Scheduled Assessments", icon: ClipboardList },
       { id: "practice-papers", label: "AI Practice Papers", icon: Sparkles },
@@ -100,18 +101,33 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          const isAdvisor = item.id === "ai-course-advisor";
+
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                if (item.isModalTrigger || isAdvisor) {
+                  if (onOpenAiAdvisor) onOpenAiAdvisor();
+                } else {
+                  setActiveTab(item.id);
+                }
+              }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-xs transition-all duration-200 text-left ${
                 isActive
                   ? "bg-white text-[#0a2558] font-black shadow-lg transform translate-x-1"
+                  : isAdvisor
+                  ? "bg-gradient-to-r from-amber-400/20 via-indigo-400/20 to-blue-400/20 text-amber-200 hover:text-white hover:bg-white/15 border border-amber-300/30 font-bold"
                   : "text-blue-100/80 hover:bg-white/10 hover:text-white"
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#0a2558]" : "text-blue-300"}`} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-[#0a2558]" : isAdvisor ? "text-amber-300 animate-pulse" : "text-blue-300"}`} />
               <span className="truncate">{item.label}</span>
+              {isAdvisor && (
+                <span className="ml-auto px-1.5 py-0.5 rounded-md bg-amber-400/30 text-amber-200 text-[9px] font-black uppercase tracking-wider">
+                  AI
+                </span>
+              )}
             </button>
           );
         })}

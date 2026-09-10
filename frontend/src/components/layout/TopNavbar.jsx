@@ -1,8 +1,8 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Bell, AlertTriangle, CheckCircle2, Building2 } from "lucide-react";
+import { Bell, AlertTriangle, CheckCircle2, Building2, Sparkles } from "lucide-react";
 
-export const TopNavbar = ({ activeTab, onOpenAnnouncements }) => {
+export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdvisor }) => {
   const { currentUser } = useAuth();
 
   const getBreadcrumbTitle = () => {
@@ -29,7 +29,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements }) => {
 
   return (
     <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 flex items-center justify-between z-20 shrink-0 shadow-sm relative select-none">
-      {/* Breadcrumb matching Screenshot */}
+      {/* Breadcrumb */}
       <div className="flex items-center gap-2.5 text-xs">
         <div className="flex items-center gap-1.5 text-slate-400">
           <Building2 className="w-4 h-4 text-[#0a2558]" />
@@ -39,8 +39,20 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements }) => {
         <span className="font-extrabold text-slate-800 tracking-tight text-sm">{getBreadcrumbTitle()}</span>
       </div>
 
-      {/* Right Controls: Verified Officer Tag + Notification Icon */}
+      {/* Right Controls: AI Course Advisor + Verified Officer Tag + Notification Icon */}
       <div className="flex items-center gap-3">
+        {/* Dynamic AI Course Advisor Trigger Button for Trainees */}
+        {currentUser?.role === "trainee" && (
+          <button
+            onClick={onOpenAiCourseAdvisor}
+            title="Get Personalized AI Course Recommendations"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-[#0a2558] hover:from-blue-700 hover:via-indigo-700 hover:to-[#081e46] text-white rounded-full text-xs font-bold shadow-sm hover:shadow-md transition-all transform hover:scale-[1.02] active:scale-95 group border border-blue-400/30"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse group-hover:rotate-12 transition-transform" />
+            <span className="tracking-wide">AI Course Advisor</span>
+          </button>
+        )}
+
         {/* Trainee Pending Approval Warning Pill */}
         {currentUser?.role === "trainee" && currentUser?.status === "pending" && (
           <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-900 rounded-full text-xs font-bold animate-pulse shadow-xs">
@@ -70,3 +82,4 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements }) => {
     </header>
   );
 };
+
