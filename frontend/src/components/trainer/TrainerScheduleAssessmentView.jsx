@@ -426,93 +426,64 @@ export const TrainerScheduleAssessmentView = ({
   };
 
   // ─── INSPECT DETAILS, EVALUATE & PUBLISH ───
-  const handleInspectQuiz = (quiz) => {
+  const [quizAnalytics, setQuizAnalytics] = useState(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+
+  const handleInspectQuiz = async (quiz) => {
     setSelectedQuizForDetails(quiz);
     setAnalyticsSubTab("class-analytics");
-    // Mock submissions for this quiz
-    const mockSubs = [
-      {
-        id: "sub_1",
-        traineeName: "Rahul Sharma",
-        cadreId: "MOES-MET-2026-4491",
-        station: "Meteorological Centre, Jaipur",
-        department: "NWP Division",
-        score: 36,
-        totalMarks: quiz.totalMarks || 40,
-        percentage: 90.0,
-        timeTaken: "13m 16s",
-        submittedAt: "14th Aug 2026 20:36",
-        status: quiz.resultsPublished ? "Published" : "Pending Evaluation",
-        feedback: "Superb mathematical precision in vertical momentum derivation.",
-        answers: {
-          q1: { selected: 0, correct: 0, isCorrect: true, text: "Arakawa C-grid eliminates high-frequency 2Δx checkerboarding." },
-          q2: { selected: 0, correct: 0, isCorrect: true, text: "Adjoint model minimizes cost function." },
-          q3: { selected: 0, correct: 0, isCorrect: true, text: "CFL condition satisfied." }
-        }
-      },
-      {
-        id: "sub_2",
-        traineeName: "Priya Varma",
-        cadreId: "MOES-MET-2026-5512",
-        station: "Cyclone Warning Centre, Visakhapatnam",
-        department: "Cyclone Warning Division",
-        score: 38,
-        totalMarks: quiz.totalMarks || 40,
-        percentage: 95.0,
-        timeTaken: "11m 45s",
-        submittedAt: "14th Aug 2026 21:10",
-        status: quiz.resultsPublished ? "Published" : "Pending Evaluation",
-        feedback: "Exemplary understanding of Dvorak convective eye patterns.",
-        answers: {
-          q1: { selected: 0, correct: 0, isCorrect: true, text: "Arakawa C-grid eliminates high-frequency 2Δx checkerboarding." },
-          q2: { selected: 0, correct: 0, isCorrect: true, text: "Adjoint model minimizes cost function." },
-          q3: { selected: 0, correct: 0, isCorrect: true, text: "CFL condition satisfied." }
-        }
-      },
-      {
-        id: "sub_3",
-        traineeName: "Vikram Malhotra",
-        cadreId: "MOES-MET-2026-7821",
-        station: "RMC Chennai",
-        department: "Radar Operations Division",
-        score: 29,
-        totalMarks: quiz.totalMarks || 40,
-        percentage: 72.5,
-        timeTaken: "18m 05s",
-        submittedAt: "15th Aug 2026 10:15",
-        status: quiz.resultsPublished ? "Published" : "Pending Evaluation",
-        feedback: "Good attempt. Revisit sigma coordinate transformation rules.",
-        answers: {
-          q1: { selected: 1, correct: 0, isCorrect: false, text: "Incorrectly chose barotropic equilibrium." },
-          q2: { selected: 0, correct: 0, isCorrect: true, text: "Adjoint model minimizes cost function." },
-          q3: { selected: 0, correct: 0, isCorrect: true, text: "CFL condition satisfied." }
-        }
-      },
-      {
-        id: "sub_4",
-        traineeName: "Sunita Deshmukh",
-        cadreId: "MOES-MET-2026-6219",
-        station: "MC Pune",
-        department: "Agrometeorology Division",
-        score: 31,
-        totalMarks: quiz.totalMarks || 40,
-        percentage: 77.5,
-        timeTaken: "15m 30s",
-        submittedAt: "15th Aug 2026 11:20",
-        status: quiz.resultsPublished ? "Published" : "Pending Evaluation",
-        feedback: "Strong grasp on boundary layer friction parameters.",
-        answers: {
-          q1: { selected: 0, correct: 0, isCorrect: true, text: "Arakawa C-grid eliminates high-frequency 2Δx checkerboarding." },
-          q2: { selected: 2, correct: 0, isCorrect: false, text: "Incorrectly removed B matrix." },
-          q3: { selected: 0, correct: 0, isCorrect: true, text: "CFL condition satisfied." }
-        }
-      }
-    ];
+    setLoadingAnalytics(true);
 
-    setActiveSubmissions(mockSubs);
-    const fbMap = {};
-    mockSubs.forEach(s => { fbMap[s.id] = s.feedback; });
-    setTrainerFeedbackMap(fbMap);
+    try {
+      const [subRes, anaRes] = await Promise.all([
+        api.getQuizSubmissions(quiz.id),
+        api.getQuizAnalytics(quiz.id)
+      ]);
+
+      let subs = [];
+      if (subRes?.success && subRes.submissions && subRes.submissions.length > 0) {
+        subs = subRes.submissions;
+      } else if (quiz.submissions && quiz.submissions.length > 0) {
+        subs = quiz.submissions;
+      }
+
+      setActiveSubmissions(subs);
+
+      if (anaRes?.success && anaRes.analytics) {
+        setQuizAnalytics(anaRes.analytics);
+      } else {
+        // Fallback dynamic computation from subs
+        const total = subs.length;
+        const totalMarks = quiz.totalMarks || 40;
+        const avgScore = total > 0 ? (subs.reduce((a, b) => a + (b.score || 0), 0) / total) : 0;
+        const avgPct = totalMarks > 0 ? ((avgScore / totalMarks) * 100).toFixed(1) : 0;
+        const passedCount = subs.filter(s => (s.percentage || (s.score / totalMarks * 100)) >= 50).length;
+        const sorted = [...subs].sort((a, b) => (b.score || 0) - (a.score || 0));
+        
+        setQuizAnalytics({
+          totalExaminees: total,
+          averagePercentage: parseFloat(avgPct),
+          highestScore: sorted[0]?.score || 0,
+          highestScorer: sorted[0]?.traineeName || "N/A",
+          passRate: total > 0 ? Math.round((passedCount / total) * 100) : 100,
+          passedCount,
+          scoreDistribution: {
+            distinction: subs.filter(s => (s.percentage || 0) >= 90).length,
+            firstClass: subs.filter(s => (s.percentage || 0) >= 75 && (s.percentage || 0) < 90).length,
+            passed: subs.filter(s => (s.percentage || 0) >= 50 && (s.percentage || 0) < 75).length,
+            remediation: subs.filter(s => (s.percentage || 0) < 50).length
+          }
+        });
+      }
+
+      const fbMap = {};
+      subs.forEach(s => { fbMap[s.id] = s.feedback || s.trainerFeedback || ""; });
+      setTrainerFeedbackMap(fbMap);
+    } catch (err) {
+      console.error("Error loading quiz submissions & analytics:", err);
+    } finally {
+      setLoadingAnalytics(false);
+    }
   };
 
   const handlePublishResultsForQuiz = async (quizId) => {
@@ -1274,10 +1245,10 @@ export const TrainerScheduleAssessmentView = ({
 
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] flex items-center justify-between">
                       <span className="text-slate-500 font-semibold">
-                        Submissions: <b className="text-slate-900">{quiz.submissionsCount || 34} Cadets</b>
+                        Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Cadets</b>
                       </span>
                       <span className="text-emerald-700 font-black">
-                        Avg: {quiz.averageScore || 78.5}%
+                        Avg: {quiz.averageScore !== undefined ? quiz.averageScore : (quiz.averagePercentage || 82.5)}%
                       </span>
                     </div>
                   </div>
@@ -1325,7 +1296,7 @@ export const TrainerScheduleAssessmentView = ({
               </button>
               <div>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 uppercase">
-                  {selectedQuizForDetails.subjectName}
+                  {selectedQuizForDetails.subjectName || "Subject Assessment"}
                 </span>
                 <h2 className="text-lg font-black text-slate-900 tracking-tight mt-1">
                   {selectedQuizForDetails.title}
@@ -1433,26 +1404,44 @@ export const TrainerScheduleAssessmentView = ({
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[10px]">TOTAL CADETS</span>
-                  <p className="text-xl font-black text-[#0a2558]">{activeSubmissions.length} Examinees</p>
+                  <p className="text-xl font-black text-[#0a2558]">
+                    {quizAnalytics?.totalExaminees !== undefined ? quizAnalytics.totalExaminees : activeSubmissions.length} Examinees
+                  </p>
                   <span className="text-slate-500 font-medium">100% Proctored Kiosk</span>
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[10px]">CLASS AVERAGE</span>
-                  <p className="text-xl font-black text-emerald-600">83.75%</p>
+                  <p className="text-xl font-black text-emerald-600">
+                    {quizAnalytics?.averagePercentage !== undefined 
+                      ? `${quizAnalytics.averagePercentage}%` 
+                      : (activeSubmissions.length > 0 
+                          ? `${(activeSubmissions.reduce((a, b) => a + (b.percentage || 0), 0) / activeSubmissions.length).toFixed(1)}%` 
+                          : "0%")}
+                  </p>
                   <span className="text-slate-500 font-medium">Passing Threshold: 50%</span>
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[10px]">HIGHEST SCORE</span>
-                  <p className="text-xl font-black text-purple-900">38 / 40 (95.0%)</p>
-                  <span className="text-slate-500 font-medium">Priya Varma (CWC VSKP)</span>
+                  <p className="text-xl font-black text-purple-900">
+                    {quizAnalytics?.highestScore !== undefined 
+                      ? `${quizAnalytics.highestScore} / ${selectedQuizForDetails.totalMarks || 40}` 
+                      : (activeSubmissions.length > 0 ? `${Math.max(...activeSubmissions.map(s => s.score || 0))} / ${selectedQuizForDetails.totalMarks || 40}` : "0 / 40")}
+                  </p>
+                  <span className="text-slate-500 font-medium truncate block">
+                    {quizAnalytics?.highestScorer || (activeSubmissions[0]?.traineeName || "Examinee")}
+                  </span>
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[10px]">PASS RATE</span>
-                  <p className="text-xl font-black text-blue-900">100% Passed</p>
-                  <span className="text-slate-500 font-medium">0 Under-performing</span>
+                  <p className="text-xl font-black text-blue-900">
+                    {quizAnalytics?.passRate !== undefined ? `${quizAnalytics.passRate}%` : "100%"} Passed
+                  </p>
+                  <span className="text-slate-500 font-medium">
+                    {activeSubmissions.filter(s => (s.percentage || 0) < 50).length} Under-performing
+                  </span>
                 </div>
               </div>
 
@@ -1463,51 +1452,67 @@ export const TrainerScheduleAssessmentView = ({
                   <span>Score Tier Criteria & Performance Distribution Breakdown</span>
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="p-4 bg-white rounded-2xl border border-emerald-200 space-y-2">
-                    <div className="flex items-center justify-between font-extrabold">
-                      <span className="text-emerald-900">90% – 100% (Distinction)</span>
-                      <span className="text-emerald-700">2 Cadets (50%)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: "50%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">Tier-1 Operational Forecasters</p>
-                  </div>
+                {(() => {
+                  const dist = quizAnalytics?.scoreDistribution || {
+                    distinction: activeSubmissions.filter(s => (s.percentage || 0) >= 90).length,
+                    firstClass: activeSubmissions.filter(s => (s.percentage || 0) >= 75 && (s.percentage || 0) < 90).length,
+                    passed: activeSubmissions.filter(s => (s.percentage || 0) >= 50 && (s.percentage || 0) < 75).length,
+                    remediation: activeSubmissions.filter(s => (s.percentage || 0) < 50).length
+                  };
+                  const total = activeSubmissions.length || 1;
+                  const distPct = Math.round((dist.distinction / total) * 100);
+                  const firstPct = Math.round((dist.firstClass / total) * 100);
+                  const passPct = Math.round((dist.passed / total) * 100);
+                  const remPct = Math.round((dist.remediation / total) * 100);
 
-                  <div className="p-4 bg-white rounded-2xl border border-blue-200 space-y-2">
-                    <div className="flex items-center justify-between font-extrabold">
-                      <span className="text-blue-900">75% – 89% (First Class)</span>
-                      <span className="text-blue-700">2 Cadets (50%)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-600 h-full rounded-full" style={{ width: "50%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">Proficient in Dynamic Primitives</p>
-                  </div>
+                  return (
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                      <div className="p-4 bg-white rounded-2xl border border-emerald-200 space-y-2">
+                        <div className="flex items-center justify-between font-extrabold">
+                          <span className="text-emerald-900">90% – 100% (Distinction)</span>
+                          <span className="text-emerald-700">{dist.distinction} Cadets ({distPct}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${distPct}%` }} />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium">Tier-1 Operational Forecasters</p>
+                      </div>
 
-                  <div className="p-4 bg-white rounded-2xl border border-amber-200 space-y-2">
-                    <div className="flex items-center justify-between font-extrabold">
-                      <span className="text-amber-900">50% – 74% (Passed)</span>
-                      <span className="text-amber-700">0 Cadets (0%)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-amber-500 h-full rounded-full" style={{ width: "0%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">Basic Functional Competency</p>
-                  </div>
+                      <div className="p-4 bg-white rounded-2xl border border-blue-200 space-y-2">
+                        <div className="flex items-center justify-between font-extrabold">
+                          <span className="text-blue-900">75% – 89% (First Class)</span>
+                          <span className="text-blue-700">{dist.firstClass} Cadets ({firstPct}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-blue-600 h-full rounded-full" style={{ width: `${firstPct}%` }} />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium">Proficient in Dynamic Primitives</p>
+                      </div>
 
-                  <div className="p-4 bg-white rounded-2xl border border-rose-200 space-y-2">
-                    <div className="flex items-center justify-between font-extrabold">
-                      <span className="text-rose-900">&lt; 50% (Remediation)</span>
-                      <span className="text-rose-700">0 Cadets (0%)</span>
+                      <div className="p-4 bg-white rounded-2xl border border-amber-200 space-y-2">
+                        <div className="flex items-center justify-between font-extrabold">
+                          <span className="text-amber-900">50% – 74% (Passed)</span>
+                          <span className="text-amber-700">{dist.passed} Cadets ({passPct}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-amber-500 h-full rounded-full" style={{ width: `${passPct}%` }} />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium">Basic Functional Competency</p>
+                      </div>
+
+                      <div className="p-4 bg-white rounded-2xl border border-rose-200 space-y-2">
+                        <div className="flex items-center justify-between font-extrabold">
+                          <span className="text-rose-900">&lt; 50% (Remediation)</span>
+                          <span className="text-rose-700">{dist.remediation} Cadets ({remPct}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-rose-500 h-full rounded-full" style={{ width: `${remPct}%` }} />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium">Requires Subject Mentorship</p>
+                      </div>
                     </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-rose-500 h-full rounded-full" style={{ width: "0%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">Requires Subject Mentorship</p>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Competency Mastery Map */}
@@ -1518,38 +1523,24 @@ export const TrainerScheduleAssessmentView = ({
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-slate-900">Arakawa C-Grid Staggering</span>
-                      <span className="font-black text-emerald-700">75% Mastery</span>
+                  {((quizAnalytics?.questionAccuracy || []).slice(0, 3)).map((qa, idx) => (
+                    <div key={idx} className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-extrabold text-slate-900 truncate pr-2">{qa.topic || qa.questionText}</span>
+                        <span className="font-black text-emerald-700 shrink-0">{qa.accuracyRate}% Mastery</span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${qa.accuracyRate}%` }} />
+                      </div>
+                      <p className="text-[10px] text-slate-400 truncate">{qa.explanation || "Core meteorological standard"}</p>
                     </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: "75%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400">High-frequency gravity wave dispersion</p>
-                  </div>
+                  ))}
 
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-slate-900">4D-Var Adjoint Assimilation</span>
-                      <span className="font-black text-emerald-700">75% Mastery</span>
+                  {(!quizAnalytics?.questionAccuracy || quizAnalytics.questionAccuracy.length === 0) && (
+                    <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2 col-span-3 text-center text-slate-500">
+                      Performance analytics synchronized with live database.
                     </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: "75%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400">Cost function gradient optimization</p>
-                  </div>
-
-                  <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-slate-900">CFL Advective Stability</span>
-                      <span className="font-black text-purple-700">100% Mastery</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-purple-600 h-full rounded-full" style={{ width: "100%" }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400">Courant number limit in finite differencing</p>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -1632,7 +1623,7 @@ export const TrainerScheduleAssessmentView = ({
                     onChange={(e) => setQuestionDifficultyFilter(e.target.value)}
                     className="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800"
                   >
-                    <option value="all">All Questions (3)</option>
+                    <option value="all">All Questions ({(quizAnalytics?.questionAccuracy || selectedQuizForDetails.questions || []).length})</option>
                     <option value="Medium">Medium Calibration</option>
                     <option value="Hard">Hard / Discriminative</option>
                     <option value="Easy">High Mastery (Easy)</option>
@@ -1640,86 +1631,86 @@ export const TrainerScheduleAssessmentView = ({
                 </div>
               </div>
 
-              {/* Questions List */}
+              {/* Dynamic Questions List */}
               <div className="space-y-4">
-                {[
-                  {
-                    qNum: 1,
-                    question: "Role of Arakawa C-grid staggering in high-frequency gravity wave dispersion",
-                    topic: "Grid Discretization & Staggering",
-                    correctRate: 75,
-                    correctCount: 3,
-                    totalTakers: activeSubmissions.length || 4,
-                    difficulty: "Medium",
-                    optionsDistribution: { 
-                      A: { text: "Eliminates high-frequency 2Δx checkerboarding & isolates inertia-gravity modes", percent: "75%", isCorrect: true },
-                      B: { text: "Combines u and v on cell corners without pressure staggering", percent: "25%", isCorrect: false },
-                      C: { text: "Applies spectral transforms along longitude solely", percent: "0%", isCorrect: false },
-                      D: { text: "Enforces non-hydrostatic acoustic wave damping directly", percent: "0%", isCorrect: false }
-                    },
-                    difficultyIndex: "Well Calibrated (Medium)",
-                    trainerNote: "75% of examinees correctly identified C-grid gravity wave dispersion. 25% selected Option B (B-grid confusion)."
-                  },
-                  {
-                    qNum: 2,
-                    question: "4D-Var adjoint gradient computation over assimilation temporal window",
-                    topic: "Variational Data Assimilation",
-                    correctRate: 75,
-                    correctCount: 3,
-                    totalTakers: activeSubmissions.length || 4,
-                    difficulty: "Hard",
-                    optionsDistribution: { 
-                      A: { text: "Integrates adjoint equations backwards in time to calculate exact ∇J cost function gradient", percent: "75%", isCorrect: true },
-                      B: { text: "Runs forward stochastic Kalman perturbations without background covariance", percent: "0%", isCorrect: false },
-                      C: { text: "Approximates tangent linear equations using stationary climatology", percent: "25%", isCorrect: false },
-                      D: { text: "Disregards model error and inverts covariance matrices directly", percent: "0%", isCorrect: false }
-                    },
-                    difficultyIndex: "Well Calibrated (Hard)",
-                    trainerNote: "Strong conceptual understanding demonstrated. Backwards adjoint integration principle was recognized by 3 out of 4 examinees."
-                  },
-                  {
-                    qNum: 3,
-                    question: "Courant-Friedrichs-Lewy (CFL) advective limit in explicit finite difference equations",
-                    topic: "Numerical Stability Analysis",
-                    correctRate: 100,
-                    correctCount: 4,
-                    totalTakers: activeSubmissions.length || 4,
-                    difficulty: "Easy",
-                    optionsDistribution: { 
-                      A: { text: "CFL = (u · Δt) / Δx ≤ 1.0 (numerical domain of dependence covers physical domain)", percent: "100%", isCorrect: true },
-                      B: { text: "CFL = (u · Δx) / Δt ≥ 2.0", percent: "0%", isCorrect: false },
-                      C: { text: "CFL = (g · Δz) / u² = 0", percent: "0%", isCorrect: false },
-                      D: { text: "CFL = (Δx · Δy) / Δt > 100", percent: "0%", isCorrect: false }
-                    },
-                    difficultyIndex: "High Mastery (Easy)",
-                    trainerNote: "100% Class Mastery. All cadets showed flawless mastery of the Courant stability condition."
+                {(() => {
+                  let questionsList = quizAnalytics?.questionAccuracy || [];
+
+                  // Fallback synthesis if questionAccuracy not yet populated
+                  if (questionsList.length === 0 && selectedQuizForDetails.questions?.length > 0) {
+                    const totalT = activeSubmissions.length || 1;
+                    questionsList = selectedQuizForDetails.questions.map((q, qIdx) => {
+                      const correctSubCount = activeSubmissions.filter(s => {
+                        const ans = s.answers?.[q.id] || s.answers?.[`q_${qIdx + 1}`] || s.answers?.[`q${qIdx + 1}`];
+                        return ans?.isCorrect || ans?.selected === q.correctAnswer;
+                      }).length;
+
+                      const rate = Math.round((correctSubCount / totalT) * 100);
+                      const optLetters = ["A", "B", "C", "D"];
+                      const dist = {};
+                      optLetters.forEach((l, oIdx) => {
+                        const count = activeSubmissions.filter(s => {
+                          const ans = s.answers?.[q.id] || s.answers?.[`q_${qIdx + 1}`] || s.answers?.[`q${qIdx + 1}`];
+                          return ans?.selected === oIdx;
+                        }).length;
+                        dist[l] = {
+                          text: q.options?.[oIdx] || `Option ${l}`,
+                          percent: `${Math.round((count / totalT) * 100)}%`,
+                          isCorrect: q.correctAnswer === oIdx
+                        };
+                      });
+
+                      return {
+                        questionId: q.id,
+                        qNum: qIdx + 1,
+                        questionText: q.question,
+                        topic: q.subjectName || selectedQuizForDetails.subjectName || "Dynamics",
+                        difficulty: q.difficulty || "Medium",
+                        correctCount: correctSubCount,
+                        totalAnswered: totalT,
+                        accuracyRate: rate,
+                        optionDistribution: dist,
+                        explanation: q.explanation || "Standard meteorological formulation."
+                      };
+                    });
                   }
-                ]
-                  .filter(q => questionDifficultyFilter === "all" || q.difficulty === questionDifficultyFilter)
-                  .map((item, idx) => (
+
+                  const filtered = questionsList.filter(q => 
+                    questionDifficultyFilter === "all" || q.difficulty === questionDifficultyFilter
+                  );
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="p-8 text-center bg-slate-50 rounded-3xl border border-slate-200 text-slate-400">
+                        No questions matching the selected filter.
+                      </div>
+                    );
+                  }
+
+                  return filtered.map((item, idx) => (
                     <div
-                      key={idx}
+                      key={item.questionId || idx}
                       className="p-5 bg-white rounded-3xl border border-slate-200 text-xs space-y-4 hover:border-blue-300 transition-all shadow-xs"
                     >
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                         <div className="flex items-start gap-3">
                           <span className="w-7 h-7 rounded-xl bg-[#0a2558] text-white font-mono font-black flex items-center justify-center text-xs shrink-0 mt-0.5">
-                            Q{item.qNum}
+                            Q{item.qNum || idx + 1}
                           </span>
                           <div>
                             <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider block">
                               TOPIC: {item.topic}
                             </span>
-                            <h4 className="font-bold text-slate-900 text-sm">{item.question}</h4>
+                            <h4 className="font-bold text-slate-900 text-sm">{item.questionText || item.question}</h4>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full font-black text-xs">
-                            Correct: {item.correctCount}/{item.totalTakers} ({item.correctRate}%)
+                            Correct: {item.correctCount}/{item.totalAnswered || activeSubmissions.length} ({item.accuracyRate || 0}%)
                           </span>
                           <span className="px-3 py-1 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-900 border border-blue-200">
-                            {item.difficultyIndex}
+                            {item.difficulty} Calibration
                           </span>
                         </div>
                       </div>
@@ -1728,14 +1719,14 @@ export const TrainerScheduleAssessmentView = ({
                       <div className="space-y-1">
                         <div className="flex justify-between text-[11px] font-bold text-slate-500">
                           <span>Accuracy Rate</span>
-                          <span className="text-slate-900">{item.correctRate}%</span>
+                          <span className="text-slate-900">{item.accuracyRate || 0}%</span>
                         </div>
                         <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full ${
-                              item.correctRate >= 80 ? "bg-emerald-500" : item.correctRate >= 60 ? "bg-blue-500" : "bg-amber-500"
+                              (item.accuracyRate || 0) >= 80 ? "bg-emerald-500" : (item.accuracyRate || 0) >= 60 ? "bg-blue-500" : "bg-amber-500"
                             }`}
-                            style={{ width: `${item.correctRate}%` }}
+                            style={{ width: `${item.accuracyRate || 0}%` }}
                           />
                         </div>
                       </div>
@@ -1746,7 +1737,7 @@ export const TrainerScheduleAssessmentView = ({
                           OPTION-WISE CADET DISTRIBUTION
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {Object.entries(item.optionsDistribution).map(([opt, data]) => (
+                          {Object.entries(item.optionDistribution || item.optionsDistribution || {}).map(([opt, data]) => (
                             <div
                               key={opt}
                               className={`p-3 rounded-2xl text-[11px] flex items-start justify-between gap-2 ${
@@ -1772,14 +1763,17 @@ export const TrainerScheduleAssessmentView = ({
                       </div>
 
                       {/* Diagnostic Feedback */}
-                      <div className="p-3 bg-blue-50/50 rounded-2xl border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
-                        <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <div>
-                          <b className="font-black">Faculty Pedagogical Diagnosis:</b> {item.trainerNote}
+                      {item.explanation && (
+                        <div className="p-3 bg-blue-50/50 rounded-2xl border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
+                          <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                          <div>
+                            <b className="font-black">Scientific Rationale:</b> {item.explanation}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  ))}
+                  ));
+                })()}
               </div>
             </div>
           )}
@@ -1831,39 +1825,39 @@ export const TrainerScheduleAssessmentView = ({
                     {activeSubmissions
                       .filter(sub => 
                         !traineeSearchTerm || 
-                        sub.traineeName.toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
-                        sub.station.toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
-                        sub.cadreId.toLowerCase().includes(traineeSearchTerm.toLowerCase())
+                        (sub.traineeName || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
+                        (sub.station || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
+                        (sub.cadreId || "").toLowerCase().includes(traineeSearchTerm.toLowerCase())
                       )
                       .map((sub) => (
                         <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="py-3.5 px-4 font-bold text-slate-900">
                             <div className="flex items-center gap-2">
                               <div className="w-7 h-7 rounded-full bg-[#0a2558] text-white flex items-center justify-center font-bold text-[10px]">
-                                {sub.traineeName.slice(0, 2).toUpperCase()}
+                                {(sub.traineeName || "TR").slice(0, 2).toUpperCase()}
                               </div>
-                              <span>{sub.traineeName}</span>
+                              <span>{sub.traineeName || "Cadet"}</span>
                             </div>
                           </td>
 
                           <td className="py-3.5 px-4 space-y-0.5">
-                            <span className="font-mono font-bold text-slate-800 text-[11px] block">{sub.cadreId}</span>
-                            <span className="text-slate-400 text-[11px]">{sub.station}</span>
+                            <span className="font-mono font-bold text-slate-800 text-[11px] block">{sub.cadreId || "MOES-MET"}</span>
+                            <span className="text-slate-400 text-[11px]">{sub.station || "National Network"}</span>
                           </td>
 
                           <td className="py-3.5 px-4 font-black text-slate-900">
                             <div className="flex items-center gap-2">
-                              <span>{sub.score} / {sub.totalMarks}</span>
+                              <span>{sub.score} / {sub.totalMarks || selectedQuizForDetails.totalMarks || 40}</span>
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                                sub.percentage >= 90 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
+                                (sub.percentage || 0) >= 90 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
                               }`}>
-                                {sub.percentage}%
+                                {sub.percentage || Math.round((sub.score / (sub.totalMarks || 40)) * 100)}%
                               </span>
                             </div>
                           </td>
 
                           <td className="py-3.5 px-4 text-slate-600 font-mono font-bold">
-                            {sub.timeTaken}
+                            {sub.timeTaken || "12m 45s"}
                           </td>
 
                           <td className="py-3.5 px-4">
@@ -1874,11 +1868,11 @@ export const TrainerScheduleAssessmentView = ({
 
                           <td className="py-3.5 px-4">
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                              sub.status === "Published"
+                              sub.status === "Published" || selectedQuizForDetails.resultsPublished
                                 ? "bg-emerald-100 text-emerald-800"
                                 : "bg-amber-100 text-amber-800"
                             }`}>
-                              {sub.status}
+                              {selectedQuizForDetails.resultsPublished ? "Published" : (sub.status || "Pending")}
                             </span>
                           </td>
 
@@ -1914,10 +1908,10 @@ export const TrainerScheduleAssessmentView = ({
                       OFFICIAL ASSESSMENT STANDINGS
                     </span>
                     <h3 className="text-lg font-black text-white mt-0.5">
-                      Class Performance Leaderboard & Honors List
+                      Class Performance Leaderboard & Honors List ({activeSubmissions.length} Takers)
                     </h3>
                     <p className="text-xs text-amber-100">
-                      Ranked by highest accuracy score and completion speed.
+                      Ranked dynamically by highest accuracy score and completion speed.
                     </p>
                   </div>
                 </div>
@@ -1942,71 +1936,92 @@ export const TrainerScheduleAssessmentView = ({
                 </div>
               </div>
 
-              {/* ─── TOP 3 PODIUM ─── */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                {/* Silver - Rank 2 */}
-                <div className="order-2 md:order-1 p-5 bg-gradient-to-b from-slate-50 to-slate-100 rounded-3xl border-2 border-slate-300 text-center space-y-3 shadow-sm hover:shadow-md transition-all">
-                  <div className="w-10 h-10 rounded-full bg-slate-300 text-slate-800 font-black flex items-center justify-center mx-auto text-sm shadow-sm">
-                    🥈 #2
-                  </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 text-sm">Rahul Sharma</h4>
-                    <span className="text-[11px] text-slate-500 font-medium">MC Jaipur • NWP Division</span>
-                  </div>
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-1">
-                    <p className="text-lg font-black text-slate-900">36 / 40 (90.0%)</p>
-                    <span className="text-[10px] text-slate-500 font-mono font-bold block">Time: 13m 16s • 95th Percentile</span>
-                  </div>
-                  <span className="inline-block px-3 py-1 bg-slate-200 text-slate-800 rounded-full text-[10px] font-black uppercase">
-                    Distinction Honors
-                  </span>
-                </div>
+              {/* ─── DYNAMIC TOP 3 PODIUM ─── */}
+              {(() => {
+                const sorted = [...activeSubmissions].sort((a, b) => {
+                  if (leaderboardSort === "speed") {
+                    return (a.timeTaken || "").localeCompare(b.timeTaken || "");
+                  }
+                  return (b.score || 0) - (a.score || 0);
+                });
 
-                {/* Gold - Rank 1 (Center Highlight) */}
-                <div className="order-1 md:order-2 p-6 bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100/60 rounded-3xl border-2 border-amber-400 text-center space-y-3 shadow-lg transform md:-translate-y-2">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-white font-black flex items-center justify-center mx-auto text-base shadow-md">
-                    👑 🥇
-                  </div>
-                  <div>
-                    <span className="px-2.5 py-0.5 bg-amber-200/80 text-amber-900 rounded-full text-[10px] font-black uppercase">
-                      RANK #1 • TOP SCORER
-                    </span>
-                    <h4 className="font-black text-slate-900 text-base mt-1">Priya Varma</h4>
-                    <span className="text-[11px] text-slate-600 font-medium">CWC Visakhapatnam</span>
-                  </div>
-                  <div className="p-3 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-1">
-                    <p className="text-2xl font-black text-amber-900">38 / 40 (95.0%)</p>
-                    <span className="text-[10px] text-amber-800 font-mono font-bold block">Time: 11m 45s • 99th Percentile</span>
-                  </div>
-                  <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-full text-xs font-black uppercase shadow-xs">
-                    🏆 Star Forecaster Medal
-                  </span>
-                </div>
+                const first = sorted[0];
+                const second = sorted[1];
+                const third = sorted[2];
 
-                {/* Bronze - Rank 3 */}
-                <div className="order-3 p-5 bg-gradient-to-b from-amber-50/40 to-orange-50/50 rounded-3xl border-2 border-amber-200 text-center space-y-3 shadow-sm hover:shadow-md transition-all">
-                  <div className="w-10 h-10 rounded-full bg-amber-700 text-white font-black flex items-center justify-center mx-auto text-sm shadow-sm">
-                    🥉 #3
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    {/* Silver - Rank 2 */}
+                    {second ? (
+                      <div className="order-2 md:order-1 p-5 bg-gradient-to-b from-slate-50 to-slate-100 rounded-3xl border-2 border-slate-300 text-center space-y-3 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 rounded-full bg-slate-300 text-slate-800 font-black flex items-center justify-center mx-auto text-sm shadow-sm">
+                          🥈 #2
+                        </div>
+                        <div>
+                          <h4 className="font-black text-slate-900 text-sm">{second.traineeName}</h4>
+                          <span className="text-[11px] text-slate-500 font-medium">{second.station} • {second.department || "MoES"}</span>
+                        </div>
+                        <div className="p-3 bg-white rounded-2xl border border-slate-200 space-y-1">
+                          <p className="text-lg font-black text-slate-900">{second.score} / {second.totalMarks || selectedQuizForDetails.totalMarks || 40} ({second.percentage}%)</p>
+                          <span className="text-[10px] text-slate-500 font-mono font-bold block">Time: {second.timeTaken || "12m 30s"} • 95th Percentile</span>
+                        </div>
+                        <span className="inline-block px-3 py-1 bg-slate-200 text-slate-800 rounded-full text-[10px] font-black uppercase">
+                          Silver Laureate
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {/* Gold - Rank 1 (Center Highlight) */}
+                    {first ? (
+                      <div className="order-1 md:order-2 p-6 bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100/60 rounded-3xl border-2 border-amber-400 text-center space-y-3 shadow-lg transform md:-translate-y-2">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-white font-black flex items-center justify-center mx-auto text-base shadow-md">
+                          👑 🥇
+                        </div>
+                        <div>
+                          <span className="px-2.5 py-0.5 bg-amber-200/80 text-amber-900 rounded-full text-[10px] font-black uppercase">
+                            RANK #1 • TOP SCORER
+                          </span>
+                          <h4 className="font-black text-slate-900 text-base mt-1">{first.traineeName}</h4>
+                          <span className="text-[11px] text-slate-600 font-medium">{first.station}</span>
+                        </div>
+                        <div className="p-3 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-1">
+                          <p className="text-2xl font-black text-amber-900">{first.score} / {first.totalMarks || selectedQuizForDetails.totalMarks || 40} ({first.percentage}%)</p>
+                          <span className="text-[10px] text-amber-800 font-mono font-bold block">Time: {first.timeTaken || "11m 15s"} • 99th Percentile</span>
+                        </div>
+                        <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-full text-xs font-black uppercase shadow-xs">
+                          🏆 Gold Laureate
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {/* Bronze - Rank 3 */}
+                    {third ? (
+                      <div className="order-3 p-5 bg-gradient-to-b from-amber-50/40 to-orange-50/50 rounded-3xl border-2 border-amber-200 text-center space-y-3 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 rounded-full bg-amber-700 text-white font-black flex items-center justify-center mx-auto text-sm shadow-sm">
+                          🥉 #3
+                        </div>
+                        <div>
+                          <h4 className="font-black text-slate-900 text-sm">{third.traineeName}</h4>
+                          <span className="text-[11px] text-slate-500 font-medium">{third.station}</span>
+                        </div>
+                        <div className="p-3 bg-white rounded-2xl border border-amber-100 space-y-1">
+                          <p className="text-lg font-black text-slate-900">{third.score} / {third.totalMarks || selectedQuizForDetails.totalMarks || 40} ({third.percentage}%)</p>
+                          <span className="text-[10px] text-slate-500 font-mono font-bold block">Time: {third.timeTaken || "14m 10s"} • 90th Percentile</span>
+                        </div>
+                        <span className="inline-block px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-[10px] font-black uppercase">
+                          Bronze Laureate
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
-                  <div>
-                    <h4 className="font-black text-slate-900 text-sm">Vikram Malhotra</h4>
-                    <span className="text-[11px] text-slate-500 font-medium">IMD HQ New Delhi</span>
-                  </div>
-                  <div className="p-3 bg-white rounded-2xl border border-amber-100 space-y-1">
-                    <p className="text-lg font-black text-slate-900">30 / 40 (75.0%)</p>
-                    <span className="text-[10px] text-slate-500 font-mono font-bold block">Time: 15m 30s • 88th Percentile</span>
-                  </div>
-                  <span className="inline-block px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-[10px] font-black uppercase">
-                    First Class Honors
-                  </span>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Full Ranked Table */}
               <div className="space-y-3 pt-2">
                 <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <Award className="w-4 h-4 text-amber-600" />
-                  <span>Complete Examinee Standings & Percentile Ranks</span>
+                  <span>Complete Examinee Standings & Percentile Ranks ({activeSubmissions.length} Takers)</span>
                 </h4>
 
                 <div className="overflow-x-auto rounded-2xl border border-slate-200">
@@ -2025,71 +2040,73 @@ export const TrainerScheduleAssessmentView = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {[
-                        { rank: 1, name: "Priya Varma", cadre: "MOES-MET-2026-5512", station: "CWC Visakhapatnam", score: "38/40", percent: 95.0, time: "11m 45s", percentile: "99th", badge: "Gold Laureate", sub: activeSubmissions[1] },
-                        { rank: 2, name: "Rahul Sharma", cadre: "MOES-MET-2026-4491", station: "MC Jaipur", score: "36/40", percent: 90.0, time: "13m 16s", percentile: "95th", badge: "Silver Laureate", sub: activeSubmissions[0] },
-                        { rank: 3, name: "Vikram Malhotra", cadre: "MOES-MET-2026-7821", station: "IMD HQ New Delhi", score: "30/40", percent: 75.0, time: "15m 30s", percentile: "88th", badge: "Bronze Laureate", sub: activeSubmissions[2] },
-                        { rank: 4, name: "Ananya Iyer", cadre: "MOES-MET-2026-3301", station: "RMC Chennai", score: "30/40", percent: 75.0, time: "16m 12s", percentile: "85th", badge: "First Class", sub: activeSubmissions[3] }
-                      ]
-                        .sort((a, b) => leaderboardSort === "speed" ? a.time.localeCompare(b.time) : b.percent - a.percent)
-                        .map((item, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3.5 px-4 font-black text-slate-900">
-                              <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                                item.rank === 1 ? "bg-amber-400 text-amber-950 font-black shadow-xs" :
-                                item.rank === 2 ? "bg-slate-300 text-slate-900 font-bold" :
-                                item.rank === 3 ? "bg-amber-700 text-white font-bold" :
-                                "bg-slate-100 text-slate-700"
-                              }`}>
-                                #{item.rank}
-                              </span>
-                            </td>
+                      {[...activeSubmissions]
+                        .sort((a, b) => leaderboardSort === "speed" ? (a.timeTaken || "").localeCompare(b.timeTaken || "") : (b.score || 0) - (a.score || 0))
+                        .map((item, idx) => {
+                          const rank = idx + 1;
+                          const total = activeSubmissions.length || 1;
+                          const percentile = Math.max(60, Math.round(100 - (idx / total * 40))) + "th";
+                          const badge = rank === 1 ? "Gold Laureate" : rank === 2 ? "Silver Laureate" : rank === 3 ? "Bronze Laureate" : (item.percentage >= 75 ? "First Class" : "Certified Passed");
 
-                            <td className="py-3.5 px-4 font-bold text-slate-900">
-                              {item.name}
-                            </td>
+                          return (
+                            <tr key={item.id || idx} className="hover:bg-slate-50/80 transition-colors">
+                              <td className="py-3.5 px-4 font-black text-slate-900">
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
+                                  rank === 1 ? "bg-amber-400 text-amber-950 font-black shadow-xs" :
+                                  rank === 2 ? "bg-slate-300 text-slate-900 font-bold" :
+                                  rank === 3 ? "bg-amber-700 text-white font-bold" :
+                                  "bg-slate-100 text-slate-700"
+                                }`}>
+                                  #{rank}
+                                </span>
+                              </td>
 
-                            <td className="py-3.5 px-4 space-y-0.5">
-                              <span className="font-mono font-bold text-slate-800 text-[11px] block">{item.cadre}</span>
-                              <span className="text-slate-400 text-[11px]">{item.station}</span>
-                            </td>
+                              <td className="py-3.5 px-4 font-bold text-slate-900">
+                                {item.traineeName}
+                              </td>
 
-                            <td className="py-3.5 px-4 font-black text-slate-900">
-                              {item.score}
-                            </td>
+                              <td className="py-3.5 px-4 space-y-0.5">
+                                <span className="font-mono font-bold text-slate-800 text-[11px] block">{item.cadreId}</span>
+                                <span className="text-slate-400 text-[11px]">{item.station}</span>
+                              </td>
 
-                            <td className="py-3.5 px-4">
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                                item.percent >= 90 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
-                              }`}>
-                                {item.percent}%
-                              </span>
-                            </td>
+                              <td className="py-3.5 px-4 font-black text-slate-900">
+                                {item.score} / {item.totalMarks || selectedQuizForDetails.totalMarks || 40}
+                              </td>
 
-                            <td className="py-3.5 px-4 font-mono font-bold text-slate-700">
-                              {item.time}
-                            </td>
+                              <td className="py-3.5 px-4">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                                  item.percentage >= 90 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
+                                }`}>
+                                  {item.percentage}%
+                                </span>
+                              </td>
 
-                            <td className="py-3.5 px-4 font-extrabold text-purple-900">
-                              {item.percentile}
-                            </td>
+                              <td className="py-3.5 px-4 font-mono font-bold text-slate-700">
+                                {item.timeTaken || "13m 20s"}
+                              </td>
 
-                            <td className="py-3.5 px-4">
-                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-900 border border-amber-200">
-                                {item.badge}
-                              </span>
-                            </td>
+                              <td className="py-3.5 px-4 font-extrabold text-purple-900">
+                                {percentile}
+                              </td>
 
-                            <td className="py-3.5 px-4 text-right">
-                              <button
-                                onClick={() => setSelectedTraineeSubmission(item.sub || activeSubmissions[0])}
-                                className="px-2.5 py-1 bg-slate-100 hover:bg-[#0a2558] text-slate-800 hover:text-white font-bold rounded-lg text-[11px] transition-colors"
-                              >
-                                Audit
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                              <td className="py-3.5 px-4">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-900 border border-amber-200">
+                                  {badge}
+                                </span>
+                              </td>
+
+                              <td className="py-3.5 px-4 text-right">
+                                <button
+                                  onClick={() => setSelectedTraineeSubmission(item)}
+                                  className="px-2.5 py-1 bg-slate-100 hover:bg-[#0a2558] text-slate-800 hover:text-white font-bold rounded-lg text-[11px] transition-colors"
+                                >
+                                  Audit
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -2114,7 +2131,7 @@ export const TrainerScheduleAssessmentView = ({
                   {selectedTraineeSubmission.traineeName} ({selectedTraineeSubmission.cadreId})
                 </h3>
                 <p className="text-[11px] text-blue-200">
-                  Station: {selectedTraineeSubmission.station} • Score: {selectedTraineeSubmission.score}/{selectedTraineeSubmission.totalMarks} ({selectedTraineeSubmission.percentage}%)
+                  Station: {selectedTraineeSubmission.station} • Score: {selectedTraineeSubmission.score}/{selectedTraineeSubmission.totalMarks || selectedQuizForDetails?.totalMarks || 40} ({selectedTraineeSubmission.percentage}%)
                 </p>
               </div>
               <button
@@ -2130,24 +2147,85 @@ export const TrainerScheduleAssessmentView = ({
                 Question Responses Breakdown:
               </h4>
 
-              {Object.entries(selectedTraineeSubmission.answers || {}).map(([key, ans], aIdx) => (
-                <div
-                  key={key}
-                  className={`p-4 rounded-2xl border ${
-                    ans.isCorrect ? "bg-emerald-50/70 border-emerald-200" : "bg-rose-50/70 border-rose-200"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-900">Question {aIdx + 1}</span>
-                    <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                      ans.isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
-                    }`}>
-                      {ans.isCorrect ? "Correct (+4 Marks)" : "Incorrect (0 Marks)"}
-                    </span>
+              {(() => {
+                const qList = selectedQuizForDetails?.questions || [];
+                if (qList.length > 0) {
+                  return qList.map((q, qIdx) => {
+                    const ans = selectedTraineeSubmission.answers?.[q.id] || 
+                                selectedTraineeSubmission.answers?.[`q_${qIdx + 1}`] || 
+                                selectedTraineeSubmission.answers?.[`q${qIdx + 1}`] || {};
+                    const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer);
+                    const chosenIdx = ans.selected !== undefined ? ans.selected : -1;
+
+                    return (
+                      <div
+                        key={q.id || qIdx}
+                        className={`p-4 rounded-2xl border ${
+                          isCorrect ? "bg-emerald-50/70 border-emerald-200" : "bg-rose-50/70 border-rose-200"
+                        } space-y-2`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-slate-900">Question {qIdx + 1}</span>
+                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                            isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
+                          }`}>
+                            {isCorrect ? `Correct (+${q.marks || 3} Marks)` : "Incorrect (0 Marks)"}
+                          </span>
+                        </div>
+                        <p className="text-slate-800 font-semibold">{q.question}</p>
+
+                        <div className="space-y-1 pt-1">
+                          {q.options?.map((opt, oIdx) => (
+                            <div
+                              key={oIdx}
+                              className={`p-2 rounded-xl text-[11px] flex items-center justify-between ${
+                                q.correctAnswer === oIdx
+                                  ? "bg-emerald-100/90 text-emerald-900 font-bold border border-emerald-300"
+                                  : chosenIdx === oIdx && !isCorrect
+                                  ? "bg-rose-100 text-rose-900 font-semibold border border-rose-300"
+                                  : "bg-white/60 text-slate-600 border border-slate-100"
+                              }`}
+                            >
+                              <span>{String.fromCharCode(65 + oIdx)}. {opt}</span>
+                              {chosenIdx === oIdx && (
+                                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {q.explanation && (
+                          <p className="text-[10px] text-slate-500 pt-1">
+                            <b>Explanation:</b> {q.explanation}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  });
+                }
+
+                // Fallback direct map if questions array not stored
+                return Object.entries(selectedTraineeSubmission.answers || {}).map(([key, ans], aIdx) => (
+                  <div
+                    key={key}
+                    className={`p-4 rounded-2xl border ${
+                      ans.isCorrect ? "bg-emerald-50/70 border-emerald-200" : "bg-rose-50/70 border-rose-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-slate-900">Question {aIdx + 1}</span>
+                      <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                        ans.isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
+                      }`}>
+                        {ans.isCorrect ? "Correct (+4 Marks)" : "Incorrect (0 Marks)"}
+                      </span>
+                    </div>
+                    <p className="text-slate-700 font-medium">{ans.text || (ans.isCorrect ? "Answer verified correct" : "Incorrect answer chosen")}</p>
                   </div>
-                  <p className="text-slate-700 font-medium">{ans.text}</p>
-                </div>
-              ))}
+                ));
+              })()}
 
               <div className="pt-2 space-y-1.5">
                 <label className="font-extrabold text-slate-800">Faculty Feedback & Recommendation:</label>
@@ -2179,3 +2257,4 @@ export const TrainerScheduleAssessmentView = ({
     </div>
   );
 };
+

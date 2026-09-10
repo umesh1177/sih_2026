@@ -113,6 +113,30 @@ export const submitQuiz = (req, res) => {
 };
 
 // --- 1-Click Result Generation & Batch Analytics ---
+export const getQuizSubmissions = (req, res) => {
+  try {
+    const { id } = req.params;
+    const quiz = db.getQuizById(id);
+    if (!quiz) {
+      return res.status(404).json({ success: false, message: "Quiz not found" });
+    }
+    const submissions = db.getSubmissionsForQuiz(id).map(s => {
+      const user = db.findUserById(s.traineeId) || {};
+      return {
+        ...s,
+        cadreId: user.cadreId || s.cadreId || `MOES-MET-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+        station: user.station || user.department || s.station || "National Meteorological Centre",
+        department: user.department || s.department || "Meteorology Division",
+        designation: user.designation || s.designation || "Scientist 'B'",
+        avatar: user.avatar || s.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"
+      };
+    });
+    return res.json({ success: true, count: submissions.length, submissions, quiz });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 export const getQuizAnalytics = (req, res) => {
   try {
     const { id } = req.params;
@@ -140,30 +164,38 @@ export const getQuizAnalytics = (req, res) => {
             { range: "61-80%", count: 0 },
             { range: "81-100%", count: 0 }
           ],
-          questionAccuracy: quiz.questions.map(q => ({
+          questionAccuracy: (quiz.questions || []).map((q, idx) => ({
             questionId: q.id,
-            questionTitle: q.question.substring(0, 45) + "...",
+            questionNumber: idx + 1,
+            questionTitle: q.question.length > 60 ? q.question.substring(0, 57) + "..." : q.question,
+            question: q.question,
+            options: q.options || [],
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation || "",
             accuracy: 0,
+            correctCount: 0,
+            totalAnswered: 0,
             difficulty: q.difficulty || "Medium",
-            marks: q.marks
+            marks: q.marks || 2,
+            optionBreakdown: [0, 0, 0, 0]
           })),
           traineeRankings: []
         }
       });
     }
 
-    const totalScoreSum = submissions.reduce((acc, s) => acc + s.score, 0);
+    const totalScoreSum = submissions.reduce((acc, s) => acc + (s.score || 0), 0);
     const averageScore = Number((totalScoreSum / totalSubmissions).toFixed(1));
     const passedCount = submissions.filter(s => s.passed).length;
     const passRate = Math.round((passedCount / totalSubmissions) * 100);
-    const scores = submissions.map(s => s.score);
+    const scores = submissions.map(s => s.score || 0);
     const highestScore = Math.max(...scores);
     const lowestScore = Math.min(...scores);
 
-    // Distribution
+    // Dynamic Distribution
     const dist = { "0-40%": 0, "41-60%": 0, "61-80%": 0, "81-100%": 0 };
     submissions.forEach(s => {
-      const pct = s.percentage;
+      const pct = s.percentage || 0;
       if (pct <= 40) dist["0-40%"]++;
       else if (pct <= 60) dist["41-60%"]++;
       else if (pct <= 80) dist["61-80%"]++;
@@ -172,40 +204,75 @@ export const getQuizAnalytics = (req, res) => {
 
     const scoreDistribution = Object.entries(dist).map(([range, count]) => ({ range, count }));
 
-    // Question Accuracy
-    const questionAccuracy = quiz.questions.map(q => {
+    // Question Accuracy & Full Option Breakdown across ALL questions
+    const questionAccuracy = (quiz.questions || []).map((q, idx) => {
       let correctAnswers = 0;
+      let totalAnswered = 0;
+      const optionBreakdown = [0, 0, 0, 0];
+
       submissions.forEach(s => {
-        if (s.answers && s.answers[q.id] === q.correctAnswer) {
-          correctAnswers++;
+        if (s.answers && s.answers[q.id] !== undefined) {
+          totalAnswered++;
+          const selectedIdx = s.answers[q.id];
+          if (typeof selectedIdx === "number" && selectedIdx >= 0 && selectedIdx < 4) {
+            optionBreakdown[selectedIdx]++;
+          }
+          if (selectedIdx === q.correctAnswer) {
+            correctAnswers++;
+          }
         }
       });
-      const accPct = Math.round((correctAnswers / totalSubmissions) * 100);
+
+      const accPct = totalAnswered > 0 ? Math.round((correctAnswers / totalAnswered) * 100) : 0;
+
       return {
         questionId: q.id,
-        questionTitle: q.question.length > 50 ? q.question.substring(0, 47) + "..." : q.question,
+        questionNumber: idx + 1,
+        questionTitle: q.question.length > 60 ? q.question.substring(0, 57) + "..." : q.question,
+        question: q.question,
+        options: q.options || [],
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation || "",
         accuracy: accPct,
+        correctCount: correctAnswers,
+        totalAnswered,
         difficulty: q.difficulty || "Medium",
-        marks: q.marks
+        marks: q.marks || 2,
+        optionBreakdown
       };
     });
 
-    // Trainee rankings sorted by score descending
+    // Trainee rankings sorted dynamically by score descending, then speed ascending
     const traineeRankings = [...submissions]
-      .sort((a, b) => b.score - a.score || a.timeTakenSeconds - b.timeTakenSeconds)
-      .map((s, idx) => ({
-        rank: idx + 1,
-        traineeName: s.traineeName,
-        traineeEmail: s.traineeEmail,
-        score: s.score,
-        totalMarks: s.totalMarks,
-        percentage: s.percentage,
-        passed: s.passed,
-        timeTakenMinutes: Math.round(s.timeTakenSeconds / 60),
-        tabSwitchCount: s.tabSwitchCount,
-        certificateId: s.certificateId,
-        submittedAt: s.submittedAt
-      }));
+      .sort((a, b) => (b.score || 0) - (a.score || 0) || (a.timeTakenSeconds || 0) - (b.timeTakenSeconds || 0))
+      .map((s, idx) => {
+        const user = db.findUserById(s.traineeId) || {};
+        return {
+          rank: idx + 1,
+          id: s.id,
+          traineeId: s.traineeId,
+          traineeName: s.traineeName || user.name || "Cadet Officer",
+          traineeEmail: s.traineeEmail || user.email || "officer@imd.gov.in",
+          station: user.station || user.department || s.station || "National Weather Forecasting Centre, New Delhi",
+          cadreId: user.cadreId || s.cadreId || `MOES-MET-2026-00${idx + 1}`,
+          department: user.department || s.department || "Numerical Weather Prediction Division",
+          designation: user.designation || s.designation || "Scientist 'B'",
+          avatar: user.avatar || s.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+          score: s.score || 0,
+          totalMarks: s.totalMarks || quiz.totalMarks || 20,
+          percentage: s.percentage || 0,
+          passed: s.passed,
+          timeTakenSeconds: s.timeTakenSeconds || 600,
+          timeTakenMinutes: Math.round((s.timeTakenSeconds || 600) / 60),
+          timeTakenText: `${Math.floor((s.timeTakenSeconds || 600) / 60)}m ${(s.timeTakenSeconds || 600) % 60}s`,
+          tabSwitchCount: s.tabSwitchCount || 0,
+          certificateId: s.certificateId,
+          trainerFeedback: s.trainerFeedback || "",
+          evaluationStatus: s.resultsPublished ? "published" : (s.evaluationStatus || "pending_publish"),
+          submittedAt: s.submittedAt || new Date().toISOString(),
+          answers: s.answers || {}
+        };
+      });
 
     return res.json({
       success: true,

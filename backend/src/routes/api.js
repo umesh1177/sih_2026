@@ -63,9 +63,9 @@ router.post("/ai/recommend-courses", requireAuth, aiController.recommendCoursesW
 router.post("/ai/generate-summary", requireAuth, aiController.generateMaterialSummaryWithAI);
 router.post("/ai/synthesize-paper", requireAuth, requireRole("trainer", "admin"), aiController.synthesizeAssessmentPaperWithAI);
 
-// --- PROTECTED: Quizzes, Kiosk Mode, Submissions & Analytics ---
 router.get("/quizzes", requireAuth, quizController.getQuizzes);
 router.get("/quizzes/:id", requireAuth, quizController.getQuizById);
+router.get("/quizzes/:id/submissions", requireAuth, quizController.getQuizSubmissions);
 router.post("/quizzes", requireAuth, requireRole("trainer", "admin"), quizController.createQuiz);
 router.post("/quizzes/submit", requireAuth, quizController.submitQuiz);
 router.post("/quizzes/:id/publish-results", requireAuth, requireRole("trainer", "admin"), quizController.publishQuizResults);
