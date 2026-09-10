@@ -219,7 +219,7 @@ export const TraineePracticePapersView = ({
             percentage: 80.0,
             passed: true,
             submittedAt: "2026-02-14T11:20:00Z",
-            adaptiveTrajectory: "Medium ➔ Beginner ➔ Medium (Morale Boosted)",
+            adaptiveTrajectory: "Medium ➔ Easy ➔ Medium (Calibrated)",
             timeTakenSeconds: 380,
             tabSwitchCount: 0
           }
@@ -378,7 +378,7 @@ export const TraineePracticePapersView = ({
             <span>AI Practice Papers & Adaptive Assessment Studio</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-3xl">
-            Generate customized practice question papers with Google Gemini AI or from the MoES Question Bank. Features <b>Dynamic Adaptive Testing</b> with morale-boosting difficulty calibration and instant performance analytics.
+            Generate customized practice question papers with Google Gemini AI or from the MoES Question Bank. Features <b>Dynamic Adaptive Testing</b> with real-time competency calibration and instant performance analytics.
           </p>
         </div>
 
@@ -418,34 +418,14 @@ export const TraineePracticePapersView = ({
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30 text-[10px] font-extrabold uppercase tracking-wider">
               <Flame className="w-3.5 h-3.5" />
-              <span>Active Feature: Morale-Aware Adaptive Testing Engine</span>
+              <span>Smart Practice Engine</span>
             </div>
             <h3 className="text-lg font-black text-white tracking-tight">
-              Real-Time Dynamic Difficulty Calibration
+              Adaptive Practice & Continuous Competency Calibration
             </h3>
             <p className="text-xs text-blue-100/90 leading-relaxed font-normal">
-              When you take a practice test, the engine actively assesses your accuracy streaks:
+              Practice sessions dynamically evaluate subject understanding in real-time, tailoring question sequences across atmospheric physics, radar products, and cyclone warning protocols.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
-              <div className="p-3 bg-white/10 rounded-2xl border border-white/15 space-y-1">
-                <span className="font-bold text-amber-300 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-amber-400" />
-                  Morale Recovery Rule:
-                </span>
-                <p className="text-[11px] text-blue-100">
-                  If 2-3 false answers occur in a row, the engine automatically lowers question difficulty (e.g. Advanced ➔ Intermediate ➔ Beginner) to reinforce fundamentals and protect officer morale.
-                </p>
-              </div>
-              <div className="p-3 bg-white/10 rounded-2xl border border-white/15 space-y-1">
-                <span className="font-bold text-emerald-300 flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
-                  Challenge Escalation Rule:
-                </span>
-                <p className="text-[11px] text-blue-100">
-                  Consecutive correct answers dynamically step up difficulty to high-order meteorological synthesis and complex case studies.
-                </p>
-              </div>
-            </div>
           </div>
 
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center space-y-2 shrink-0 w-full lg:w-64">
@@ -789,10 +769,10 @@ export const TraineePracticePapersView = ({
                   <div>
                     <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
                       <Flame className="w-4 h-4 text-amber-500" />
-                      <span>Enable Morale-Aware Adaptive Testing</span>
+                      <span>Enable Dynamic Adaptive Testing</span>
                     </span>
                     <p className="text-[11px] text-slate-500 mt-0.5">
-                      Dynamically scales difficulty up or down based on response streaks
+                      Dynamically scales question difficulty based on response accuracy
                     </p>
                   </div>
                   <input

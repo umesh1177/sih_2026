@@ -772,10 +772,10 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
               <div className="p-3.5 bg-blue-50 rounded-2xl border border-blue-200 text-[11px] text-blue-900 space-y-1">
                 <span className="font-extrabold flex items-center gap-1 text-[#0a2558]">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  Morale-Aware Dynamic Testing Enabled:
+                  Dynamic Adaptive Testing Enabled:
                 </span>
                 <p className="text-blue-800">
-                  If 2-3 consecutive false answers occur during the test, the engine automatically reduces difficulty to rebuild confidence.
+                  Real-time question difficulty calibration dynamically scales to ensure comprehensive concept coverage across selected subjects.
                 </p>
               </div>
 

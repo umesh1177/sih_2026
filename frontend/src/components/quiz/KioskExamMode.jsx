@@ -319,25 +319,21 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         const lastThree = recentAnswers.slice(-3);
         const lastTwo = recentAnswers.slice(-2);
         
-        // 1. Morale Booster: 3 consecutive misses (all false) -> reduce difficulty
+        // 1. Accuracy Streak: Adjust difficulty dynamically behind the scenes without revealing recovery rules to trainee
         if (lastThree.length === 3 && lastThree.every(v => v === false)) {
-          setAdaptiveDifficulty("Easy (Morale Booster Active)");
-          setAdaptiveToast("⚡ Adaptive Morale Engine: 3 consecutive misses detected. Difficulty dynamically reduced to Easy / Foundational to rebuild confidence and morale!");
-          setAdaptiveTrajectory(prev => [...prev, "Easy (Morale Booster)"]);
+          setAdaptiveDifficulty("Easy");
+          setAdaptiveTrajectory(prev => [...prev, "Easy"]);
         } else if (lastTwo.length === 2 && lastTwo.every(v => v === false) && adaptiveDifficulty.includes("Hard")) {
           setAdaptiveDifficulty("Medium");
-          setAdaptiveToast("⚡ Adaptive Engine: Recalibrating difficulty to Intermediate for balanced pacing.");
-          setAdaptiveTrajectory(prev => [...prev, "Medium (Balanced)"]);
+          setAdaptiveTrajectory(prev => [...prev, "Medium"]);
         }
-        // 2. Challenge Escalation: 3 consecutive correct answers -> increase difficulty
+        // 2. High Accuracy Streak: Scale up difficulty
         else if (lastThree.length === 3 && lastThree.every(v => v === true)) {
-          setAdaptiveDifficulty("Hard (Advanced Scenarios)");
-          setAdaptiveToast("🎯 High Accuracy Streak! Dynamic difficulty elevated to Advanced Meteorological Synthesis.");
-          setAdaptiveTrajectory(prev => [...prev, "Hard (Advanced)"]);
+          setAdaptiveDifficulty("Hard");
+          setAdaptiveTrajectory(prev => [...prev, "Hard"]);
         } else if (lastTwo.length === 2 && lastTwo.every(v => v === true) && adaptiveDifficulty.includes("Easy")) {
           setAdaptiveDifficulty("Medium");
-          setAdaptiveToast("📈 Accuracy Recovery! Scaling difficulty back to Intermediate.");
-          setAdaptiveTrajectory(prev => [...prev, "Medium (Progressing)"]);
+          setAdaptiveTrajectory(prev => [...prev, "Medium"]);
         }
       }
     }
@@ -428,7 +424,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                 <span>Adaptive Difficulty Calibration Path:</span>
               </span>
               <span className="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200">
-                Morale-Aware Engine
+                Dynamic Engine
               </span>
             </div>
             <div className="flex items-center gap-2 flex-wrap pt-1">
@@ -593,9 +589,6 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           </span>
           <span className="font-bold text-slate-800">
             Active Difficulty: <b className="text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 font-mono text-[11px]">{adaptiveDifficulty}</b>
-          </span>
-          <span className="text-[10px] text-slate-400 hidden md:inline">
-            • Morale Booster Active (3 consecutive misses recalibrates difficulty)
           </span>
         </div>
 

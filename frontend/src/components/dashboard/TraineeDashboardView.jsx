@@ -227,7 +227,7 @@ export const TraineeDashboardView = ({
             <h3 className="text-base font-black text-white">AI Practice Assessment Studio & Question Bank</h3>
           </div>
           <p className="text-xs text-blue-100 leading-relaxed font-normal">
-            Generate customized AI question papers, test your skills with <b>Morale-Aware Adaptive Difficulty</b>, and create manual questions stored in your personal Question Bank.
+            Generate customized AI question papers, test your skills with <b>Dynamic Adaptive Difficulty</b>, and create manual questions stored in your personal Question Bank.
           </p>
         </div>
 

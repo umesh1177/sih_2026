@@ -1827,6 +1827,203 @@
   ],
   "quizzes": [
     {
+      "id": "paper_qb_1789038687245",
+      "title": "Adaptive Question Bank Drill",
+      "courseId": "crs_nwp_101",
+      "courseName": "Question Bank Adaptive Practice",
+      "trainerName": "MoES Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 19,
+      "passMarks": 10,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-10T11:11:27.337Z",
+      "deadlineTime": "2026-09-17T11:11:27.337Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "questions": [
+        {
+          "id": "qb_025",
+          "question": "Under CMIP6 projections (SSP5-8.5 high emission scenario), Indian mean annual temperature by 2100 is projected to increase by approximately:",
+          "subjectId": "sub_cli_02",
+          "subjectName": "LRF & Climate Projections",
+          "module": "Module 3",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "options": [
+            "0.5–1.0°C",
+            "1.0–2.0°C",
+            "4.0–6.0°C",
+            "7.0–9.0°C"
+          ],
+          "correctAnswer": 2,
+          "explanation": "CMIP6 SSP5-8.5 projections for India indicate 4–6°C warming relative to pre-industrial baseline by end of 21st century (MoES-IITM report 2020)."
+        },
+        {
+          "id": "qb_73508527",
+          "question": "Which thermodynamic variable is conserved in both dry and moist adiabatic processes without precipitation in NWP models?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Equivalent Potential Temperature (Theta-e)",
+            "Virtual Temperature (Tv)",
+            "Dew Point Temperature (Td)",
+            "Dry Static Energy (s)"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Equivalent potential temperature (Theta-e) is conserved during both dry and reversible moist pseudoadiabatic ascents."
+        },
+        {
+          "id": "qb_006",
+          "question": "In a dual-polarization Doppler radar, which variable best distinguishes between rain and hail?",
+          "subjectId": "sub_dwr_02",
+          "subjectName": "Severe Storm Signatures",
+          "module": "Module 2",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Reflectivity (Z)",
+            "Radial Velocity (V)",
+            "Differential Reflectivity (ZDR)",
+            "Spectrum Width (W)"
+          ],
+          "correctAnswer": 2,
+          "explanation": "ZDR is near 0 dB for spherical hailstones but is typically 1–3 dB for oblate raindrops, enabling discrimination."
+        },
+        {
+          "id": "qb_027",
+          "question": "Which thermodynamic parameter represents the temperature a parcel would have if brought to 1000 hPa adiabatically?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Governing Equations",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Equivalent potential temperature (θe)",
+            "Potential temperature (θ)",
+            "Wet bulb temperature (Tw)",
+            "Virtual temperature (Tv)"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Potential temperature θ = T × (P₀/P)^(R/Cp) is conserved during dry adiabatic processes and represents temperature brought to 1000 hPa."
+        },
+        {
+          "id": "qb_029",
+          "question": "Which institution in India operates the National Seismic Monitoring Network (NSeIS) of broadband seismographs?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Governing Equations",
+          "module": "Module 1",
+          "marks": 1,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "NGRI Hyderabad",
+            "IMD (India Meteorological Department)",
+            "NRSC Hyderabad",
+            "GSI (Geological Survey of India)"
+          ],
+          "correctAnswer": 1,
+          "explanation": "IMD operates the National Seismic Monitoring Network (NSeIS) with 115+ broadband seismographs across India."
+        },
+        {
+          "id": "qb_013",
+          "question": "Rapid Intensification (RI) of a tropical cyclone is defined by IMD/WMO as an increase in maximum sustained winds of at least:",
+          "subjectId": "sub_cyc_01",
+          "subjectName": "Cyclone Dynamics",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "options": [
+            "10 knots in 12 hours",
+            "30 knots in 24 hours",
+            "50 knots in 48 hours",
+            "20 knots in 6 hours"
+          ],
+          "correctAnswer": 1,
+          "explanation": "WMO defines RI as an increase of ≥30 knots (≈55 km/h) in maximum sustained winds within a 24-hour period."
+        },
+        {
+          "id": "qb_015",
+          "question": "Cyclone Amphan (May 2020) was the first Super Cyclonic Storm in the Bay of Bengal since:",
+          "subjectId": "sub_cyc_01",
+          "subjectName": "Cyclone Dynamics",
+          "module": "Module 1",
+          "marks": 1,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Cyclone Orissa (1999)",
+            "Cyclone Aila (2009)",
+            "Cyclone Phailin (2013)",
+            "Cyclone Fani (2019)"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Amphan was the first Super Cyclonic Storm (≥130 kt) in BOB since the 1999 Odisha Super Cyclone."
+        },
+        {
+          "id": "qb_012",
+          "question": "Which ocean basin has the highest frequency of tropical cyclone formation in the Indian Ocean region?",
+          "subjectId": "sub_cyc_01",
+          "subjectName": "Cyclone Dynamics",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Arabian Sea only",
+            "Bay of Bengal",
+            "South Indian Ocean (30°S)",
+            "Both BOB and AS equally"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Bay of Bengal accounts for ~80% of North Indian Ocean tropical cyclone activity due to warm SSTs, low wind shear, and moisture convergence."
+        },
+        {
+          "id": "qb_020",
+          "question": "The Standardized Precipitation Index (SPI) for drought monitoring is computed over a reference period. A SPI value of -2.0 indicates:",
+          "subjectId": "sub_agro_01",
+          "subjectName": "Agromet Advisory Services",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Mildly dry conditions",
+            "Moderately dry conditions",
+            "Severely dry conditions",
+            "Extremely dry conditions"
+          ],
+          "correctAnswer": 3,
+          "explanation": "SPI ≤ -2.0 classifies as 'Extreme Drought' according to the McKee et al. (1993) scale."
+        },
+        {
+          "id": "qb_001",
+          "question": "Which coordinate system is most commonly used in operational NWP models to handle terrain-following levels?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Governing Equations",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Pressure (p) coordinates",
+            "Sigma (σ) coordinates",
+            "Height (z) coordinates",
+            "Isentropic (θ) coordinates"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Sigma coordinates follow terrain contours, avoiding computational complications near steep orography like the Himalayas."
+        }
+      ]
+    },
+    {
       "id": "quiz_fca188f5",
       "title": "Subject 1: Governing Equations & Atmospheric Dynamics Assessment",
       "courseId": "crs_nwp_101",
@@ -2676,6 +2873,72 @@
     }
   ],
   "quizSubmissions": [
+    {
+      "id": "subm_99059aa5",
+      "quizId": "paper_qb_1789038687245",
+      "quizTitle": "Adaptive Question Bank Drill",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 19,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 4,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-10T11:15:43.716Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
+    {
+      "id": "subm_755e5b9d",
+      "quizId": "paper_qb_1789038687245",
+      "quizTitle": "Adaptive Question Bank Drill",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 19,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 8,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-10T11:13:23.205Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
+    {
+      "id": "subm_923c34fa",
+      "quizId": "paper_qb_1789038687245",
+      "quizTitle": "Adaptive Question Bank Drill",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 19,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 72,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-10T11:12:43.315Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
     {
       "id": "subm_db948826",
       "quizId": "quiz_nwp_2025_01",
