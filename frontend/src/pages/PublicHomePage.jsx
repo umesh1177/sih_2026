@@ -203,12 +203,12 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
           
           {/* Logo & National Emblem Identity */}
           <div className="flex items-center gap-3.5 shrink-0">
-            <div className="w-12 h-12 rounded-2xl bg-[#0a2558] text-white flex items-center justify-center font-black text-2xl shadow-md border-2 border-blue-200">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-2xl shadow-md border-2 border-blue-200">
               Q
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-base sm:text-lg font-black text-[#0a2558] tracking-tight">
+                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
                   CAPACITY CONNECT
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-100 text-blue-900 uppercase border border-blue-200">
@@ -262,7 +262,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
 
             <button
               onClick={() => onOpenLoginPage && onOpenLoginPage()}
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-all hover:scale-105"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition-all hover:scale-105"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>Register Officer</span>
@@ -271,27 +271,27 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
         </div>
       </header>
 
-      {/* ─── 3. MODERN HERO SECTION (LIGHT THEME & NAVY ACCENTS) ─── */}
-      <section className="bg-gradient-to-br from-[#0a2558] via-[#0d3477] to-[#122854] text-white py-14 lg:py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden shadow-md">
+      {/* ─── 3. MODERN HERO SECTION (LIGHT THEME & CLEAN ELEVATION) ─── */}
+      <section className="bg-gradient-to-b from-blue-50/70 via-slate-50/50 to-white text-slate-900 py-12 lg:py-18 px-4 sm:px-6 lg:px-8 relative overflow-hidden border-b border-slate-200">
         
-        {/* Subtle decorative background circles */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-emerald-400/10 blur-3xl pointer-events-none" />
+        {/* Subtle decorative mesh glow */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-200/30 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-emerald-200/20 blur-3xl pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
           
           {/* Left Hero Content */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-blue-200">
-              <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-blue-200 text-xs font-bold text-blue-700 shadow-xs">
+              <Sparkles className="w-4 h-4 text-blue-600" />
               <span>Official Capacity Building • Ministry of Earth Sciences (MoES)</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-white">
-              Empowering India's Meteorological Workforce Through <span className="text-sky-300">Digital Competency Mastery</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-slate-900">
+              Empowering India's Meteorological Workforce Through <span className="text-blue-600">Digital Competency Mastery</span>
             </h1>
 
-            <p className="text-sm sm:text-base text-blue-100/90 leading-relaxed max-w-2xl font-normal">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl font-normal">
               A unified digital ecosystem for the <b>Ministry of Earth Sciences (MoES)</b> and <b>India Meteorological Department (IMD)</b>. Standardized operational curricula, AI-proctored kiosk assessments, automated competency radar mapping, and official cryptographic certifications.
             </p>
 
@@ -302,10 +302,10 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                   if (traineeAcc) switchAccount(traineeAcc);
                   onEnterPortal();
                 }}
-                className="flex items-center gap-2 px-6 sm:px-7 py-3.5 bg-white text-[#0a2558] hover:bg-blue-50 font-black rounded-2xl text-xs sm:text-sm shadow-xl transition-all transform hover:scale-105 active:scale-95"
+                className="flex items-center gap-2 px-6 sm:px-7 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-xs sm:text-sm shadow-md transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
               >
-                <GraduationCap className="w-4 h-4 text-blue-700" />
-                <span>Enter Trainee Dashboard (Rahul)</span>
+                <GraduationCap className="w-4 h-4 text-white" />
+                <span>Enter Trainee Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -315,10 +315,10 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                   if (trainerAcc) switchAccount(trainerAcc);
                   onEnterPortal();
                 }}
-                className="flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-blue-600/40 hover:bg-blue-600/60 text-white font-bold rounded-2xl text-xs sm:text-sm border border-blue-400/40 transition-all hover:scale-105 active:scale-95"
+                className="flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-2xl text-xs sm:text-sm border border-slate-300 shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
-                <Layers className="w-4 h-4 text-blue-200" />
-                <span>Enter Trainer Dashboard</span>
+                <Layers className="w-4 h-4 text-blue-600" />
+                <span>Enter Trainer Desk</span>
               </button>
 
               <button
@@ -326,43 +326,43 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                   setShowVerifyModal(true);
                   setVerifyError("");
                 }}
-                className="flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 font-bold rounded-2xl text-xs sm:text-sm border border-emerald-400/40 transition-all hover:scale-105 active:scale-95"
+                className="flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-2xl text-xs sm:text-sm border border-emerald-300 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Verify Certificate</span>
               </button>
             </div>
 
             {/* Live Telemetry Counters */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/15 max-w-lg">
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200 max-w-lg">
               <div>
-                <p className="text-2xl sm:text-3xl font-black text-white">4,280+</p>
-                <p className="text-[11px] text-blue-200 font-medium">Certified Officers</p>
+                <p className="text-2xl sm:text-3xl font-black text-slate-900">4,280+</p>
+                <p className="text-[11px] text-slate-500 font-medium">Certified Officers</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-black text-white">36</p>
-                <p className="text-[11px] text-blue-200 font-medium">Regional Met Centres</p>
+                <p className="text-2xl sm:text-3xl font-black text-slate-900">36</p>
+                <p className="text-[11px] text-slate-500 font-medium">Regional Met Centres</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-black text-emerald-300">100%</p>
-                <p className="text-[11px] text-blue-200 font-medium">Verifiable Credentials</p>
+                <p className="text-2xl sm:text-3xl font-black text-emerald-600">100%</p>
+                <p className="text-[11px] text-slate-500 font-medium">Verifiable Credentials</p>
               </div>
             </div>
           </div>
 
-          {/* Right Hero Card: Instant Interactive Verification Box */}
-          <div className="lg:col-span-5 bg-white/10 backdrop-blur-md rounded-3xl p-6 sm:p-7 border border-white/20 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/15">
-              <span className="font-bold text-sm text-white flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          {/* Right Hero Card: Instant Interactive Verification Box (Light Theme) */}
+          <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-md space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Instant Certificate Verification</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400 text-slate-950 shadow-sm">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                 PUBLIC LEDGER
               </span>
             </div>
 
-            <p className="text-xs text-blue-100 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               Enter any Certificate ID or unique verification URL to confirm authentic accreditation:
             </p>
 
@@ -374,26 +374,26 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                   value={verifyQuery}
                   onChange={(e) => setVerifyQuery(e.target.value)}
                   placeholder="e.g. MOES-CERT-NWP-401-0981"
-                  className="flex-1 px-3.5 py-2.5 bg-white text-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"
+                  className="flex-1 px-3.5 py-2.5 bg-slate-50 text-slate-900 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onKeyDown={(e) => e.key === "Enter" && handlePerformVerification()}
                 />
                 <button
                   onClick={() => handlePerformVerification()}
-                  className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-transform active:scale-95 shrink-0 shadow-md"
+                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition-transform active:scale-95 shrink-0 shadow-sm cursor-pointer"
                 >
                   Verify Now
                 </button>
               </div>
               
               {/* Sample Quick IDs */}
-              <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-blue-200 pt-1">
-                <span className="font-semibold text-blue-100">Sample Credential IDs:</span>
+              <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-500 pt-1">
+                <span className="font-semibold text-slate-700">Sample Credential IDs:</span>
                 <button
                   onClick={() => {
                     setVerifyQuery("MOES-CERT-NWP-401-0981");
                     handlePerformVerification("MOES-CERT-NWP-401-0981");
                   }}
-                  className="underline hover:text-white font-mono"
+                  className="underline hover:text-blue-700 font-mono cursor-pointer"
                 >
                   MOES-CERT-NWP-401-0981
                 </button>
@@ -403,7 +403,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                     setVerifyQuery("MOES-IMD-2026-9810");
                     handlePerformVerification("MOES-IMD-2026-9810");
                   }}
-                  className="underline hover:text-white font-mono"
+                  className="underline hover:text-blue-700 font-mono cursor-pointer"
                 >
                   MOES-IMD-2026-9810
                 </button>
@@ -411,13 +411,13 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
             </div>
 
             {/* Framework highlights */}
-            <div className="pt-3 border-t border-white/15 space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-blue-100">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div className="pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-slate-600">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Signed by Director General of Meteorology</span>
               </div>
-              <div className="flex items-center gap-2 text-blue-100">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-600">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Instant QR-code verification for promotions & roster duty</span>
               </div>
             </div>
@@ -427,10 +427,10 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
       </section>
 
       {/* ─── 4. DEDICATED PUBLIC CERTIFICATE VERIFICATION BANNER SECTION ─── */}
-      <section id="verification-section" className="py-10 px-4 sm:px-6 lg:px-8 bg-emerald-50/80 border-b border-emerald-200">
+      <section id="verification-section" className="py-10 px-4 sm:px-6 lg:px-8 bg-emerald-50/60 border-b border-emerald-200">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-2xl shadow-md shrink-0 border-2 border-emerald-300">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-2xl shadow-sm shrink-0 border-2 border-emerald-300">
               <Award className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -454,9 +454,9 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                 setShowVerifyModal(true);
                 setVerifyError("");
               }}
-              className="flex items-center gap-2 px-6 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-black rounded-2xl text-xs shadow-md transition-all shrink-0 hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-xs shadow-sm transition-all shrink-0 hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-300" />
               <span>Launch Verification Portal</span>
             </button>
           </div>
@@ -596,7 +596,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                 onClick={() => setHomeCourseFilter(tab.id)}
                 className={`px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all text-xs border flex items-center gap-1.5 ${
                   isSelected
-                    ? "bg-[#0a2558] text-white border-[#0a2558] shadow-sm scale-105"
+                    ? "bg-blue-600 text-white border-blue-600 shadow-sm scale-105"
                     : tab.id === "Recent"
                     ? "bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200"
                     : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
@@ -625,7 +625,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                 setLevelFilter("All Levels");
                 setSearchQuery("");
               }}
-              className="px-4 py-2 bg-[#0a2558] text-white rounded-xl text-xs font-bold shadow-sm"
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors"
             >
               Reset All Filters
             </button>
@@ -653,7 +653,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#0a2558] text-white shadow">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white shadow">
                           {course.code}
                         </span>
                         {isNewlyCreated && (
@@ -710,7 +710,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                         onOpenCourse(course);
                         onEnterPortal();
                       }}
-                      className="px-3.5 py-1.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs transition-colors shadow flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow flex items-center gap-1 cursor-pointer"
                     >
                       <span>Explore</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -729,7 +729,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-black text-[#0a2558] flex items-center gap-2">
+                <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
                   <BellRing className="w-5 h-5 text-blue-600" />
                   <span>MoES Directives & Training Circulars</span>
                 </h2>
@@ -761,21 +761,21 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
       )}
 
       {/* ─── 8. FOOTER ─── */}
-      <footer className="bg-[#0a2558] text-white py-10 border-t border-white/10 px-4 sm:px-6 lg:px-8 text-center text-xs">
+      <footer className="bg-slate-900 text-white py-10 border-t border-slate-800 px-4 sm:px-6 lg:px-8 text-center text-xs">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex items-center justify-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-white text-[#0a2558] flex items-center justify-center font-black text-lg">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg">
               Q
             </div>
             <span className="font-black text-base tracking-tight">CAPACITY CONNECT</span>
           </div>
-          <p className="font-bold text-blue-100">
+          <p className="font-bold text-slate-200">
             Ministry of Earth Sciences (MoES) & India Meteorological Department (IMD)
           </p>
-          <p className="text-blue-200/70 text-[11px] max-w-xl mx-auto">
+          <p className="text-slate-400 text-[11px] max-w-xl mx-auto">
             National Digital Capacity Building & Competency Learning Management Portal. Designed for high-integrity meteorological training, automated competency mapping, and cryptographic certificate issuance.
           </p>
-          <div className="pt-4 border-t border-white/10 text-slate-400 text-[10px] flex items-center justify-between flex-wrap gap-2">
+          <div className="pt-4 border-t border-slate-800 text-slate-500 text-[10px] flex items-center justify-between flex-wrap gap-2">
             <span>© 2026 Ministry of Earth Sciences, Government of India. All rights reserved.</span>
             <span>Secured with SHA-256 Cryptographic Verification Ledger</span>
           </div>
@@ -831,7 +831,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                 <button
                   onClick={() => handlePerformVerification()}
                   disabled={verifying}
-                  className="px-5 py-2.5 bg-[#0a2558] hover:bg-[#081d45] text-white font-bold rounded-xl text-xs shadow-sm disabled:opacity-60 transition-transform active:scale-95"
+                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm disabled:opacity-60 transition-transform active:scale-95 cursor-pointer"
                 >
                   {verifying ? "Verifying..." : "Verify Authenticity"}
                 </button>
