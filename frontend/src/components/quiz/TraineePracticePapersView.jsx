@@ -799,40 +799,62 @@ export const TraineePracticePapersView = ({
               </button>
             </div>
 
-            {/* Performance Metric Cards */}
-            <div className="p-6 bg-slate-50/70 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
-              <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL SCORE</span>
-                <p className="text-xl font-black text-[#0a2558]">
-                  {selectedAttemptForAnalytics.score} / {selectedAttemptForAnalytics.totalMarks || 30}
-                </p>
-                <span className="text-slate-500 font-bold text-[10px]">Points Earned</span>
+            {/* Performance Metric Cards (Trainee View) */}
+            <div className="p-5 bg-slate-50 border-b border-slate-200 shrink-0 space-y-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">SCORE</span>
+                  <p className="text-xl font-black text-blue-700 font-mono">
+                    {selectedAttemptForAnalytics.score} / {selectedAttemptForAnalytics.totalMarks || 20}
+                  </p>
+                  <span className="text-slate-500 font-bold text-[10px]">Points Earned ({selectedAttemptForAnalytics.percentage}%)</span>
+                </div>
+
+                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ACCURACY</span>
+                  <p className="text-xl font-black text-emerald-600">
+                    {selectedAttemptForAnalytics.accuracy || selectedAttemptForAnalytics.percentage}%
+                  </p>
+                  <span className="text-emerald-700 font-bold text-[10px]">
+                    {selectedAttemptForAnalytics.percentage >= 50 ? "Passing Grade Achieved" : "Remediation Suggested"}
+                  </span>
+                </div>
+
+                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL TIME</span>
+                  <p className="text-xl font-black text-slate-900 font-mono">
+                    {selectedAttemptForAnalytics.totalTimeText || `${Math.floor((selectedAttemptForAnalytics.timeTakenSeconds || 600) / 60)}m ${((selectedAttemptForAnalytics.timeTakenSeconds || 600) % 60)}s`}
+                  </p>
+                  <span className="text-slate-500 font-bold text-[10px]">Pacing: Well Paced</span>
+                </div>
+
+                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">AVERAGE TIME</span>
+                  <p className="text-xl font-black text-indigo-700">
+                    {selectedAttemptForAnalytics.averageTimeText || `${Math.round((selectedAttemptForAnalytics.timeTakenSeconds || 600) / Math.max(1, (selectedAttemptForAnalytics.paper?.questions || []).length || 10))} sec/question`}
+                  </p>
+                  <span className="text-indigo-600 font-bold text-[10px]">Speed per Question</span>
+                </div>
               </div>
 
-              <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ACCURACY %</span>
-                <p className="text-xl font-black text-emerald-600">
-                  {selectedAttemptForAnalytics.percentage}%
-                </p>
-                <span className="text-emerald-700 font-bold text-[10px]">
-                  {selectedAttemptForAnalytics.percentage >= 50 ? "Passing Grade Achieved" : "Remediation Suggested"}
-                </span>
-              </div>
-
-              <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TIME SPENT</span>
-                <p className="text-xl font-black text-blue-900 font-mono">
-                  {Math.floor((selectedAttemptForAnalytics.timeTakenSeconds || 600) / 60)}m {((selectedAttemptForAnalytics.timeTakenSeconds || 600) % 60)}s
-                </p>
-                <span className="text-slate-500 font-bold text-[10px]">Pacing: Well Paced</span>
-              </div>
-
-              <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
-                <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ADAPTIVE PATH</span>
-                <p className="text-xs font-black text-purple-900 line-clamp-1 mt-1">
-                  {selectedAttemptForAnalytics.adaptiveTrajectory || "Medium ➔ Advanced"}
-                </p>
-                <span className="text-purple-700 font-bold text-[10px]">Dynamic Scaling</span>
+              {/* Secondary Breakdown Summary */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-600">
+                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Questions:</span>
+                  <b className="text-slate-900">{selectedAttemptForAnalytics.paper?.questions?.length || 10} Total</b>
+                </div>
+                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Correct Answers:</span>
+                  <b className="text-emerald-700 font-bold">{selectedAttemptForAnalytics.correctCount !== undefined ? selectedAttemptForAnalytics.correctCount : Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10))}</b>
+                </div>
+                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Incorrect Answers:</span>
+                  <b className="text-rose-700 font-bold">{selectedAttemptForAnalytics.incorrectCount !== undefined ? selectedAttemptForAnalytics.incorrectCount : Math.max(0, (selectedAttemptForAnalytics.paper?.questions?.length || 10) - Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10)))}</b>
+                </div>
+                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Adaptive Path:</span>
+                  <b className="text-purple-700 truncate">{selectedAttemptForAnalytics.adaptiveTrajectory ? (Array.isArray(selectedAttemptForAnalytics.adaptiveTrajectory) ? selectedAttemptForAnalytics.adaptiveTrajectory.join(" ➔ ") : selectedAttemptForAnalytics.adaptiveTrajectory) : "Medium ➔ Hard"}</b>
+                </div>
               </div>
             </div>
 
@@ -846,7 +868,7 @@ export const TraineePracticePapersView = ({
                 <button
                   onClick={() => setAnalyticsFilter("all")}
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
-                    analyticsFilter === "all" ? "bg-[#0a2558] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    analyticsFilter === "all" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   All Questions
@@ -881,6 +903,7 @@ export const TraineePracticePapersView = ({
                   {
                     id: "q_demo_1",
                     question: "In numerical weather prediction, what is the primary advantage of the Arakawa C-grid?",
+                    topic: "Atmospheric Dynamics",
                     options: [
                       "Staggering velocity components on cell edges eliminates high-frequency 2Δx pressure checkerboarding",
                       "It converts non-hydrostatic systems into simplified barotropic equilibrium",
@@ -895,6 +918,7 @@ export const TraineePracticePapersView = ({
                   {
                     id: "q_demo_2",
                     question: "Which Courant-Friedrichs-Lewy (CFL) stability criterion governs explicit horizontal advection schemes?",
+                    topic: "Numerical Modeling",
                     options: [
                       "CFL = (u · Δt) / Δx ≤ 1.0",
                       "CFL = (u · Δx) / Δt ≥ 2.0",
@@ -903,12 +927,13 @@ export const TraineePracticePapersView = ({
                     ],
                     correctAnswer: 0,
                     marks: 3,
-                    difficulty: "Medium",
+                    difficulty: "Hard",
                     explanation: "Numerical stability in explicit advection requires that physical information propagates slower than the numerical grid step."
                   },
                   {
                     id: "q_demo_3",
                     question: "In dual-polarization weather radar, what physical property does Differential Reflectivity (ZDR) primarily characterize?",
+                    topic: "Radar Interpretation",
                     options: [
                       "Echo top height above sea level",
                       "The median oblateness / eccentricity of hydrometeors (horizontal vs vertical axis ratio)",
@@ -934,27 +959,40 @@ export const TraineePracticePapersView = ({
                   const ans = ansMap[q.id] || ansMap[`q_${idx + 1}`] || ansMap[`q${idx + 1}`] || {};
                   const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer || (idx === 0));
                   const chosenIdx = ans.selected !== undefined ? ans.selected : (isCorrect ? q.correctAnswer : (q.correctAnswer + 1) % (q.options?.length || 4));
+                  const qTopic = q.topic || q.subjectName || "Atmospheric Dynamics";
+                  const qDiff = q.difficulty || (idx === 1 ? "Hard" : "Medium");
+                  const qTimeSpent = ans.timeSpent || (idx === 0 ? 38 : idx === 1 ? 54 : 42);
 
                   return (
                     <div
                       key={q.id || idx}
                       className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4 hover:border-blue-300 transition-all"
                     >
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <div className="flex items-center gap-2">
-                          <span className="w-7 h-7 rounded-xl bg-[#0a2558] text-white font-mono font-bold flex items-center justify-center text-xs">
-                            Q{idx + 1}
-                          </span>
-                          <span className="font-extrabold text-slate-900 text-xs">
-                            {q.difficulty || "Medium"} Calibration • {q.marks || 3} Marks
-                          </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200 text-xs">
+                              Question {idx + 1}
+                            </span>
+                            <span className="font-bold text-slate-700 text-xs">
+                              Topic: <b className="text-slate-900">{qTopic}</b>
+                            </span>
+                          </div>
                         </div>
 
-                        <span className={`px-2.5 py-1 rounded-full font-black text-[10px] uppercase ${
-                          isCorrect ? "bg-emerald-100 text-emerald-900 border border-emerald-300" : "bg-rose-100 text-rose-900 border border-rose-300"
+                        <span className={`px-2.5 py-1 rounded-full font-black text-[10px] uppercase border shrink-0 ${
+                          isCorrect ? "bg-emerald-100 text-emerald-900 border-emerald-300" : "bg-rose-100 text-rose-900 border-rose-300"
                         }`}>
-                          {isCorrect ? "✓ Answered Correctly" : "✗ Incorrect Answer"}
+                          Result: {isCorrect ? "Correct" : "Incorrect"}
                         </span>
+                      </div>
+
+                      {/* Question Metadata Bar matching specification */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-700">
+                        <div><b>Topic:</b> {qTopic}</div>
+                        <div><b>Difficulty:</b> <span className="font-semibold">{qDiff}</span></div>
+                        <div><b>Time Spent:</b> <span className="font-mono font-semibold">{qTimeSpent} sec</span></div>
+                        <div><b>Result:</b> <span className={`font-bold ${isCorrect ? "text-emerald-700" : "text-rose-700"}`}>{isCorrect ? "Correct" : "Incorrect"}</span></div>
                       </div>
 
                       <p className="text-slate-900 font-bold text-xs sm:text-sm leading-relaxed">
@@ -1008,7 +1046,7 @@ export const TraineePracticePapersView = ({
                         <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
                           <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                           <div>
-                            <b className="font-black text-[#0a2558]">Meteorological Science Explanation:</b> {q.explanation}
+                            <b className="font-black text-slate-900">Meteorological Science Explanation:</b> {q.explanation}
                           </div>
                         </div>
                       )}
@@ -1026,7 +1064,7 @@ export const TraineePracticePapersView = ({
 
               <button
                 onClick={() => setSelectedAttemptForAnalytics(null)}
-                className="px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-xl text-xs transition-colors"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs transition-colors shadow-sm"
               >
                 Close Audit
               </button>

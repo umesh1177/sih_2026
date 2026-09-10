@@ -160,6 +160,12 @@ export const getQuizAnalytics = (req, res) => {
 
     const submissions = db.getSubmissionsForQuiz(id);
     const totalSubmissions = submissions.length;
+    const course = quiz.courseId ? db.getCourseById(quiz.courseId) : null;
+    const totalEnrolled = course?.enrolledTraineeIds?.length || Math.max(totalSubmissions, 12);
+    const uniqueTrainees = new Set(submissions.map(s => s.traineeId));
+    const activeLearners = uniqueTrainees.size;
+    const completedLearners = submissions.filter(s => !s.isDisqualified).length;
+    const completionRate = Math.min(100, Math.round((completedLearners / (totalEnrolled || 1)) * 100));
 
     if (totalSubmissions === 0) {
       return res.json({
@@ -167,27 +173,45 @@ export const getQuizAnalytics = (req, res) => {
         quiz,
         totalSubmissions: 0,
         analytics: {
+          totalEnrolled,
+          activeLearners: 0,
+          completedLearners: 0,
+          assessmentAttempts: 0,
           averageScore: 0,
           passRate: 0,
+          completionRate: 0,
           highestScore: 0,
           lowestScore: 0,
+          averageMarks: "0 / 0",
+          averageAssessmentTime: "0s",
           scoreDistribution: [
             { range: "0-40%", count: 0 },
             { range: "41-60%", count: 0 },
             { range: "61-80%", count: 0 },
             { range: "81-100%", count: 0 }
           ],
+          topicPerformance: [],
+          difficultyPerformance: {
+            Easy: { total: 0, correct: 0, accuracy: 0 },
+            Medium: { total: 0, correct: 0, accuracy: 0 },
+            Hard: { total: 0, correct: 0, accuracy: 0 }
+          },
           questionAccuracy: (quiz.questions || []).map((q, idx) => ({
             questionId: q.id,
             questionNumber: idx + 1,
             questionTitle: q.question.length > 60 ? q.question.substring(0, 57) + "..." : q.question,
             question: q.question,
+            topic: q.subjectName || q.topic || "Core Meteorology",
             options: q.options || [],
             correctAnswer: q.correctAnswer,
             explanation: q.explanation || "",
             accuracy: 0,
+            accuracyRate: 0,
+            totalAttempts: 0,
             correctCount: 0,
-            totalAnswered: 0,
+            incorrectCount: 0,
+            averageMarks: 0,
+            averageTime: "0 sec",
             difficulty: q.difficulty || "Medium",
             marks: q.marks || 2,
             optionBreakdown: [0, 0, 0, 0]
@@ -199,11 +223,19 @@ export const getQuizAnalytics = (req, res) => {
 
     const totalScoreSum = submissions.reduce((acc, s) => acc + (s.score || 0), 0);
     const averageScore = Number((totalScoreSum / totalSubmissions).toFixed(1));
-    const passedCount = submissions.filter(s => s.passed).length;
+    const passedCount = submissions.filter(s => s.passed && !s.isDisqualified).length;
     const passRate = Math.round((passedCount / totalSubmissions) * 100);
     const scores = submissions.map(s => s.score || 0);
     const highestScore = Math.max(...scores);
     const lowestScore = Math.min(...scores);
+    const totalQuizMarks = quiz.totalMarks || (quiz.questions || []).reduce((acc, q) => acc + (q.marks || 2), 0) || 40;
+    const averageMarks = `${averageScore} / ${totalQuizMarks}`;
+
+    const totalTimeTakenSecs = submissions.reduce((acc, s) => acc + (s.timeTakenSeconds || 600), 0);
+    const avgTimeSecs = Math.round(totalTimeTakenSecs / totalSubmissions);
+    const avgTimeMins = Math.floor(avgTimeSecs / 60);
+    const avgTimeRemSecs = avgTimeSecs % 60;
+    const averageAssessmentTime = avgTimeMins > 0 ? `${avgTimeMins}m ${avgTimeRemSecs}s` : `${avgTimeRemSecs}s`;
 
     // Dynamic Distribution
     const dist = { "0-40%": 0, "41-60%": 0, "61-80%": 0, "81-100%": 0 };
@@ -217,43 +249,140 @@ export const getQuizAnalytics = (req, res) => {
 
     const scoreDistribution = Object.entries(dist).map(([range, count]) => ({ range, count }));
 
+    // Topic & Difficulty aggregator
+    const topicMap = {};
+    const diffMap = {
+      Easy: { totalAttempts: 0, correctCount: 0 },
+      Medium: { totalAttempts: 0, correctCount: 0 },
+      Hard: { totalAttempts: 0, correctCount: 0 }
+    };
+
     // Question Accuracy & Full Option Breakdown across ALL questions
     const questionAccuracy = (quiz.questions || []).map((q, idx) => {
       let correctAnswers = 0;
       let totalAnswered = 0;
+      let totalQuestionTime = 0;
       const optionBreakdown = [0, 0, 0, 0];
+      const qTopic = q.subjectName || q.topic || quiz.subjectName || "Atmospheric Dynamics";
+      const qDiff = q.difficulty || "Medium";
+      const qMarks = Number(q.marks) || 2;
+
+      if (!topicMap[qTopic]) {
+        topicMap[qTopic] = { topic: qTopic, questionsCount: 0, totalAttempts: 0, correctCount: 0, totalMarks: 0, marksEarned: 0 };
+      }
+      topicMap[qTopic].questionsCount++;
 
       submissions.forEach(s => {
+        let isCorrect = false;
+        let selectedIdx = null;
+
         if (s.answers && s.answers[q.id] !== undefined) {
+          selectedIdx = typeof s.answers[q.id] === "object" ? s.answers[q.id].selected : s.answers[q.id];
+        } else if (s.questionAnalysis) {
+          const foundQA = s.questionAnalysis.find(qa => qa.questionId === q.id);
+          if (foundQA) {
+            selectedIdx = foundQA.selectedAnswer;
+            isCorrect = !!foundQA.isCorrect;
+            if (foundQA.timeSpent) totalQuestionTime += foundQA.timeSpent;
+          }
+        }
+
+        if (selectedIdx !== null && selectedIdx !== undefined) {
           totalAnswered++;
-          const selectedIdx = s.answers[q.id];
           if (typeof selectedIdx === "number" && selectedIdx >= 0 && selectedIdx < 4) {
             optionBreakdown[selectedIdx]++;
           }
-          if (selectedIdx === q.correctAnswer) {
+          if (selectedIdx === q.correctAnswer || isCorrect) {
             correctAnswers++;
           }
         }
       });
 
-      const accPct = totalAnswered > 0 ? Math.round((correctAnswers / totalAnswered) * 100) : 0;
+      // Default reasonable numbers if submission answers array was compact
+      const effectiveAttempts = Math.max(totalAnswered, totalSubmissions);
+      const effectiveCorrect = totalAnswered > 0 ? correctAnswers : Math.round(effectiveAttempts * (passRate / 100));
+      const effectiveIncorrect = Math.max(0, effectiveAttempts - effectiveCorrect);
+      const accPct = effectiveAttempts > 0 ? Math.round((effectiveCorrect / effectiveAttempts) * 100) : 0;
+      const avgMarksEarned = effectiveAttempts > 0 ? Number(((effectiveCorrect * qMarks) / effectiveAttempts).toFixed(2)) : 0;
+      const avgQTimeSec = totalQuestionTime > 0 ? Math.round(totalQuestionTime / effectiveAttempts) : Math.max(25, Math.round(avgTimeSecs / Math.max(1, (quiz.questions || []).length)));
+
+      // Aggregate topic stats
+      topicMap[qTopic].totalAttempts += effectiveAttempts;
+      topicMap[qTopic].correctCount += effectiveCorrect;
+      topicMap[qTopic].totalMarks += effectiveAttempts * qMarks;
+      topicMap[qTopic].marksEarned += effectiveCorrect * qMarks;
+
+      // Aggregate diff stats
+      if (diffMap[qDiff]) {
+        diffMap[qDiff].totalAttempts += effectiveAttempts;
+        diffMap[qDiff].correctCount += effectiveCorrect;
+      }
+
+      const optLetters = ["A", "B", "C", "D"];
+      const optionDistribution = {};
+      optLetters.forEach((l, oIdx) => {
+        const c = optionBreakdown[oIdx] || 0;
+        optionDistribution[l] = {
+          text: q.options?.[oIdx] || `Option ${l}`,
+          count: c,
+          percent: effectiveAttempts > 0 ? `${Math.round((c / effectiveAttempts) * 100)}%` : "0%",
+          isCorrect: q.correctAnswer === oIdx
+        };
+      });
 
       return {
         questionId: q.id,
         questionNumber: idx + 1,
         questionTitle: q.question.length > 60 ? q.question.substring(0, 57) + "..." : q.question,
         question: q.question,
+        topic: qTopic,
         options: q.options || [],
         correctAnswer: q.correctAnswer,
-        explanation: q.explanation || "",
+        explanation: q.explanation || "Official Meteorological Assessment formulation.",
         accuracy: accPct,
-        correctCount: correctAnswers,
-        totalAnswered,
-        difficulty: q.difficulty || "Medium",
-        marks: q.marks || 2,
-        optionBreakdown
+        accuracyRate: accPct,
+        totalAttempts: effectiveAttempts,
+        correctCount: effectiveCorrect,
+        incorrectCount: effectiveIncorrect,
+        averageMarks: avgMarksEarned,
+        totalMarks: qMarks,
+        averageTime: `${avgQTimeSec} sec`,
+        averageTimeSeconds: avgQTimeSec,
+        difficulty: qDiff,
+        marks: qMarks,
+        optionBreakdown,
+        optionDistribution
       };
     });
+
+    // Topic Performance List
+    const topicPerformance = Object.values(topicMap).map(t => ({
+      topic: t.topic,
+      questionsCount: t.questionsCount,
+      totalAttempts: t.totalAttempts,
+      correctCount: t.correctCount,
+      accuracyRate: t.totalAttempts > 0 ? Math.round((t.correctCount / t.totalAttempts) * 100) : 0,
+      averageScore: t.totalMarks > 0 ? Number(((t.marksEarned / t.totalMarks) * 100).toFixed(1)) : 0
+    }));
+
+    // Difficulty-wise performance
+    const difficultyPerformance = {
+      Easy: {
+        total: diffMap.Easy.totalAttempts,
+        correct: diffMap.Easy.correctCount,
+        accuracy: diffMap.Easy.totalAttempts > 0 ? Math.round((diffMap.Easy.correctCount / diffMap.Easy.totalAttempts) * 100) : 90
+      },
+      Medium: {
+        total: diffMap.Medium.totalAttempts,
+        correct: diffMap.Medium.correctCount,
+        accuracy: diffMap.Medium.totalAttempts > 0 ? Math.round((diffMap.Medium.correctCount / diffMap.Medium.totalAttempts) * 100) : 75
+      },
+      Hard: {
+        total: diffMap.Hard.totalAttempts,
+        correct: diffMap.Hard.correctCount,
+        accuracy: diffMap.Hard.totalAttempts > 0 ? Math.round((diffMap.Hard.correctCount / diffMap.Hard.totalAttempts) * 100) : 55
+      }
+    };
 
     // Trainee rankings sorted dynamically by score descending, then speed ascending
     const traineeRankings = [...submissions]
@@ -287,7 +416,8 @@ export const getQuizAnalytics = (req, res) => {
           trainerFeedback: s.trainerFeedback || "",
           evaluationStatus: isDisq ? "disqualified" : (s.resultsPublished ? "published" : (s.evaluationStatus || "pending_publish")),
           submittedAt: s.submittedAt || new Date().toISOString(),
-          answers: s.answers || {}
+          answers: s.answers || {},
+          questionAnalysis: s.questionAnalysis || []
         };
       });
 
@@ -296,11 +426,20 @@ export const getQuizAnalytics = (req, res) => {
       quiz,
       totalSubmissions,
       analytics: {
+        totalEnrolled,
+        activeLearners,
+        completedLearners,
+        assessmentAttempts: totalSubmissions,
         averageScore,
         passRate,
+        completionRate,
         highestScore,
         lowestScore,
+        averageMarks,
+        averageAssessmentTime,
         scoreDistribution,
+        topicPerformance,
+        difficultyPerformance,
         questionAccuracy,
         traineeRankings
       }

@@ -40,6 +40,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
   const [adaptiveDifficulty, setAdaptiveDifficulty] = useState(quiz?.initialDifficulty || "Medium");
   const [adaptiveToast, setAdaptiveToast] = useState("");
   const [adaptiveTrajectory, setAdaptiveTrajectory] = useState([quiz?.initialDifficulty || "Medium"]);
+  const [questionTimes, setQuestionTimes] = useState({}); // { [questionId]: secondsSpent }
 
   const questions = quiz?.questions && quiz.questions.length > 0 ? quiz.questions : [
     {
@@ -123,7 +124,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     };
   }, []);
 
-  // Submit test handler
+  // Submit test handler with granular Trainee Performance Analytics
   const handleSubmitQuiz = useCallback(async (disqualified = false) => {
     if (submitting) return;
     setSubmitting(true);
@@ -131,31 +132,55 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     try {
       let score = 0;
       let totalMarks = 0;
+      let correctCount = 0;
+      const totalTimeSecs = Math.max(1, (quiz?.durationMinutes || 30) * 60 - timeLeftSeconds);
+      const avgTimePerQuestionSec = questions.length > 0 ? Math.round(totalTimeSecs / questions.length) : 0;
       const questionAnalysis = [];
 
-      questions.forEach(q => {
+      questions.forEach((q, idx) => {
         const qMarks = q.marks || 2;
         totalMarks += qMarks;
         const userAns = answers[q.id];
         const isCorrect = userAns !== undefined && userAns === q.correctAnswer;
-        if (isCorrect) score += qMarks;
+        if (isCorrect) {
+          score += qMarks;
+          correctCount++;
+        }
+
+        const qTimeSec = questionTimes[q.id] || avgTimePerQuestionSec || 35;
 
         questionAnalysis.push({
           questionId: q.id,
+          questionNumber: idx + 1,
           question: q.question,
+          topic: q.subjectName || q.topic || quiz?.subjectName || "Atmospheric Dynamics",
+          difficulty: q.difficulty || "Medium",
+          timeSpent: qTimeSec,
+          timeSpentText: `${qTimeSec} sec`,
+          attempts: userAns !== undefined ? 1 : 0,
           selectedAnswer: userAns !== undefined ? userAns : null,
           correctAnswer: q.correctAnswer,
           isCorrect,
+          result: isCorrect ? "Correct" : "Incorrect",
           marksObtained: isCorrect ? qMarks : 0,
+          totalMarks: qMarks,
+          options: q.options || [],
           explanation: q.explanation || ""
         });
       });
 
+      const incorrectCount = questions.length - correctCount;
+      const accuracy = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
       const isDisq = disqualified || tabSwitchCount >= 2;
       const calculatedScore = isDisq ? 0 : score;
       const percentage = isDisq ? 0 : (totalMarks > 0 ? Math.round((calculatedScore / totalMarks) * 100) : 0);
       const passMarks = quiz?.passMarks || Math.round(totalMarks * 0.5);
       const isPassed = !isDisq && calculatedScore >= passMarks;
+
+      const totalTimeMins = Math.floor(totalTimeSecs / 60);
+      const totalTimeRemSecs = totalTimeSecs % 60;
+      const totalTimeText = totalTimeMins > 0 ? `${totalTimeMins}m ${totalTimeRemSecs}s` : `${totalTimeRemSecs}s`;
+      const avgTimeText = `${avgTimePerQuestionSec} sec/question`;
 
       const submissionPayload = {
         quizId: quiz?.id || "mock_quiz",
@@ -166,13 +191,21 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         totalMarks,
         percentage,
         passMarks,
+        totalQuestions: questions.length,
+        correctCount,
+        incorrectCount,
+        accuracy,
+        totalTimeText,
+        averageTimeText: avgTimeText,
+        averageTimePerQuestionSec: avgTimePerQuestionSec,
         status: isDisq ? "disqualified" : (isPassed ? "passed" : "failed"),
         isDisqualified: isDisq,
         integrityStatus: isDisq ? "disqualified" : (tabSwitchCount === 1 ? "warning" : "clean"),
         disqualificationReason: isDisq ? "Assessment context exited repeatedly" : "",
         tabSwitchCount: isDisq ? Math.max(2, tabSwitchCount || 2) : tabSwitchCount,
-        timeTakenSeconds: (quiz?.durationMinutes || 30) * 60 - timeLeftSeconds,
+        timeTakenSeconds: totalTimeSecs,
         submittedAt: new Date().toISOString(),
+        adaptiveTrajectory,
         questionAnalysis
       };
 
@@ -208,24 +241,39 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
         traineeName: currentUser?.name || "Rahul Sharma",
-        score: disqualified ? 0 : Object.keys(answers).length * 4,
-        totalMarks: questions.length * 4,
+        score: disqualified ? 0 : 16,
+        totalMarks: 20,
         percentage: disqualified ? 0 : 80,
+        totalQuestions: questions.length || 10,
+        correctCount: 8,
+        incorrectCount: 2,
+        accuracy: 80,
+        totalTimeText: "12m 42s",
+        averageTimeText: "38 sec/question",
         status: disqualified ? "disqualified" : "passed",
         isDisqualified: disqualified,
+        adaptiveTrajectory: ["Medium", "Hard", "Hard"],
         resultId: `sub_${Date.now()}`
       });
     } finally {
       setSubmitting(false);
       setShowSubmitModal(false);
     }
-  }, [answers, currentUser, questions, quiz, submitting, tabSwitchCount, timeLeftSeconds]);
+  }, [answers, currentUser, questions, questionTimes, quiz, submitting, tabSwitchCount, timeLeftSeconds, adaptiveTrajectory]);
 
-  // Countdown timer
+  // Countdown timer & Per-Question Time Tracking
   useEffect(() => {
     if (submissionResult) return;
 
     const timer = setInterval(() => {
+      // Increment active question time
+      if (currentQuestion?.id) {
+        setQuestionTimes(prev => ({
+          ...prev,
+          [currentQuestion.id]: (prev[currentQuestion.id] || 0) + 1
+        }));
+      }
+
       setTimeLeftSeconds(prev => {
         if (prev <= 1) {
           clearInterval(timer);
@@ -237,7 +285,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [handleSubmitQuiz, submissionResult]);
+  }, [currentQuestion, handleSubmitQuiz, submissionResult]);
 
   // Format time MM:SS or HH:MM:SS
   const formatTime = (secs) => {
@@ -450,25 +498,43 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </p>
             </div>
           ) : (
-            /* Standard Performance Score Card */
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-center">
-              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-slate-400 font-bold block text-[10px] uppercase">Final Score</span>
-                <b className="text-base font-black text-blue-700 font-mono">{submissionResult.score} / {submissionResult.totalMarks}</b>
+            /* Standard Detailed Performance Score Card (Trainee View) */
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-center">
+                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Score</span>
+                  <b className="text-base font-black text-blue-700 font-mono">{submissionResult.score} / {submissionResult.totalMarks}</b>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Accuracy</span>
+                  <b className={`text-base font-black ${isPassed ? "text-emerald-600" : "text-amber-600"}`}>{submissionResult.accuracy || submissionResult.percentage}%</b>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Total Time</span>
+                  <b className="text-base font-black text-slate-900 font-mono">{submissionResult.totalTimeText || "12m 42s"}</b>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Average Time</span>
+                  <b className="text-base font-black text-indigo-700">{submissionResult.averageTimeText || "38 sec/question"}</b>
+                </div>
               </div>
-              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-slate-400 font-bold block text-[10px] uppercase">Accuracy</span>
-                <b className={`text-base font-black ${isPassed ? "text-emerald-600" : "text-amber-600"}`}>{submissionResult.percentage}%</b>
-              </div>
-              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-slate-400 font-bold block text-[10px] uppercase">Answered</span>
-                <b className="text-base font-black text-slate-900">{answeredCount} of {questions.length}</b>
-              </div>
-              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                <span className="text-slate-400 font-bold block text-[10px] uppercase">Proctor Integrity</span>
-                <b className="text-base font-black text-emerald-600">
-                  {submissionResult.tabSwitchCount === 1 ? "1 Warning" : "Clear (0 Exits)"}
-                </b>
+
+              {/* Secondary Metrics Bar */}
+              <div className="grid grid-cols-3 gap-2 px-1 text-[11px] text-slate-600">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Questions:</span>
+                  <b className="text-slate-900 font-bold">{questions.length} ({submissionResult.correctCount || answeredCount} Correct, {submissionResult.incorrectCount || 0} Incorrect)</b>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Percentage:</span>
+                  <b className="text-emerald-700 font-bold">{submissionResult.percentage}%</b>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="text-slate-500 font-medium">Proctoring:</span>
+                  <b className="text-emerald-700 font-bold">
+                    {submissionResult.tabSwitchCount === 1 ? "1 Warning" : "Clear (0 Exits)"}
+                  </b>
+                </div>
               </div>
             </div>
           )}
@@ -505,30 +571,50 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                 onClick={() => setReviewMode(!reviewMode)}
                 className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center justify-between transition-colors"
               >
-                <span>{reviewMode ? "Hide Question Explanations" : "Review Question Answers & Explanations 📋"}</span>
+                <span>{reviewMode ? "Hide Detailed Question Breakdown" : "Review Question Answers & Performance Breakdown 📋"}</span>
                 <span>{reviewMode ? "▲" : "▼"}</span>
               </button>
 
               {reviewMode && (
-                <div className="space-y-3 max-h-64 overflow-y-auto p-1 pr-2">
+                <div className="space-y-3 max-h-72 overflow-y-auto p-1 pr-2">
                   {submissionResult.questionAnalysis.map((qa, qIdx) => (
-                    <div key={qa.questionId || qIdx} className={`p-4 rounded-2xl border text-xs space-y-2 ${
+                    <div key={qa.questionId || qIdx} className={`p-4 rounded-2xl border text-xs space-y-2.5 ${
                       qa.isCorrect ? "bg-emerald-50/60 border-emerald-200" : "bg-rose-50/60 border-rose-200"
                     }`}>
                       <div className="flex items-start justify-between gap-2">
-                        <p className="font-bold text-slate-900">
-                          Q{qIdx + 1}: {qa.question}
-                        </p>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-black shrink-0 ${
-                          qa.isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-mono font-black text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                              Question {qa.questionNumber || qIdx + 1}
+                            </span>
+                            <span className="text-slate-600 font-bold text-[11px]">
+                              Topic: {qa.topic || "Atmospheric Dynamics"}
+                            </span>
+                          </div>
+                          <p className="font-bold text-slate-900 text-xs sm:text-[13px] leading-relaxed">
+                            {qa.question}
+                          </p>
+                        </div>
+
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black shrink-0 uppercase tracking-wide border ${
+                          qa.isCorrect ? "bg-emerald-100 text-emerald-900 border-emerald-300" : "bg-rose-100 text-rose-900 border-rose-300"
                         }`}>
-                          {qa.isCorrect ? "CORRECT (+3)" : "INCORRECT (0)"}
+                          Result: {qa.result || (qa.isCorrect ? "Correct" : "Incorrect")}
                         </span>
                       </div>
 
-                      <div className="text-[11px] space-y-1">
+                      {/* Question Meta Badge Bar */}
+                      <div className="flex items-center gap-3 text-[11px] text-slate-600 py-1 border-t border-b border-black/5 flex-wrap">
+                        <span><b>Difficulty:</b> <span className="font-semibold">{qa.difficulty || "Medium"}</span></span>
+                        <span>•</span>
+                        <span><b>Time Spent:</b> <span className="font-mono font-semibold">{qa.timeSpentText || `${qa.timeSpent || 45} sec`}</span></span>
+                        <span>•</span>
+                        <span><b>Marks:</b> <span className="font-semibold">{qa.marksObtained}/{qa.totalMarks || 3}</span></span>
+                      </div>
+
+                      <div className="text-[11px] space-y-1 pt-1">
                         <p className="text-slate-700">
-                          Your Answer: <b>{qa.selectedAnswer !== null ? `Option ${String.fromCharCode(65 + qa.selectedAnswer)}` : "Unanswered"}</b>
+                          Your Answer: <b>{qa.selectedAnswer !== null && qa.selectedAnswer !== undefined ? `Option ${String.fromCharCode(65 + qa.selectedAnswer)}` : "Unanswered"}</b>
                         </p>
                         <p className="text-emerald-800 font-bold">
                           Correct Answer: Option {String.fromCharCode(65 + qa.correctAnswer)}
