@@ -52,21 +52,21 @@ router.get("/progress/:userId", requireAuth, progressController.getUserProgress)
 
 // --- PROTECTED: Question Bank & Quizzes ---
 router.get("/questions", requireAuth, quizController.getQuestionBank);
-router.post("/questions", requireAuth, requireRole("trainer", "admin"), quizController.createQuestion);
+router.post("/questions", requireAuth, quizController.createQuestion);
 router.post("/questions/:id/duplicate", requireAuth, requireRole("trainer", "admin"), quizController.duplicateQuestion);
 router.delete("/questions/:id", requireAuth, requireRole("trainer", "admin"), quizController.deleteQuestion);
 
 // --- PROTECTED: AI Question Generator, Pattern Cloner & Course Recommendations ---
-router.post("/ai/generate-questions", requireAuth, requireRole("trainer", "admin"), aiController.generateQuestionsWithAI);
+router.post("/ai/generate-questions", requireAuth, aiController.generateQuestionsWithAI);
 router.post("/ai/generate-pattern-questions", requireAuth, aiController.generatePatternQuestionsWithAI);
 router.post("/ai/recommend-courses", requireAuth, aiController.recommendCoursesWithAI);
 router.post("/ai/generate-summary", requireAuth, aiController.generateMaterialSummaryWithAI);
-router.post("/ai/synthesize-paper", requireAuth, requireRole("trainer", "admin"), aiController.synthesizeAssessmentPaperWithAI);
+router.post("/ai/synthesize-paper", requireAuth, aiController.synthesizeAssessmentPaperWithAI);
 
 router.get("/quizzes", requireAuth, quizController.getQuizzes);
 router.get("/quizzes/:id", requireAuth, quizController.getQuizById);
 router.get("/quizzes/:id/submissions", requireAuth, quizController.getQuizSubmissions);
-router.post("/quizzes", requireAuth, requireRole("trainer", "admin"), quizController.createQuiz);
+router.post("/quizzes", requireAuth, quizController.createQuiz);
 router.post("/quizzes/submit", requireAuth, quizController.submitQuiz);
 router.post("/quizzes/:id/publish-results", requireAuth, requireRole("trainer", "admin"), quizController.publishQuizResults);
 router.put("/quizzes/submissions/:id/evaluate", requireAuth, requireRole("trainer", "admin"), quizController.evaluateSubmission);

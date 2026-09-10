@@ -1069,6 +1069,186 @@
   ],
   "questionBank": [
     {
+      "id": "qb_c86627f5",
+      "question": "IMD operational Doppler Weather Radars (DWR) encounter Doppler velocity aliasing (folding) during severe convective events. In the Py-ART library, which module function provides a region-based phase unwrapping algorithm specifically designed to dealias radial velocity fields?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "pyart.retrieve.unfold_velocity_fft",
+        "pyart.process.dealias_velocity_4d",
+        "pyart.correct.dealias_region_based",
+        "pyart.config.unwrap_aliased_doppler"
+      ],
+      "correctAnswer": 2,
+      "explanation": "In Py-ART, 'pyart.correct.dealias_region_based' performs velocity dealiasing by grouping radar gates into regions of similar velocities and unwrapping phase discontinuities across region boundaries."
+    },
+    {
+      "id": "qb_1b6def11",
+      "question": "To evaluate parcel instability for deep moist convection over the Western Ghats during pre-monsoon, forecasters need Most Unstable CAPE (MUCAPE) and CIN (MUCIN). Which MetPy function calculates parameters for the most unstable parcel in a atmospheric sounding?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "metpy.calc.mucape_mucin(pressure, temperature, dewpoint)",
+        "metpy.calc.cape_cin_unstable(pressure, temperature, dewpoint)",
+        "metpy.calc.most_unstable_cape_cin(pressure, temperature, dewpoint)",
+        "metpy.calc.calc_most_unstable_parameters(pressure, temperature, dewpoint)"
+      ],
+      "correctAnswer": 2,
+      "explanation": "'metpy.calc.most_unstable_cape_cin' calculates the Convective Available Potential Energy (CAPE) and Convective Inhibition (CIN) for the most unstable parcel identified within a vertical profile."
+    },
+    {
+      "id": "qb_69fa986b",
+      "question": "When plotting INSAT-3D satellite imagery overlaid with synoptic charts centered over India using Cartopy, which projection class correctly instantiates a Lambert Conformal Conic map projection centered at 80°E longitude and 15°N latitude?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "cartopy.crs.PlateCarreeConformal(center_lon=80.0, center_lat=15.0)",
+        "cartopy.crs.LambertConformal(central_longitude=80.0, central_latitude=15.0)",
+        "cartopy.crs.MercatorConformal(lon_0=80.0, lat_0=15.0)",
+        "cartopy.crs.LambertAzimuthalEqualArea(central_longitude=80.0)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "'cartopy.crs.LambertConformal' is the correct class in Cartopy for Lambert Conformal Conic projections, configured using parameters like 'central_longitude' and 'central_latitude'."
+    },
+    {
+      "id": "qb_005f2020",
+      "question": "IMD receives GFS and NCUM forecast data in operational GRIB2 format. Which backend engine is natively integrated with xarray via the ECMWF ecCodes library to read GRIB2 files into xarray Datasets?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "xr.open_dataset('forecast.grib2', engine='pygrib2')",
+        "xr.open_dataset('forecast.grib2', engine='netcdf4')",
+        "xr.open_dataset('forecast.grib2', engine='grib_parser')",
+        "xr.open_dataset('forecast.grib2', engine='cfgrib')"
+      ],
+      "correctAnswer": 3,
+      "explanation": "'cfgrib' is the standard open-source Python driver and engine interface for xarray that utilizes ECMWF ecCodes C-library bindings to read GRIB1/GRIB2 files into xarray Datasets."
+    },
+    {
+      "id": "qb_02e5606c",
+      "question": "Horizontal Moisture Flux Convergence (MFC) is a key parameter for forecasting heavy monsoon precipitation. Given specific humidity (q) and wind components (u, v), how is moisture convergence correctly computed in Python using MetPy vector operations?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "- metpy.calc.divergence(u * q, v * q, dx, dy)",
+        "metpy.calc.divergence(u / q, v / q, dx, dy)",
+        "metpy.calc.advection(q, u, v, dx, dy)",
+        "- metpy.calc.gradient(u * q + v * q, dx, dy)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Moisture flux divergence is given by divergence(u*q, v*q). Moisture flux convergence is the negative of moisture flux divergence, represented as '- metpy.calc.divergence(u * q, v * q, dx, dy)'."
+    },
+    {
+      "id": "qb_eaeef7b8",
+      "question": "Operational NWP model output from NCUM (NCMRWF Unified Model) often comes on an unstructured or curvilinear grid. Which scipy module function is standard for fast 2D spatial interpolation of unstructured scalar fields (e.g., 2m temperature) onto a regular IMD latitude-longitude grid?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "scipy.interpolate.GridData2D",
+        "scipy.interpolate.interp2d_unstructured",
+        "scipy.interpolate.griddata",
+        "scipy.interpolate.remap_bilinear"
+      ],
+      "correctAnswer": 2,
+      "explanation": "'scipy.interpolate.griddata' interpolates unstructured N-dimensional data to a structured grid using nearest-neighbor, linear, or cubic spline interpolation algorithms."
+    },
+    {
+      "id": "qb_13c150af",
+      "question": "Upper-tropospheric baroclinic potential vorticity (PV) anomalies can trigger cyclogenesis over the Arabian Sea. Which MetPy function calculates baroclinic Ertel Potential Vorticity from potential temperature, pressure, and wind components (u, v)?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "metpy.calc.ertel_potential_vorticity(theta, u, v, pressure)",
+        "metpy.calc.potential_vorticity_baroclinic(potential_temperature, pressure, u, v)",
+        "metpy.calc.baroclinic_pv(potential_temperature, u, v, pressure)",
+        "metpy.calc.pv_baroclinic(theta, pressure, u, v)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "'metpy.calc.potential_vorticity_baroclinic' calculates Ertel Potential Vorticity on isobaric surfaces using potential temperature, pressure, and the horizontal wind components."
+    },
+    {
+      "id": "qb_cff21828",
+      "question": "When ingesting INSAT-3D Thermal Infrared-1 (TIR1) brightness temperature data stored in an xarray Dataset 'ds', a forecaster wants to mask out non-convective clouds by retaining only pixels where Brightness Temperature is below 200 K, replacing other pixels with NaN. Which xarray syntax achieves this while maintaining coordinate array dimensions?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "ds['TIR1'].filter(ds['TIR1'] < 200)",
+        "ds['TIR1'].select(lambda x: x < 200)",
+        "ds['TIR1'].mask(ds['TIR1'] >= 200, drop=True)",
+        "ds['TIR1'].where(ds['TIR1'] < 200)"
+      ],
+      "correctAnswer": 3,
+      "explanation": "In xarray, the '.where()' method filters elements based on a condition, keeping values where the condition is True and replacing values where the condition is False with NaN, preserving the array shape and coordinates."
+    },
+    {
+      "id": "qb_ae3e8068",
+      "question": "To diagnose synoptic-scale ageostrophic forcing and vertical motion during the passage of a Monsoon Depression, forecasters compute Quasi-Geostrophic (QG) Q-vectors. Which function call in MetPy calculates Q-vector components (Qx, Qy) from geostrophic wind components and temperature on an isobaric surface?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "metpy.calc.q_vector(u_g, v_g, temperature, pressure, dx, dy)",
+        "metpy.calc.qg_omega_forces(geopotential, temperature, pressure)",
+        "metpy.calc.geostrophic_q_vector(u, v, t, p)",
+        "metpy.calc.vector_q_divergence(u_g, v_g, temperature, dx, dy)"
+      ],
+      "correctAnswer": 0,
+      "explanation": "MetPy's 'metpy.calc.q_vector' function requires geostrophic wind components (u_g, v_g), temperature, pressure level, and grid spacing (dx, dy) to compute the horizontal vector components of the Q-vector."
+    },
+    {
+      "id": "qb_8905d7e4",
+      "question": "When diagnosticating severe thunderstorm potential over northern India using upper-air sounding data, forecasters compute the Equivalent Potential Temperature (theta-e). Which MetPy function correctly performs this calculation using exact moist thermodynamics?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "metpy.calc.theta_e(pressure, temperature, dewpoint)",
+        "metpy.calc.equivalent_potential_temperature(pressure, temperature, dewpoint)",
+        "metpy.calc.potential_temperature_equivalent(pressure, temperature, dewpoint)",
+        "metpy.calc.compute_theta_e(pressure, temperature, dewpoint)"
+      ],
+      "correctAnswer": 1,
+      "explanation": "In MetPy, 'metpy.calc.equivalent_potential_temperature' is the designated function to compute equivalent potential temperature from pressure, temperature, and dewpoint using Bolton (1980) moist thermodynamic formulations."
+    },
+    {
       "id": "qb_54c10fe9",
       "question": "For operational forecast cycles in Numerical Weather Prediction & Radar Data Assimilation, which method prevents non-physical high-frequency acoustic wave amplification?",
       "subjectId": "sub_nwp_01",
@@ -1286,6 +1466,213 @@
     }
   ],
   "quizzes": [
+    {
+      "id": "paper_custom_1789043032690",
+      "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology",
+      "trainerName": "AI Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 30,
+      "passMarks": 15,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-10T12:23:52.864Z",
+      "deadlineTime": "2026-09-17T12:23:52.864Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "questions": [
+        {
+          "id": "ai_q_1c87130c",
+          "question": "When diagnosticating severe thunderstorm potential over northern India using upper-air sounding data, forecasters compute the Equivalent Potential Temperature (theta-e). Which MetPy function correctly performs this calculation using exact moist thermodynamics?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "metpy.calc.theta_e(pressure, temperature, dewpoint)",
+            "metpy.calc.equivalent_potential_temperature(pressure, temperature, dewpoint)",
+            "metpy.calc.potential_temperature_equivalent(pressure, temperature, dewpoint)",
+            "metpy.calc.compute_theta_e(pressure, temperature, dewpoint)"
+          ],
+          "correctAnswer": 1,
+          "explanation": "In MetPy, 'metpy.calc.equivalent_potential_temperature' is the designated function to compute equivalent potential temperature from pressure, temperature, and dewpoint using Bolton (1980) moist thermodynamic formulations.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_67757351",
+          "question": "IMD operational Doppler Weather Radars (DWR) encounter Doppler velocity aliasing (folding) during severe convective events. In the Py-ART library, which module function provides a region-based phase unwrapping algorithm specifically designed to dealias radial velocity fields?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "pyart.retrieve.unfold_velocity_fft",
+            "pyart.process.dealias_velocity_4d",
+            "pyart.correct.dealias_region_based",
+            "pyart.config.unwrap_aliased_doppler"
+          ],
+          "correctAnswer": 2,
+          "explanation": "In Py-ART, 'pyart.correct.dealias_region_based' performs velocity dealiasing by grouping radar gates into regions of similar velocities and unwrapping phase discontinuities across region boundaries.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_f307fb04",
+          "question": "To diagnose synoptic-scale ageostrophic forcing and vertical motion during the passage of a Monsoon Depression, forecasters compute Quasi-Geostrophic (QG) Q-vectors. Which function call in MetPy calculates Q-vector components (Qx, Qy) from geostrophic wind components and temperature on an isobaric surface?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "metpy.calc.q_vector(u_g, v_g, temperature, pressure, dx, dy)",
+            "metpy.calc.qg_omega_forces(geopotential, temperature, pressure)",
+            "metpy.calc.geostrophic_q_vector(u, v, t, p)",
+            "metpy.calc.vector_q_divergence(u_g, v_g, temperature, dx, dy)"
+          ],
+          "correctAnswer": 0,
+          "explanation": "MetPy's 'metpy.calc.q_vector' function requires geostrophic wind components (u_g, v_g), temperature, pressure level, and grid spacing (dx, dy) to compute the horizontal vector components of the Q-vector.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_d14f1588",
+          "question": "When ingesting INSAT-3D Thermal Infrared-1 (TIR1) brightness temperature data stored in an xarray Dataset 'ds', a forecaster wants to mask out non-convective clouds by retaining only pixels where Brightness Temperature is below 200 K, replacing other pixels with NaN. Which xarray syntax achieves this while maintaining coordinate array dimensions?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "ds['TIR1'].filter(ds['TIR1'] < 200)",
+            "ds['TIR1'].select(lambda x: x < 200)",
+            "ds['TIR1'].mask(ds['TIR1'] >= 200, drop=True)",
+            "ds['TIR1'].where(ds['TIR1'] < 200)"
+          ],
+          "correctAnswer": 3,
+          "explanation": "In xarray, the '.where()' method filters elements based on a condition, keeping values where the condition is True and replacing values where the condition is False with NaN, preserving the array shape and coordinates.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_b31014b5",
+          "question": "Upper-tropospheric baroclinic potential vorticity (PV) anomalies can trigger cyclogenesis over the Arabian Sea. Which MetPy function calculates baroclinic Ertel Potential Vorticity from potential temperature, pressure, and wind components (u, v)?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "metpy.calc.ertel_potential_vorticity(theta, u, v, pressure)",
+            "metpy.calc.potential_vorticity_baroclinic(potential_temperature, pressure, u, v)",
+            "metpy.calc.baroclinic_pv(potential_temperature, u, v, pressure)",
+            "metpy.calc.pv_baroclinic(theta, pressure, u, v)"
+          ],
+          "correctAnswer": 1,
+          "explanation": "'metpy.calc.potential_vorticity_baroclinic' calculates Ertel Potential Vorticity on isobaric surfaces using potential temperature, pressure, and the horizontal wind components.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_c8b29752",
+          "question": "Operational NWP model output from NCUM (NCMRWF Unified Model) often comes on an unstructured or curvilinear grid. Which scipy module function is standard for fast 2D spatial interpolation of unstructured scalar fields (e.g., 2m temperature) onto a regular IMD latitude-longitude grid?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "scipy.interpolate.GridData2D",
+            "scipy.interpolate.interp2d_unstructured",
+            "scipy.interpolate.griddata",
+            "scipy.interpolate.remap_bilinear"
+          ],
+          "correctAnswer": 2,
+          "explanation": "'scipy.interpolate.griddata' interpolates unstructured N-dimensional data to a structured grid using nearest-neighbor, linear, or cubic spline interpolation algorithms.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_622955ea",
+          "question": "Horizontal Moisture Flux Convergence (MFC) is a key parameter for forecasting heavy monsoon precipitation. Given specific humidity (q) and wind components (u, v), how is moisture convergence correctly computed in Python using MetPy vector operations?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "- metpy.calc.divergence(u * q, v * q, dx, dy)",
+            "metpy.calc.divergence(u / q, v / q, dx, dy)",
+            "metpy.calc.advection(q, u, v, dx, dy)",
+            "- metpy.calc.gradient(u * q + v * q, dx, dy)"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Moisture flux divergence is given by divergence(u*q, v*q). Moisture flux convergence is the negative of moisture flux divergence, represented as '- metpy.calc.divergence(u * q, v * q, dx, dy)'.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_3b07d9c1",
+          "question": "IMD receives GFS and NCUM forecast data in operational GRIB2 format. Which backend engine is natively integrated with xarray via the ECMWF ecCodes library to read GRIB2 files into xarray Datasets?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "xr.open_dataset('forecast.grib2', engine='pygrib2')",
+            "xr.open_dataset('forecast.grib2', engine='netcdf4')",
+            "xr.open_dataset('forecast.grib2', engine='grib_parser')",
+            "xr.open_dataset('forecast.grib2', engine='cfgrib')"
+          ],
+          "correctAnswer": 3,
+          "explanation": "'cfgrib' is the standard open-source Python driver and engine interface for xarray that utilizes ECMWF ecCodes C-library bindings to read GRIB1/GRIB2 files into xarray Datasets.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_e1a73520",
+          "question": "When plotting INSAT-3D satellite imagery overlaid with synoptic charts centered over India using Cartopy, which projection class correctly instantiates a Lambert Conformal Conic map projection centered at 80°E longitude and 15°N latitude?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "cartopy.crs.PlateCarreeConformal(center_lon=80.0, center_lat=15.0)",
+            "cartopy.crs.LambertConformal(central_longitude=80.0, central_latitude=15.0)",
+            "cartopy.crs.MercatorConformal(lon_0=80.0, lat_0=15.0)",
+            "cartopy.crs.LambertAzimuthalEqualArea(central_longitude=80.0)"
+          ],
+          "correctAnswer": 1,
+          "explanation": "'cartopy.crs.LambertConformal' is the correct class in Cartopy for Lambert Conformal Conic projections, configured using parameters like 'central_longitude' and 'central_latitude'.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_ec923bd2",
+          "question": "To evaluate parcel instability for deep moist convection over the Western Ghats during pre-monsoon, forecasters need Most Unstable CAPE (MUCAPE) and CIN (MUCIN). Which MetPy function calculates parameters for the most unstable parcel in a atmospheric sounding?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "metpy.calc.mucape_mucin(pressure, temperature, dewpoint)",
+            "metpy.calc.cape_cin_unstable(pressure, temperature, dewpoint)",
+            "metpy.calc.most_unstable_cape_cin(pressure, temperature, dewpoint)",
+            "metpy.calc.calc_most_unstable_parameters(pressure, temperature, dewpoint)"
+          ],
+          "correctAnswer": 2,
+          "explanation": "'metpy.calc.most_unstable_cape_cin' calculates the Convective Available Potential Energy (CAPE) and Convective Inhibition (CIN) for the most unstable parcel identified within a vertical profile.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        }
+      ]
+    },
     {
       "id": "paper_custom_1789042404006",
       "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
@@ -2342,6 +2729,72 @@
     }
   ],
   "quizSubmissions": [
+    {
+      "id": "subm_44e6087d",
+      "quizId": "paper_custom_1789043032690",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 30,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 107,
+      "tabSwitchCount": 2,
+      "submittedAt": "2026-09-10T12:27:41.335Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
+    {
+      "id": "subm_5510b918",
+      "quizId": "paper_custom_1789043032690",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 30,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 107,
+      "tabSwitchCount": 2,
+      "submittedAt": "2026-09-10T12:27:41.297Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
+    {
+      "id": "subm_c9d6a8ec",
+      "quizId": "paper_custom_1789043032690",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 30,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 8,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-10T12:24:10.440Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
     {
       "id": "subm_cf038ece",
       "quizId": "paper_custom_1789042404006",

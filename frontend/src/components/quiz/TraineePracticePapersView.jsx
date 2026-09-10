@@ -251,11 +251,12 @@ export const TraineePracticePapersView = ({
       const enteredTopic = (generateForm.topic || "").trim();
 
       if (generateForm.source === "ai") {
+        const requestedCount = Number(generateForm.questionCount) || 10;
         // Generate with Gemini AI specifically tailored to the entered topic
         const res = await api.generateAiQuestions({
           topic: enteredTopic || "Meteorological Science & Operational NWP",
           difficulty: generateForm.initialDifficulty || "Medium",
-          count: Number(generateForm.questionCount) || 5,
+          count: requestedCount,
           subjectName: generateForm.title || enteredTopic
         });
 
@@ -279,41 +280,83 @@ export const TraineePracticePapersView = ({
           }
         } else {
           // Dynamic fallback tailored to the specific entered topic
-          const fallbackTopic = enteredTopic || "Atmospheric Physics & Weather Forecasting";
-          generatedQuestions = [
+          const fallbackTopic = enteredTopic || "Operational Meteorological Science";
+          const diff = generateForm.initialDifficulty || "Medium";
+          const numMarks = diff === "Hard" ? 4 : diff === "Easy" ? 2 : 3;
+
+          const templates = [
             {
-              id: `q_gen_${Date.now()}_1`,
-              question: `In operational meteorological forecasting for "${fallbackTopic}", which primary governing principle or diagnostic parameter is evaluated?`,
-              options: [
-                `Potential vorticity (PV) advection and dynamic balance equations formulated for ${fallbackTopic}`,
-                `Static hydrostatic approximation without horizontal pressure transport`,
-                `Neglecting all diabatic condensation heating across cloud columns`,
-                `Uniform surface boundary roughness length without topographical staggering`
+              q: `In the domain of "${fallbackTopic}", what is the primary physical mechanism or diagnostic metric evaluated during operational analysis?`,
+              opt: [
+                `Hydrodynamic energy balance and prognostic conservation equations formulated for ${fallbackTopic}`,
+                `Static dry adiabatic assumption neglecting moisture transport`,
+                `Constant atmospheric density ignoring baroclinic height gradients`,
+                `Zero boundary layer turbulent kinetic energy dissipation`
               ],
-              correctAnswer: 0,
-              marks: generateForm.initialDifficulty === "Hard" ? 4 : 3,
-              difficulty: generateForm.initialDifficulty || "Medium",
-              subjectName: generateForm.title || fallbackTopic,
-              module: "Topic Specialization",
-              explanation: `Operational evaluation for ${fallbackTopic} relies directly on potential vorticity conservation and prognostic governing balance equations.`
+              ans: 0,
+              exp: `Accurate operational analysis for ${fallbackTopic} is governed by coupled momentum, thermodynamic, and mass conservation equations.`
             },
             {
-              id: `q_gen_${Date.now()}_2`,
-              question: `When executing numerical data assimilation and model verification for "${fallbackTopic}", what methodology ensures optimal stability?`,
-              options: [
-                `Background error covariance (B-matrix) calibration paired with radiosonde and satellite radiance verification for ${fallbackTopic}`,
-                `Setting all observational error variances to zero strictly`,
-                `Executing purely explicit time steps exceeding the Courant-Friedrichs-Lewy limit`,
-                `Removing lateral boundary conditions in regional domains`
+              q: `When calibrating numerical models and satellite observations for "${fallbackTopic}", which approach minimizes analysis uncertainty?`,
+              opt: [
+                `Flow-dependent background error covariance weighting paired with radiosonde verification for ${fallbackTopic}`,
+                `Arbitrary spectral truncation at low wave numbers`,
+                `Assuming zero observational error variance across all vertical soundings`,
+                `Setting lateral boundary conditions as impermeable static walls`
               ],
-              correctAnswer: 0,
-              marks: generateForm.initialDifficulty === "Hard" ? 4 : 3,
-              difficulty: generateForm.initialDifficulty || "Medium",
-              subjectName: generateForm.title || fallbackTopic,
-              module: "Topic Specialization",
-              explanation: `Accurate modeling of ${fallbackTopic} requires balanced covariance weighting and multi-sensor observational verification.`
+              ans: 0,
+              exp: `Flow-dependent covariance weighting ensures observational innovations are accurately assimilated for ${fallbackTopic}.`
+            },
+            {
+              q: `Under severe weather nowcasting for "${fallbackTopic}", which remote sensing signature indicates rapid intensification?`,
+              opt: [
+                `Cloud-top brightness temperature cooling combined with high dual-pol reflectivity gradients in ${fallbackTopic}`,
+                `Uniform surface albedo with zero Doppler velocity shear`,
+                `Stationary isothermal lapse rate in the boundary layer`,
+                `Lack of moisture convergence along surface frontal boundaries`
+              ],
+              ans: 0,
+              exp: `Rapid cloud-top cooling and steep polarimetric gradients are verified precursors of active intensification in ${fallbackTopic}.`
+            },
+            {
+              q: `Which numerical integration scheme is most effective for mitigating high-frequency acoustic wave amplification in "${fallbackTopic}"?`,
+              opt: [
+                `Split-explicit time stepping separating fast acoustic modes from meteorological advection in ${fallbackTopic}`,
+                `Purely unconstrained explicit forward Euler integration`,
+                `Removing horizontal pressure gradient terms completely`,
+                `Setting vertical velocity w = 0 universally across all domain points`
+              ],
+              ans: 0,
+              exp: `Split-explicit time integration stabilizes fast acoustic propagation while maintaining efficiency in ${fallbackTopic}.`
+            },
+            {
+              q: `For operational forecast verification in "${fallbackTopic}", which statistical metric is mandated by IMD / WMO guidelines?`,
+              opt: [
+                `Equitable Threat Score (ETS), Brier Score, and Root Mean Square Error (RMSE) calibrated for ${fallbackTopic}`,
+                `Single-point uncalibrated persistence ratio without reference climatology`,
+                `Unweighted mean absolute deviation ignoring spatial displacement errors`,
+                `Qualitative visual inspection without quantitative contingency tables`
+              ],
+              ans: 0,
+              exp: `ETS, Brier Score, and RMSE provide standardized probabilistic and categorical verification for ${fallbackTopic}.`
             }
           ];
+
+          generatedQuestions = [];
+          for (let i = 0; i < requestedCount; i++) {
+            const tmpl = templates[i % templates.length];
+            generatedQuestions.push({
+              id: `q_gen_${Date.now()}_${i + 1}`,
+              question: tmpl.q,
+              options: tmpl.opt,
+              correctAnswer: tmpl.ans,
+              marks: numMarks,
+              difficulty: diff,
+              subjectName: generateForm.title || fallbackTopic,
+              module: `Module ${(i % 5) + 1}`,
+              explanation: tmpl.exp
+            });
+          }
         }
       } else {
         // Fetch from Question Bank with exact and semantic topic filtering
