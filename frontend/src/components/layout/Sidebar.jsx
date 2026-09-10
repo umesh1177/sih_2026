@@ -17,7 +17,8 @@ import {
   Sparkles,
   TrendingUp,
   ShieldAlert,
-  Star
+  Star,
+  Users
 } from "lucide-react";
 
 export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage, onOpenAiAdvisor }) => {
@@ -36,6 +37,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "course-feedback", label: "Course Feedback & Quality", icon: Star },
         { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
+        { id: "trainer-matching", label: "Faculty Matching & Workload", icon: Users },
         { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
         { id: "questions", label: "Question Bank", icon: Layers },
         { id: "content-library", label: "Content Library", icon: FolderKanban },
@@ -47,6 +49,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
     if (currentUser?.role === "admin") {
       return [
         ...baseItems,
+        { id: "trainer-matching", label: "Faculty Matching & Workload", icon: Users },
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "course-feedback", label: "Course Feedback & Quality", icon: Star },
         { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },

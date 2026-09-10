@@ -640,14 +640,14 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                   : "bg-slate-50/70 border-slate-200 hover:border-blue-300 hover:bg-blue-50/40"
                               }`}
                             >
-                              <div className="flex items-center gap-2.5">
+                              <div className="flex items-start gap-2.5">
                                 <img
                                   src={tw.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
                                   alt={tw.trainerName}
-                                  className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0"
+                                  className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
                                 />
                                 <div>
-                                  <div className="flex items-center gap-1.5">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
                                     <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
                                     <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
                                       tw.matchScore >= 80 
@@ -659,18 +659,36 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                       {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
                                     </span>
                                   </div>
-                                  <p className="text-[10px] text-slate-500 truncate max-w-[160px]">{tw.designation}</p>
+                                  <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{tw.designation}</p>
                                   
-                                  {/* Workload balancing badge */}
+                                  {/* Rule 17 Cold Start Indicator */}
+                                  {tw.isColdStart ? (
+                                    <div className="mt-1 flex items-center gap-1">
+                                      <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px] border border-slate-200">
+                                        Performance history unavailable
+                                      </span>
+                                      <span className="text-[9px] text-emerald-700 font-bold">🌱 Cold-Start</span>
+                                    </div>
+                                  ) : (
+                                    <div className="mt-1 flex items-center gap-1.5 text-[9px] text-slate-500 font-medium">
+                                      <span className="text-amber-600 font-bold">★ {tw.performanceScore || "4.8"}</span>
+                                      <span>({tw.feedbackCount || 15}+ Trainee Reviews)</span>
+                                    </div>
+                                  )}
+
+                                  {/* Rule 18 Workload Balancing & Recommendation Badge */}
                                   <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                                    <span className={`px-2 py-0.2 rounded-full text-[9px] font-bold ${
-                                      tw.workloadStatus === "High Load" 
-                                        ? "bg-rose-100 text-rose-800" 
-                                        : tw.workloadStatus === "Optimal" 
-                                        ? "bg-blue-100 text-blue-800" 
-                                        : "bg-emerald-100 text-emerald-800"
+                                    <span className={`px-2 py-0.2 rounded-full text-[9px] font-black ${
+                                      tw.workloadLevel === "High" || tw.recommendationTone === "warning"
+                                        ? "bg-rose-100 text-rose-800 border border-rose-200" 
+                                        : tw.workloadLevel === "Moderate" || tw.recommendationTone === "balanced"
+                                        ? "bg-amber-100 text-amber-800 border border-amber-200" 
+                                        : "bg-emerald-100 text-emerald-800 border border-emerald-200"
                                     }`}>
-                                      {tw.workloadStatus}: {tw.assignedCoursesCount} Courses
+                                      {tw.finalRecommendation || (tw.workloadStatus === "High Load" ? "⚠ Workload Warning" : "🌟 Optimal Availability")}
+                                    </span>
+                                    <span className="text-[9px] text-slate-400 font-mono">
+                                      ({tw.assignedCoursesCount || tw.currentCourseLoad || 0} Courses • {tw.activeLearners || 0} Cadets)
                                     </span>
                                   </div>
                                 </div>
@@ -678,7 +696,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                               <button
                                 type="button"
-                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${
+                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 ${
                                   isAssigned ? "bg-purple-700 text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
                                 }`}
                               >

@@ -33,6 +33,7 @@ import { TrainerScheduleAssessmentView } from "./components/trainer/TrainerSched
 import { TraineePerformanceCategoryView } from "./components/analytics/TraineePerformanceCategoryView";
 import { LearningGapDetectionHub } from "./components/analytics/LearningGapDetectionHub";
 import { CourseFeedbackImprovementStudio } from "./components/analytics/CourseFeedbackImprovementStudio";
+import { TrainerMatchingWorkloadHub } from "./components/trainer/TrainerMatchingWorkloadHub";
 import { PublicHomePage } from "./pages/PublicHomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { api } from "./services/api";
@@ -330,6 +331,7 @@ const MainApp = () => {
                   onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
                   onOpenAnalytics={() => setActiveTab("analytics")}
                   onNavigatePerformance={() => setActiveTab("trainee-performance")}
+                  onNavigateTrainerMatching={() => setActiveTab("trainer-matching")}
                 />
               )}
             </>
@@ -374,9 +376,10 @@ const MainApp = () => {
           {(activeTab === "schedule-assessment" || (currentUser?.role === "trainer" && activeTab === "quizzes")) && (
             <TrainerScheduleAssessmentView
               currentUser={currentUser}
-              onOpenStudio={(course) => {
-                setSelectedOverviewCourse(null);
-                setActiveStudioCourse(course);
+              onOpenQuestionBank={() => setActiveTab("questions")}
+              onScheduleSuccess={() => {
+                refreshGlobalData();
+                setActiveTab("schedule-assessment");
               }}
               onOpenContentLibrary={() => setActiveTab("content-library")}
             />
@@ -516,6 +519,17 @@ const MainApp = () => {
               }}
               onOpenQuestionBank={() => setActiveTab("questions")}
               onOpenAssessment={() => setActiveTab("schedule-assessment")}
+            />
+          )}
+
+          {/* 6.8. FACULTY MATCHING & WORKLOAD INTELLIGENCE HUB (RULES 17 & 18) */}
+          {activeTab === "trainer-matching" && (
+            <TrainerMatchingWorkloadHub
+              currentUser={currentUser}
+              onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
+              onAssignToCourse={(trainer, subject) => {
+                setIsCreateCourseModalOpen(true);
+              }}
             />
           )}
 

@@ -13,7 +13,9 @@ export const suggestTrainersForSubject = (req, res) => {
   try {
     const { subjectName = "" } = req.body;
     const rawName = (subjectName || "").trim().toLowerCase();
-    const trainers = db.users.filter(u => u.role === "trainer" && u.status === "approved");
+    
+    // Get full workload and cold-start metadata from db
+    const workloads = db.getTrainersWorkload();
 
     const domainKnowledge = {
       nwp: {
@@ -30,27 +32,31 @@ export const suggestTrainersForSubject = (req, res) => {
       },
       agri: {
         keywords: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "agrometeorology"],
-        coreTrainerName: "Sunita Deshmukh"
+        coreTrainerName: "Rajesh Pillai"
       },
       climate: {
         keywords: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "seasonal", "climatology"],
         coreTrainerName: "Rajesh Pillai"
+      },
+      satellite: {
+        keywords: ["satellite", "radiance", "insat", "sounding", "rgb", "sounder", "space", "remote sensing", "cloud", "infrared", "water vapor"],
+        coreTrainerName: "Sunita Deshmukh"
       }
     };
 
     const tokens = rawName.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
 
-    const scoredTrainers = trainers.map(t => {
+    const scoredTrainers = workloads.map(tw => {
       let matchScore = 0;
       let directMatches = 0;
 
       if (rawName && rawName !== "subject title..." && !rawName.match(/^subject\s*\d*$/i)) {
         tokens.forEach(tok => {
           if (!["umesh", "admin", "officer", "scientist", "subject", "part", "test", "demo", "title", "study"].includes(tok)) {
-            (t.skills || []).forEach(sk => {
+            (tw.skills || []).forEach(sk => {
               if (sk.toLowerCase().includes(tok)) directMatches += 2;
             });
-            (t.specialization || []).forEach(sp => {
+            (tw.specialization || []).forEach(sp => {
               if (sp.toLowerCase().includes(tok)) directMatches += 2;
             });
           }
@@ -58,7 +64,7 @@ export const suggestTrainersForSubject = (req, res) => {
 
         Object.entries(domainKnowledge).forEach(([domain, conf]) => {
           const hasTopicKeyword = conf.keywords.some(kw => rawName.includes(kw));
-          const isCoreTrainer = (t.name && conf.coreTrainerName && t.name.toLowerCase().includes(conf.coreTrainerName.toLowerCase()));
+          const isCoreTrainer = (tw.trainerName && conf.coreTrainerName && tw.trainerName.toLowerCase().includes(conf.coreTrainerName.toLowerCase()));
 
           if (hasTopicKeyword && isCoreTrainer) {
             matchScore += 80;
@@ -78,19 +84,28 @@ export const suggestTrainersForSubject = (req, res) => {
         }
       }
 
+      // Re-evaluate final recommendation with subject match score
+      let adjustedRec = tw.finalRecommendation;
+      let adjustedBadge = tw.recommendationBadge;
+
+      if (matchScore >= 70 && tw.workloadLevel === "High") {
+        adjustedRec = "Consider with workload warning";
+        adjustedBadge = "⚠ Consider with workload warning";
+      } else if (matchScore >= 70 && tw.isColdStart) {
+        adjustedRec = "Eligible New Faculty (Cold-Start Matched)";
+        adjustedBadge = "🌱 Matched on Credentials (Cold-Start)";
+      } else if (matchScore >= 70 && tw.workloadLevel === "Optimal") {
+        adjustedRec = "Highly Recommended (Optimal Availability)";
+        adjustedBadge = "🌟 Highly Recommended";
+      }
+
       return {
-        trainerId: t.id,
-        name: t.name,
-        trainerName: t.name,
-        email: t.email,
-        department: t.department,
-        designation: t.designation,
-        specialization: t.specialization || [],
-        skills: t.skills || t.specialization || [],
-        experienceYears: t.experienceYears || 10,
+        ...tw,
+        name: tw.trainerName,
         matchScore: matchScore,
-        avatar: t.avatar,
-        workloadStatus: t.workloadStatus || "Optimal"
+        matchLabel: matchScore >= 80 ? "Top Recommendation" : matchScore >= 40 ? "Moderate Match" : "Low Match",
+        finalRecommendation: adjustedRec,
+        recommendationBadge: adjustedBadge
       };
     }).sort((a, b) => b.matchScore - a.matchScore);
 

@@ -46,7 +46,8 @@ export const AdminDashboardView = ({
   onOpenAnalytics, 
   onOpenBroadcastModal,
   onOpenCreateCourse,
-  onNavigatePerformance
+  onNavigatePerformance,
+  onNavigateTrainerMatching
 }) => {
   const [stats, setStats] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
@@ -129,6 +130,16 @@ export const AdminDashboardView = ({
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-3 shrink-0 z-10">
+          {onNavigateTrainerMatching && (
+            <button
+              onClick={onNavigateTrainerMatching}
+              className="flex items-center gap-2 px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold rounded-2xl text-xs border border-emerald-200 transition-all transform hover:scale-105 active:scale-95 shadow-2xs"
+            >
+              <Users className="w-4 h-4 text-emerald-600" />
+              <span>Faculty Matching (Rules 17 & 18)</span>
+            </button>
+          )}
+
           {onNavigatePerformance && (
             <button
               onClick={onNavigatePerformance}
@@ -221,9 +232,19 @@ export const AdminDashboardView = ({
           <div className="space-y-1">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Certified Faculty</span>
             <div className="text-2xl font-black text-slate-900">{stats?.totalTrainers || 6}</div>
-            <span className="text-[11px] text-blue-700 font-bold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-blue-700" /> 100% Verified Senior Staff
-            </span>
+            {onNavigateTrainerMatching ? (
+              <button 
+                onClick={onNavigateTrainerMatching}
+                className="text-[11px] text-emerald-700 font-bold hover:underline flex items-center gap-0.5"
+              >
+                <span>Faculty Workload & Matching</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            ) : (
+              <span className="text-[11px] text-blue-700 font-bold flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-blue-700" /> 100% Verified Senior Staff
+              </span>
+            )}
           </div>
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 shadow-2xs">
             <Award className="w-6 h-6" />
