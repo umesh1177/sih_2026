@@ -51,6 +51,7 @@ import {
   FastForward,
   CheckSquare,
   Square,
+  PlusCircle,
   X
 } from "lucide-react";
 import { api } from "../../services/api";
@@ -225,8 +226,15 @@ const DEFAULT_SUBJECTS = [
 ];
 
 export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSuccess }) => {
-  const subjects = (course?.subjects && course.subjects.length > 0) ? course.subjects : DEFAULT_SUBJECTS;
+  // Check if current user has Trainer or Admin authority
+  const isTrainer = currentUser?.role === "trainer" || currentUser?.role === "admin";
+
+  const [curriculumSubjects, setCurriculumSubjects] = useState(
+    (course?.subjects && course.subjects.length > 0) ? course.subjects : DEFAULT_SUBJECTS
+  );
   
+  const subjects = curriculumSubjects;
+
   const initialMaterial = subjects[0]?.modules?.[0]?.materials?.[0] || {
     id: "default_mat",
     title: "Video 1: Recorded Masterclass — Sigma Coordinates & Lower Boundary Conditions",
@@ -259,6 +267,28 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
   const [editingPrereqMaterial, setEditingPrereqMaterial] = useState(null);
   const [prereqConfigMap, setPrereqConfigMap] = useState({});
   const [toastMessage, setToastMessage] = useState(null);
+
+  // ─── TRAINER QUICK ADD MATERIAL / QUIZ MODAL STATE ───
+  const [showAddResourceModal, setShowAddResourceModal] = useState(false);
+  const [addResourceTarget, setAddResourceTarget] = useState({ subjectId: "", moduleId: "", afterMaterialId: "", afterMaterialTitle: "" });
+  const [newResourceForm, setNewResourceForm] = useState({
+    type: "quiz", // "quiz" | "video" | "pdf" | "presentation"
+    title: "",
+    duration: "15 mins",
+    passPercentage: 50,
+    url: "",
+    enforcePrecedingVideoPrereq: true,
+    enforceNextMaterialPrereq: true,
+    questions: [
+      {
+        question: "What is the primary governing criterion in this lecture?",
+        options: ["CFL Numerical Stability ≤ 1.0", "Infinite geostrophic divergence", "Zero surface roughness", "Non-hydrostatic explosion"],
+        correctAnswer: 0,
+        marks: 5,
+        explanation: "The CFL condition guarantees bounded explicit advection time-stepping."
+      }
+    ]
+  });
 
   // View Layout Modes: "standard" | "split" | "fullscreen"
   const [viewMode, setViewMode] = useState("standard");
@@ -304,7 +334,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
   const evaluateMaterialUnlock = useCallback((mat) => {
     if (!mat) return { isLocked: false, unmet: [], met: [], condition: "OPEN", reason: "No material" };
     
-    // Master ON/OFF Switch Check
+    // Master ON/OFF Switch Check (If trainer switched OFF, everyone has open access)
     if (!isLockPathEnabled) {
       return { isLocked: false, unmet: [], met: [], condition: "OPEN", reason: "Open Exploration Mode Enabled" };
     }
@@ -441,6 +471,122 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
     }
   };
 
+  // ─── TRAINER: ADD QUIZ OR LEARNING RESOURCE BELOW VIDEO / MATERIAL ───
+  const handleTrainerAddResourceSubmit = (e) => {
+    e.preventDefault();
+    if (!newResourceForm.title.trim()) {
+      alert("Please enter a title for the learning resource / quiz.");
+      return;
+    }
+
+    const targetSubId = addResourceTarget.subjectId || selectedSubjectId;
+    const targetModId = addResourceTarget.moduleId || selectedModuleId;
+    const afterMatId = addResourceTarget.afterMaterialId || selectedMaterial?.id;
+
+    const newMatId = `mat_custom_${Date.now()}`;
+    const precedingMat = findMaterialById(afterMatId)?.material;
+
+    // Prerequisite config for the new item:
+    let newPrereqConfig = {
+      enabled: false,
+      condition: "ALL",
+      requiredWatchThreshold: 80,
+      prerequisites: []
+    };
+
+    if (newResourceForm.enforcePrecedingVideoPrereq && precedingMat) {
+      newPrereqConfig = {
+        enabled: true,
+        condition: "ALL",
+        requiredWatchThreshold: 80,
+        prerequisites: [
+          {
+            id: precedingMat.id,
+            title: precedingMat.title,
+            type: precedingMat.type,
+            ...(precedingMat.type === "video" ? { requiredWatchPct: 80 } : { requiredPassScore: 50 })
+          }
+        ]
+      };
+    }
+
+    const createdMaterial = {
+      id: newMatId,
+      title: newResourceForm.title.trim(),
+      type: newResourceForm.type,
+      duration: newResourceForm.duration,
+      durationSeconds: newResourceForm.type === "video" ? 2700 : 900,
+      allowDownload: newResourceForm.type !== "quiz" && newResourceForm.type !== "video",
+      uploadedBy: currentUser?.name ? `${currentUser.name} (Trainer)` : "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
+      uploadedAt: `Uploaded on: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
+      url: newResourceForm.url || (newResourceForm.type === "video" ? "https://www.youtube.com/embed/dQw4w9WgXcQ" : ""),
+      totalMarks: newResourceForm.type === "quiz" ? (newResourceForm.questions.length * 5) : undefined,
+      passPercentage: newResourceForm.type === "quiz" ? newResourceForm.passPercentage : undefined,
+      questions: newResourceForm.type === "quiz" ? newResourceForm.questions : undefined,
+      prerequisiteConfig: newPrereqConfig
+    };
+
+    // Insert into curriculum right below afterMatId:
+    const updatedSubjects = curriculumSubjects.map(sub => {
+      if (sub.id !== targetSubId) return sub;
+      return {
+        ...sub,
+        modules: (sub.modules || []).map(mod => {
+          if (mod.id !== targetModId) return mod;
+          const currentMaterials = mod.materials || [];
+          const insertIndex = currentMaterials.findIndex(m => m.id === afterMatId);
+          
+          let nextMaterials = [];
+          if (insertIndex === -1) {
+            nextMaterials = [...currentMaterials, createdMaterial];
+          } else {
+            // Insert immediately after
+            nextMaterials = [
+              ...currentMaterials.slice(0, insertIndex + 1),
+              createdMaterial,
+              ...currentMaterials.slice(insertIndex + 1)
+            ];
+
+            // If enforceNextMaterialPrereq is true, update the immediately following item to require this new quiz:
+            if (newResourceForm.enforceNextMaterialPrereq && insertIndex + 1 < currentMaterials.length) {
+              const followingMat = nextMaterials[insertIndex + 2];
+              if (followingMat) {
+                const existingPrereqs = followingMat.prerequisiteConfig?.prerequisites || [];
+                nextMaterials[insertIndex + 2] = {
+                  ...followingMat,
+                  prerequisiteConfig: {
+                    enabled: true,
+                    condition: followingMat.prerequisiteConfig?.condition || "ALL",
+                    requiredWatchThreshold: 80,
+                    prerequisites: [
+                      ...existingPrereqs.filter(p => p.id !== precedingMat?.id),
+                      {
+                        id: createdMaterial.id,
+                        title: createdMaterial.title,
+                        type: createdMaterial.type,
+                        ...(createdMaterial.type === "quiz" ? { requiredPassScore: createdMaterial.passPercentage || 50 } : { requiredWatchPct: 80 })
+                      }
+                    ]
+                  }
+                };
+              }
+            }
+          }
+
+          return {
+            ...mod,
+            materials: nextMaterials
+          };
+        })
+      };
+    });
+
+    setCurriculumSubjects(updatedSubjects);
+    setSelectedMaterial(createdMaterial);
+    setShowAddResourceModal(false);
+    showNotification(`✓ Successfully added "${createdMaterial.title}" below "${precedingMat?.title?.substring(0, 30)}..." with prerequisite unlock rule active!`);
+  };
+
   // Storage key helper
   const getNoteStorageKey = (matId) => {
     const userId = currentUser?.id || "guest_officer";
@@ -451,6 +597,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
   // Sync state if course changes
   useEffect(() => {
     if (course?.subjects && course.subjects.length > 0) {
+      setCurriculumSubjects(course.subjects);
       const firstSub = course.subjects[0];
       const firstMod = firstSub?.modules?.[0];
       const firstMat = firstMod?.materials?.[0];
@@ -764,55 +911,57 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
           </div>
         </div>
 
-        {/* Right Section: Master Lock Path Toggle, Progress, View Modes, Tools */}
+        {/* Right Section: Master Lock Path Toggle (TRAINER ONLY), Progress, View Modes, Tools */}
         <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end ml-auto">
           
-          {/* ─── TRAINER MASTER CONTROLLED LEARNING PATH ON/OFF TOGGLE ─── */}
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
-            <button
-              onClick={() => {
-                const nextState = !isLockPathEnabled;
-                setIsLockPathEnabled(nextState);
-                showNotification(
-                  nextState 
-                    ? "🔒 Controlled Learning Path Activated: Prerequisites and 80% watch threshold strictly enforced." 
-                    : "🔓 Open Exploration Mode Activated: All prerequisite lock constraints bypassed for trainees."
-                );
-              }}
-              title="Toggle Controlled Learning Progression Path on/off"
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                isLockPathEnabled 
-                  ? "bg-indigo-600 text-white shadow-sm" 
-                  : "bg-amber-500 text-white shadow-sm"
-              }`}
-            >
-              {isLockPathEnabled ? (
-                <>
-                  <Lock className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Controlled Path:</span>
-                  <span className="uppercase tracking-wider text-[10px] font-black bg-indigo-800/60 px-1.5 py-0.5 rounded">ON (Strict)</span>
-                </>
-              ) : (
-                <>
-                  <Unlock className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Path Mode:</span>
-                  <span className="uppercase tracking-wider text-[10px] font-black bg-amber-700/60 px-1.5 py-0.5 rounded">OFF (Open)</span>
-                </>
-              )}
-            </button>
+          {/* ─── TRAINER ONLY: MASTER CONTROLLED LEARNING PATH ON/OFF TOGGLE & CONFIG ─── */}
+          {isTrainer && (
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+              <button
+                onClick={() => {
+                  const nextState = !isLockPathEnabled;
+                  setIsLockPathEnabled(nextState);
+                  showNotification(
+                    nextState 
+                      ? "🔒 Controlled Learning Path Activated: Prerequisites and 80% watch threshold strictly enforced for trainees." 
+                      : "🔓 Open Exploration Mode Activated: All prerequisite lock constraints bypassed for trainees."
+                  );
+                }}
+                title="Trainer Control: Toggle Controlled Learning Progression Path on/off for trainees"
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                  isLockPathEnabled 
+                    ? "bg-indigo-600 text-white shadow-sm" 
+                    : "bg-amber-500 text-white shadow-sm"
+                }`}
+              >
+                {isLockPathEnabled ? (
+                  <>
+                    <Lock className="w-3.5 h-3.5" />
+                    <span className="hidden md:inline">Controlled Path:</span>
+                    <span className="uppercase tracking-wider text-[10px] font-black bg-indigo-800/60 px-1.5 py-0.5 rounded">ON (Strict)</span>
+                  </>
+                ) : (
+                  <>
+                    <Unlock className="w-3.5 h-3.5" />
+                    <span className="hidden md:inline">Path Mode:</span>
+                    <span className="uppercase tracking-wider text-[10px] font-black bg-amber-700/60 px-1.5 py-0.5 rounded">OFF (Open)</span>
+                  </>
+                )}
+              </button>
 
-            {/* Trainer Prereq Config Button */}
-            <button
-              onClick={() => {
-                setEditingPrereqMaterial(selectedMaterial);
-                setShowTrainerConfigModal(true);
-              }}
-              title="Configure Prerequisite Dependencies for this resource"
-              className="p-1 rounded-lg hover:bg-slate-200 text-slate-600 border border-slate-200/60 transition-colors"
-            >
-              <Sliders className="w-3.5 h-3.5 text-slate-700" />
-            </button>
-          </div>
+              {/* Trainer Prereq Config Button */}
+              <button
+                onClick={() => {
+                  setEditingPrereqMaterial(selectedMaterial);
+                  setShowTrainerConfigModal(true);
+                }}
+                title="Configure Prerequisite Dependencies for this resource"
+                className="p-1 rounded-lg hover:bg-slate-200 text-slate-600 border border-slate-200/60 transition-colors"
+              >
+                <Sliders className="w-3.5 h-3.5 text-slate-700" />
+              </button>
+            </div>
+          )}
 
           {/* Progress Bar (Visible on large screens) */}
           <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 text-xs shrink-0">
@@ -919,8 +1068,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
         </div>
       </header>
 
-      {/* ═════════ MASTER ON/OFF STATUS BANNER (When Bypassed) ═════════ */}
-      {!isLockPathEnabled && (
+      {/* ═════════ MASTER ON/OFF STATUS BANNER (TRAINER ONLY When Bypassed) ═════════ */}
+      {isTrainer && !isLockPathEnabled && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between text-xs text-amber-900 shrink-0 shadow-inner">
           <div className="flex items-center gap-2">
             <Unlock className="w-4 h-4 text-amber-600 shrink-0" />
@@ -940,7 +1089,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
       {/* ═════════ MAIN STUDIO VIEWPORT ═════════ */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        {/* ─── LEFT: CURRICULUM NAVIGATOR WITH LOCK ICONS ─── */}
+        {/* ─── LEFT: CURRICULUM NAVIGATOR WITH LOCK ICONS & TRAINER UPLOAD CONTROLS ─── */}
         {!isSidebarCollapsed && (
           <aside className="w-full md:w-76 lg:w-84 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto shadow-sm z-20 transition-all duration-300 max-h-48 md:max-h-none">
             <div className="p-3 sm:p-4 border-b border-slate-200 bg-slate-50/90 flex items-center justify-between sticky top-0 z-10">
@@ -1004,55 +1153,112 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                                 const isLocked = unlockInfo.isLocked;
 
                                 return (
-                                  <button
-                                    key={mat.id}
-                                    onClick={() => handleSelectMaterial(subject.id, mod.id, mat)}
-                                    className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all text-xs ${
-                                      isActive
-                                        ? "bg-blue-600 text-white font-bold shadow-md ring-1 ring-blue-400 transform scale-[1.01]"
-                                        : isLocked
-                                        ? "bg-slate-100/70 hover:bg-slate-200/70 text-slate-500 border border-dashed border-slate-300"
-                                        : "hover:bg-slate-100 text-slate-700 font-medium"
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2.5 truncate">
-                                      {isLocked ? (
-                                        <Lock className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-amber-600"}`} />
-                                      ) : mat.type === "video" ? (
-                                        <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-rose-600"}`} />
-                                      ) : mat.type === "quiz" ? (
-                                        <HelpCircle className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-indigo-600"}`} />
-                                      ) : mat.type === "presentation" ? (
-                                        <Layers className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-amber-600"}`} />
-                                      ) : (
-                                        <FileText className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-sky-600"}`} />
-                                      )}
-                                      
-                                      <div className="truncate flex flex-col text-left">
-                                        <span className="truncate text-[11px]">{mat.title}</span>
-                                        {isLocked && (
-                                          <span className={`text-[9px] font-bold ${isActive ? "text-amber-200" : "text-amber-700"}`}>
-                                            🔒 Locked ({unlockInfo.condition} Condition)
-                                          </span>
+                                  <div key={mat.id} className="group relative">
+                                    <button
+                                      onClick={() => handleSelectMaterial(subject.id, mod.id, mat)}
+                                      className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between gap-2 transition-all text-xs ${
+                                        isActive
+                                          ? "bg-blue-600 text-white font-bold shadow-md ring-1 ring-blue-400 transform scale-[1.01]"
+                                          : isLocked
+                                          ? "bg-slate-100/70 hover:bg-slate-200/70 text-slate-500 border border-dashed border-slate-300"
+                                          : "hover:bg-slate-100 text-slate-700 font-medium"
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-2.5 truncate">
+                                        {isLocked ? (
+                                          <Lock className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-amber-600"}`} />
+                                        ) : mat.type === "video" ? (
+                                          <PlayCircle className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-rose-600"}`} />
+                                        ) : mat.type === "quiz" ? (
+                                          <HelpCircle className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-indigo-600"}`} />
+                                        ) : mat.type === "presentation" ? (
+                                          <Layers className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-amber-600"}`} />
+                                        ) : (
+                                          <FileText className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-sky-600"}`} />
                                         )}
+                                        
+                                        <div className="truncate flex flex-col text-left">
+                                          <span className="truncate text-[11px]">{mat.title}</span>
+                                          {isLocked && (
+                                            <span className={`text-[9px] font-bold ${isActive ? "text-amber-200" : "text-amber-700"}`}>
+                                              🔒 Locked ({unlockInfo.condition} Condition)
+                                            </span>
+                                          )}
+                                        </div>
                                       </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                      {isLocked ? (
-                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-300">
-                                          LOCKED
-                                        </span>
-                                      ) : isDone ? (
-                                        <CheckCircle2 className={`w-3.5 h-3.5 ${isActive ? "text-emerald-200" : "text-emerald-600"}`} />
-                                      ) : mat.allowDownload ? (
-                                        <Download className={`w-3 h-3 ${isActive ? "text-blue-100" : "text-slate-400"}`} />
-                                      ) : null}
-                                    </div>
-                                  </button>
+                                      <div className="flex items-center gap-1.5 shrink-0">
+                                        {isLocked ? (
+                                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-800 border border-amber-300">
+                                            LOCKED
+                                          </span>
+                                        ) : isDone ? (
+                                          <CheckCircle2 className={`w-3.5 h-3.5 ${isActive ? "text-emerald-200" : "text-emerald-600"}`} />
+                                        ) : mat.allowDownload ? (
+                                          <Download className={`w-3 h-3 ${isActive ? "text-blue-100" : "text-slate-400"}`} />
+                                        ) : null}
+                                      </div>
+                                    </button>
+
+                                    {/* TRAINER ONLY: Quick Action Button to Add Quiz/Material Below This Item */}
+                                    {isTrainer && mat.type === "video" && (
+                                      <div className="hidden group-hover:flex items-center justify-end px-2 pt-1 pb-0.5">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setAddResourceTarget({
+                                              subjectId: subject.id,
+                                              moduleId: mod.id,
+                                              afterMaterialId: mat.id,
+                                              afterMaterialTitle: mat.title
+                                            });
+                                            setNewResourceForm(prev => ({
+                                              ...prev,
+                                              type: "quiz",
+                                              title: `Video Quiz: ${mat.title.replace(/^Video \d+:\s*/i, "").substring(0, 30)} Check`,
+                                              enforcePrecedingVideoPrereq: true,
+                                              enforceNextMaterialPrereq: true
+                                            }));
+                                            setShowAddResourceModal(true);
+                                          }}
+                                          className="text-[10px] text-indigo-700 font-bold hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-md border border-indigo-200 flex items-center gap-1 shadow-xs"
+                                        >
+                                          <PlusCircle className="w-3 h-3 text-indigo-600" />
+                                          <span>+ Upload Quiz Below Video</span>
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 );
                               })}
                             </div>
+
+                            {/* TRAINER ONLY: Add Resource at Bottom of Module */}
+                            {isTrainer && (
+                              <button
+                                onClick={() => {
+                                  const lastMat = mod.materials?.[mod.materials.length - 1];
+                                  setAddResourceTarget({
+                                    subjectId: subject.id,
+                                    moduleId: mod.id,
+                                    afterMaterialId: lastMat?.id || "",
+                                    afterMaterialTitle: lastMat?.title || mod.title
+                                  });
+                                  setNewResourceForm(prev => ({
+                                    ...prev,
+                                    type: "quiz",
+                                    title: "In-Module Topic Assessment Quiz",
+                                    enforcePrecedingVideoPrereq: true,
+                                    enforceNextMaterialPrereq: true
+                                  }));
+                                  setShowAddResourceModal(true);
+                                }}
+                                className="w-full mt-2 py-1.5 rounded-lg border border-dashed border-slate-300 text-slate-500 hover:text-indigo-700 hover:bg-indigo-50/50 hover:border-indigo-300 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors"
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>+ Add Learning Resource / Video Quiz</span>
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1115,17 +1321,19 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
             {/* Stage Quick Actions */}
             <div className="flex items-center gap-2 shrink-0 flex-wrap">
               
-              {/* Configure Prerequisite Button for Trainer */}
-              <button
-                onClick={() => {
-                  setEditingPrereqMaterial(selectedMaterial);
-                  setShowTrainerConfigModal(true);
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs border border-slate-200 shadow-sm"
-              >
-                <Sliders className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Trainer Rule Config</span>
-              </button>
+              {/* TRAINER ONLY: Configure Prerequisite Button */}
+              {isTrainer && (
+                <button
+                  onClick={() => {
+                    setEditingPrereqMaterial(selectedMaterial);
+                    setShowTrainerConfigModal(true);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs border border-slate-200 shadow-sm"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Trainer Rule Config</span>
+                </button>
+              )}
 
               {/* Mark Complete (if not locked) */}
               {!currentUnlockStatus.isLocked && (
@@ -1275,22 +1483,24 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   </div>
                 </div>
 
-                {/* Trainer Bypass Prompt */}
-                <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                  <span className="text-slate-500 text-[11px]">
-                    Trainer note: You can disable this lock globally or customize conditions using the header controls.
-                  </span>
-                  <button
-                    onClick={() => {
-                      setIsLockPathEnabled(false);
-                      showNotification("🔓 Controlled Path Disabled: All materials are now open for exploration.");
-                    }}
-                    className="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 font-bold text-xs bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-200 shrink-0"
-                  >
-                    <Unlock className="w-3.5 h-3.5" />
-                    <span>Bypass & Open Exploration</span>
-                  </button>
-                </div>
+                {/* TRAINER ONLY: Bypass Button */}
+                {isTrainer && (
+                  <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <span className="text-slate-500 text-[11px]">
+                      Trainer preview mode: You can bypass this lock or customize condition rules.
+                    </span>
+                    <button
+                      onClick={() => {
+                        setIsLockPathEnabled(false);
+                        showNotification("🔓 Controlled Path Disabled: All materials are now open for exploration.");
+                      }}
+                      className="flex items-center gap-1.5 text-amber-700 hover:text-amber-800 font-bold text-xs bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-200 shrink-0"
+                    >
+                      <Unlock className="w-3.5 h-3.5" />
+                      <span>Bypass & Open Exploration</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               /* ─── UNLOCKED CONTENT STAGES ─── */
@@ -2205,8 +2415,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
 
       </div>
 
-      {/* ═════════ TRAINER PREREQUISITE CONFIGURATOR MODAL ═════════ */}
-      {showTrainerConfigModal && (
+      {/* ═════════ TRAINER PREREQUISITE CONFIGURATOR MODAL (TRAINER ONLY) ═════════ */}
+      {isTrainer && showTrainerConfigModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             
@@ -2347,6 +2557,245 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ═════════ TRAINER QUICK ADD VIDEO QUIZ / LEARNING RESOURCE MODAL ═════════ */}
+      {isTrainer && showAddResourceModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center font-bold">
+                  <PlusCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base">
+                    Trainer: Upload Resource Below Video
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Target Placement: Directly following <b>"{addResourceTarget.afterMaterialTitle || "Video Lecture"}"</b>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAddResourceModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleTrainerAddResourceSubmit} className="space-y-4 text-xs">
+              
+              {/* Type selector */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">
+                  Resource Format
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewResourceForm({ ...newResourceForm, type: "quiz" })}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
+                      newResourceForm.type === "quiz"
+                        ? "bg-indigo-50 border-indigo-600 text-indigo-950 ring-1 ring-indigo-400"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <HelpCircle className="w-4 h-4 text-indigo-600" />
+                    <span className="text-[10px]">Video Quiz</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewResourceForm({ ...newResourceForm, type: "video" })}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
+                      newResourceForm.type === "video"
+                        ? "bg-rose-50 border-rose-600 text-rose-950 ring-1 ring-rose-400"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <PlayCircle className="w-4 h-4 text-rose-600" />
+                    <span className="text-[10px]">Next Video</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewResourceForm({ ...newResourceForm, type: "pdf" })}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
+                      newResourceForm.type === "pdf"
+                        ? "bg-sky-50 border-sky-600 text-sky-950 ring-1 ring-sky-400"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <FileText className="w-4 h-4 text-sky-600" />
+                    <span className="text-[10px]">PDF Study</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewResourceForm({ ...newResourceForm, type: "presentation" })}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 ${
+                      newResourceForm.type === "presentation"
+                        ? "bg-amber-50 border-amber-600 text-amber-950 ring-1 ring-amber-400"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Layers className="w-4 h-4 text-amber-600" />
+                    <span className="text-[10px]">Slide Deck</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Title input */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  {newResourceForm.type === "quiz" ? "Assessment / Quiz Title" : "Resource Title"}
+                </label>
+                <input
+                  type="text"
+                  value={newResourceForm.title}
+                  onChange={(e) => setNewResourceForm({ ...newResourceForm, title: e.target.value })}
+                  placeholder={newResourceForm.type === "quiz" ? "e.g. Video Quiz: Boundary Layer Stability Check" : "e.g. Lecture 02: Numerical Advection Schemes"}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-600"
+                  required
+                />
+              </div>
+
+              {/* Duration & Passing score */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Duration</label>
+                  <input
+                    type="text"
+                    value={newResourceForm.duration}
+                    onChange={(e) => setNewResourceForm({ ...newResourceForm, duration: e.target.value })}
+                    className="w-full p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs"
+                  />
+                </div>
+
+                {newResourceForm.type === "quiz" && (
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Pass Grade Requirement</label>
+                    <select
+                      value={newResourceForm.passPercentage}
+                      onChange={(e) => setNewResourceForm({ ...newResourceForm, passPercentage: Number(e.target.value) })}
+                      className="w-full p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900"
+                    >
+                      <option value={50}>50% (Standard Pass)</option>
+                      <option value={70}>70% (Rigorous Pass)</option>
+                      <option value={80}>80% (Mastery)</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Quiz Questions Editor (If type === quiz) */}
+              {newResourceForm.type === "quiz" && (
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-xs text-indigo-900">Quiz Question 1 (Sample Check):</span>
+                    <span className="text-[10px] font-mono text-slate-500">5 Marks</span>
+                  </div>
+
+                  <input
+                    type="text"
+                    value={newResourceForm.questions[0].question}
+                    onChange={(e) => {
+                      const updatedQ = [...newResourceForm.questions];
+                      updatedQ[0].question = e.target.value;
+                      setNewResourceForm({ ...newResourceForm, questions: updatedQ });
+                    }}
+                    placeholder="Enter question text here..."
+                    className="w-full p-2 rounded-xl bg-white border border-slate-200 text-xs"
+                  />
+
+                  <div className="space-y-1.5">
+                    {newResourceForm.questions[0].options.map((opt, oIdx) => (
+                      <div key={oIdx} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="correctOpt"
+                          checked={newResourceForm.questions[0].correctAnswer === oIdx}
+                          onChange={() => {
+                            const updatedQ = [...newResourceForm.questions];
+                            updatedQ[0].correctAnswer = oIdx;
+                            setNewResourceForm({ ...newResourceForm, questions: updatedQ });
+                          }}
+                          className="accent-indigo-600"
+                        />
+                        <input
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const updatedQ = [...newResourceForm.questions];
+                            updatedQ[0].options[oIdx] = e.target.value;
+                            setNewResourceForm({ ...newResourceForm, questions: updatedQ });
+                          }}
+                          className="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg text-[11px]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Controlled Progression Rule Checkboxes */}
+              <div className="p-3.5 bg-indigo-50/80 border border-indigo-200 rounded-2xl space-y-2 text-indigo-950">
+                <span className="font-extrabold text-xs block text-indigo-900">
+                  🔒 Automated Progression Rule Wiring:
+                </span>
+                
+                <label className="flex items-start gap-2 cursor-pointer text-[11px]">
+                  <input
+                    type="checkbox"
+                    checked={newResourceForm.enforcePrecedingVideoPrereq}
+                    onChange={(e) => setNewResourceForm({ ...newResourceForm, enforcePrecedingVideoPrereq: e.target.checked })}
+                    className="mt-0.5 accent-indigo-600"
+                  />
+                  <span>
+                    Require preceding video <b>(≥ 80% watch threshold)</b> before trainee can access this {newResourceForm.type}.
+                  </span>
+                </label>
+
+                {newResourceForm.type === "quiz" && (
+                  <label className="flex items-start gap-2 cursor-pointer text-[11px]">
+                    <input
+                      type="checkbox"
+                      checked={newResourceForm.enforceNextMaterialPrereq}
+                      onChange={(e) => setNewResourceForm({ ...newResourceForm, enforceNextMaterialPrereq: e.target.checked })}
+                      className="mt-0.5 accent-indigo-600"
+                    />
+                    <span>
+                      Require trainee to pass this quiz <b>(≥ {newResourceForm.passPercentage}%)</b> before downstream materials become unlocked.
+                    </span>
+                  </label>
+                )}
+              </div>
+
+              {/* Modal footer actions */}
+              <div className="pt-2 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddResourceModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-md flex items-center gap-1.5"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Publish & Wire Learning Path</span>
+                </button>
+              </div>
+
+            </form>
           </div>
         </div>
       )}
