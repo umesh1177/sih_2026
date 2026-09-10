@@ -166,57 +166,97 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
     setExpandedSubject(newSub.id);
   };
 
-  // Competency Matrix Trainer Suggestion Matcher
+  // Competency Matrix Trainer Suggestion Matcher strictly evaluated on Subject Title
   const getSuggestedTrainersForSubject = (subject) => {
-    const searchTerms = [
-      subject.name || "", 
-      subject.description || "", 
-      subject.requiredSkills || "", 
-      form.category || ""
-    ].join(" ").toLowerCase();
+    const rawName = (subject.name || "").trim().toLowerCase();
 
-    const domainKeywords = {
-      nwp: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equations", "modeling", "model", "assimilation", "4d-var", "hpc", "fluid", "grid", "arakawa", "primitive", "dispersion", "atmospheric"],
-      radar: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing"],
-      cyclone: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "warning"],
-      agri: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "plant"],
-      climate: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "projection", "seasonal"]
+    // MoES domain clusters
+    const domainKnowledge = {
+      nwp: {
+        keywords: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equation", "modeling", "model", "assimilation", "4d-var", "3d-var", "hpc", "arakawa", "primitive", "advection", "baroclinic", "atmospheric dynamics", "grid", "sigma", "continuity", "hydrostatic"],
+        coreTrainerName: "Amit Sengupta"
+      },
+      radar: {
+        keywords: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "kdp", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing", "microwave", "precipitable", "band"],
+        coreTrainerName: "Sunita Kulkarni"
+      },
+      cyclone: {
+        keywords: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "sea surface", "bay of bengal", "arabian sea", "cdo", "eye"],
+        coreTrainerName: "Rajiv Roy"
+      },
+      agri: {
+        keywords: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "agrometeorology"],
+        coreTrainerName: "Sunita Deshmukh"
+      },
+      climate: {
+        keywords: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "seasonal", "climatology"],
+        coreTrainerName: "Rajesh Pillai"
+      }
     };
 
+    // If subject name is empty or default generic text
+    if (!rawName || rawName === "subject title..." || rawName.match(/^subject\s*\d*$/i)) {
+      return trainersWorkload.map(tw => ({
+        ...tw,
+        matchScore: 0,
+        matchLabel: "Enter Subject Title"
+      }));
+    }
+
+    const tokens = rawName.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
+
     return trainersWorkload.map(tw => {
-      let matchScore = 42;
-      const trainerSkills = [
-        ...(tw.skills || []),
-        ...(tw.specialization || []),
-        tw.department || "",
+      const trainerText = [
         tw.trainerName || "",
-        tw.designation || ""
+        tw.department || "",
+        tw.designation || "",
+        ...(tw.skills || []),
+        ...(tw.specialization || [])
       ].join(" ").toLowerCase();
 
-      // Check domain alignment
-      Object.entries(domainKeywords).forEach(([domain, words]) => {
-        const hasTopic = words.some(w => searchTerms.includes(w));
-        const hasTrainerSkill = words.some(w => trainerSkills.includes(w));
-        if (hasTopic && hasTrainerSkill) {
-          matchScore += 45;
+      let matchScore = 0;
+      let directMatches = 0;
+
+      // 1. Check direct skill/specialization overlap (excluding generic stopwords)
+      tokens.forEach(tok => {
+        if (!["umesh", "admin", "officer", "scientist", "subject", "part", "test", "demo", "title", "study"].includes(tok)) {
+          (tw.skills || []).forEach(sk => {
+            if (sk.toLowerCase().includes(tok)) directMatches += 2;
+          });
+          (tw.specialization || []).forEach(sp => {
+            if (sp.toLowerCase().includes(tok)) directMatches += 2;
+          });
         }
       });
 
-      // Token matching
-      const tokens = searchTerms.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
-      tokens.forEach(token => {
-        if (trainerSkills.includes(token)) {
-          matchScore += 12;
+      // 2. Check domain knowledge clusters
+      Object.entries(domainKnowledge).forEach(([domain, conf]) => {
+        const hasTopicKeyword = conf.keywords.some(kw => rawName.includes(kw));
+        const isCoreTrainer = (tw.trainerName && conf.coreTrainerName && tw.trainerName.toLowerCase().includes(conf.coreTrainerName.toLowerCase())) ||
+                              conf.keywords.some(kw => trainerText.includes(kw));
+
+        if (hasTopicKeyword && isCoreTrainer) {
+          matchScore += 80;
+        } else if (hasTopicKeyword) {
+          matchScore -= 10;
         }
       });
 
-      if (tw.department?.toLowerCase().includes(form.category.toLowerCase().split(" ")[0])) {
-        matchScore += 8;
+      if (directMatches > 0) {
+        matchScore += directMatches * 10;
+      }
+
+      // Clamp score
+      if (matchScore <= 0) {
+        matchScore = 0;
+      } else {
+        matchScore = Math.min(Math.max(matchScore, 10), 99);
       }
 
       return {
         ...tw,
-        matchScore: Math.min(Math.max(matchScore, 45), 99)
+        matchScore,
+        matchLabel: matchScore >= 80 ? "Top Recommendation" : matchScore >= 40 ? "Moderate Match" : "Low Match"
       };
     }).sort((a, b) => b.matchScore - a.matchScore);
   };
@@ -227,12 +267,15 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
         if (s.id !== subId) return s;
         const updated = { ...s, [key]: val };
 
-        // If subject name or skills changed and user hasn't manually locked trainer, auto-assign top suggested
-        if (key === "name" || key === "requiredSkills") {
+        // If subject name changed, dynamically update trainer suggestion if not manually overridden
+        if (key === "name") {
           const suggestions = getSuggestedTrainersForSubject(updated);
-          if (suggestions.length > 0 && !s.isManuallyAssigned) {
+          if (suggestions.length > 0 && suggestions[0].matchScore >= 60 && !s.isManuallyAssigned) {
             updated.assignedTrainerId = suggestions[0].trainerId;
             updated.assignedTrainerName = suggestions[0].trainerName;
+          } else if (suggestions.length > 0 && suggestions[0].matchScore < 60 && !s.isManuallyAssigned) {
+            updated.assignedTrainerId = "";
+            updated.assignedTrainerName = "";
           }
         }
         return updated;
@@ -554,12 +597,22 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                       <div className="flex items-center justify-between">
                         <span className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                          <span>Competency Matrix Suggested Trainers & Faculty Workload:</span>
+                          <span>AI Competency Matrix Faculty Matching:</span>
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
-                          Assigned: <b className="text-purple-900">{subject.assignedTrainerName || "Not assigned yet"}</b>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          Assigned Faculty: <b className={subject.assignedTrainerName ? "text-purple-900 font-bold" : "text-slate-400 font-normal"}>{subject.assignedTrainerName || "None (Type subject or click Assign)"}</b>
                         </span>
                       </div>
+
+                      {/* Guidance notice when no domain match */}
+                      {suggestedTrainers[0]?.matchScore === 0 && (
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">
+                          <span className="text-amber-500 font-bold">💡</span>
+                          <span>
+                            Type a meteorological subject title (e.g. <b>Doppler Radar, Tropical Cyclone, NWP Dynamics, Satellite Meteorology</b>) to see live AI Faculty Matching, or click <b>Assign</b> on any faculty below.
+                          </span>
+                        </div>
+                      )}
 
                       {/* Top Trainers Grid with Workload Indicator */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -582,6 +635,8 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                               className={`p-3 rounded-xl border cursor-pointer transition-all flex items-start justify-between gap-2.5 ${
                                 isAssigned 
                                   ? "bg-purple-50 border-purple-400 ring-2 ring-purple-300 shadow-sm" 
+                                  : tw.matchScore >= 80
+                                  ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-400"
                                   : "bg-slate-50/70 border-slate-200 hover:border-blue-300 hover:bg-blue-50/40"
                               }`}
                             >
@@ -594,8 +649,14 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                 <div>
                                   <div className="flex items-center gap-1.5">
                                     <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
-                                    <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded text-[9px] font-bold">
-                                      {tw.matchScore}% Match
+                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
+                                      tw.matchScore >= 80 
+                                        ? "bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs" 
+                                        : tw.matchScore >= 40 
+                                        ? "bg-blue-100 text-blue-900 border-blue-200" 
+                                        : "bg-slate-100 text-slate-500 border-slate-200"
+                                    }`}>
+                                      {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
                                     </span>
                                   </div>
                                   <p className="text-[10px] text-slate-500 truncate max-w-[160px]">{tw.designation}</p>
@@ -618,7 +679,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                               <button
                                 type="button"
                                 className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${
-                                  isAssigned ? "bg-purple-700 text-white" : "bg-white border border-slate-300 text-slate-700"
+                                  isAssigned ? "bg-purple-700 text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
                                 }`}
                               >
                                 {isAssigned ? "Selected ✓" : "Assign"}

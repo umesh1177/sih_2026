@@ -11,52 +11,72 @@ export const getCompetencyMatrix = (req, res) => {
 
 export const suggestTrainersForSubject = (req, res) => {
   try {
-    const { subjectName = "", requiredSkills = "", category = "" } = req.body;
+    const { subjectName = "" } = req.body;
+    const rawName = (subjectName || "").trim().toLowerCase();
     const trainers = db.users.filter(u => u.role === "trainer" && u.status === "approved");
 
+    const domainKnowledge = {
+      nwp: {
+        keywords: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equation", "modeling", "model", "assimilation", "4d-var", "3d-var", "hpc", "arakawa", "primitive", "advection", "baroclinic", "atmospheric dynamics", "grid", "sigma", "continuity", "hydrostatic"],
+        coreTrainerName: "Amit Sengupta"
+      },
+      radar: {
+        keywords: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "kdp", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing", "microwave", "precipitable", "band"],
+        coreTrainerName: "Sunita Kulkarni"
+      },
+      cyclone: {
+        keywords: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "sea surface", "bay of bengal", "arabian sea", "cdo", "eye"],
+        coreTrainerName: "Rajiv Roy"
+      },
+      agri: {
+        keywords: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "agrometeorology"],
+        coreTrainerName: "Sunita Deshmukh"
+      },
+      climate: {
+        keywords: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "seasonal", "climatology"],
+        coreTrainerName: "Rajesh Pillai"
+      }
+    };
+
+    const tokens = rawName.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
+
     const scoredTrainers = trainers.map(t => {
-      let matchScore = 45; // Base confidence
-      const combinedSearch = [
-        subjectName,
-        typeof requiredSkills === "string" ? requiredSkills : (requiredSkills || []).join(" "),
-        category
-      ].join(" ").toLowerCase();
+      let matchScore = 0;
+      let directMatches = 0;
 
-      const trainerSkills = [
-        ...(t.specialization || []),
-        ...(t.skills || []),
-        t.department || "",
-        t.bio || "",
-        t.name || ""
-      ].join(" ").toLowerCase();
+      if (rawName && rawName !== "subject title..." && !rawName.match(/^subject\s*\d*$/i)) {
+        tokens.forEach(tok => {
+          if (!["umesh", "admin", "officer", "scientist", "subject", "part", "test", "demo", "title", "study"].includes(tok)) {
+            (t.skills || []).forEach(sk => {
+              if (sk.toLowerCase().includes(tok)) directMatches += 2;
+            });
+            (t.specialization || []).forEach(sp => {
+              if (sp.toLowerCase().includes(tok)) directMatches += 2;
+            });
+          }
+        });
 
-      // Domain definitions for MoES / IMD Specializations
-      const domainKeywords = {
-        nwp: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equations", "modeling", "model", "assimilation", "4d-var", "hpc", "fluid", "grid", "arakawa", "primitive", "dispersion", "atmospheric"],
-        radar: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing"],
-        cyclone: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "warning"],
-        agri: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "plant"],
-        climate: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "projection", "seasonal"]
-      };
+        Object.entries(domainKnowledge).forEach(([domain, conf]) => {
+          const hasTopicKeyword = conf.keywords.some(kw => rawName.includes(kw));
+          const isCoreTrainer = (t.name && conf.coreTrainerName && t.name.toLowerCase().includes(conf.coreTrainerName.toLowerCase()));
 
-      // Match against domain keywords
-      Object.entries(domainKeywords).forEach(([domain, words]) => {
-        const hasTopic = words.some(w => combinedSearch.includes(w));
-        const hasTrainerSkill = words.some(w => trainerSkills.includes(w));
-        if (hasTopic && hasTrainerSkill) {
-          matchScore += 45;
+          if (hasTopicKeyword && isCoreTrainer) {
+            matchScore += 80;
+          } else if (hasTopicKeyword) {
+            matchScore -= 10;
+          }
+        });
+
+        if (directMatches > 0) {
+          matchScore += directMatches * 10;
         }
-      });
 
-      // Individual token matching
-      const tokens = combinedSearch.split(/[\s,./\-&]+/).filter(tok => tok.length > 3);
-      tokens.forEach(token => {
-        if (trainerSkills.includes(token)) {
-          matchScore += 10;
+        if (matchScore <= 0) {
+          matchScore = 0;
+        } else {
+          matchScore = Math.min(Math.max(matchScore, 10), 99);
         }
-      });
-
-      matchScore = Math.min(Math.max(matchScore, 48), 99);
+      }
 
       return {
         trainerId: t.id,
