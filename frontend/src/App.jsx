@@ -52,11 +52,13 @@ import {
 const MainApp = () => {
   const { currentUser, switchAccount, demoAccounts } = useAuth();
   
-  // Navigation & Page views
+  // Navigation & Page views: Defaults to Home Page ("landing")
   const [viewMode, setViewMode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("verify") || params.get("id")) return "landing";
-    return "portal";
+    if (params.get("mode") === "portal" || params.get("tab")) return "portal";
+    if (params.get("mode") === "login") return "login";
+    return "landing";
   });
   const [activeTab, setActiveTab] = useState("dashboard");
 

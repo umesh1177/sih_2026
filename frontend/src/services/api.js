@@ -433,11 +433,45 @@ export const api = {
     return res.json();
   },
 
+  getQuizSubmissions: async (quizId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/quizzes/${quizId}/submissions`, {
+        headers: authHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, submissions: [] };
+    }
+  },
+
+  getTraineeSubmissions: async (traineeId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/analytics/trainee/${traineeId}`, {
+        headers: getHeaders()
+      });
+      const data = await res.json();
+      return {
+        success: true,
+        submissions: data.submissions || []
+      };
+    } catch (err) {
+      return { success: false, submissions: [] };
+    }
+  },
+
   getTraineeAnalytics: async (traineeId) => {
-    const res = await fetch(`${API_BASE_URL}/analytics/trainee/${traineeId}`, {
-      headers: getHeaders()
-    });
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE_URL}/analytics/trainee/${traineeId}`, {
+        headers: getHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, competencyRadar: [], submissions: [] };
+    }
+  },
+
+  generateSummaryWithAI: async (payload) => {
+    return api.generateMaterialSummary(payload);
   },
 
   // Competency Mapping
