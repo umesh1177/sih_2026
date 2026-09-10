@@ -14,7 +14,8 @@ import {
   LogOut,
   Building2,
   FolderKanban,
-  Sparkles
+  Sparkles,
+  TrendingUp
 } from "lucide-react";
 
 export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage, onOpenAiAdvisor }) => {
@@ -30,6 +31,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
     if (currentUser?.role === "trainer") {
       return [
         ...baseItems,
+        { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
         { id: "questions", label: "Question Bank", icon: Layers },
         { id: "content-library", label: "Content Library", icon: FolderKanban },
@@ -41,6 +43,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
     if (currentUser?.role === "admin") {
       return [
         ...baseItems,
+        { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "approvals", label: "Officer Approvals", icon: UserCheck },
         { id: "announcements", label: "National Broadcasts", icon: BellRing },
         { id: "analytics", label: "Platform Analytics", icon: BarChart3 },

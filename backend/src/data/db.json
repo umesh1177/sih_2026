@@ -645,6 +645,19 @@
                   "size": "320 MB",
                   "uploadedBy": "Dr. Amit Sengupta",
                   "allowDownload": false
+                },
+                {
+                  "id": "lib_01",
+                  "title": "Primitive Equations & Atmospheric Governing Laws Masterclass",
+                  "type": "video",
+                  "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                  "duration": "48 mins",
+                  "size": "320 MB",
+                  "topic": "Module 1: Navier-Stokes & Primitive Equation Systems",
+                  "subject": "Subject 1: Governing Equations & Atmospheric Dynamics",
+                  "uploadedBy": "Dr. Amit Sengupta",
+                  "uploadedAt": "2026-09-10T16:58:34.973Z",
+                  "allowDownload": false
                 }
               ]
             },
@@ -666,6 +679,16 @@
                   "title": "Lab Manual: Configuring WRF Preprocessing System (WPS)",
                   "type": "pdf",
                   "size": "5.1 MB",
+                  "allowDownload": true
+                },
+                {
+                  "id": "lib_02",
+                  "title": "Atmospheric Governing Equations & Grid Staggering Slide Deck",
+                  "type": "presentation",
+                  "url": "",
+                  "pages": 46,
+                  "size": "14.8 MB",
+                  "uploadedBy": "Dr. Amit Sengupta",
                   "allowDownload": true
                 }
               ]
@@ -700,7 +723,10 @@
             }
           ]
         }
-      ]
+      ],
+      "controlledLearningPathEnabled": true,
+      "maxEnrollment": 50,
+      "updatedAt": "2026-09-10T17:12:51.020Z"
     },
     {
       "id": "crs_dwr_102",

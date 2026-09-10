@@ -23,7 +23,8 @@ import {
   Check,
   ShieldAlert,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  TrendingUp
 } from "lucide-react";
 import { api } from "../../services/api";
 
@@ -32,7 +33,8 @@ export const TrainerDashboardView = ({
   onOpenAiGenerator, 
   onOpenCourse, 
   onOpenContentLibrary,
-  onOpenQuestionBank
+  onOpenQuestionBank,
+  onNavigatePerformance
 }) => {
   const [courses, setCourses] = useState([]);
   const [integrityAlerts, setIntegrityAlerts] = useState([]);
@@ -183,6 +185,16 @@ export const TrainerDashboardView = ({
         </div>
 
         <div className="flex items-center gap-3 shrink-0 z-10 flex-wrap sm:flex-nowrap">
+          {onNavigatePerformance && (
+            <button
+              onClick={onNavigatePerformance}
+              className="flex items-center gap-2 px-5 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-bold rounded-2xl text-xs shadow-sm transition-all transform hover:scale-105 active:scale-95"
+            >
+              <TrendingUp className="w-4 h-4 text-indigo-600" />
+              <span>Learner Performance</span>
+            </button>
+          )}
+
           {onOpenQuestionBank && (
             <button
               onClick={onOpenQuestionBank}

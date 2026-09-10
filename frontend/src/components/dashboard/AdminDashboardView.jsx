@@ -45,7 +45,8 @@ export const AdminDashboardView = ({
   onOpenApprovals, 
   onOpenAnalytics, 
   onOpenBroadcastModal,
-  onOpenCreateCourse
+  onOpenCreateCourse,
+  onNavigatePerformance
 }) => {
   const [stats, setStats] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
@@ -128,6 +129,16 @@ export const AdminDashboardView = ({
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-3 shrink-0 z-10">
+          {onNavigatePerformance && (
+            <button
+              onClick={onNavigatePerformance}
+              className="flex items-center gap-2 px-4 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-950 font-bold rounded-2xl text-xs border border-indigo-200 transition-all transform hover:scale-105 active:scale-95 shadow-2xs"
+            >
+              <TrendingUp className="w-4 h-4 text-indigo-600" />
+              <span>Learner Performance</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenCreateCourse}
             className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"

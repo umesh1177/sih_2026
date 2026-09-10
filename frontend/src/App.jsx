@@ -30,6 +30,7 @@ import { AdminDashboardView } from "./components/dashboard/AdminDashboardView";
 import { ContentLibraryView } from "./components/trainer/ContentLibraryView";
 import { TrainerCurriculumStudio } from "./components/trainer/TrainerCurriculumStudio";
 import { TrainerScheduleAssessmentView } from "./components/trainer/TrainerScheduleAssessmentView";
+import { TraineePerformanceCategoryView } from "./components/analytics/TraineePerformanceCategoryView";
 import { PublicHomePage } from "./pages/PublicHomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { api } from "./services/api";
@@ -316,6 +317,7 @@ const MainApp = () => {
                     setContentLibrarySubjectFilter(subjectId || "all");
                     setActiveTab("content-library");
                   }}
+                  onNavigatePerformance={() => setActiveTab("trainee-performance")}
                 />
               )}
 
@@ -325,6 +327,7 @@ const MainApp = () => {
                   onOpenBroadcastModal={() => setActiveTab("announcements")}
                   onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
                   onOpenAnalytics={() => setActiveTab("analytics")}
+                  onNavigatePerformance={() => setActiveTab("trainee-performance")}
                 />
               )}
             </>
@@ -469,6 +472,20 @@ const MainApp = () => {
           {/* 6. NATIONAL BROADCASTS & CIRCULARS HUB */}
           {activeTab === "announcements" && (
             <NationalBroadcastsView onRefreshData={refreshGlobalData} />
+          )}
+
+          {/* 6.5. TRAINEE PERFORMANCE CLASSIFICATION & DIAGNOSTICS */}
+          {activeTab === "trainee-performance" && (
+            <TraineePerformanceCategoryView
+              currentUser={currentUser}
+              onOpenStudio={(course) => {
+                setSelectedOverviewCourse(null);
+                setActiveStudioCourse(course);
+              }}
+              onOpenCourse={(course) => {
+                setSelectedOverviewCourse(course);
+              }}
+            />
           )}
 
           {/* 7. PLATFORM ANALYTICS & REPORTING */}
