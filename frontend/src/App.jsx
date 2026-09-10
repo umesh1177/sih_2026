@@ -32,6 +32,7 @@ import { TrainerCurriculumStudio } from "./components/trainer/TrainerCurriculumS
 import { TrainerScheduleAssessmentView } from "./components/trainer/TrainerScheduleAssessmentView";
 import { TraineePerformanceCategoryView } from "./components/analytics/TraineePerformanceCategoryView";
 import { LearningGapDetectionHub } from "./components/analytics/LearningGapDetectionHub";
+import { CourseFeedbackImprovementStudio } from "./components/analytics/CourseFeedbackImprovementStudio";
 import { PublicHomePage } from "./pages/PublicHomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { api } from "./services/api";
@@ -502,6 +503,19 @@ const MainApp = () => {
                 setSelectedOverviewCourse(course);
               }}
               onNavigateTab={(tab) => setActiveTab(tab)}
+            />
+          )}
+
+          {/* 6.7. TRAINER FEEDBACK -> COURSE IMPROVEMENT STUDIO (RULE 16) */}
+          {activeTab === "course-feedback" && (
+            <CourseFeedbackImprovementStudio
+              currentUser={currentUser}
+              onOpenStudio={(course) => {
+                setSelectedOverviewCourse(null);
+                setActiveStudioCourse(course);
+              }}
+              onOpenQuestionBank={() => setActiveTab("questions")}
+              onOpenAssessment={() => setActiveTab("schedule-assessment")}
             />
           )}
 
