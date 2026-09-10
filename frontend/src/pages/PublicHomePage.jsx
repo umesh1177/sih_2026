@@ -297,11 +297,28 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
 
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
               <button
-                onClick={() => onEnterPortal()}
-                className="flex items-center gap-2 px-6 sm:px-8 py-3.5 bg-white text-[#0a2558] hover:bg-blue-50 font-black rounded-2xl text-xs sm:text-sm shadow-xl transition-all transform hover:scale-105 active:scale-95"
+                onClick={() => {
+                  const traineeAcc = demoAccounts.find(a => a.role === "trainee");
+                  if (traineeAcc) switchAccount(traineeAcc);
+                  onEnterPortal();
+                }}
+                className="flex items-center gap-2 px-6 sm:px-7 py-3.5 bg-white text-[#0a2558] hover:bg-blue-50 font-black rounded-2xl text-xs sm:text-sm shadow-xl transition-all transform hover:scale-105 active:scale-95"
               >
-                <span>Enter Training Portal as {currentUser?.role.toUpperCase()}</span>
+                <GraduationCap className="w-4 h-4 text-blue-700" />
+                <span>Enter Trainee Dashboard (Rahul)</span>
                 <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  const trainerAcc = demoAccounts.find(a => a.role === "trainer");
+                  if (trainerAcc) switchAccount(trainerAcc);
+                  onEnterPortal();
+                }}
+                className="flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-blue-600/40 hover:bg-blue-600/60 text-white font-bold rounded-2xl text-xs sm:text-sm border border-blue-400/40 transition-all hover:scale-105 active:scale-95"
+              >
+                <Layers className="w-4 h-4 text-blue-200" />
+                <span>Enter Trainer Dashboard</span>
               </button>
 
               <button
@@ -312,7 +329,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                 className="flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 font-bold rounded-2xl text-xs sm:text-sm border border-emerald-400/40 transition-all hover:scale-105 active:scale-95"
               >
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Verify Public Certificate</span>
+                <span>Verify Certificate</span>
               </button>
             </div>
 

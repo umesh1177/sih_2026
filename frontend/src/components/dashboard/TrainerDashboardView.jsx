@@ -28,7 +28,8 @@ export const TrainerDashboardView = ({
   currentUser, 
   onOpenAiGenerator, 
   onOpenCourse, 
-  onOpenContentLibrary 
+  onOpenContentLibrary,
+  onOpenQuestionBank
 }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -142,7 +143,17 @@ export const TrainerDashboardView = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 z-10">
+        <div className="flex items-center gap-3 shrink-0 z-10 flex-wrap sm:flex-nowrap">
+          {onOpenQuestionBank && (
+            <button
+              onClick={onOpenQuestionBank}
+              className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0a2558] font-bold rounded-2xl text-xs shadow-sm transition-all transform hover:scale-105 active:scale-95"
+            >
+              <Layers className="w-4 h-4 text-[#0a2558]" />
+              <span>Question Bank</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenContentLibrary}
             className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"

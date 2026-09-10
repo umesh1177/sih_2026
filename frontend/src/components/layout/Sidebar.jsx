@@ -13,7 +13,8 @@ import {
   Award,
   LogOut,
   Building2,
-  FolderKanban
+  FolderKanban,
+  Sparkles
 } from "lucide-react";
 
 export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage }) => {
@@ -30,6 +31,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
       return [
         ...baseItems,
         { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
+        { id: "questions", label: "Question Bank", icon: Layers },
         { id: "content-library", label: "Content Library", icon: FolderKanban },
         { id: "certificates", label: "Certified Credentials", icon: Award },
         { id: "profile", label: "Officer Profile", icon: FileText },

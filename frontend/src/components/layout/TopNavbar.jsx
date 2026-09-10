@@ -3,9 +3,10 @@ import { useAuth } from "../../context/AuthContext";
 import { Bell, AlertTriangle, CheckCircle2, Sparkles, Building2, Globe, ChevronDown, Languages } from "lucide-react";
 
 export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, demoAccounts, switchAccount } = useAuth();
   const [selectedLang, setSelectedLang] = useState("EN");
   const [isBhashiniOpen, setIsBhashiniOpen] = useState(false);
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
 
   const languages = [
     { code: "EN", name: "English", native: "English" },
@@ -62,7 +63,55 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator })
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
+        {/* Fast Role Switcher (Trainee | Trainer | Admin) */}
+        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-2xs">
+          <button
+            onClick={() => {
+              const traineeAcc = demoAccounts.find(a => a.role === "trainee");
+              if (traineeAcc) switchAccount(traineeAcc);
+            }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all ${
+              currentUser?.role === "trainee"
+                ? "bg-[#0a2558] text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-white"
+            }`}
+            title="Switch to Trainee Officer (Rahul Sharma)"
+          >
+            Trainee
+          </button>
+
+          <button
+            onClick={() => {
+              const trainerAcc = demoAccounts.find(a => a.role === "trainer");
+              if (trainerAcc) switchAccount(trainerAcc);
+            }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all ${
+              currentUser?.role === "trainer"
+                ? "bg-[#0a2558] text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-white"
+            }`}
+            title="Switch to Faculty Trainer (Dr. Amit Sengupta)"
+          >
+            Trainer
+          </button>
+
+          <button
+            onClick={() => {
+              const adminAcc = demoAccounts.find(a => a.role === "admin");
+              if (adminAcc) switchAccount(adminAcc);
+            }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all ${
+              currentUser?.role === "admin"
+                ? "bg-[#0a2558] text-white shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-white"
+            }`}
+            title="Switch to National Admin (Dr. Mrutyunjay Mohapatra)"
+          >
+            Admin
+          </button>
+        </div>
+
         {/* BHASHINI AI Multilingual Dropdown (Govt of India Initiative) */}
         <div className="relative">
           <button
