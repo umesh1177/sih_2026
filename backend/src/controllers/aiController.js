@@ -249,13 +249,26 @@ export const recommendCoursesWithAI = async (req, res) => {
     const user = traineeProfile || req.user || {};
 
     const dbCourses = db.getCourses ? db.getCourses() : [];
-    const availableCourses = (Array.isArray(courses) && courses.length > 0) ? courses : dbCourses;
+    const allCourses = (Array.isArray(courses) && courses.length > 0) ? courses : dbCourses;
+
+    // Strictly filter out courses in which the trainee is already enrolled
+    const userId = user.id || req.user?.id;
+    const availableCourses = allCourses.filter(c => {
+      if (userId && Array.isArray(c.enrolledTraineeIds) && c.enrolledTraineeIds.includes(userId)) {
+        return false;
+      }
+      if (Array.isArray(user.enrolledCourseIds) && user.enrolledCourseIds.includes(c.id)) {
+        return false;
+      }
+      return true;
+    });
 
     if (!availableCourses || availableCourses.length === 0) {
       return res.json({
         success: true,
         source: "Capacity Connect AI Engine",
-        recommendations: []
+        recommendations: [],
+        message: "You are already enrolled in all available courses in the catalog!"
       });
     }
 

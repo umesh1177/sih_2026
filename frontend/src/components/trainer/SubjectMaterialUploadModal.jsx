@@ -92,16 +92,17 @@ export const SubjectMaterialUploadModal = ({
       <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl flex flex-col overflow-hidden text-slate-800 font-sans my-auto">
         
         {/* ═════════ HEADER ═════════ */}
-        <div className="p-6 bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] text-white flex items-center justify-between gap-4 shrink-0">
+        {/* ═════════ HEADER ═════════ */}
+        <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 font-bold shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold shadow-xs">
               <Upload className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold tracking-tight text-white">
+              <h2 className="text-base font-extrabold tracking-tight text-slate-900">
                 Upload Learning Material to Subject
               </h2>
-              <p className="text-xs text-blue-200">
+              <p className="text-xs text-slate-500">
                 {subject.title || "Subject 1: Governing Equations & Atmospheric Dynamics"}
               </p>
             </div>
@@ -109,7 +110,7 @@ export const SubjectMaterialUploadModal = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -276,9 +277,9 @@ export const SubjectMaterialUploadModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-xl text-xs shadow-lg transition-transform hover:scale-105"
+              className="flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-md transition-all"
             >
-              <Upload className="w-4 h-4 text-emerald-300" />
+              <Upload className="w-4 h-4 text-white" />
               <span>{loading ? "Publishing to Module..." : success ? "Published Successfully ✓" : "Publish Material"}</span>
             </button>
           </div>
