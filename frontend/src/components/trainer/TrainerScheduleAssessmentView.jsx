@@ -264,9 +264,74 @@ export const TrainerScheduleAssessmentView = ({
     }));
   };
 
+  // Helper: Retrieve syllabus topics taught for the selected subject
+  const getSubjectTaughtTopics = (subject) => {
+    if (!subject) return [];
+    const topics = [];
+    (subject.modules || []).forEach(m => {
+      if (m.title) topics.push(m.title.replace(/^Module \d+:\s*/i, ""));
+      (m.materials || []).forEach(mat => {
+        if (mat.title) topics.push(mat.title.replace(/^(Lecture|Presentation|Practical|Lab)\s*\d*:\s*/i, ""));
+      });
+    });
+
+    const sName = (subject.name || subject.title || "").toLowerCase();
+    if (sName.includes("dynamics") || sName.includes("nwp") || sName.includes("modeling")) {
+      topics.push("Governing Navier-Stokes Equations", "Arakawa C-Grid Staggering", "CFL Numerical Stability", "4D-Var Data Assimilation", "Sigma Coordinates", "Boundary Layer Parameterizations");
+    } else if (sName.includes("radar") || sName.includes("dwr")) {
+      topics.push("Dual-Polarization Differential Reflectivity (ZDR)", "Specific Differential Phase (KDP)", "TITAN Convective Cell Tracking", "Hydrometeor Classification", "Doppler Velocity De-Aliasing");
+    } else if (sName.includes("cyclone") || sName.includes("tropical")) {
+      topics.push("Dvorak Technique Pattern Recognition", "Tropical Cyclogenesis & SST", "ADCIRC Storm Surge Modeling", "RSMC Warning Protocols & Track Forecasts");
+    } else if (sName.includes("satellite") || sName.includes("insat")) {
+      topics.push("INSAT-3DR Sounder Temperature Profiles", "Water Vapour 6.7 µm Channel Analysis", "Nighttime Fog Brightness Temperature Difference", "Cloud Motion Vectors (CMVs)");
+    } else if (sName.includes("agro") || sName.includes("crop")) {
+      topics.push("FASAL Agromet Advisory Formulation", "MEGHDOOT Block-Level Forecasts", "Crop Water Stress Index & Phenology", "Agricultural Drought Monitoring");
+    }
+    return Array.from(new Set(topics));
+  };
+
+  const validateTopicForSubject = (enteredTopic, subject) => {
+    if (!enteredTopic || !enteredTopic.trim()) {
+      return { isValid: true, message: "" };
+    }
+    const topicLower = enteredTopic.trim().toLowerCase();
+    if (!subject) return { isValid: true, message: "" };
+
+    const subjectText = [
+      subject.name || "",
+      subject.title || "",
+      subject.description || "",
+      subject.requiredSkills || "",
+      ...(subject.modules || []).map(m => `${m.title} ${m.description || ""}`),
+      ...getSubjectTaughtTopics(subject)
+    ].join(" ").toLowerCase();
+
+    const topicTokens = topicLower.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
+    const isCovered = topicTokens.some(tok => subjectText.includes(tok)) || subjectText.includes(topicLower);
+
+    if (!isCovered) {
+      return {
+        isValid: false,
+        message: `This topic is not teached yet for "${cleanSubject(subject.name || subject.title)}". Please choose or enter a topic covered in the uploaded syllabus modules.`
+      };
+    }
+
+    return { isValid: true, message: "" };
+  };
+
   // ─── AI QUESTION PAPER GENERATION (POWERED BY GOOGLE GEMINI) ───
   const handleGenerateAiPaper = async (e) => {
     e.preventDefault();
+    
+    const curCourse = courses.find(c => c.id === createForm.courseId);
+    const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName || s.title === createForm.subjectName) || curCourse?.subjects?.[0];
+
+    const topicCheck = validateTopicForSubject(aiPaperConfig.conceptName, curSubject);
+    if (!topicCheck.isValid) {
+      showToast(topicCheck.message, "error");
+      return;
+    }
+
     setIsGeneratingAiPaper(true);
     try {
       const res = await api.synthesizeAssessmentPaperWithAI({
@@ -915,6 +980,60 @@ export const TrainerScheduleAssessmentView = ({
                     </div>
                   </div>
                 </div>
+
+                {/* Topic Not Taught / Wrong Subject Syllabus Warning Alert */}
+                {(() => {
+                  const selCourse = courses.find(c => c.id === createForm.courseId);
+                  const selSub = selCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName || s.title === createForm.subjectName) || selCourse?.subjects?.[0];
+                  const topicVal = validateTopicForSubject(aiPaperConfig.conceptName, selSub);
+                  const taughtList = getSubjectTaughtTopics(selSub);
+
+                  if (!topicVal.isValid) {
+                    return (
+                      <div className="p-4 bg-amber-100/90 border border-amber-400 rounded-2xl text-amber-950 flex items-start gap-3 animate-in fade-in shadow-xs">
+                        <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-extrabold text-xs text-amber-950 flex items-center gap-1.5">
+                              <span>Topic Not Taught in this Subject</span>
+                            </h4>
+                            <span className="px-2 py-0.5 rounded-md bg-amber-200 text-amber-950 font-bold text-[9px] uppercase">
+                              Syllabus Scope Alert
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-amber-900 leading-relaxed font-semibold">
+                            {topicVal.message}
+                          </p>
+
+                          {taughtList.length > 0 && (
+                            <div className="pt-1.5 space-y-1">
+                              <span className="text-[10px] text-amber-900 font-extrabold uppercase tracking-wide block">
+                                Taught Syllabus Topics for this Subject:
+                              </span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                {taughtList.slice(0, 6).map((top, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => {
+                                      setAiPaperConfig(prev => ({ ...prev, conceptName: top, topicName: top }));
+                                    }}
+                                    className="px-2.5 py-1 bg-white hover:bg-amber-200/90 border border-amber-300 hover:border-amber-500 rounded-lg text-[10px] font-bold text-amber-950 transition-colors shadow-2xs flex items-center gap-1"
+                                  >
+                                    <span>+</span>
+                                    <span>{top}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
                 <div className="flex justify-end pt-2">
                   <button

@@ -446,6 +446,72 @@
       "certificates": [],
       "avatar": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=250",
       "createdAt": "2025-02-01T10:00:00.000Z"
+    },
+    {
+      "id": "u_trainer_1884f632",
+      "name": "Umesh1177puvgec",
+      "email": "umesh1177puvgec@gmail.com",
+      "passwordHash": null,
+      "role": "trainer",
+      "department": "India Meteorological Department",
+      "designation": "Officer",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-10T12:40:26.934Z"
+    },
+    {
+      "id": "u_admin_c632aac8",
+      "name": "Hp1708697",
+      "email": "hp1708697@gmail.com",
+      "passwordHash": null,
+      "role": "admin",
+      "department": "India Meteorological Department",
+      "designation": "Officer",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-10T12:42:43.289Z"
+    },
+    {
+      "id": "u_admin_b49ff613",
+      "name": "Hp1707697",
+      "email": "hp1707697@gmail.com",
+      "passwordHash": null,
+      "role": "admin",
+      "department": "India Meteorological Department",
+      "designation": "Officer",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-10T12:50:04.467Z"
     }
   ],
   "courses": [
@@ -518,7 +584,6 @@
         "Linux & Shell Scripting"
       ],
       "enrolledTraineeIds": [
-        "u_trainee_1",
         "u_trainee_2",
         "u_trainee_3"
       ],
@@ -1069,6 +1134,276 @@
   ],
   "questionBank": [
     {
+      "id": "qb_1e302dfd",
+      "question": "Is it permissible to overload the standard main method ('public static void main(String[] args)') in a Java application designed for atmospheric modeling?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 2,
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "options": [
+        "No, overloading the main method is explicitly forbidden by the Java compiler.",
+        "Yes, the main method can be overloaded, but the JVM automatically invokes only 'main(String[] args)' as the entry point.",
+        "Yes, and the JVM automatically executes all overloaded main methods sequentially upon startup.",
+        "No, static methods in Java cannot be overloaded."
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, static methods (including the 'main' method) can be overloaded like any other method as long as their parameter lists differ. However, the Java Virtual Machine (JVM) specifically looks for 'public static void main(String[] args)' as the standard entry point to start execution."
+    },
+    {
+      "id": "qb_6aad475b",
+      "question": "Consider a Java class for atmospheric data processing containing two overloaded methods: 'void analyze(int gridPoints)' and 'void analyze(double gridPoints)'. If the call 'analyze(100)' is executed, which method will be invoked?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 2,
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "options": [
+        "analyze(double gridPoints), because integer values are automatically converted to double first.",
+        "analyze(int gridPoints), because it provides an exact match for the integer literal parameter.",
+        "Both methods are executed sequentially.",
+        "A compile-time error occurs due to method ambiguity."
+      ],
+      "correctAnswer": 1,
+      "explanation": "When resolving overloaded methods, Java's compiler first searches for an exact match for the provided argument types. Since '100' is an integer literal, it matches 'analyze(int gridPoints)' directly without requiring type promotion to double."
+    },
+    {
+      "id": "qb_a67f0b98",
+      "question": "Method overloading in Java data-processing modules is an example of which form of polymorphism?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 2,
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "options": [
+        "Compile-time polymorphism (Static binding)",
+        "Run-time polymorphism (Dynamic binding)",
+        "Late binding polymorphism",
+        "Deferred dispatch polymorphism"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Method overloading is resolved at compile-time by the Java compiler based on the reference type and signature of the call arguments. Hence, it is known as compile-time polymorphism or static binding."
+    },
+    {
+      "id": "qb_43bed1f0",
+      "question": "Which of the following statements correctly describes the relationship between return types and method overloading in Java?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 2,
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "options": [
+        "Method overloading can be achieved solely by changing the return type of a method.",
+        "Changing only the return type without altering the parameter list causes a compile-time error.",
+        "Overloaded methods are required to return the exact same data type.",
+        "The return type of an overloaded method must always be void."
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, the method signature consists only of the method name and the parameter list; it does not include the return type. Therefore, two methods with identical names and parameter lists but different return types cause a compile-time error because the compiler cannot determine which method to invoke."
+    },
+    {
+      "id": "qb_3f85d4ff",
+      "question": "In Java programming for Numerical Weather Prediction (NWP) software components, method overloading allows a class to contain multiple methods with the same name. What criteria must be satisfied for two methods to be validly overloaded?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 2,
+      "type": "MCQ",
+      "difficulty": "Easy",
+      "options": [
+        "They must have different return types.",
+        "They must have different parameter lists (differing in number, data types, or sequence of parameters).",
+        "They must have different access modifiers (e.g., public vs. private).",
+        "They must throw different types of exceptions."
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Java, method overloading requires that methods share the same name but have distinct parameter lists (also known as method signatures differing in type, count, or order of parameters). Changing only the return type, access modifier, or thrown exceptions is insufficient and results in a compilation error."
+    },
+    {
+      "id": "qb_3a6e535f",
+      "question": "A diagnostic script creates a copy of a nested list representing vertical profile vector pairs: 'wind_profile = [[10, 12], [15, 18], [22, 25]]' using 'copied_profile = wind_profile.copy()'. If 'copied_profile[0][0] = 99' is executed, what happens to the original 'wind_profile'?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "wind_profile[0][0] remains 10 because .copy() creates an isolated deep copy of all nested lists.",
+        "wind_profile[0][0] becomes 99 because .copy() performs a shallow copy, leaving inner mutable lists referenced shared.",
+        "Python raises a TypeError because nested lists become immutable upon shallow copying.",
+        "wind_profile is deleted from the current namespace to avoid pointer ambiguity."
+      ],
+      "correctAnswer": 1,
+      "explanation": "The `.copy()` method on a list creates a shallow copy. The outer list object is duplicated, but references to nested sub-objects (the inner lists) are copied by reference. Modifying an inner mutable list affects both original and copied structures. A deep copy (`copy.deepcopy()`) would be required to prevent this."
+    },
+    {
+      "id": "qb_e6b4454e",
+      "question": "An NWP post-processing pipeline requires an immutable, hashable set of unique diagnostic variable names (e.g., {\"U10M\", \"V10M\", \"T2M\"}) to act as a key inside a global model cache dictionary. Which built-in data type should be used?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "set",
+        "tuple_set",
+        "enum",
+        "frozenset"
+      ],
+      "correctAnswer": 3,
+      "explanation": "While a standard Python 'set' is mutable and unhashable, 'frozenset' is an immutable version of a set. Because it is immutable, a frozenset is hashable and can be used as a dictionary key or set element."
+    },
+    {
+      "id": "qb_edae7082",
+      "question": "Given an ordered vertical pressure coordinate sequence 'pressure_levels = [1000, 925, 850, 700, 500, 300, 200, 100]', which Python slice notation extracts the lower-troposphere pressure levels [850, 700, 500]?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "pressure_levels[2:5]",
+        "pressure_levels[2:4]",
+        "pressure_levels[3:6]",
+        "pressure_levels[1:4]"
+      ],
+      "correctAnswer": 0,
+      "explanation": "Python indexing is 0-based, and slice endpoints are exclusive. Index 2 corresponds to 850, index 3 to 700, and index 4 to 500. Slicing with [2:5] retrieves elements at indices 2, 3, and 4."
+    },
+    {
+      "id": "qb_df4589e2",
+      "question": "When building binary atmospheric masks (e.g., land/sea or cloud/no-cloud masks), logical true/false conditions are evaluated. How does Python's built-in 'bool' type relate structurally to the 'int' type?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "bool is an independent primitive type that cannot be used in numerical arithmetic.",
+        "bool is a subclass of int, where True evaluates to 1 and False evaluates to 0 in arithmetic contexts.",
+        "bool is a subclass of str, storing 'True' as string '1' and 'False' as string '0'.",
+        "bool is a dynamic wrapper around float that treats non-zero floats as True."
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Python, 'bool' is a direct subclass of 'int'. 'True' and 'False' behave like the integers 1 and 0 respectively in arithmetic expressions (e.g., sum([True, False, True]) evaluates to 2)."
+    },
+    {
+      "id": "qb_84811bcf",
+      "question": "A raw binary data stream from an S-band Doppler Weather Radar is ingested into a Python pre-processor. Which standard Python data type provides an IMMUTABLE sequence of raw bytes (integers in range 0 <= x < 256)?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "bytearray",
+        "memoryview",
+        "bytes",
+        "str encoded in UTF-8"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The 'bytes' class in Python is an immutable sequence of single bytes (integers from 0 to 255). Conversely, 'bytearray' is a mutable byte sequence, and 'str' represents Unicode text."
+    },
+    {
+      "id": "qb_add300d6",
+      "question": "In a spectral atmospheric dynamics model using spherical harmonic expansion, wave coefficients require both real and imaginary components. Which native Python built-in data type natively handles numbers containing imaginary units?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "complex type, written using the syntax '3.5 + 2.1j' or instantiated via 'complex(3.5, 2.1)'.",
+        "fourier type, written using the syntax '3.5 + 2.1i' or instantiated via 'fourier(3.5, 2.1)'.",
+        "vector type, instantiated via 'vector(3.5, 2.1)'.",
+        "struct type, instantiated via 'struct(real=3.5, imag=2.1)'."
+      ],
+      "correctAnswer": 0,
+      "explanation": "Python has native built-in support for complex numbers via the 'complex' type. Complex literals use 'j' or 'J' as the imaginary indicator (e.g., 3.5 + 2.1j), and individual components can be accessed via '.real' and '.imag' attributes."
+    },
+    {
+      "id": "qb_743cc8e8",
+      "question": "An NWP data assimilation system needs to evaluate missing weather station IDs by comparing a master set of expected station IDs ('req_ids') against retrieved station IDs ('ret_ids'). Which native Python data structure operation performs this set difference efficiently without explicit loops?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "Converting both sequences to list types and executing req_ids - ret_ids.",
+        "Converting both sequences to tuple types and executing req_ids ^ ret_ids.",
+        "Converting both sequences to dict types and calling req_ids.pop(ret_ids).",
+        "Converting both sequences to set types and executing req_ids - ret_ids or req_ids.difference(ret_ids)."
+      ],
+      "correctAnswer": 3,
+      "explanation": "Python's set data structure supports mathematical set operations such as difference (-), intersection (&), and union (|) optimized via hash table lookups, providing linear average time complexity."
+    },
+    {
+      "id": "qb_27827b03",
+      "question": "When accumulating micro-scale mixing ratio changes over thousands of time steps in a 1D column model using Python built-in float variables, precision drift occurs. What underlying characteristic of Python's standard 'float' type causes this behavior?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "Python float is an arbitrary-precision rational number that truncates at 32-bit thresholds.",
+        "Python float dynamically downcasts to 16-bit half-precision inside numerical loops to save memory.",
+        "Python float is implemented as a IEEE 754 double-precision (64-bit) binary floating-point number, which cannot represent certain decimal fractions exactly.",
+        "Python float stores values using binary-coded decimal (BCD), causing cumulative division errors."
+      ],
+      "correctAnswer": 2,
+      "explanation": "Python's standard float is implemented using C double-precision (64-bit IEEE 754 floating-point standard). Base-2 binary representations cannot perfectly represent base-10 decimal fractions like 0.1, leading to small representation errors that accumulate over repetitive loops."
+    },
+    {
+      "id": "qb_ba77a033",
+      "question": "A meteorologist uses a Python dictionary to index observational weather stations using coordinate pairs (latitude, longitude) as keys. Which property of Python data types allows a tuple of floats to serve as a valid dictionary key, while a list of floats fails?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "Tuples are hashable and immutable objects, whereas lists are mutable and unhashable.",
+        "Tuples are strictly homogeneous sequences, while lists are heterogeneous sequences.",
+        "Tuples use contiguous C-array memory layouts, whereas lists use linked pointers.",
+        "Tuples override equality operations to allow approximate floating-point coordinate matching."
+      ],
+      "correctAnswer": 0,
+      "explanation": "Python dictionary keys must be hashable, requiring an immutable __hash__() value that remains constant throughout the object's lifetime. Tuples containing immutable objects (like floats) are hashable and immutable, whereas lists are mutable and thus unhashable."
+    },
+    {
+      "id": "qb_0e8f056a",
+      "question": "In processing Numerical Weather Prediction (NWP) domain boundaries, why are standard Python tuples preferred over lists for storing fixed geographic coordinate limits such as (lat_min, lon_min, lat_max, lon_max)?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "module": "Module 1",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "Tuples allow dynamic appending during atmospheric model execution, whereas lists are fixed in size.",
+        "Tuples are immutable data structures, preventing accidental runtime modification of spatial domain limits during parallel model execution.",
+        "Tuples automatically convert standard float values to 64-bit IEEE floating-point representations upon instantiation.",
+        "Tuples natively support element-wise mathematical vector operations without requiring NumPy arrays."
+      ],
+      "correctAnswer": 1,
+      "explanation": "In Python, tuples are immutable sequence types. Storing domain boundary limits or grid metadata in tuples guarantees data integrity because their elements cannot be added, removed, or modified after creation, unlike mutable lists."
+    },
+    {
       "id": "qb_c86627f5",
       "question": "IMD operational Doppler Weather Radars (DWR) encounter Doppler velocity aliasing (folding) during severe convective events. In the Py-ART library, which module function provides a region-based phase unwrapping algorithm specifically designed to dealias radial velocity fields?",
       "subjectId": "sub_nwp_01",
@@ -1466,6 +1801,325 @@
     }
   ],
   "quizzes": [
+    {
+      "id": "paper_custom_1789043716908",
+      "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology",
+      "trainerName": "AI Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 10,
+      "passMarks": 5,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-10T12:35:16.954Z",
+      "deadlineTime": "2026-09-17T12:35:16.954Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "questions": [
+        {
+          "id": "ai_q_9dbaabb3",
+          "question": "In Java programming for Numerical Weather Prediction (NWP) software components, method overloading allows a class to contain multiple methods with the same name. What criteria must be satisfied for two methods to be validly overloaded?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "They must have different return types.",
+            "They must have different parameter lists (differing in number, data types, or sequence of parameters).",
+            "They must have different access modifiers (e.g., public vs. private).",
+            "They must throw different types of exceptions."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Java, method overloading requires that methods share the same name but have distinct parameter lists (also known as method signatures differing in type, count, or order of parameters). Changing only the return type, access modifier, or thrown exceptions is insufficient and results in a compilation error.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_f2cda698",
+          "question": "Which of the following statements correctly describes the relationship between return types and method overloading in Java?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Method overloading can be achieved solely by changing the return type of a method.",
+            "Changing only the return type without altering the parameter list causes a compile-time error.",
+            "Overloaded methods are required to return the exact same data type.",
+            "The return type of an overloaded method must always be void."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Java, the method signature consists only of the method name and the parameter list; it does not include the return type. Therefore, two methods with identical names and parameter lists but different return types cause a compile-time error because the compiler cannot determine which method to invoke.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_61d434ea",
+          "question": "Method overloading in Java data-processing modules is an example of which form of polymorphism?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Compile-time polymorphism (Static binding)",
+            "Run-time polymorphism (Dynamic binding)",
+            "Late binding polymorphism",
+            "Deferred dispatch polymorphism"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Method overloading is resolved at compile-time by the Java compiler based on the reference type and signature of the call arguments. Hence, it is known as compile-time polymorphism or static binding.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_cbb16dfc",
+          "question": "Consider a Java class for atmospheric data processing containing two overloaded methods: 'void analyze(int gridPoints)' and 'void analyze(double gridPoints)'. If the call 'analyze(100)' is executed, which method will be invoked?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "analyze(double gridPoints), because integer values are automatically converted to double first.",
+            "analyze(int gridPoints), because it provides an exact match for the integer literal parameter.",
+            "Both methods are executed sequentially.",
+            "A compile-time error occurs due to method ambiguity."
+          ],
+          "correctAnswer": 1,
+          "explanation": "When resolving overloaded methods, Java's compiler first searches for an exact match for the provided argument types. Since '100' is an integer literal, it matches 'analyze(int gridPoints)' directly without requiring type promotion to double.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_0b66294f",
+          "question": "Is it permissible to overload the standard main method ('public static void main(String[] args)') in a Java application designed for atmospheric modeling?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "No, overloading the main method is explicitly forbidden by the Java compiler.",
+            "Yes, the main method can be overloaded, but the JVM automatically invokes only 'main(String[] args)' as the entry point.",
+            "Yes, and the JVM automatically executes all overloaded main methods sequentially upon startup.",
+            "No, static methods in Java cannot be overloaded."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Java, static methods (including the 'main' method) can be overloaded like any other method as long as their parameter lists differ. However, the Java Virtual Machine (JVM) specifically looks for 'public static void main(String[] args)' as the standard entry point to start execution.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        }
+      ]
+    },
+    {
+      "id": "paper_custom_1789043384969",
+      "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology",
+      "trainerName": "AI Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 30,
+      "passMarks": 15,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-10T12:29:45.036Z",
+      "deadlineTime": "2026-09-17T12:29:45.036Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "questions": [
+        {
+          "id": "ai_q_e356330b",
+          "question": "In processing Numerical Weather Prediction (NWP) domain boundaries, why are standard Python tuples preferred over lists for storing fixed geographic coordinate limits such as (lat_min, lon_min, lat_max, lon_max)?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Tuples allow dynamic appending during atmospheric model execution, whereas lists are fixed in size.",
+            "Tuples are immutable data structures, preventing accidental runtime modification of spatial domain limits during parallel model execution.",
+            "Tuples automatically convert standard float values to 64-bit IEEE floating-point representations upon instantiation.",
+            "Tuples natively support element-wise mathematical vector operations without requiring NumPy arrays."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Python, tuples are immutable sequence types. Storing domain boundary limits or grid metadata in tuples guarantees data integrity because their elements cannot be added, removed, or modified after creation, unlike mutable lists.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_8b2a07c7",
+          "question": "A meteorologist uses a Python dictionary to index observational weather stations using coordinate pairs (latitude, longitude) as keys. Which property of Python data types allows a tuple of floats to serve as a valid dictionary key, while a list of floats fails?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Tuples are hashable and immutable objects, whereas lists are mutable and unhashable.",
+            "Tuples are strictly homogeneous sequences, while lists are heterogeneous sequences.",
+            "Tuples use contiguous C-array memory layouts, whereas lists use linked pointers.",
+            "Tuples override equality operations to allow approximate floating-point coordinate matching."
+          ],
+          "correctAnswer": 0,
+          "explanation": "Python dictionary keys must be hashable, requiring an immutable __hash__() value that remains constant throughout the object's lifetime. Tuples containing immutable objects (like floats) are hashable and immutable, whereas lists are mutable and thus unhashable.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_2782611e",
+          "question": "When accumulating micro-scale mixing ratio changes over thousands of time steps in a 1D column model using Python built-in float variables, precision drift occurs. What underlying characteristic of Python's standard 'float' type causes this behavior?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Python float is an arbitrary-precision rational number that truncates at 32-bit thresholds.",
+            "Python float dynamically downcasts to 16-bit half-precision inside numerical loops to save memory.",
+            "Python float is implemented as a IEEE 754 double-precision (64-bit) binary floating-point number, which cannot represent certain decimal fractions exactly.",
+            "Python float stores values using binary-coded decimal (BCD), causing cumulative division errors."
+          ],
+          "correctAnswer": 2,
+          "explanation": "Python's standard float is implemented using C double-precision (64-bit IEEE 754 floating-point standard). Base-2 binary representations cannot perfectly represent base-10 decimal fractions like 0.1, leading to small representation errors that accumulate over repetitive loops.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_aaeb62f2",
+          "question": "An NWP data assimilation system needs to evaluate missing weather station IDs by comparing a master set of expected station IDs ('req_ids') against retrieved station IDs ('ret_ids'). Which native Python data structure operation performs this set difference efficiently without explicit loops?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Converting both sequences to list types and executing req_ids - ret_ids.",
+            "Converting both sequences to tuple types and executing req_ids ^ ret_ids.",
+            "Converting both sequences to dict types and calling req_ids.pop(ret_ids).",
+            "Converting both sequences to set types and executing req_ids - ret_ids or req_ids.difference(ret_ids)."
+          ],
+          "correctAnswer": 3,
+          "explanation": "Python's set data structure supports mathematical set operations such as difference (-), intersection (&), and union (|) optimized via hash table lookups, providing linear average time complexity.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_0d9af6dc",
+          "question": "In a spectral atmospheric dynamics model using spherical harmonic expansion, wave coefficients require both real and imaginary components. Which native Python built-in data type natively handles numbers containing imaginary units?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "complex type, written using the syntax '3.5 + 2.1j' or instantiated via 'complex(3.5, 2.1)'.",
+            "fourier type, written using the syntax '3.5 + 2.1i' or instantiated via 'fourier(3.5, 2.1)'.",
+            "vector type, instantiated via 'vector(3.5, 2.1)'.",
+            "struct type, instantiated via 'struct(real=3.5, imag=2.1)'."
+          ],
+          "correctAnswer": 0,
+          "explanation": "Python has native built-in support for complex numbers via the 'complex' type. Complex literals use 'j' or 'J' as the imaginary indicator (e.g., 3.5 + 2.1j), and individual components can be accessed via '.real' and '.imag' attributes.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_73cc90ef",
+          "question": "A raw binary data stream from an S-band Doppler Weather Radar is ingested into a Python pre-processor. Which standard Python data type provides an IMMUTABLE sequence of raw bytes (integers in range 0 <= x < 256)?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "bytearray",
+            "memoryview",
+            "bytes",
+            "str encoded in UTF-8"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The 'bytes' class in Python is an immutable sequence of single bytes (integers from 0 to 255). Conversely, 'bytearray' is a mutable byte sequence, and 'str' represents Unicode text.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_dadd8685",
+          "question": "When building binary atmospheric masks (e.g., land/sea or cloud/no-cloud masks), logical true/false conditions are evaluated. How does Python's built-in 'bool' type relate structurally to the 'int' type?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "bool is an independent primitive type that cannot be used in numerical arithmetic.",
+            "bool is a subclass of int, where True evaluates to 1 and False evaluates to 0 in arithmetic contexts.",
+            "bool is a subclass of str, storing 'True' as string '1' and 'False' as string '0'.",
+            "bool is a dynamic wrapper around float that treats non-zero floats as True."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Python, 'bool' is a direct subclass of 'int'. 'True' and 'False' behave like the integers 1 and 0 respectively in arithmetic expressions (e.g., sum([True, False, True]) evaluates to 2).",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_41b87518",
+          "question": "Given an ordered vertical pressure coordinate sequence 'pressure_levels = [1000, 925, 850, 700, 500, 300, 200, 100]', which Python slice notation extracts the lower-troposphere pressure levels [850, 700, 500]?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "pressure_levels[2:5]",
+            "pressure_levels[2:4]",
+            "pressure_levels[3:6]",
+            "pressure_levels[1:4]"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Python indexing is 0-based, and slice endpoints are exclusive. Index 2 corresponds to 850, index 3 to 700, and index 4 to 500. Slicing with [2:5] retrieves elements at indices 2, 3, and 4.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_ea93747e",
+          "question": "An NWP post-processing pipeline requires an immutable, hashable set of unique diagnostic variable names (e.g., {\"U10M\", \"V10M\", \"T2M\"}) to act as a key inside a global model cache dictionary. Which built-in data type should be used?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "set",
+            "tuple_set",
+            "enum",
+            "frozenset"
+          ],
+          "correctAnswer": 3,
+          "explanation": "While a standard Python 'set' is mutable and unhashable, 'frozenset' is an immutable version of a set. Because it is immutable, a frozenset is hashable and can be used as a dictionary key or set element.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        },
+        {
+          "id": "ai_q_efebd4b9",
+          "question": "A diagnostic script creates a copy of a nested list representing vertical profile vector pairs: 'wind_profile = [[10, 12], [15, 18], [22, 25]]' using 'copied_profile = wind_profile.copy()'. If 'copied_profile[0][0] = 99' is executed, what happens to the original 'wind_profile'?",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "wind_profile[0][0] remains 10 because .copy() creates an isolated deep copy of all nested lists.",
+            "wind_profile[0][0] becomes 99 because .copy() performs a shallow copy, leaving inner mutable lists referenced shared.",
+            "Python raises a TypeError because nested lists become immutable upon shallow copying.",
+            "wind_profile is deleted from the current namespace to avoid pointer ambiguity."
+          ],
+          "correctAnswer": 1,
+          "explanation": "The `.copy()` method on a list creates a shallow copy. The outer list object is duplicated, but references to nested sub-objects (the inner lists) are copied by reference. Modifying an inner mutable list affects both original and copied structures. A deep copy (`copy.deepcopy()`) would be required to prevent this.",
+          "generatedByAI": true,
+          "aiModel": "Google Gemini Flash (gemini-3.6-flash)"
+        }
+      ]
+    },
     {
       "id": "paper_custom_1789043032690",
       "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
@@ -2729,6 +3383,50 @@
     }
   ],
   "quizSubmissions": [
+    {
+      "id": "subm_8e14e8ea",
+      "quizId": "paper_custom_1789043716908",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 10,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 38,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-10T12:37:13.423Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
+    {
+      "id": "subm_f4dfedd4",
+      "quizId": "paper_custom_1789043384969",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 30,
+      "percentage": 0,
+      "passed": false,
+      "timeTakenSeconds": 62,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-10T12:34:27.693Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null
+    },
     {
       "id": "subm_44e6087d",
       "quizId": "paper_custom_1789043032690",

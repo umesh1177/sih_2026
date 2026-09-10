@@ -166,74 +166,79 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
     setExpandedSubject(newSub.id);
   };
 
-  const updateSubject = (subId, key, val) => {
-    setForm(prev => ({
-      ...prev,
-      subjects: prev.subjects.map(s => s.id === subId ? { ...s, [key]: val } : s)
-    }));
-  };
-
-  const removeSubject = (subId) => {
-    setForm(prev => ({ ...prev, subjects: prev.subjects.filter(s => s.id !== subId) }));
-  };
-
-  // Module actions
-  const addModule = (subId) => {
-    const currentSubject = form.subjects.find(s => s.id === subId);
-    const modCount = currentSubject?.modules?.length || 0;
-    const newMod = {
-      id: `mod_${uuidv4().substring(0, 8)}`,
-      title: `Module ${modCount + 1}: Technical Lecture & Operational Protocols`,
-      duration: "1 Week",
-      materials: []
-    };
-    setForm(prev => ({
-      ...prev,
-      subjects: prev.subjects.map(s => s.id === subId ? { ...s, modules: [...(s.modules || []), newMod] } : s)
-    }));
-  };
-
-  const updateModule = (subId, modId, val) => {
-    setForm(prev => ({
-      ...prev,
-      subjects: prev.subjects.map(s => s.id === subId ? {
-        ...s,
-        modules: s.modules.map(m => m.id === modId ? { ...m, title: val } : m)
-      } : s)
-    }));
-  };
-
-  const removeModule = (subId, modId) => {
-    setForm(prev => ({
-      ...prev,
-      subjects: prev.subjects.map(s => s.id === subId ? {
-        ...s,
-        modules: s.modules.filter(m => m.id !== modId)
-      } : s)
-    }));
-  };
-
   // Competency Matrix Trainer Suggestion Matcher
   const getSuggestedTrainersForSubject = (subject) => {
     const searchTerms = [
-      subject.name, 
-      subject.description, 
-      subject.requiredSkills, 
-      form.category
+      subject.name || "", 
+      subject.description || "", 
+      subject.requiredSkills || "", 
+      form.category || ""
     ].join(" ").toLowerCase();
 
+    const domainKeywords = {
+      nwp: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equations", "modeling", "model", "assimilation", "4d-var", "hpc", "fluid", "grid", "arakawa", "primitive", "dispersion", "atmospheric"],
+      radar: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing"],
+      cyclone: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "warning"],
+      agri: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "plant"],
+      climate: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "projection", "seasonal"]
+    };
+
     return trainersWorkload.map(tw => {
-      let matchScore = 50;
-      (tw.skills || []).forEach(sk => {
-        if (searchTerms.includes(sk.toLowerCase())) matchScore += 20;
+      let matchScore = 42;
+      const trainerSkills = [
+        ...(tw.skills || []),
+        ...(tw.specialization || []),
+        tw.department || "",
+        tw.trainerName || "",
+        tw.designation || ""
+      ].join(" ").toLowerCase();
+
+      // Check domain alignment
+      Object.entries(domainKeywords).forEach(([domain, words]) => {
+        const hasTopic = words.some(w => searchTerms.includes(w));
+        const hasTrainerSkill = words.some(w => trainerSkills.includes(w));
+        if (hasTopic && hasTrainerSkill) {
+          matchScore += 45;
+        }
       });
-      if (tw.department?.toLowerCase().includes(form.category.toLowerCase().split(" ")[0])) matchScore += 15;
+
+      // Token matching
+      const tokens = searchTerms.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
+      tokens.forEach(token => {
+        if (trainerSkills.includes(token)) {
+          matchScore += 12;
+        }
+      });
+
+      if (tw.department?.toLowerCase().includes(form.category.toLowerCase().split(" ")[0])) {
+        matchScore += 8;
+      }
 
       return {
         ...tw,
-        matchScore: Math.min(99, matchScore)
+        matchScore: Math.min(Math.max(matchScore, 45), 99)
       };
     }).sort((a, b) => b.matchScore - a.matchScore);
+  };
+
+  const updateSubject = (subId, key, val) => {
+    setForm(prev => {
+      const updatedSubjects = prev.subjects.map(s => {
+        if (s.id !== subId) return s;
+        const updated = { ...s, [key]: val };
+
+        // If subject name or skills changed and user hasn't manually locked trainer, auto-assign top suggested
+        if (key === "name" || key === "requiredSkills") {
+          const suggestions = getSuggestedTrainersForSubject(updated);
+          if (suggestions.length > 0 && !s.isManuallyAssigned) {
+            updated.assignedTrainerId = suggestions[0].trainerId;
+            updated.assignedTrainerName = suggestions[0].trainerName;
+          }
+        }
+        return updated;
+      });
+      return { ...prev, subjects: updatedSubjects };
+    });
   };
 
   const handleSubmit = async () => {
@@ -564,8 +569,15 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                             <div 
                               key={tw.trainerId}
                               onClick={() => {
-                                updateSubject(subject.id, "assignedTrainerId", tw.trainerId);
-                                updateSubject(subject.id, "assignedTrainerName", tw.trainerName);
+                                setForm(prev => ({
+                                  ...prev,
+                                  subjects: prev.subjects.map(s => s.id === subject.id ? {
+                                    ...s,
+                                    assignedTrainerId: tw.trainerId,
+                                    assignedTrainerName: tw.trainerName,
+                                    isManuallyAssigned: true
+                                  } : s)
+                                }));
                               }}
                               className={`p-3 rounded-xl border cursor-pointer transition-all flex items-start justify-between gap-2.5 ${
                                 isAssigned 
