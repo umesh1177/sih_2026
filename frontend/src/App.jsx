@@ -14,12 +14,14 @@ import { CourseOverviewPage } from "./components/courses/CourseOverviewPage";
 import { PrerequisiteCheckModal } from "./components/courses/PrerequisiteCheckModal";
 import { AiCourseAdvisorModal } from "./components/courses/AiCourseAdvisorModal";
 import { CreateCourseModal } from "./components/courses/CreateCourseModal";
-import { ProfessionalProfileModal } from "./components/profile/ProfessionalProfileModal";
 import { OfficerProfileView } from "./components/profile/OfficerProfileView";
 import { CredentialsCertificationsView } from "./components/certificates/CredentialsCertificationsView";
 import { CertificateModal } from "./components/profile/CertificateModal";
 import { CompetencyMatrixView } from "./components/admin/CompetencyMatrixView";
 import { UserApprovalQueue } from "./components/admin/UserApprovalQueue";
+import { CredentialVerificationView } from "./components/admin/CredentialVerificationView";
+import { OrganizationStructureView } from "./components/admin/OrganizationStructureView";
+import { AuditLogView } from "./components/admin/AuditLogView";
 import { BroadcastManagerModal } from "./components/admin/BroadcastManagerModal";
 import { TraineeDashboardView } from "./components/dashboard/TraineeDashboardView";
 import { TrainerDashboardView } from "./components/dashboard/TrainerDashboardView";
@@ -29,45 +31,43 @@ import { TrainerCurriculumStudio } from "./components/trainer/TrainerCurriculumS
 import { TrainerScheduleAssessmentView } from "./components/trainer/TrainerScheduleAssessmentView";
 import { PublicHomePage } from "./pages/PublicHomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { PublicCertificateVerifyPage } from "./pages/PublicCertificateVerifyPage";
 import { api } from "./services/api";
 import { 
-  BookOpen, 
-  Layers, 
-  Award, 
-  Sparkles, 
   Plus, 
   BarChart3, 
-  ClipboardList, 
-  BellRing,
-  UserCheck,
-  CheckCircle2,
-  X,
-  PlayCircle,
-  FileText
+  X
 } from "lucide-react";
 
 const MainApp = () => {
-  const { currentUser, switchAccount, demoAccounts } = useAuth();
+  const { currentUser, refreshProfile } = useAuth();
   
-  // Navigation & Page views
-  const [viewMode, setViewMode] = useState("portal"); // "landing" | "login" | "portal"
+  // Rule 16 Navigation: If authenticated -> portal; if not -> landing
+  const [viewMode, setViewMode] = useState(() => (currentUser ? "portal" : "landing"));
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // Course Overview (Matching iGOT style) and Learning Studio
+  // Keep viewMode synced if user logs in or out
+  useEffect(() => {
+    if (!currentUser && viewMode === "portal") {
+      setViewMode("landing");
+    }
+  }, [currentUser]);
+
+  // Course Overview and Learning Studio
   const [selectedOverviewCourse, setSelectedOverviewCourse] = useState(null);
   const [activeStudioCourse, setActiveStudioCourse] = useState(null);
-  const [activeTrainerStudioCourse, setActiveTrainerStudioCourse] = useState(null); // { course, subjectId }
+  const [activeTrainerStudioCourse, setActiveTrainerStudioCourse] = useState(null);
 
-  // Active Modals & Fullscreen states
+  // Active Modals & Exam states
   const [activeExamQuiz, setActiveExamQuiz] = useState(null);
   const [selectedQuizAnalyticsId, setSelectedQuizAnalyticsId] = useState(null);
   const [certificateData, setCertificateData] = useState(null);
+  const [verifyCertificateCode, setVerifyCertificateCode] = useState("");
   
   const [prereqModalCourse, setPrereqModalCourse] = useState(null);
   const [isAiCourseAdvisorOpen, setIsAiCourseAdvisorOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [showAnnouncementsModal, setShowAnnouncementsModal] = useState(false);
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
@@ -85,9 +85,9 @@ const MainApp = () => {
         api.getQuizzes(),
         api.getAnnouncements()
       ]);
-      if (cRes.success) setCourses(cRes.courses);
-      if (qRes.success) setQuizzes(qRes.quizzes);
-      if (aRes.success) setAnnouncements(aRes.announcements);
+      if (cRes.success) setCourses(cRes.courses || []);
+      if (qRes.success) setQuizzes(qRes.quizzes || []);
+      if (aRes.success) setAnnouncements(aRes.announcements || []);
     } catch (err) {
       console.error("Global data refresh failed:", err);
     }
@@ -99,10 +99,9 @@ const MainApp = () => {
 
   const handleEnrollCourseSuccess = async (courseId) => {
     try {
-      const res = await api.enrollCourse(courseId, currentUser?.id || "u_trainee_1");
+      const res = await api.enrollCourse(courseId);
       if (res.success) {
         await refreshGlobalData();
-        // Update selected overview course state if open
         if (selectedOverviewCourse && selectedOverviewCourse.id === courseId) {
           setSelectedOverviewCourse(prev => ({
             ...prev,
@@ -115,12 +114,16 @@ const MainApp = () => {
     }
   };
 
-  // Landing page view
+  // 1. Landing page view (Rule 16: Public Default)
   if (viewMode === "landing") {
     return (
       <PublicHomePage
-        onEnterPortal={() => setViewMode("portal")}
+        onEnterPortal={() => setViewMode(currentUser ? "portal" : "login")}
         onOpenLoginPage={() => setViewMode("login")}
+        onOpenVerifyCertificate={(code) => {
+          setVerifyCertificateCode(code || "");
+          setViewMode("verify-cert");
+        }}
         onOpenCourse={(c) => {
           setSelectedOverviewCourse(c);
           setViewMode("portal");
@@ -129,11 +132,21 @@ const MainApp = () => {
     );
   }
 
-  // Dedicated Login / Register page
+  // 2. Dedicated Login / Register page
   if (viewMode === "login") {
     return (
       <LoginPage
         onLoginSuccess={() => setViewMode("portal")}
+        onBack={() => setViewMode("landing")}
+      />
+    );
+  }
+
+  // 3. Public Certificate Verification page
+  if (viewMode === "verify-cert") {
+    return (
+      <PublicCertificateVerifyPage
+        initialCode={verifyCertificateCode}
         onBack={() => setViewMode("landing")}
       />
     );
@@ -172,7 +185,7 @@ const MainApp = () => {
     );
   }
 
-  // If Full-Tab Course Studio is active -> Render full studio in the portal tab!
+  // If Full-Tab Course Studio is active -> Render full studio
   if (activeStudioCourse) {
     return (
       <div className="flex h-screen bg-[#f8fafc] text-slate-800 font-sans overflow-hidden select-none">
@@ -197,7 +210,7 @@ const MainApp = () => {
     );
   }
 
-  // If Course Overview Page (Matching shared photo) is selected -> Render Course Overview Page!
+  // If Course Overview Page is selected
   if (selectedOverviewCourse) {
     return (
       <div className="flex h-screen bg-white text-slate-800 font-sans overflow-hidden select-none">
@@ -226,7 +239,6 @@ const MainApp = () => {
           />
         </div>
 
-        {/* Prerequisite Skill Check Modal */}
         {prereqModalCourse && (
           <PrerequisiteCheckModal
             isOpen={!!prereqModalCourse}
@@ -266,7 +278,7 @@ const MainApp = () => {
 
         {/* Dynamic Tab Pane */}
         <main className="flex-1 overflow-y-auto">
-          {/* 1. DASHBOARD VIEW (Role specific) */}
+          {/* 1. DASHBOARD VIEW (Role-Specific) */}
           {activeTab === "dashboard" && (
             <>
               {currentUser?.role === "trainee" && (
@@ -303,16 +315,18 @@ const MainApp = () => {
               {currentUser?.role === "admin" && (
                 <AdminDashboardView
                   onOpenApprovals={() => setActiveTab("approvals")}
+                  onOpenCredentialVerification={() => setActiveTab("credential-verification")}
+                  onOpenOrgStructure={() => setActiveTab("org-structure")}
                   onOpenCompetency={() => setActiveTab("competency")}
                   onOpenAnnouncements={() => setIsBroadcastModalOpen(true)}
                   onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
-                  onOpenAnalytics={() => setActiveTab("analytics")}
+                  onOpenAuditLogs={() => setActiveTab("audit-logs")}
                 />
               )}
             </>
           )}
 
-          {/* 2. CONTENT LIBRARY (Trainer Media & Learning Materials Repository) */}
+          {/* 2. CONTENT LIBRARY (Trainer Media & Learning Materials) */}
           {activeTab === "content-library" && (
             <ContentLibraryView
               currentUser={currentUser}
@@ -324,7 +338,7 @@ const MainApp = () => {
             />
           )}
 
-          {/* 3. QUESTION BANK */}
+          {/* 3. QUESTION BANK (Trainer & Admin Only) */}
           {activeTab === "questions" && (
             <div className="p-6 space-y-6">
               <QuestionBankTable
@@ -335,7 +349,7 @@ const MainApp = () => {
             </div>
           )}
 
-          {/* 3. TRAINER SCHEDULE ASSESSMENT (Dedicated Comprehensive Module) */}
+          {/* 4. TRAINER SCHEDULE ASSESSMENT */}
           {(activeTab === "schedule-assessment" || (currentUser?.role === "trainer" && activeTab === "quizzes")) && (
             <TrainerScheduleAssessmentView
               currentUser={currentUser}
@@ -347,7 +361,7 @@ const MainApp = () => {
             />
           )}
 
-          {/* 4. SCHEDULED QUIZZES & ASSESSMENTS */}
+          {/* 5. SCHEDULED QUIZZES & ASSESSMENTS */}
           {((activeTab === "quizzes" && currentUser?.role !== "trainer") || activeTab === "trainee-quizzes") && (
             currentUser?.role === "trainee" ? (
               <TraineeAssessmentsView
@@ -360,7 +374,7 @@ const MainApp = () => {
                 <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
                     <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                      Assessment Operations & Kiosk Scheduling
+                      Assessment Operations & Controlled Kiosk Mode
                     </h1>
                     <p className="text-xs text-slate-500 mt-0.5">
                       Create timed MCQ evaluations with strict start windows, pass marks, and automated grading.
@@ -375,7 +389,6 @@ const MainApp = () => {
                   </button>
                 </div>
 
-                {/* Trainer / Admin Quizzes List */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {quizzes.map(quiz => (
                     <div key={quiz.id} className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
@@ -414,7 +427,7 @@ const MainApp = () => {
             )
           )}
 
-          {/* 4. COURSES & SUBJECTS CATALOG (Rich Filtered View) */}
+          {/* 6. COURSES & SUBJECTS CATALOG */}
           {(activeTab === "courses" || activeTab === "subjects" || activeTab === "my-learning") && (
             <CourseCatalogView
               courses={courses}
@@ -425,13 +438,22 @@ const MainApp = () => {
             />
           )}
 
-          {/* 5. COMPETENCY MAPPING */}
+          {/* 7. COMPETENCY MAPPING (Phase 6) */}
           {activeTab === "competency" && <CompetencyMatrixView />}
 
-          {/* 6. USER APPROVALS */}
+          {/* 8. OFFICER APPROVALS (Phase 1 & 2) */}
           {activeTab === "approvals" && <UserApprovalQueue />}
 
-          {/* 7. CERTIFICATIONS & CREDENTIALS SHOWCASE */}
+          {/* 9. CREDENTIAL VERIFICATION (Phase 7) */}
+          {activeTab === "credential-verification" && <CredentialVerificationView />}
+
+          {/* 10. ORGANIZATION STRUCTURE (Phase 3) */}
+          {activeTab === "org-structure" && <OrganizationStructureView />}
+
+          {/* 11. GOVERNANCE AUDIT LOGS (Phase 9) */}
+          {activeTab === "audit-logs" && <AuditLogView />}
+
+          {/* 12. CERTIFIED CREDENTIALS SHOWCASE */}
           {activeTab === "certificates" && (
             <CredentialsCertificationsView
               currentUser={currentUser}
@@ -441,7 +463,7 @@ const MainApp = () => {
             />
           )}
 
-          {/* 8. OFFICER PROFESSIONAL PROFILE (DIRECT PAGE VIEW - NO MODAL REQUIRED) */}
+          {/* 13. OFFICER PROFESSIONAL PROFILE */}
           {activeTab === "profile" && (
             <OfficerProfileView
               onOpenCertificate={(submission, courseTitle, traineeName) => {
@@ -452,7 +474,7 @@ const MainApp = () => {
         </main>
       </div>
 
-      {/* FULLSCREEN KIOSK EXAM OVERLAY */}
+      {/* FULLSCREEN CONTROLLED KIOSK EXAM OVERLAY (Phase 5) */}
       {activeExamQuiz && (
         <KioskExamMode
           quiz={activeExamQuiz}
@@ -475,6 +497,7 @@ const MainApp = () => {
           onEnrollSuccess={handleEnrollCourseSuccess}
           onOpenProfile={() => {
             setPrereqModalCourse(null);
+            setSelectedOverviewCourse(null);
             setActiveTab("profile");
           }}
         />
@@ -490,7 +513,7 @@ const MainApp = () => {
         onEnrollCourse={(course) => setPrereqModalCourse(course)}
       />
 
-      {/* Other Modals */}
+      {/* AI Question Modal */}
       <AiQuestionModal
         isOpen={isAiModalOpen}
         onClose={() => setIsAiModalOpen(false)}
@@ -500,6 +523,7 @@ const MainApp = () => {
         }}
       />
 
+      {/* Quiz Schedule Modal */}
       <QuizScheduleModal
         isOpen={isScheduleModalOpen}
         currentUser={currentUser}
@@ -507,17 +531,14 @@ const MainApp = () => {
         onQuizCreated={() => refreshGlobalData()}
       />
 
+      {/* Quiz Analytics Modal */}
       <QuizAnalyticsModal
         isOpen={!!selectedQuizAnalyticsId}
         quizId={selectedQuizAnalyticsId}
         onClose={() => setSelectedQuizAnalyticsId(null)}
       />
 
-      <ProfessionalProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-      />
-
+      {/* Certificate Modal */}
       <CertificateModal
         isOpen={!!certificateData}
         submission={certificateData?.submission}
@@ -526,12 +547,14 @@ const MainApp = () => {
         onClose={() => setCertificateData(null)}
       />
 
+      {/* Broadcast Manager Modal */}
       <BroadcastManagerModal
         isOpen={isBroadcastModalOpen}
         onClose={() => setIsBroadcastModalOpen(false)}
         onPublished={() => refreshGlobalData()}
       />
 
+      {/* Create Course Modal */}
       <CreateCourseModal
         isOpen={isCreateCourseModalOpen}
         onClose={() => setIsCreateCourseModalOpen(false)}

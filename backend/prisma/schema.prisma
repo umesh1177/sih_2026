@@ -1,0 +1,592 @@
+// Prisma Schema for CAPACITY CONNECT - MoES / IMD LMS Portal
+// Problem Statement ID: 26075 | Theme: Smart Education
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───
+enum Role {
+  trainee
+  trainer
+  admin
+}
+
+enum AccountStatus {
+  pending
+  approved
+  rejected
+  disabled
+}
+
+enum AdminScope {
+  ORGANIZATION
+  DEPARTMENT
+  CENTRE
+}
+
+enum CredentialStatus {
+  SELF_DECLARED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum CompetencyLevel {
+  LEVEL_1_BASIC
+  LEVEL_2_INTERMEDIATE
+  LEVEL_3_ADVANCED
+  LEVEL_4_EXPERT
+}
+
+enum AssessmentStatus {
+  draft
+  published
+  archived
+}
+
+enum AttemptStatus {
+  in_progress
+  submitted
+  evaluated
+}
+
+enum AvailabilityStatus {
+  available
+  partially_available
+  unavailable
+}
+
+// ─── 1. Organization & Hierarchy ───
+model Organization {
+  id          String       @id @default(uuid())
+  code        String       @unique // e.g. "MOES", "IMD"
+  name        String
+  description String?
+  website     String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  departments Department[]
+  users       User[]
+  courses     Course[]
+  auditLogs   AuditLog[]
+
+  @@map("organizations")
+}
+
+model Department {
+  id             String       @id @default(uuid())
+  organizationId String
+  code           String       // e.g. "NWP", "DWR", "CYC"
+  name           String
+  centreName     String?      // e.g. "IMD HQ New Delhi", "RMC Chennai"
+  location       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users          User[]
+  courses        Course[]
+  auditLogs      AuditLog[]
+
+  @@unique([organizationId, code])
+  @@map("departments")
+}
+
+// ─── 2. Users & Profiles ───
+model User {
+  id             String        @id @default(uuid())
+  employeeId     String        @unique // Official Employee ID
+  email          String        @unique
+  passwordHash   String
+  name           String
+  phone          String?
+  role           Role          @default(trainee)
+  status         AccountStatus @default(pending)
+  designation    String
+  organizationId String
+  departmentId   String
+  adminScope     AdminScope?   @default(DEPARTMENT)
+  avatar         String?
+  approvalNotes  String?
+  approvedById   String?
+  approvedAt     DateTime?
+  disabledAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  department     Department    @relation(fields: [departmentId], references: [id])
+
+  traineeProfile TraineeProfile?
+  trainerProfile TrainerProfile?
+  
+  enrollments    Enrollment[]
+  attempts       AssessmentAttempt[]
+  feedbacks      Feedback[]
+  certificates   Certificate[]
+  notifications  Notification[]
+  auditLogs      AuditLog[]    @relation("UserAuditLogs")
+  
+  leadCourses    Course[]      @relation("LeadTrainerCourses")
+  trainerCourses CourseTrainer[]
+  availabilities TrainerAvailability[]
+
+  @@index([email])
+  @@index([employeeId])
+  @@index([role, status])
+  @@map("users")
+}
+
+model TraineeProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  interests       String[]
+  skills          String[]
+  qualifications  String[]
+  experienceNotes String?
+  bio             String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("trainee_profiles")
+}
+
+model TrainerProfile {
+  id              String             @id @default(uuid())
+  userId          String             @unique
+  specializations String[]
+  bio             String?
+  yearsExperience Float              @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  competencies    TrainerCompetency[]
+  credentials     Credential[]
+  workExperiences WorkExperience[]
+
+  @@map("trainer_profiles")
+}
+
+// ─── 3. Competencies & Mapping Framework ───
+model Competency {
+  id          String          @id @default(uuid())
+  code        String          @unique // e.g. "COMP_NWP_01"
+  name        String
+  category    String          // e.g. "Numerical Weather Prediction", "Radar Meteorology"
+  description String
+  active      Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  trainerCompetencies TrainerCompetency[]
+  courseRequirements  CourseCompetencyRequirement[]
+
+  @@map("competencies")
+}
+
+model TrainerCompetency {
+  id                 String           @id @default(uuid())
+  trainerProfileId   String
+  competencyId       String
+  claimedLevel       CompetencyLevel  @default(LEVEL_1_BASIC)
+  verifiedLevel      CompetencyLevel?
+  verificationStatus CredentialStatus @default(SELF_DECLARED)
+  verifiedById       String?
+  verifiedAt         DateTime?
+  verificationNotes  String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  trainerProfile     TrainerProfile   @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
+  competency         Competency       @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+
+  @@unique([trainerProfileId, competencyId])
+  @@map("trainer_competencies")
+}
+
+model Credential {
+  id                 String           @id @default(uuid())
+  trainerProfileId   String
+  credentialType     String           // "Certification", "Degree", "Training Qualification"
+  title              String
+  issuer             String
+  credentialNumber   String?
+  issueDate          DateTime
+  expiryDate         DateTime?
+  claimedLevel       CompetencyLevel  @default(LEVEL_2_INTERMEDIATE)
+  documentUrl        String?          // Cloudinary / Object Storage URL
+  verificationStatus CredentialStatus @default(PENDING)
+  verifiedById       String?
+  verifiedAt         DateTime?
+  verificationNotes  String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  trainerProfile     TrainerProfile   @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
+
+  @@map("credentials")
+}
+
+model WorkExperience {
+  id                 String           @id @default(uuid())
+  trainerProfileId   String
+  organization       String
+  designation        String
+  domain             String           // e.g. "Radar Meteorology", "Cyclone Tracking"
+  startDate          DateTime
+  endDate            DateTime?
+  currentlyWorking   Boolean          @default(false)
+  documentUrl        String?
+  verificationStatus CredentialStatus @default(PENDING)
+  verifiedById       String?
+  verifiedAt         DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  trainerProfile     TrainerProfile   @relation(fields: [trainerProfileId], references: [id], onDelete: Cascade)
+
+  @@map("work_experiences")
+}
+
+model TrainerAvailability {
+  id          String             @id @default(uuid())
+  trainerId   String
+  startDate   DateTime
+  endDate     DateTime
+  status      AvailabilityStatus @default(available)
+  notes       String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  trainer     User               @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@map("trainer_availabilities")
+}
+
+// ─── 4. Courses & Curriculum ───
+model Course {
+  id                 String       @id @default(uuid())
+  code               String       @unique // e.g. "MOES-IMD-NWP-101"
+  title              String
+  category           String
+  level              String       @default("Intermediate")
+  duration           String       @default("4 Weeks")
+  creditHours        Int          @default(3)
+  organizationId     String
+  departmentId       String
+  leadTrainerId      String?
+  description        String
+  prerequisites      String[]
+  thumbnail          String?
+  isPublished        Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id])
+  department         Department   @relation(fields: [departmentId], references: [id])
+  leadTrainer        User?        @relation("LeadTrainerCourses", fields: [leadTrainerId], references: [id])
+
+  competencyRequirements CourseCompetencyRequirement[]
+  trainers               CourseTrainer[]
+  subjects               Subject[]
+  enrollments            Enrollment[]
+  assessments            Assessment[]
+  feedbacks              Feedback[]
+  certificates           Certificate[]
+
+  @@map("courses")
+}
+
+model CourseCompetencyRequirement {
+  id            String          @id @default(uuid())
+  courseId      String
+  competencyId  String
+  requiredLevel CompetencyLevel @default(LEVEL_2_INTERMEDIATE)
+  mandatory     Boolean         @default(true)
+  weight        Float           @default(1.0)
+
+  course        Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  competency    Competency      @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, competencyId])
+  @@map("course_competency_requirements")
+}
+
+model CourseTrainer {
+  id        String   @id @default(uuid())
+  courseId  String
+  trainerId String
+  assignedAt DateTime @default(now())
+
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  trainer   User     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, trainerId])
+  @@map("course_trainers")
+}
+
+model Subject {
+  id          String    @id @default(uuid())
+  courseId    String
+  name        String
+  description String?
+  orderIndex  Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  modules     Module[]
+
+  @@map("subjects")
+}
+
+model Module {
+  id          String             @id @default(uuid())
+  subjectId   String
+  title       String
+  duration    String             @default("2 Hours")
+  description String?
+  mandatory   Boolean            @default(true)
+  orderIndex  Int                @default(1)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  subject     Subject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  materials   LearningMaterial[]
+
+  @@map("modules")
+}
+
+model LearningMaterial {
+  id             String   @id @default(uuid())
+  moduleId       String
+  title          String
+  type           String   // "pdf", "video", "ppt", "manual"
+  format         String?
+  url            String
+  duration       String?
+  pages          Int?
+  size           String?
+  topic          String?
+  uploadedById   String?
+  allowDownload  Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  module         Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@map("learning_materials")
+}
+
+// ─── 5. Enrollments & Progress Tracking ───
+model Enrollment {
+  id                 String    @id @default(uuid())
+  userId             String
+  courseId           String
+  enrolledAt         DateTime  @default(now())
+  completedAt        DateTime?
+  progressPercentage Int       @default(0)
+  completedModuleIds String[]
+
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course             Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+// ─── 6. Assessment Engine & Controlled Kiosk ───
+model Assessment {
+  id                  String             @id @default(uuid())
+  courseId            String
+  trainerId           String
+  title               String
+  description         String?
+  durationMinutes     Int                @default(30)
+  totalMarks          Int                @default(20)
+  passMarks           Int                @default(10)
+  scheduledStartTime  DateTime
+  deadlineTime        DateTime
+  status              AssessmentStatus   @default(published)
+  isKioskModeRequired Boolean            @default(true)
+  resultsPublished    Boolean            @default(false)
+  publishedAt         DateTime?
+  maxAttempts         Int                @default(1)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  course              Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions           AssessmentQuestion[]
+  attempts            AssessmentAttempt[]
+
+  @@map("assessments")
+}
+
+model Question {
+  id            String   @id @default(uuid())
+  subjectId     String?
+  subjectName   String
+  module        String   @default("Module 1")
+  question      String
+  options       String[]
+  correctAnswer Int      // 0-3 index
+  explanation   String?
+  marks         Int      @default(2)
+  type          String   @default("MCQ")
+  difficulty    String   @default("Medium")
+  isDraft       Boolean  @default(false)
+  generatedByAI Boolean  @default(false)
+  aiModel       String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  assessmentQuestions AssessmentQuestion[]
+
+  @@map("questions")
+}
+
+model AssessmentQuestion {
+  id           String     @id @default(uuid())
+  assessmentId String
+  questionId   String
+  orderIndex   Int        @default(1)
+
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question     Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, questionId])
+  @@map("assessment_questions")
+}
+
+model AssessmentAttempt {
+  id                 String             @id @default(uuid())
+  assessmentId       String
+  traineeId          String
+  attemptNumber      Int                @default(1)
+  startedAt          DateTime           @default(now())
+  submittedAt        DateTime?
+  timeTakenSeconds   Int                @default(0)
+  status             AttemptStatus      @default(submitted)
+  score              Float              @default(0)
+  totalMarks         Int                @default(20)
+  percentage         Float              @default(0)
+  passed             Boolean            @default(false)
+  integrityEventCount Int               @default(0) // Tab switches / kiosk triggers
+  trainerFeedback    String?
+  evaluationStatus   String             @default("published")
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  assessment         Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  trainee            User               @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  answers            AssessmentAnswer[]
+
+  @@map("assessment_attempts")
+}
+
+model AssessmentAnswer {
+  id             String            @id @default(uuid())
+  attemptId      String
+  questionId     String
+  selectedOption Int?
+  isCorrect      Boolean           @default(false)
+  marksAwarded   Float             @default(0)
+
+  attempt        AssessmentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@map("assessment_answers")
+}
+
+// ─── 7. Feedback & Certification ───
+model Feedback {
+  id              String   @id @default(uuid())
+  courseId        String
+  traineeId       String
+  trainerRating   Int      @default(5)
+  contentRating   Int      @default(5)
+  relevanceRating Int      @default(5)
+  comment         String?
+  createdAt       DateTime @default(now())
+
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  trainee         User     @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+
+  @@map("feedbacks")
+}
+
+model Certificate {
+  id               String   @id @default(uuid())
+  certificateNumber String   @unique // e.g. "MOES-IMD-CERT-2026-8941"
+  verificationCode String   @unique // Unique secure verification code
+  traineeId        String
+  courseId         String
+  issuedAt         DateTime @default(now())
+  issuedById       String?
+  status           String   @default("VALID")
+  createdAt        DateTime @default(now())
+
+  trainee          User     @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([verificationCode])
+  @@map("certificates")
+}
+
+// ─── 8. Announcements, Notifications & Governance Audit Logs ───
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  category  String   @default("General")
+  content   String
+  urgent    Boolean  @default(false)
+  author    String   @default("MoES Directorate")
+  createdAt DateTime @default(now())
+
+  @@map("announcements")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id             String        @id @default(uuid())
+  action         String        // "USER_APPROVED", "CREDENTIAL_VERIFIED", "COURSE_CREATED", etc.
+  actorId        String
+  targetEntity   String        // "User", "Credential", "Course", "Certificate"
+  targetId       String
+  details        String?       // JSON string
+  ipAddress      String?
+  organizationId String?
+  departmentId   String?
+  createdAt      DateTime      @default(now())
+
+  actor          User          @relation("UserAuditLogs", fields: [actorId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  department     Department?   @relation(fields: [departmentId], references: [id])
+
+  @@index([action])
+  @@index([actorId])
+  @@map("audit_logs")
+}

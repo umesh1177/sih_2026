@@ -1,51 +1,32 @@
 import { db } from "../store/dbStore.js";
+import { auditService } from "../store/auditService.js";
 
 export const getCompetencyMatrix = (req, res) => {
   try {
-    const matrix = db.getCompetencyMatrix();
+    const matrix = db.getCompetencies();
     return res.json({ success: true, count: matrix.length, matrix });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
 
+// Phase 6: Explainable Rule-Based Competency Engine
 export const suggestTrainersForSubject = (req, res) => {
   try {
-    const { subjectName, requiredSkills = [] } = req.body;
-    const trainers = db.users.filter(u => u.role === "trainer" && u.status === "approved");
-
-    const scoredTrainers = trainers.map(t => {
-      let matchScore = 60; // base score
-      const trainerBioAndSkills = (t.specialization || []).concat(t.bio || "").join(" ").toLowerCase();
-
-      if (subjectName) {
-        const subWords = subjectName.toLowerCase().split(" ");
-        subWords.forEach(word => {
-          if (word.length > 3 && trainerBioAndSkills.includes(word)) {
-            matchScore += 12;
-          }
-        });
-      }
-
-      matchScore = Math.min(matchScore, 99);
-
-      return {
-        trainerId: t.id,
-        name: t.name,
-        email: t.email,
-        department: t.department,
-        designation: t.designation,
-        specialization: t.specialization,
-        experienceYears: t.experienceYears || 10,
-        matchScore: matchScore,
-        avatar: t.avatar
-      };
-    }).sort((a, b) => b.matchScore - a.matchScore);
+    const { courseId, subjectName, requiredCompetencyId, requiredLevel } = req.body;
+    
+    const result = db.matchTrainersForCourse({
+      courseId,
+      subjectName,
+      requiredCompetencyId,
+      requiredLevel: Number(requiredLevel) || 2
+    });
 
     return res.json({
       success: true,
-      subjectName,
-      suggestedTrainers: scoredTrainers
+      targetCompetency: result.targetCompetency,
+      requiredLevel: result.requiredLevel,
+      suggestedTrainers: result.trainers
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -55,12 +36,28 @@ export const suggestTrainersForSubject = (req, res) => {
 export const assignTrainerToCompetency = (req, res) => {
   try {
     const { competencyId } = req.params;
-    const { trainerId, trainerName } = req.body;
-    const updated = db.assignTrainerToCompetency(competencyId, trainerId, trainerName);
-    if (!updated) {
-      return res.status(404).json({ success: false, message: "Competency not found" });
+    const { trainerId, courseId } = req.body;
+
+    const trainer = db.findUserById(trainerId);
+    if (!trainer) {
+      return res.status(404).json({ success: false, message: "Trainer not found" });
     }
-    return res.json({ success: true, message: "Trainer mapped to competency domain successfully", competency: updated });
+
+    auditService.log({
+      action: "TRAINER_ASSIGNED",
+      actorId: req.user.id,
+      actorName: req.user.name,
+      actorRole: "admin",
+      targetEntity: "Competency",
+      targetId: competencyId,
+      details: { trainerId: trainer.id, trainerName: trainer.name, courseId }
+    });
+
+    return res.json({
+      success: true,
+      message: `Trainer ${trainer.name} successfully assigned to domain!`,
+      trainer
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

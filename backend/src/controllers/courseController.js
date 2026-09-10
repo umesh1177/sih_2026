@@ -22,26 +22,33 @@ export const getCourseById = (req, res) => {
   }
 };
 
+// Phase 4 IDOR fix: Never trust traineeId from request body. Use req.user.id
 export const enrollCourse = (req, res) => {
   try {
     const { id } = req.params;
-    const { traineeId } = req.body;
-    if (!traineeId) {
-      return res.status(400).json({ success: false, message: "Trainee ID is required" });
+    const traineeId = req.user.id;
+
+    if (req.user.role !== "trainee") {
+      return res.status(403).json({ success: false, message: "Only officers with Trainee role can enroll in courses." });
     }
+
+    if (req.user.status !== "approved") {
+      return res.status(403).json({ success: false, message: "Your account is pending verification. Enrollment is not permitted." });
+    }
+
     const course = db.enrollTrainee(id, traineeId);
     if (!course) {
       return res.status(404).json({ success: false, message: "Course not found" });
     }
     return res.json({ success: true, message: "Successfully enrolled in course!", course });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    return res.status(400).json({ success: false, message: err.message });
   }
 };
 
 export const createCourse = (req, res) => {
   try {
-    const course = db.createCourse(req.body);
+    const course = db.createCourse(req.body, req.user);
     return res.status(201).json({ success: true, message: "Course created successfully", course });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -51,14 +58,14 @@ export const createCourse = (req, res) => {
 export const uploadLearningMaterial = (req, res) => {
   try {
     const { courseId, subjectId, moduleId } = req.params;
-    const materialData = req.body;
+    const materialData = { ...req.body, uploadedById: req.user.id, uploadedBy: req.user.name };
     const material = db.addMaterialToModule(courseId, subjectId, moduleId, materialData);
     if (!material) {
       return res.status(404).json({ success: false, message: "Course, Subject or Module not found" });
     }
     return res.status(201).json({
       success: true,
-      message: "Material added to module successfully with download permissions set.",
+      message: "Material added to curriculum module successfully.",
       material
     });
   } catch (err) {
@@ -69,14 +76,13 @@ export const uploadLearningMaterial = (req, res) => {
 export const addModuleToSubject = (req, res) => {
   try {
     const { courseId, subjectId } = req.params;
-    const moduleData = req.body;
-    const newMod = db.addModuleToSubject(courseId, subjectId, moduleData);
+    const newMod = db.addModuleToSubject(courseId, subjectId, req.body);
     if (!newMod) {
       return res.status(404).json({ success: false, message: "Course or Subject not found" });
     }
     return res.status(201).json({
       success: true,
-      message: "New curriculum module created successfully!",
+      message: "Curriculum module created successfully!",
       module: newMod
     });
   } catch (err) {
@@ -91,10 +97,7 @@ export const deleteModuleFromSubject = (req, res) => {
     if (!removed) {
       return res.status(404).json({ success: false, message: "Module not found in subject" });
     }
-    return res.json({
-      success: true,
-      message: "Module removed from subject successfully."
-    });
+    return res.json({ success: true, message: "Module removed from subject successfully." });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -107,10 +110,7 @@ export const deleteLearningMaterial = (req, res) => {
     if (!removed) {
       return res.status(404).json({ success: false, message: "Material not found in module" });
     }
-    return res.json({
-      success: true,
-      message: "Material removed from module successfully."
-    });
+    return res.json({ success: true, message: "Material removed from module successfully." });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -126,10 +126,20 @@ export const getFeedbacks = (req, res) => {
   }
 };
 
+// Derive trainee identity from req.user
+export const submitFeedback = (req, res) => {
+  try {
+    const fb = db.addFeedback(req.body, req.user);
+    return res.status(201).json({ success: true, message: "Feedback submitted successfully!", feedback: fb });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 export const getTrainerEnrolledTrainees = (req, res) => {
   try {
-    const trainerName = req.query.trainerName || req.user?.name;
-    const trainerId = req.query.trainerId || req.user?.id;
+    const trainerName = req.user.role === "trainer" ? req.user.name : req.query.trainerName;
+    const trainerId = req.user.role === "trainer" ? req.user.id : req.query.trainerId;
     const trainees = db.getEnrolledTraineesForTrainer(trainerName, trainerId);
     return res.json({ success: true, count: trainees.length, trainees });
   } catch (err) {
@@ -137,20 +147,15 @@ export const getTrainerEnrolledTrainees = (req, res) => {
   }
 };
 
-export const submitFeedback = (req, res) => {
-  try {
-    const fb = db.addFeedback(req.body);
-    return res.status(201).json({ success: true, message: "Feedback submitted successfully!", feedback: fb });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-// --- Trainer Content Library Handlers ---
+// Content Library Handlers
 export const getContentLibrary = (req, res) => {
   try {
-    const { trainerId, trainerName, subject, subjectId, type, status, search } = req.query;
-    const items = db.getContentLibrary({ trainerId, trainerName, subject: subject || subjectId, type, status, search });
+    const { subject, type } = req.query;
+    const filters = { subject, type };
+    if (req.user.role === "trainer") {
+      filters.trainerId = req.user.id;
+    }
+    const items = db.getContentLibrary(filters);
     return res.json({ success: true, count: items.length, items });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -159,8 +164,7 @@ export const getContentLibrary = (req, res) => {
 
 export const createContentLibraryItem = (req, res) => {
   try {
-    const itemData = req.body;
-    const newItem = db.createContentLibraryItem(itemData);
+    const newItem = db.createContentLibraryItem(req.body, req.user);
     return res.status(201).json({ success: true, message: "Material successfully added to Content Library!", item: newItem });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -174,7 +178,7 @@ export const updateContentLibraryItem = (req, res) => {
     if (!updated) {
       return res.status(404).json({ success: false, message: "Library item not found" });
     }
-    return res.json({ success: true, message: "Material metadata updated successfully!", item: updated });
+    return res.json({ success: true, message: "Material updated successfully!", item: updated });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -192,18 +196,3 @@ export const deleteContentLibraryItem = (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
-
-export const attachContentLibraryItem = (req, res) => {
-  try {
-    const { id } = req.params;
-    const { courseId, subjectId, moduleId } = req.body;
-    const attached = db.attachContentToSubjectModule(id, courseId, subjectId, moduleId);
-    if (!attached) {
-      return res.status(400).json({ success: false, message: "Failed to map content item to course/module" });
-    }
-    return res.json({ success: true, message: "Material mapped to subject module successfully!" });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
-

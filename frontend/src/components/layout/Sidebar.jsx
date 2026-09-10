@@ -6,7 +6,6 @@ import {
   FileText, 
   HelpCircle, 
   ClipboardList, 
-  Layers, 
   BarChart3, 
   BellRing, 
   UserCheck, 
@@ -15,13 +14,15 @@ import {
   Compass,
   LogOut,
   Building2,
-  FolderKanban
+  FolderKanban,
+  ShieldCheck,
+  History
 } from "lucide-react";
 
 export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
   const { currentUser, logout } = useAuth();
 
-  // Role based navigation links
+  // Role based navigation items
   const getNavItems = () => {
     const baseItems = [
       { id: "dashboard", label: "Executive Dashboard", icon: LayoutDashboard },
@@ -43,11 +44,14 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
       return [
         ...baseItems,
         { id: "approvals", label: "Officer Approvals", icon: UserCheck },
+        { id: "credential-verification", label: "Credential Verification", icon: ShieldCheck },
+        { id: "org-structure", label: "Organization Structure", icon: Building2 },
         { id: "competency", label: "Competency Matrix", icon: Compass },
         { id: "questions", label: "Question Bank", icon: HelpCircle },
         { id: "quizzes", label: "Assessments Engine", icon: ClipboardList },
         { id: "announcements", label: "National Broadcasts", icon: BellRing },
         { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
+        { id: "audit-logs", label: "Governance Audit Log", icon: History },
       ];
     }
 
@@ -89,7 +93,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
       </div>
 
       {/* Navigation List */}
-      <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -97,7 +101,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-xs transition-all duration-200 text-left ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all duration-200 text-left ${
                 isActive
                   ? "bg-white text-[#0a2558] font-black shadow-lg transform translate-x-1"
                   : "text-blue-100/80 hover:bg-white/10 hover:text-white"
@@ -120,20 +124,20 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
           />
           <div className="overflow-hidden flex-1">
             <p className="text-xs font-bold text-white truncate">
-              {currentUser?.name || "Institute Officer"}
+              {currentUser?.name || "Officer"}
             </p>
             <p className="text-[10px] text-blue-200/70 truncate capitalize">
-              {currentUser?.designation || currentUser?.department || currentUser?.email || "IMD Officer"}
+              {currentUser?.designation || currentUser?.department || currentUser?.role || "IMD Officer"}
             </p>
           </div>
         </div>
 
-        {/* Logout Button */}
+        {/* Logout Button (Leaves user unauthenticated) */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-red-100 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95"
+          className="w-full flex items-center justify-center gap-2 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-red-100 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
         </button>
       </div>

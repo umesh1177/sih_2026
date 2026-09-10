@@ -3,12 +3,16 @@ import {
   Layers, 
   Sparkles, 
   CheckCircle2, 
+  XCircle,
   UserCheck, 
   Award, 
   Search, 
-  Plus,
-  ShieldCheck,
-  ChevronRight
+  ShieldCheck, 
+  ChevronRight,
+  Info,
+  Clock,
+  Briefcase,
+  Star
 } from "lucide-react";
 import { api } from "../../services/api";
 
@@ -18,6 +22,7 @@ export const CompetencyMatrixView = () => {
   const [selectedComp, setSelectedComp] = useState(null);
   const [suggestedTrainers, setSuggestedTrainers] = useState([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   const fetchCompetencies = async () => {
     setLoading(true);
@@ -25,7 +30,9 @@ export const CompetencyMatrixView = () => {
       const res = await api.getCompetencies();
       if (res.success && res.matrix) {
         setMatrix(res.matrix);
-        setSelectedComp(res.matrix[0]);
+        if (res.matrix.length > 0) {
+          handleSelectCompetency(res.matrix[0]);
+        }
       }
     } catch (err) {
       console.error("Failed loading competency framework:", err);
@@ -42,9 +49,13 @@ export const CompetencyMatrixView = () => {
     setSelectedComp(comp);
     setLoadingSuggestions(true);
     try {
-      const res = await api.suggestTrainers(comp.name, [comp.category]);
+      const res = await api.suggestTrainers({
+        requiredCompetencyId: comp.id,
+        subjectName: comp.name,
+        requiredLevel: 2
+      });
       if (res.success) {
-        setSuggestedTrainers(res.suggestedTrainers);
+        setSuggestedTrainers(res.suggestedTrainers || []);
       }
     } catch (err) {
       console.error("Suggestion error:", err);
@@ -56,13 +67,15 @@ export const CompetencyMatrixView = () => {
   const handleAssignTrainer = async (trainer) => {
     if (!selectedComp) return;
     try {
-      const res = await api.assignTrainerToCompetency(selectedComp.id, trainer.trainerId, trainer.name);
+      const res = await api.assignTrainerToCompetency(selectedComp.id, trainer.trainerId);
       if (res.success) {
-        alert(`Trainer ${trainer.name} successfully mapped to ${selectedComp.name}!`);
-        fetchCompetencies();
+        setNotification({
+          type: "success",
+          message: `Trainer ${trainer.name} successfully assigned to ${selectedComp.name}!`
+        });
       }
     } catch (err) {
-      alert("Assignment failed: " + err.message);
+      setNotification({ type: "error", message: err.message || "Assignment failed." });
     }
   };
 
@@ -73,25 +86,34 @@ export const CompetencyMatrixView = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 uppercase tracking-wider">
-              AI Competency Engine
+              Phase 6 Explainable Engine
             </span>
-            <span className="text-xs text-blue-200">MoES Human Capital Development</span>
+            <span className="text-xs text-blue-200">MoES Rule-Based Faculty Matching</span>
           </div>
           <h1 className="text-xl font-bold tracking-tight">
             Institutional Competency Mapping & Trainer Matching Matrix
           </h1>
-          <p className="text-xs text-blue-100/80 mt-1 max-w-2xl">
-            Automatically maps departmental skill requirements against verified senior scientist credentials and suggests optimal training leads for operational meteorology courses.
+          <p className="text-xs text-blue-100/80 mt-1 max-w-2xl leading-relaxed">
+            Multi-factor explainable engine evaluating verified competency levels (40%), accredited certifications (25%), verified operational experience (20%), past training feedback (10%), and workload availability (5%).
           </p>
         </div>
       </div>
+
+      {notification && (
+        <div className={`p-4 rounded-2xl border text-xs flex items-center justify-between ${
+          notification.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
+        }`}>
+          <span>{notification.message}</span>
+          <button onClick={() => setNotification(null)} className="font-bold">Dismiss</button>
+        </div>
+      )}
 
       {/* Grid: Left Competency Domains, Right Matched Trainers */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Domains List */}
         <div className="lg:col-span-5 space-y-3">
           <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
-            Meteorological Competency Domains ({matrix.length})
+            Institutional Meteorological Domains ({matrix.length})
           </h2>
 
           <div className="space-y-2.5">
@@ -112,7 +134,7 @@ export const CompetencyMatrixView = () => {
                       {comp.category}
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">
-                      Level: {comp.requiredLevel}
+                      Active Domain
                     </span>
                   </div>
 
@@ -120,8 +142,8 @@ export const CompetencyMatrixView = () => {
                   <p className="text-slate-500 line-clamp-2 mb-3">{comp.description}</p>
 
                   <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
-                    <span className="text-slate-600 font-medium">
-                      Mapped Trainers: <b>{comp.suggestedTrainers?.length || 0}</b>
+                    <span className="text-slate-600 font-medium font-mono text-[10px]">
+                      Code: {comp.code}
                     </span>
                     <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${isSelected ? "translate-x-1 text-[#0a2558]" : ""}`} />
                   </div>
@@ -131,14 +153,14 @@ export const CompetencyMatrixView = () => {
           </div>
         </div>
 
-        {/* Right Details & AI Recommended Trainers */}
+        {/* Right Details & Explainable Recommendation Engine */}
         <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-6">
           {selectedComp ? (
             <>
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-800">
-                    Domain Focus
+                    Selected Specialization
                   </span>
                   <span className="text-xs font-semibold text-slate-400">ID: {selectedComp.id}</span>
                 </div>
@@ -146,57 +168,114 @@ export const CompetencyMatrixView = () => {
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">{selectedComp.description}</p>
               </div>
 
-              {/* Verified Trainer Pool & AI Match Recommendation */}
+              {/* Matched Trainers with 5-Factor Score Breakdown */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-yellow-500" />
-                    <span>AI Recommended Trainer Matches</span>
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>Explainable Faculty Rankings & Eligibility</span>
                   </h3>
-                  <span className="text-[11px] text-slate-400">Ranked by Domain Match Score</span>
+                  <span className="text-[11px] text-slate-400">Evaluated on Verified Evidence Only</span>
                 </div>
 
-                <div className="space-y-3">
-                  {(suggestedTrainers.length > 0 ? suggestedTrainers : (selectedComp.matchedTrainers || [])).map((t, idx) => (
-                    <div
-                      key={t.trainerId || idx}
-                      className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs"
-                    >
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={t.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
-                          alt={t.name}
-                          className="w-10 h-10 rounded-xl object-cover ring-2 ring-white shadow-sm"
-                        />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-bold text-slate-900">{t.name}</h4>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
-                              {t.matchScore || 96}% MATCH
-                            </span>
+                {loadingSuggestions ? (
+                  <div className="py-12 text-center text-slate-400 text-xs">
+                    Calculating multi-factor competency eligibility...
+                  </div>
+                ) : suggestedTrainers.length === 0 ? (
+                  <div className="p-6 bg-slate-50 rounded-2xl text-center text-slate-500 text-xs">
+                    No approved trainers currently mapped to this competency.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {suggestedTrainers.map((t) => (
+                      <div
+                        key={t.trainerId}
+                        className={`p-5 rounded-2xl border text-xs space-y-3 transition-all ${
+                          t.eligible
+                            ? "bg-slate-50 border-slate-200"
+                            : "bg-rose-50/40 border-rose-200 opacity-80"
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={t.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
+                              alt={t.name}
+                              className="w-11 h-11 rounded-xl object-cover ring-2 ring-white shadow-sm"
+                            />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-extrabold text-slate-900 text-sm">{t.name}</h4>
+                                {t.eligible ? (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>{t.matchScore}% MATCH</span>
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 flex items-center gap-1">
+                                    <XCircle className="w-3 h-3" />
+                                    <span>INELIGIBLE</span>
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500">{t.designation} • {t.department}</p>
+                            </div>
                           </div>
-                          <p className="text-[11px] text-slate-500">{t.department || "IMD Headquarters"}</p>
-                          <p className="text-[10px] text-blue-700 font-semibold mt-0.5">
-                            Specialization: {(t.specialization || ["Meteorology"]).join(", ")}
+
+                          <button
+                            onClick={() => handleAssignTrainer(t)}
+                            disabled={!t.eligible}
+                            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0a2558] hover:bg-[#071c42] disabled:bg-slate-300 text-white rounded-xl font-bold text-xs shadow-sm transition-transform hover:scale-105 shrink-0"
+                          >
+                            <UserCheck className="w-3.5 h-3.5 text-emerald-300" />
+                            <span>Select as Lead Faculty</span>
+                          </button>
+                        </div>
+
+                        {/* 5-Factor Score Bar Display */}
+                        {t.scoreBreakdown && (
+                          <div className="grid grid-cols-5 gap-2 p-2.5 bg-white rounded-xl border border-slate-100 text-[10px] text-center">
+                            <div>
+                              <span className="text-slate-400 block">Competency</span>
+                              <b className="text-slate-800">{t.scoreBreakdown.competency}/40</b>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">Certifications</span>
+                              <b className="text-slate-800">{t.scoreBreakdown.certification}/25</b>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">Experience</span>
+                              <b className="text-slate-800">{t.scoreBreakdown.experience}/20</b>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">Performance</span>
+                              <b className="text-slate-800">{t.scoreBreakdown.performance}/10</b>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 block">Availability</span>
+                              <b className="text-slate-800">{t.scoreBreakdown.availability}/5</b>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Why Recommended / Explanation Callout */}
+                        <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl text-[11px] text-slate-700">
+                          <p className="font-bold text-[#0a2558] mb-0.5 flex items-center gap-1">
+                            <Info className="w-3.5 h-3.5" />
+                            <span>Why Recommended?</span>
                           </p>
+                          <p className="leading-relaxed">{t.explanation}</p>
                         </div>
                       </div>
-
-                      <button
-                        onClick={() => handleAssignTrainer(t)}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-lg font-bold text-xs shadow-sm transition-transform hover:scale-105 shrink-0"
-                      >
-                        <UserCheck className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Assign as Lead Trainer</span>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           ) : (
             <div className="py-12 text-center text-slate-400 text-xs">
-              Select a competency domain from the left to inspect trainer mappings.
+              Select a meteorological competency domain from the left to inspect faculty matches.
             </div>
           )}
         </div>

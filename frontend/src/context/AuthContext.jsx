@@ -4,126 +4,56 @@ import { api, setToken, clearToken, getStoredUser, setStoredUser, clearStoredUse
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  // Load persisted user on mount (survives page refresh)
+  // Load persisted user on mount ONLY if both token and user exist in storage (Rule 16)
   const [currentUser, setCurrentUser] = useState(() => {
+    const token = getToken();
     const stored = getStoredUser();
-    if (stored) return stored;
-    // Default demo user for hackathon judges
-    return {
-      id: "u_trainer_1",
-      name: "Dr. Amit Sengupta",
-      email: "amit.sengupta@imd.gov.in",
-      role: "trainer",
-      department: "Numerical Weather Prediction Division, New Delhi",
-      designation: "Scientist 'F' & Senior Meteorologist",
-      specialization: ["Numerical Weather Prediction", "WRF / GFS Modeling", "Ensemble Prediction"],
-      experienceYears: 18,
-      status: "approved",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"
-    };
+    if (token && stored && stored.status === "approved") {
+      return stored;
+    }
+    return null; // Initial state is Unauthenticated (Public)
   });
 
   const [loading, setLoading] = useState(false);
 
-  // Demo Fast Switcher Accounts for Judges & Reviewers
+  // Demo accounts for judges with standard password: Password@123
   const demoAccounts = [
     {
+      role: "admin",
+      label: "Admin (Dr. R. K. Bhattacharya - DG Admin)",
+      email: "admin@imd.gov.in",
+      password: "Password@123",
+      description: "Director General & Chief Academic Controller (Scope: Organization)"
+    },
+    {
       role: "trainer",
-      label: "Trainer (Dr. Amit Sengupta - NWP)",
+      label: "Trainer (Dr. Amit Sengupta - Lead NWP)",
       email: "amit.sengupta@imd.gov.in",
-      user: {
-        id: "u_trainer_1",
-        name: "Dr. Amit Sengupta",
-        email: "amit.sengupta@imd.gov.in",
-        role: "trainer",
-        department: "Numerical Weather Prediction Division, New Delhi",
-        designation: "Scientist 'F' & Senior Meteorologist",
-        specialization: ["Numerical Weather Prediction", "WRF / GFS Modeling", "Ensemble Prediction"],
-        experienceYears: 18,
-        status: "approved",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"
-      }
+      password: "Password@123",
+      description: "Senior Scientist 'F' – NWP Division"
     },
     {
       role: "trainee",
-      label: "Trainee (Rahul Sharma - Scientist 'B')",
+      label: "Trainee (Cadet Rahul Sharma - Scientist 'B')",
       email: "rahul.sharma@imd.gov.in",
-      user: {
-        id: "u_trainee_1",
-        name: "Rahul Sharma",
-        email: "rahul.sharma@imd.gov.in",
-        role: "trainee",
-        department: "Meteorological Centre, Jaipur",
-        designation: "Scientist 'B' (Trainee)",
-        status: "approved",
-        interests: ["NWP Models", "Satellite Imagery", "Severe Weather Warnings"],
-        skills: ["Python for Meteorology", "Synoptic Analysis", "QGIS", "Data Assimilation"],
-        qualifications: "M.Sc. Physics (University of Rajasthan), Advanced PG Diploma in Meteorology",
-        experience: "2 years as Trainee Scientific Assistant at IMD Jaipur Field Station.",
-        certificates: [
-          { title: "Basic Meteorological Forecaster (BMF)", issuer: "IMD Training Centre Pune", year: "2024" }
-        ],
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"
-      }
-    },
-    {
-      role: "trainee_pending",
-      label: "Trainee (Aniket Deshmukh - Pending Approval)",
-      email: "aniket.d@imd.gov.in",
-      user: {
-        id: "u_trainee_pending",
-        name: "Aniket Deshmukh",
-        email: "aniket.d@imd.gov.in",
-        role: "trainee",
-        department: "Regional Meteorological Centre, Mumbai",
-        designation: "Scientific Assistant Grade-II",
-        status: "pending",
-        interests: ["Urban Flood Forecasting", "Nowcasting", "Doppler Radar"],
-        skills: ["Surface Observations", "AWS Data Analysis"],
-        qualifications: "B.Sc. Physics (Mumbai University)",
-        experience: "1 year field station maintenance.",
-        certificates: [],
-        avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=250"
-      }
-    },
-    {
-      role: "admin",
-      label: "Admin (Director General Admin)",
-      email: "admin@imd.gov.in",
-      user: {
-        id: "u_admin_1",
-        name: "Dr. Mrutyunjay Mohapatra",
-        email: "admin@imd.gov.in",
-        role: "admin",
-        department: "Directorate General of Meteorology, New Delhi",
-        designation: "Director General & Chief Admin",
-        status: "approved",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250"
-      }
+      password: "Password@123",
+      description: "Scientist 'B' – Operational NWP Trainee"
     }
   ];
 
-  const switchAccount = (accountObj) => {
-    const user = accountObj.user;
-    setCurrentUser(user);
-    setStoredUser(user);
-    // Use a demo token for fast-switch accounts
-    setToken(`demo-jwt-token-${user.id}`);
-  };
-
-  const login = async (email, password, role) => {
+  const login = async (email, password) => {
     setLoading(true);
     try {
-      const res = await api.login(email, password, role);
-      if (res.success && res.user) {
+      const res = await api.login(email, password);
+      if (res.success && res.user && res.token) {
         setCurrentUser(res.user);
         setStoredUser(res.user);
-        if (res.token) setToken(res.token);
-        return { success: true };
+        setToken(res.token);
+        return { success: true, user: res.user };
       }
-      return { success: false, message: res.message };
+      return { success: false, message: res.message, status: res.status };
     } catch (err) {
-      return { success: false, message: err.message };
+      return { success: false, message: err.message || "Network error" };
     } finally {
       setLoading(false);
     }
@@ -133,15 +63,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await api.register(userData);
-      if (res.success && res.user) {
-        setCurrentUser(res.user);
-        setStoredUser(res.user);
-        if (res.token) setToken(res.token);
-        return { success: true, message: res.message, user: res.user };
-      }
-      return { success: false, message: res.message };
+      // Registration never automatically logs in or issues a portal session
+      return res;
     } catch (err) {
-      return { success: false, message: err.message };
+      return { success: false, message: err.message || "Registration failed" };
     } finally {
       setLoading(false);
     }
@@ -150,7 +75,7 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = async () => {
     if (!currentUser?.id) return;
     try {
-      const res = await api.getProfile(currentUser.id);
+      const res = await api.getMe();
       if (res.success && res.user) {
         setCurrentUser(res.user);
         setStoredUser(res.user);
@@ -160,30 +85,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Rule 17: Logout leaves user unauthenticated
   const logout = () => {
     clearToken();
     clearStoredUser();
-    // Revert to default demo trainer
-    const defaultUser = demoAccounts[0].user;
-    setCurrentUser(defaultUser);
-    setStoredUser(defaultUser);
-    setToken(`demo-jwt-token-${defaultUser.id}`);
+    setCurrentUser(null);
   };
-
-  // On mount: ensure token exists for the persisted user
-  useEffect(() => {
-    const token = getToken();
-    if (!token && currentUser?.id) {
-      setToken(`demo-jwt-token-${currentUser.id}`);
-    }
-  }, []);
 
   return (
     <AuthContext.Provider value={{
       currentUser,
       setCurrentUser,
       demoAccounts,
-      switchAccount,
       login,
       register,
       refreshProfile,

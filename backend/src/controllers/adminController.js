@@ -1,36 +1,42 @@
 import { db } from "../store/dbStore.js";
 
+// Phase 12 Analytics: Aggregated directly from database records
 export const getAdminStats = (req, res) => {
   try {
-    const trainees = db.users.filter(u => u.role === "trainee");
-    const trainers = db.users.filter(u => u.role === "trainer");
-    const pendingUsers = db.users.filter(u => u.status === "pending");
-    const courses = db.getCourses();
-    const quizzes = db.getQuizzes();
-    const submissions = db.quizSubmissions;
+    const isDeptAdmin = req.user?.adminScope === "DEPARTMENT";
+    const userDeptId = req.user?.departmentId;
 
-    const totalCertificates = submissions.filter(s => s.certificateGenerated).length;
+    let users = db.users;
+    let courses = db.courses;
+    let submissions = db.quizSubmissions;
+    let certificates = db.certificates;
+
+    if (isDeptAdmin && userDeptId) {
+      users = users.filter(u => u.departmentId === userDeptId);
+      courses = courses.filter(c => c.departmentId === userDeptId);
+      const deptUserIds = users.map(u => u.id);
+      submissions = submissions.filter(s => deptUserIds.includes(s.traineeId));
+      certificates = certificates.filter(c => deptUserIds.includes(c.traineeId));
+    }
+
+    const trainees = users.filter(u => u.role === "trainee");
+    const trainers = users.filter(u => u.role === "trainer");
+    const pendingUsers = users.filter(u => u.status === "pending");
+    const pendingCredentials = db.getPendingCredentials(req.user);
+
     const passedCount = submissions.filter(s => s.passed).length;
-    const overallPassRate = submissions.length > 0 ? Math.round((passedCount / submissions.length) * 100) : 92;
+    const overallPassRate = submissions.length > 0 ? Math.round((passedCount / submissions.length) * 100) : 0;
 
-    // Department-wise distribution
-    const deptDistribution = [
-      { name: "NWP Division", count: 42, activeTrainees: 28 },
-      { name: "Radar & Satellite", count: 35, activeTrainees: 22 },
-      { name: "Cyclone Warning", count: 29, activeTrainees: 19 },
-      { name: "Agrometeorology", count: 24, activeTrainees: 16 },
-      { name: "Seismology & Marine", count: 18, activeTrainees: 12 }
-    ];
-
-    // Monthly certification trend
-    const monthlyCertifications = [
-      { month: "Sep", certificates: 14, enrollments: 32 },
-      { month: "Oct", certificates: 22, enrollments: 45 },
-      { month: "Nov", certificates: 35, enrollments: 58 },
-      { month: "Dec", certificates: 48, enrollments: 70 },
-      { month: "Jan", certificates: 62, enrollments: 85 },
-      { month: "Feb", certificates: 78, enrollments: 104 }
-    ];
+    // Real department-level distribution from database
+    const deptDistribution = db.departments.map(dept => {
+      const deptUsers = db.users.filter(u => u.departmentId === dept.id || u.department === dept.name);
+      return {
+        name: dept.code,
+        fullName: dept.name,
+        count: deptUsers.length,
+        activeTrainees: deptUsers.filter(u => u.role === "trainee" && u.status === "approved").length
+      };
+    });
 
     return res.json({
       success: true,
@@ -38,12 +44,13 @@ export const getAdminStats = (req, res) => {
         totalTrainees: trainees.length,
         totalTrainers: trainers.length,
         pendingApprovalsCount: pendingUsers.length,
+        pendingCredentialsCount: pendingCredentials.length,
         totalCourses: courses.length,
-        totalQuizzesScheduled: quizzes.length,
-        totalCertificatesIssued: totalCertificates + 142, // Combined historical + active
-        overallPassRate: overallPassRate,
+        totalQuizzesScheduled: db.quizzes.length,
+        totalCertificatesIssued: certificates.length,
+        overallPassRate,
         deptDistribution,
-        monthlyCertifications
+        adminScope: req.user?.adminScope || "ORGANIZATION"
       }
     });
   } catch (err) {
@@ -53,7 +60,7 @@ export const getAdminStats = (req, res) => {
 
 export const getPendingUsers = (req, res) => {
   try {
-    const pending = db.getPendingUsers();
+    const pending = db.getPendingUsers(req.user);
     return res.json({ success: true, count: pending.length, pendingUsers: pending });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -64,13 +71,13 @@ export const verifyUser = (req, res) => {
   try {
     const { id } = req.params;
     const { approved, notes } = req.body;
-    const user = db.approveUser(id, approved, notes);
+    const user = db.approveUser(id, approved, notes, req.user);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     return res.json({
       success: true,
-      message: approved ? `User ${user.name} approved successfully!` : `User ${user.name} registration rejected.`,
+      message: approved ? `Officer ${user.name} verified and approved successfully!` : `Officer ${user.name} registration rejected.`,
       user
     });
   } catch (err) {
@@ -80,11 +87,10 @@ export const verifyUser = (req, res) => {
 
 export const getAllUsers = (req, res) => {
   try {
-    const { role, status } = req.query;
-    let users = [...db.users];
-    if (role) users = users.filter(u => u.role === role);
-    if (status) users = users.filter(u => u.status === status);
-    return res.json({ success: true, count: users.length, users });
+    const { role, status, search, departmentId } = req.query;
+    const users = db.getAllUsers({ role, status, search, departmentId }, req.user);
+    const safeUsers = users.map(({ passwordHash, ...u }) => u);
+    return res.json({ success: true, count: safeUsers.length, users: safeUsers });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -92,10 +98,10 @@ export const getAllUsers = (req, res) => {
 
 export const publishAnnouncement = (req, res) => {
   try {
-    const announcement = db.createAnnouncement(req.body);
+    const announcement = db.createAnnouncement(req.body, req.user);
     return res.status(201).json({
       success: true,
-      message: "Announcement published to homepage live ticker & notifications successfully!",
+      message: "Announcement published successfully to portal circulars.",
       announcement
     });
   } catch (err) {
