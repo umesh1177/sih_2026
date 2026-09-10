@@ -157,7 +157,7 @@ export const AiCourseAdvisorModal = ({
                           {/* Match Score Badge */}
                           <div className="text-right shrink-0">
                             <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-black">
-                              {rec.matchScore || 92}% Match
+                              {rec.matchScore ?? 0}% Match
                             </span>
                           </div>
                         </div>

@@ -244,53 +244,115 @@ class DatabaseStore {
     return null;
   }
 
-  getTrainersWorkload() {
-    const trainers = this.users.filter(u => u.role === "trainer");
-    return trainers.map(trainer => {
-      const assignedCourses = this.courses.filter(c => {
-        if (c.leadTrainerId === trainer.id) return true;
-        if (c.leadTrainerName && trainer.name && c.leadTrainerName.toLowerCase().includes(trainer.name.toLowerCase())) return true;
-        if (c.subjects?.some(s => s.assignedTrainerId === trainer.id || (s.assignedTrainerName && s.assignedTrainerName.toLowerCase().includes(trainer.name.toLowerCase())))) return true;
-        return false;
-      });
+  getEnrolledTraineesForTrainer(trainerName, trainerId) {
+    let courses = this.courses || [];
+    if (trainerName || trainerId) {
+      const filtered = courses.filter(c => 
+        c.leadTrainerId === trainerId ||
+        (trainerName && c.leadTrainerName && c.leadTrainerName.toLowerCase().includes(trainerName.toLowerCase())) ||
+        (c.subjects || []).some(s => s.assignedTrainerId === trainerId || (trainerName && s.assignedTrainerName && s.assignedTrainerName.toLowerCase().includes(trainerName.toLowerCase())))
+      );
+      if (filtered.length > 0) courses = filtered;
+    }
 
-      const assignedSubjectNames = [];
-      let totalAssignedModules = 0;
+    const traineeMap = new Map();
+    const allTraineeUsers = this.users.filter(u => u.role === "trainee");
 
-      this.courses.forEach(c => {
-        c.subjects?.forEach(s => {
-          if (s.assignedTrainerId === trainer.id || (s.assignedTrainerName && trainer.name && s.assignedTrainerName.toLowerCase().includes(trainer.name.toLowerCase()))) {
-            assignedSubjectNames.push({
-              subjectTitle: s.title || s.name,
-              courseTitle: c.title,
-              courseCode: c.code
+    courses.forEach(c => {
+      const enrolledIds = c.enrolledTraineeIds || [];
+      enrolledIds.forEach(tId => {
+        const u = allTraineeUsers.find(user => user.id === tId || user.email === tId || user.cadreId === tId);
+        if (u) {
+          if (!traineeMap.has(u.id)) {
+            const userSubmissions = (this.quizSubmissions || []).filter(s => s.traineeId === u.id || s.traineeId === u.email || s.traineeName === u.name);
+            const totalSubs = userSubmissions.length;
+            const avgScore = totalSubs > 0 
+              ? Math.round(userSubmissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / totalSubs)
+              : (u.assessmentScore || 0);
+
+            const passedSubs = userSubmissions.filter(s => s.passed).length;
+            const consistencyScore = totalSubs > 0 ? Math.min(100, Math.round((passedSubs / totalSubs) * 80 + totalSubs * 5)) : 0;
+            const practiceSubs = userSubmissions.filter(s => s.isPractice);
+            const practiceScore = practiceSubs.length > 0
+              ? Math.round(practiceSubs.reduce((acc, s) => acc + (s.percentage || 0), 0) / practiceSubs.length)
+              : avgScore;
+
+            const strengths = [];
+            const weaknesses = [];
+            const topicScores = {};
+            userSubmissions.forEach(s => {
+              if (s.quizTitle || s.topic) {
+                const topic = s.topic || s.quizTitle;
+                if (!topicScores[topic]) topicScores[topic] = { total: 0, count: 0 };
+                topicScores[topic].total += (s.percentage || 0);
+                topicScores[topic].count += 1;
+              }
             });
-            totalAssignedModules += (s.modules?.length || 0);
+            Object.entries(topicScores).forEach(([top, data]) => {
+              const pct = data.total / data.count;
+              if (pct >= 75) strengths.push(top);
+              else if (pct < 60) weaknesses.push(top);
+            });
+
+            traineeMap.set(u.id, {
+              id: u.id,
+              traineeId: u.id,
+              name: u.name,
+              email: u.email,
+              cadreId: u.cadreId || `MOES-CADRE-${u.id}`,
+              designation: u.designation || "Scientist 'B' (Trainee)",
+              department: u.department || "Meteorology Division",
+              station: u.station || "National Meteorological Centre",
+              courseId: c.id,
+              courseTitle: c.title,
+              assessmentScore: avgScore,
+              completionPercentage: u.completionPercentage || (totalSubs > 0 ? Math.min(100, totalSubs * 25) : 0),
+              practiceScore: practiceScore,
+              consistencyScore: consistencyScore,
+              isDisqualified: !!u.isDisqualified,
+              strengths: strengths.length > 0 ? strengths : (u.skills || ["Atmospheric Observation"]),
+              weaknesses: weaknesses,
+              enrolledCoursesCount: (u.enrolledCourseIds || []).length || 1,
+              certificatesCount: (u.certificates || []).length || userSubmissions.filter(s => s.certificateGenerated).length
+            });
           }
+        }
+      });
+    });
+
+    if (traineeMap.size === 0) {
+      allTraineeUsers.forEach(u => {
+        const userSubmissions = (this.quizSubmissions || []).filter(s => s.traineeId === u.id || s.traineeId === u.email || s.traineeName === u.name);
+        const totalSubs = userSubmissions.length;
+        const avgScore = totalSubs > 0 
+          ? Math.round(userSubmissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / totalSubs)
+          : (u.assessmentScore || 0);
+
+        traineeMap.set(u.id, {
+          id: u.id,
+          traineeId: u.id,
+          name: u.name,
+          email: u.email,
+          cadreId: u.cadreId || `MOES-CADRE-${u.id}`,
+          designation: u.designation || "Scientist 'B' (Trainee)",
+          department: u.department || "Meteorology Division",
+          station: u.station || "National Meteorological Centre",
+          courseId: courses[0]?.id || "course_nwp_01",
+          courseTitle: courses[0]?.title || "Numerical Weather Prediction",
+          assessmentScore: avgScore,
+          completionPercentage: u.completionPercentage || 0,
+          practiceScore: avgScore,
+          consistencyScore: totalSubs > 0 ? 80 : 0,
+          isDisqualified: !!u.isDisqualified,
+          strengths: u.skills || ["Atmospheric Observation"],
+          weaknesses: [],
+          enrolledCoursesCount: (u.enrolledCourseIds || []).length || 1,
+          certificatesCount: (u.certificates || []).length
         });
       });
+    }
 
-      const workloadScore = assignedCourses.length * 2 + assignedSubjectNames.length;
-      let workloadStatus = "Optimal";
-      if (workloadScore >= 5) workloadStatus = "High Load";
-      else if (workloadScore <= 1) workloadStatus = "Available";
-
-      return {
-        trainerId: trainer.id,
-        trainerName: trainer.name,
-        designation: trainer.designation,
-        department: trainer.department,
-        station: trainer.station,
-        avatar: trainer.avatar,
-        skills: trainer.skills || trainer.specialization || [],
-        assignedCoursesCount: assignedCourses.length,
-        assignedCourses: assignedCourses.map(c => ({ id: c.id, code: c.code, title: c.title })),
-        assignedSubjects: assignedSubjectNames,
-        totalAssignedModules,
-        workloadScore,
-        workloadStatus
-      };
-    });
+    return Array.from(traineeMap.values());
   }
 
   generateBulkCertificates(courseId, templateData = {}) {

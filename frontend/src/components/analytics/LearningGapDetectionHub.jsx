@@ -229,10 +229,78 @@ export const LearningGapDetectionHub = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // ─── DYNAMIC LEARNING GAP TELEMETRY LOADER ───
+  useEffect(() => {
+    const loadDynamicGaps = async () => {
+      try {
+        const userId = currentUser?.id || currentUser?.traineeId;
+        if (!userId) return;
+        const [analyticsRes, qbRes] = await Promise.all([
+          api.getTraineeAnalytics(userId).catch(() => ({ success: false })),
+          api.getQuestions().catch(() => ({ success: false }))
+        ]);
+
+        const updatedTopics = { ...TOPIC_REMEDIATION_KB };
+
+        if (analyticsRes.success && analyticsRes.submissions && analyticsRes.submissions.length > 0) {
+          const subs = analyticsRes.submissions;
+          const dynamicTopicScores = {};
+
+          subs.forEach(s => {
+            const topic = s.topic || s.subject || s.quizTitle || "Atmospheric Dynamics";
+            if (!dynamicTopicScores[topic]) {
+              dynamicTopicScores[topic] = { total: 0, count: 0, subject: s.subject || "Meteorology" };
+            }
+            dynamicTopicScores[topic].total += (s.percentage || 0);
+            dynamicTopicScores[topic].count += 1;
+          });
+
+          Object.entries(dynamicTopicScores).forEach(([top, stats]) => {
+            const acc = Math.round(stats.total / stats.count);
+            if (updatedTopics[top]) {
+              updatedTopics[top] = {
+                ...updatedTopics[top],
+                baselineAccuracy: acc,
+                totalQuestions: stats.count * 10,
+                wrongQuestions: Math.round((1 - acc / 100) * stats.count * 10),
+                status: acc < 50 ? "critical" : acc < 70 ? "moderate" : "mastered"
+              };
+            }
+          });
+        }
+
+        if (qbRes.success && Array.isArray(qbRes.questions) && qbRes.questions.length > 0) {
+          Object.keys(updatedTopics).forEach(k => {
+            const matchedQs = qbRes.questions.filter(q => 
+              (q.topic && q.topic.toLowerCase().includes(k.toLowerCase())) ||
+              (q.subjectName && q.subjectName.toLowerCase().includes(k.toLowerCase()))
+            );
+            if (matchedQs.length > 0) {
+              updatedTopics[k] = {
+                ...updatedTopics[k],
+                sampleQuestions: matchedQs.slice(0, 5).map(q => ({
+                  question: q.question,
+                  options: q.options || [],
+                  correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+                  explanation: q.explanation || ""
+                }))
+              };
+            }
+          });
+        }
+
+        setTopicsData(updatedTopics);
+      } catch (err) {
+        console.error("Failed to load dynamic learning gap telemetry:", err);
+      }
+    };
+
+    loadDynamicGaps();
+  }, [currentUser]);
+
   // ─── GAP DETECTION CLASSIFICATION ───
   const detectedGaps = useMemo(() => {
     const list = Object.entries(topicsData).map(([key, data]) => {
-      // Check if retested
       const retest = retestedScores[key];
       const effectiveAccuracy = retest !== undefined ? retest : data.baselineAccuracy;
       const isGap = effectiveAccuracy < gapThreshold;
@@ -248,7 +316,6 @@ export const LearningGapDetectionHub = ({
       };
     });
 
-    // Sort: critical gaps first, then moderate, then mastered
     return list.sort((a, b) => a.effectiveAccuracy - b.effectiveAccuracy);
   }, [topicsData, gapThreshold, retestedScores]);
 
@@ -259,9 +326,53 @@ export const LearningGapDetectionHub = ({
   const currentTopic = topicsData[selectedTopicKey] || topicsData["Radar Interpretation"];
 
   // ─── LAUNCH TARGETED PRACTICE QUIZ HANDLER ───
-  const handleLaunchTargetedQuiz = (topicKey) => {
+  const handleLaunchTargetedQuiz = async (topicKey) => {
     const topicInfo = topicsData[topicKey];
     if (!topicInfo) return;
+
+    let quizQuestions = [];
+
+    if (topicInfo.sampleQuestions && topicInfo.sampleQuestions.length > 0) {
+      quizQuestions = topicInfo.sampleQuestions.map((q, idx) => ({
+        id: `q_${idx + 1}`,
+        text: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        marks: 2,
+        difficulty: "Medium",
+        topic: topicInfo.topic
+      }));
+    } else {
+      try {
+        const qbRes = await api.getQuestions();
+        if (qbRes.success && Array.isArray(qbRes.questions)) {
+          const matched = qbRes.questions.filter(q => 
+            (q.topic && q.topic.toLowerCase().includes(topicInfo.topic.toLowerCase())) ||
+            (q.subjectName && q.subjectName.toLowerCase().includes(topicInfo.subject?.toLowerCase() || ""))
+          );
+          if (matched.length > 0) {
+            quizQuestions = matched.slice(0, 5).map((q, idx) => ({
+              id: q.id || `q_${idx + 1}`,
+              text: q.question,
+              options: q.options || [],
+              correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+              explanation: q.explanation || "",
+              marks: Number(q.marks) || 2,
+              difficulty: q.difficulty || "Medium",
+              topic: topicInfo.topic
+            }));
+          }
+        }
+      } catch (e) {
+        console.error("Failed fetching questions from bank:", e);
+      }
+    }
+
+    if (quizQuestions.length === 0) {
+      showToast("No practice questions are available for this topic yet.", "info");
+      return;
+    }
 
     const targetedQuiz = {
       id: `targeted_practice_${Date.now()}`,
@@ -270,39 +381,12 @@ export const LearningGapDetectionHub = ({
       courseId: topicInfo.courseId || "course_nwp_01",
       courseName: topicInfo.subject || "Meteorological Specialization",
       durationMinutes: 15,
-      totalMarks: 20,
-      passMarks: 12,
+      totalMarks: quizQuestions.reduce((acc, q) => acc + (q.marks || 2), 0),
+      passMarks: Math.round(quizQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) * 0.6),
       isPractice: true,
       isAdaptive: true,
       isTargetedRemediation: true,
-      questions: topicInfo.sampleQuestions && topicInfo.sampleQuestions.length > 0 
-        ? topicInfo.sampleQuestions.map((q, idx) => ({
-            id: `q_${idx + 1}`,
-            text: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            explanation: q.explanation,
-            marks: 2,
-            difficulty: "Medium",
-            topic: topicInfo.topic
-          }))
-        : [
-            {
-              id: "q_1",
-              text: `Key foundational assessment question on ${topicInfo.topic}`,
-              options: [
-                "Option A: Standard baseline parameter",
-                "Option B: Verified operational formulation",
-                "Option C: Non-hydrostatic correction factor",
-                "Option D: Boundary layer relaxation zone"
-              ],
-              correctAnswer: 1,
-              explanation: "Option B is the standard validated operational answer.",
-              marks: 2,
-              difficulty: "Medium",
-              topic: topicInfo.topic
-            }
-          ]
+      questions: quizQuestions
     };
 
     if (onStartExam) {

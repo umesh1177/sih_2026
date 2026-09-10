@@ -63,21 +63,20 @@ export const TrainerMatchingWorkloadHub = ({
   const fetchWorkloads = async () => {
     setLoading(true);
     try {
-      // Call backend workload engine or fallback to suggested trainers for simulated subject
       const res = await api.getTrainersWorkload();
-      if (res.success && res.workloads) {
-        setWorkloads(res.workloads);
+      if (res.success && (res.workloads || res.workload)) {
+        setWorkloads(res.workloads || res.workload || []);
       } else {
-        // Fallback to suggestTrainers endpoint
         const sRes = await api.suggestTrainers(simulatedSubject);
         if (sRes.success && sRes.suggestedTrainers) {
-          setWorkloads(sRes.suggestedTrainers);
+          setWorkloads(sRes.suggestedTrainers || []);
+        } else {
+          setWorkloads([]);
         }
       }
     } catch (err) {
       console.error("Failed fetching trainer workloads:", err);
-      // Fallback with mock realistic data
-      setWorkloads(getMockFallbackWorkloads());
+      setWorkloads([]);
     } finally {
       setLoading(false);
     }
@@ -93,197 +92,17 @@ export const TrainerMatchingWorkloadHub = ({
     try {
       const res = await api.suggestTrainers(subjName);
       if (res.success && res.suggestedTrainers) {
-        setWorkloads(res.suggestedTrainers);
+        setWorkloads(res.suggestedTrainers || []);
+      } else {
+        setWorkloads([]);
       }
     } catch (err) {
       console.error("Simulation error:", err);
+      setWorkloads([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const getMockFallbackWorkloads = () => [
-    {
-      trainerId: "u_trainer_1",
-      trainerName: "Dr. Amit Sengupta",
-      department: "Numerical Weather Prediction Division, New Delhi",
-      designation: "Scientist 'F' & Senior Meteorologist",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
-      skills: ["WRF Modeling", "Data Assimilation 4D-Var", "High Performance Computing", "Atmospheric Dynamics"],
-      specialization: ["Numerical Weather Prediction", "WRF / GFS Modeling", "Ensemble Prediction"],
-      isColdStart: false,
-      performanceHistoryAvailable: true,
-      performanceScore: 4.8,
-      performanceDisplay: "4.8 / 5.0 (24 Trainee Reviews • 5 Exams)",
-      feedbackCount: 24,
-      assessmentHistoryCount: 5,
-      currentCourseLoad: 3,
-      assignedCoursesCount: 3,
-      assignedCourses: [{ id: "c1", title: "Advanced Numerical Weather Prediction (NWP)" }, { id: "c2", title: "High-Resolution Regional Atmospheric Dynamics" }, { id: "c3", title: "4D-Var Assimilation" }],
-      activeLearners: 145,
-      scheduledAssessments: 4,
-      declaredAvailability: "Limited",
-      workloadLevel: "High",
-      workloadStatus: "High Load",
-      workloadScore: 88,
-      matchScore: 94,
-      finalRecommendation: "Consider with workload warning",
-      recommendationBadge: "⚠ Consider with workload warning",
-      recommendationTone: "warning",
-      recommendationReason: "High course load (3 active courses) and 145 active trainees. Requires workload balancing approval.",
-      matchedCredentials: {
-        verifiedCompetency: ["WRF Modeling", "4D-Var Assimilation", "Atmospheric Dynamics"],
-        certifications: [{ title: "WMO Lead NWP Forecaster", issuer: "WMO", year: "2023" }],
-        experienceYears: 18,
-        experienceDisplay: "18+ Yrs Operational Forecaster",
-        qualification: "Ph.D. in Atmospheric Sciences (IIT Delhi)"
-      }
-    },
-    {
-      trainerId: "u_trainer_2",
-      trainerName: "Dr. Sunita Kulkarni",
-      department: "Radar & Satellite Meteorology Division, Pune",
-      designation: "Scientist 'E' & Radar Specialist",
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250",
-      skills: ["Dual-Polarization Moments", "TITAN Cell Tracking", "Velocity De-aliasing", "Hydrometeor Classification"],
-      specialization: ["Doppler Weather Radar", "INSAT-3DR Products", "Nowcasting"],
-      isColdStart: false,
-      performanceHistoryAvailable: true,
-      performanceScore: 4.7,
-      performanceDisplay: "4.7 / 5.0 (18 Trainee Reviews • 3 Exams)",
-      feedbackCount: 18,
-      assessmentHistoryCount: 3,
-      currentCourseLoad: 2,
-      assignedCoursesCount: 2,
-      assignedCourses: [{ id: "c4", title: "Doppler Weather Radar Operations & Severe Storm Nowcasting" }],
-      activeLearners: 78,
-      scheduledAssessments: 2,
-      declaredAvailability: "Moderate",
-      workloadLevel: "Moderate",
-      workloadStatus: "Moderate Load",
-      workloadScore: 58,
-      matchScore: 96,
-      finalRecommendation: "Recommended with balanced workload",
-      recommendationBadge: "🟡 Balanced Workload",
-      recommendationTone: "balanced",
-      recommendationReason: "Moderate commitments with high radar competency.",
-      matchedCredentials: {
-        verifiedCompetency: ["Dual-Polarization Radar", "TITAN Tracking", "Severe Storm Nowcasting"],
-        certifications: [{ title: "WMO Radar Specialist Class-I", issuer: "WMO", year: "2023" }],
-        experienceYears: 14,
-        experienceDisplay: "14+ Yrs Operational Forecaster",
-        qualification: "Ph.D. in Radar Remote Sensing (IISc Bangalore)"
-      }
-    },
-    {
-      trainerId: "u_trainer_3",
-      trainerName: "Dr. Rajiv Roy",
-      department: "Cyclone Warning Division, Regional Meteorological Centre Kolkata",
-      designation: "Scientist 'E' & Marine Forecaster",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250",
-      skills: ["Dvorak Technique", "ADCIRC Surge Modeling", "RSMC Warning Protocols", "Coastal Inundation"],
-      specialization: ["Tropical Cyclogenesis", "Storm Surge Modeling", "Ocean Meteorology"],
-      isColdStart: false,
-      performanceHistoryAvailable: true,
-      performanceScore: 4.9,
-      performanceDisplay: "4.9 / 5.0 (20 Trainee Reviews • 2 Exams)",
-      feedbackCount: 20,
-      assessmentHistoryCount: 2,
-      currentCourseLoad: 1,
-      assignedCoursesCount: 1,
-      assignedCourses: [{ id: "c5", title: "Tropical Cyclogenesis & Marine Forecasting" }],
-      activeLearners: 42,
-      scheduledAssessments: 1,
-      declaredAvailability: "Full-Time",
-      workloadLevel: "Optimal",
-      workloadStatus: "Optimal Availability",
-      workloadScore: 32,
-      matchScore: 82,
-      finalRecommendation: "Highly Recommended (Optimal Availability)",
-      recommendationBadge: "🌟 Highly Recommended",
-      recommendationTone: "optimal",
-      recommendationReason: "Optimal availability and top track record.",
-      matchedCredentials: {
-        verifiedCompetency: ["Dvorak Technique", "Storm Surge Modeling", "RSMC Protocols"],
-        certifications: [{ title: "RSMC Tropical Cyclone Lead", issuer: "MoES", year: "2024" }],
-        experienceYears: 12,
-        experienceDisplay: "12+ Yrs Marine Forecaster",
-        qualification: "M.Tech Ocean Engineering (IIT Kharagpur)"
-      }
-    },
-    {
-      trainerId: "u_trainer_4",
-      trainerName: "Dr. Rajesh Pillai",
-      department: "Agrometeorology & Climate Science Division, Pune",
-      designation: "Scientist 'E' & Climate Forecaster",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
-      skills: ["Agrometeorology", "Fasal Modeling", "Monsoon Dynamics", "Soil Moisture Index"],
-      specialization: ["Agrometeorology", "Crop-Weather Modeling", "Drought Early Warning"],
-      isColdStart: true,
-      performanceHistoryAvailable: false,
-      performanceScore: null,
-      performanceDisplay: "Performance history unavailable",
-      feedbackCount: 0,
-      assessmentHistoryCount: 0,
-      currentCourseLoad: 0,
-      assignedCoursesCount: 0,
-      assignedCourses: [],
-      activeLearners: 0,
-      scheduledAssessments: 0,
-      declaredAvailability: "Full-Time",
-      workloadLevel: "Optimal",
-      workloadStatus: "Optimal Availability",
-      workloadScore: 0,
-      matchScore: 91,
-      finalRecommendation: "Eligible New Faculty (Cold-Start Matched)",
-      recommendationBadge: "🌱 Matched on Credentials (Cold-Start)",
-      recommendationTone: "cold-start",
-      recommendationReason: "Performance history unavailable. Matched using verified competency, certifications, qualification, and 10+ yrs field experience.",
-      matchedCredentials: {
-        verifiedCompetency: ["Agrometeorology", "Fasal Crop Modeling", "Drought Warning"],
-        certifications: [{ title: "WMO Agrometeorological Advisory Lead", issuer: "WMO", year: "2023" }],
-        experienceYears: 10,
-        experienceDisplay: "10+ Yrs Field Research",
-        qualification: "Ph.D. in Agrometeorology (IARI New Delhi)"
-      }
-    },
-    {
-      trainerId: "u_trainer_5",
-      trainerName: "Dr. Sunita Deshmukh",
-      department: "Satellite Meteorology & Space Applications, New Delhi",
-      designation: "Scientist 'D' & Remote Sensing Analyst",
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=250",
-      skills: ["Satellite Meteorology", "Radiance Data Assimilation", "RGB Composite Interpretation", "Microwave Sounding"],
-      specialization: ["Satellite Radiance Assimilation", "INSAT-3DR Sounder Products", "Convective Initiation"],
-      isColdStart: true,
-      performanceHistoryAvailable: false,
-      performanceScore: null,
-      performanceDisplay: "Performance history unavailable",
-      feedbackCount: 0,
-      assessmentHistoryCount: 0,
-      currentCourseLoad: 1,
-      assignedCoursesCount: 1,
-      assignedCourses: [{ id: "c6", title: "Satellite Remote Sensing" }],
-      activeLearners: 50,
-      scheduledAssessments: 1,
-      declaredAvailability: "Limited",
-      workloadLevel: "High",
-      workloadStatus: "High Load",
-      workloadScore: 75,
-      matchScore: 89,
-      finalRecommendation: "Consider with workload warning (Cold-Start)",
-      recommendationBadge: "⚠ Workload Warning (New Faculty)",
-      recommendationTone: "warning",
-      recommendationReason: "Newly onboarded faculty with high operational watch duties. Performance history unavailable — matched on verified ISRO fellowship & M.Tech credentials.",
-      matchedCredentials: {
-        verifiedCompetency: ["Satellite Radiance", "INSAT-3DR Products", "RGB Composites"],
-        certifications: [{ title: "ISRO/WMO Satellite Meteorology Fellowship", issuer: "ISRO / CSSTEAP", year: "2023" }],
-        experienceYears: 8,
-        experienceDisplay: "8+ Yrs Space Applications",
-        qualification: "M.Tech Remote Sensing (IIRS Dehradun)"
-      }
-    }
-  ];
 
   // Filtering trainers
   const filteredTrainers = workloads.filter(t => {

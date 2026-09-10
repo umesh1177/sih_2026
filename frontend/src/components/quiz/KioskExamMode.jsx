@@ -49,115 +49,6 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
   ]);
   const [questionTimes, setQuestionTimes] = useState({}); // { [questionId]: secondsSpent }
 
-  // Default fallback questions with Easy, Moderate, Hard coverage
-  const defaultFallbackQuestions = [
-    {
-      id: "q_demo_1",
-      question: "In numerical weather prediction (NWP), what is the primary role of the Arakawa C-grid staggering?",
-      options: [
-        "Placing velocity variables (u, v) on cell faces and mass variables (T, P) at cell centres to optimise gravity wave dispersion",
-        "Placing all variables at cell vertices exclusively",
-        "Eliminating vertical advection across sigma coordinates",
-        "Converting non-hydrostatic systems into hydrostatic balance"
-      ],
-      correctAnswer: 0,
-      marks: 3,
-      difficulty: "Moderate",
-      subjectName: "Atmospheric Dynamics",
-      explanation: "Arakawa C-grid offers superior dispersion properties for high-frequency gravity and inertia-gravity waves."
-    },
-    {
-      id: "q_demo_2",
-      question: "In dual-polarization weather radar, what physical property does Differential Reflectivity (ZDR) primarily characterize?",
-      options: [
-        "Echo top height above sea level",
-        "The median oblateness / eccentricity of hydrometeors (horizontal vs vertical axis ratio)",
-        "Radial velocity toward the radar antenna",
-        "Total atmospheric precipitable water"
-      ],
-      correctAnswer: 1,
-      marks: 3,
-      difficulty: "Moderate",
-      subjectName: "Doppler Radar Meteorology",
-      explanation: "ZDR = 10 * log10(Zh / Zv), giving direct insights into hydrometeor geometric oblateness."
-    },
-    {
-      id: "q_demo_3",
-      question: "For Tropical Cyclone intensity estimation via the Dvorak Technique, which satellite pattern represents the highest convective organization?",
-      options: [
-        "Shear Pattern with displaced convective core",
-        "Curved Band Pattern with 0.5 spiral wrap",
-        "Eye Pattern with cold symmetrical Central Dense Overcast (CDO)",
-        "Isolated banding without low-level center definition"
-      ],
-      correctAnswer: 2,
-      marks: 4,
-      difficulty: "Hard",
-      subjectName: "Tropical Meteorology",
-      explanation: "A distinct, warm eye embedded within a cold, symmetrical CDO yields the highest T-Number intensity."
-    },
-    {
-      id: "q_demo_4",
-      question: "Which condition must be satisfied to prevent numerical instability in explicit finite difference advection schemes (CFL condition)?",
-      options: [
-        "CFL = (u · Δt) / Δx ≤ 1.0",
-        "CFL = (u · Δx) / Δt ≥ 1.0",
-        "CFL = (Δx · Δt) / u = 0",
-        "CFL = u² / (g · Δz) > 2.0"
-      ],
-      correctAnswer: 0,
-      marks: 3,
-      difficulty: "Moderate",
-      subjectName: "Numerical Modeling",
-      explanation: "The Courant-Friedrichs-Lewy condition dictates that the physical domain of dependence must lie within the numerical domain."
-    },
-    {
-      id: "q_demo_5",
-      question: "What meteorological instrument is primarily used to measure solar irradiance and direct beam sunshine?",
-      options: [
-        "Pyrheliometer",
-        "Barometer",
-        "Anemometer",
-        "Psychrometer"
-      ],
-      correctAnswer: 0,
-      marks: 2,
-      difficulty: "Easy",
-      subjectName: "Meteorological Instrumentation",
-      explanation: "A pyrheliometer measures direct beam solar irradiance at normal incidence."
-    },
-    {
-      id: "q_demo_6",
-      question: "In 4D-Var data assimilation, how is the gradient of the cost function with respect to initial state vector calculated?",
-      options: [
-        "Integrating the adjoint model backward in time over the assimilation window",
-        "Direct forward empirical interpolation",
-        "Applying random Monte Carlo perturbations",
-        "Eliminating covariance matrices completely"
-      ],
-      correctAnswer: 0,
-      marks: 4,
-      difficulty: "Hard",
-      subjectName: "Data Assimilation",
-      explanation: "Adjoint model integration backward in time provides the exact gradient for quasi-Newton optimization."
-    },
-    {
-      id: "q_demo_7",
-      question: "Which cloud type is characterized as high-level, thin, and composed almost entirely of ice crystals?",
-      options: [
-        "Cirrus",
-        "Stratus",
-        "Cumulus",
-        "Nimbostratus"
-      ],
-      correctAnswer: 0,
-      marks: 2,
-      difficulty: "Easy",
-      subjectName: "Cloud Physics",
-      explanation: "Cirrus clouds are high-altitude hair-like clouds composed of delicate ice crystals."
-    }
-  ];
-
   // Helper to normalize difficulty level strings
   const normalizeDiff = (d) => {
     if (!d) return "Moderate";
@@ -167,9 +58,9 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     return "Moderate";
   };
 
-  // Full Pool of Available Questions
+  // Full Pool of Available Questions strictly from quiz
   const allPoolQuestions = React.useMemo(() => {
-    const pool = (quiz?.questions && quiz.questions.length > 0) ? quiz.questions : defaultFallbackQuestions;
+    const pool = (quiz?.questions && Array.isArray(quiz.questions)) ? quiz.questions : [];
     return pool.map((q, idx) => ({
       ...q,
       id: q.id || `q_p_${idx}`,
@@ -289,10 +180,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       const avgTimeText = `${avgTimePerQuestionSec} sec/question`;
 
       const submissionPayload = {
-        quizId: quiz?.id || "mock_quiz",
+        quizId: quiz?.id || "quiz_unspecified",
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
-        traineeName: currentUser?.name || "Rahul Sharma",
+        traineeName: currentUser?.name || currentUser?.email || "Officer Trainee",
         score: calculatedScore,
         totalMarks,
         percentage,
@@ -344,10 +235,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     } catch (err) {
       console.error("Submission failed:", err);
       setSubmissionResult({
-        quizId: quiz?.id || "mock_quiz",
+        quizId: quiz?.id || "quiz_unspecified",
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
-        traineeName: currentUser?.name || "Rahul Sharma",
+        traineeName: currentUser?.name || currentUser?.email || "Officer Trainee",
         score: disqualified ? 0 : 16,
         totalMarks: 20,
         percentage: disqualified ? 0 : 80,
@@ -657,7 +548,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {isDisq ? "ASSESSMENT DISQUALIFIED" : (submissionResult.quizTitle || "Assessment Completed")}
             </h2>
             <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">
-              Candidate: <b className="text-slate-800">{currentUser?.name || "Rahul Sharma"}</b> • Submission ID: <span className="font-mono">{submissionResult.resultId || "SUB-2026-98"}</span>
+              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Submission ID: <span className="font-mono">{submissionResult.resultId || "SUB-2026-98"}</span>
             </p>
           </div>
 
@@ -930,7 +821,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </span>
             </div>
             <p className="text-[11px] text-slate-500 font-medium">
-              Candidate: <b className="text-slate-800">{currentUser?.name || "Rahul Sharma"}</b> • Fullscreen Security Locked
+              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Fullscreen Security Locked
             </p>
           </div>
         </div>

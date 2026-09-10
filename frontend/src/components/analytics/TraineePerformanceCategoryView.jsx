@@ -175,8 +175,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       if (tRes.success && Array.isArray(tRes.trainees)) {
         setTrainees(tRes.trainees);
       } else {
-        // Fallback default realistic trainees if empty
-        setTrainees(generateDefaultTrainees());
+        setTrainees([]);
       }
 
       if (cRes.success && Array.isArray(cRes.courses)) {
@@ -184,145 +183,22 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       }
     } catch (err) {
       console.error("Error loading performance data:", err);
-      setTrainees(generateDefaultTrainees());
+      setTrainees([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const generateDefaultTrainees = () => [
-    {
-      id: "t_1",
-      traineeId: "u_trainee_1",
-      name: "Rahul Sharma",
-      email: "rahul.sharma@imd.gov.in",
-      cadreId: "MOES-MET-2026-4491",
-      designation: "Scientist 'B' (Trainee)",
-      department: "IMD Numerical Weather Prediction",
-      station: "Meteorological Centre, Jaipur",
-      courseId: "course_nwp_01",
-      courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-      assessmentScore: 88,
-      completionPercentage: 92,
-      practiceScore: 84,
-      consistencyScore: 90,
-      isDisqualified: false,
-      strengths: ["Atmospheric Dynamics", "Sigma Coordinates", "Thermodynamic Diagrams"],
-      needsImprovement: ["Radar Interpretation", "Non-hydrostatic Advection"],
-      submissionsCount: 4
-    },
-    {
-      id: "t_2",
-      traineeId: "u_trainee_2",
-      name: "Priya Nair",
-      email: "priya.nair@imd.gov.in",
-      cadreId: "MOES-MET-2026-5512",
-      designation: "Scientist 'B' (Radar Specialist)",
-      department: "Radar Meteorology & Cyclone Tracking",
-      station: "Cyclone Warning Centre, Visakhapatnam",
-      courseId: "course_nwp_01",
-      courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-      assessmentScore: 78,
-      completionPercentage: 80,
-      practiceScore: 72,
-      consistencyScore: 85,
-      isDisqualified: false,
-      strengths: ["Doppler Radar Reflectivity", "Cyclone Vortex Tracking", "ZDR/KDP Classification"],
-      needsImprovement: ["HPC Numerical Solvers", "Variational 4D-Var Constraints"],
-      submissionsCount: 3
-    },
-    {
-      id: "t_3",
-      traineeId: "u_trainee_3",
-      name: "Ananya Roy",
-      email: "ananya.roy@incois.gov.in",
-      cadreId: "MOES-OCN-2026-8819",
-      designation: "Project Scientist 'A'",
-      department: "Satellite Data Assimilation Cell",
-      station: "National Centre for Medium Range Weather Forecasting",
-      courseId: "course_nwp_01",
-      courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-      assessmentScore: 94,
-      completionPercentage: 100,
-      practiceScore: 92,
-      consistencyScore: 95,
-      isDisqualified: false,
-      strengths: ["Satellite Radiances Ingestion", "3D-Var Cost Function Minimization", "Atmospheric Wave Dynamics"],
-      needsImprovement: ["Planetary Boundary Layer Closures"],
-      submissionsCount: 5
-    },
-    {
-      id: "t_4",
-      traineeId: "u_trainee_4",
-      name: "Vikram Malhotra",
-      email: "vikram.malhotra@imd.gov.in",
-      cadreId: "MOES-MET-2026-3011",
-      designation: "Scientific Assistant",
-      department: "Agromet Advisory Service Group",
-      station: "IMD Pune Training Centre",
-      courseId: "course_nwp_01",
-      courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-      assessmentScore: 62,
-      completionPercentage: 65,
-      practiceScore: 58,
-      consistencyScore: 60,
-      isDisqualified: false,
-      strengths: ["Surface Meteorological Observations", "Rainfall Spatial Mapping"],
-      needsImprovement: ["Numerical CFL Stability Limits", "Tensor Gradient Formulations"],
-      submissionsCount: 2
-    },
-    {
-      id: "t_5",
-      traineeId: "u_trainee_5",
-      name: "Rohan Kulkarni",
-      email: "rohan.kulkarni@imd.gov.in",
-      cadreId: "MOES-MET-2026-9920",
-      designation: "Meteorological Assistant",
-      department: "IMD Numerical Weather Prediction",
-      station: "IMD Mausam Bhavan, New Delhi",
-      courseId: "course_nwp_01",
-      courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-      assessmentScore: 42,
-      completionPercentage: 35,
-      practiceScore: 40,
-      consistencyScore: 30,
-      isDisqualified: false,
-      strengths: ["Station Plotting"],
-      needsImprovement: ["Atmospheric Dynamics", "Numerical Equation Solvers", "Radar Meteorology", "CFL Stability"],
-      submissionsCount: 1
-    },
-    {
-      id: "t_6",
-      traineeId: "u_trainee_6",
-      name: "Karan Johar (Disqualified Cadet)",
-      email: "karan.j@imd.gov.in",
-      cadreId: "MOES-MET-2026-1102",
-      designation: "Trainee Cadet",
-      department: "Radar Meteorology & Cyclone Tracking",
-      station: "Radar Station, Chennai",
-      courseId: "course_nwp_01",
-      courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-      assessmentScore: 0,
-      completionPercentage: 20,
-      practiceScore: 10,
-      consistencyScore: 15,
-      isDisqualified: true,
-      strengths: ["Basic Meteorology"],
-      needsImprovement: ["Kiosk Security Compliance", "Full Curriculum Retake Required"],
-      submissionsCount: 0
-    }
-  ];
 
   // ─── COMPOSITE OVERALL SCORE & CATEGORY CALCULATION ───
   const processedTrainees = useMemo(() => {
     const totalWeight = (weights.assessmentWeight + weights.courseCompletionWeight + weights.practiceWeight + weights.consistencyWeight) || 100;
 
     return trainees.map(trainee => {
-      // 1. Calculate weighted overall score
-      const aScore = Number(trainee.assessmentScore ?? trainee.avgQuizScore ?? 75);
-      const cScore = Number(trainee.completionPercentage ?? trainee.progressPercentage ?? 60);
-      const pScore = Number(trainee.practiceScore ?? 70);
-      const kScore = Number(trainee.consistencyScore ?? 80);
+      // 1. Calculate weighted overall score from actual trainee data
+      const aScore = Number(trainee.assessmentScore ?? trainee.avgQuizScore ?? 0);
+      const cScore = Number(trainee.completionPercentage ?? trainee.progressPercentage ?? 0);
+      const pScore = Number(trainee.practiceScore ?? 0);
+      const kScore = Number(trainee.consistencyScore ?? 0);
 
       const weightedSum = (
         (aScore * weights.assessmentWeight) +
@@ -348,8 +224,8 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       }
 
       // 3. Extract Competencies & Mastery Diagnostics
-      const strengths = trainee.strengths || (compositeScore >= 75 ? ["Atmospheric Dynamics", "Synoptic Weather Analysis", "Radar Interpretation"] : ["Surface Observation Guidelines"]);
-      const needsImprovement = trainee.needsImprovement || (compositeScore < 70 ? ["Radar Interpretation", "Numerical Prediction", "CFL Stability Limits"] : ["Advanced 4D-Var Mathematical Optimizations"]);
+      const strengths = trainee.strengths && trainee.strengths.length > 0 ? trainee.strengths : [];
+      const needsImprovement = trainee.needsImprovement && trainee.needsImprovement.length > 0 ? trainee.needsImprovement : [];
 
       return {
         ...trainee,

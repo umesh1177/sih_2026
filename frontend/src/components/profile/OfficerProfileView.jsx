@@ -48,7 +48,7 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
   };
 
   const [form, setForm] = useState({
-    name: currentUser?.name || "Rahul Sharma",
+    name: currentUser?.name || currentUser?.email || "Officer Trainee",
     email: currentUser?.email || "rahul.sharma@imd.gov.in",
     department: currentUser?.department || "Numerical Weather Prediction (NWP) Division",
     designation: currentUser?.designation || "Scientist 'B' (Trainee)",

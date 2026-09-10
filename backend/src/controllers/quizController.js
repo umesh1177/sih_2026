@@ -463,15 +463,48 @@ export const getTraineeAnalytics = (req, res) => {
       ? Math.round(submissions.reduce((acc, s) => acc + s.percentage, 0) / totalQuizzesAttempted) 
       : 0;
 
-    // Radar Competency Scores for Trainee
-    const competencyRadar = [
-      { subject: "NWP & Dynamics", score: 92, fullMark: 100 },
-      { subject: "Doppler Radar (DWR)", score: 88, fullMark: 100 },
-      { subject: "Cyclone Dvorak Tech", score: 85, fullMark: 100 },
-      { subject: "Satellite Meteorology", score: 90, fullMark: 100 },
-      { subject: "Data Assimilation", score: 78, fullMark: 100 },
-      { subject: "Agrometeorology", score: 70, fullMark: 100 }
-    ];
+    // Dynamically calculate Radar Competency Scores for Trainee from actual submissions and courses
+    const competencyMap = {};
+    
+    courses.forEach(c => {
+      (c.subjects || []).forEach(sub => {
+        const subName = sub.title || sub.name || "Atmospheric Dynamics";
+        if (!competencyMap[subName]) {
+          competencyMap[subName] = { subject: subName, totalMarks: 0, scoredMarks: 0, count: 0, fullMark: 100 };
+        }
+      });
+    });
+
+    submissions.forEach(s => {
+      const quiz = db.getQuizById ? db.getQuizById(s.quizId) : null;
+      const subSubject = s.subject || quiz?.subject || s.quizTitle || "Atmospheric Dynamics";
+      if (!competencyMap[subSubject]) {
+        competencyMap[subSubject] = { subject: subSubject, totalMarks: 0, scoredMarks: 0, count: 0, fullMark: 100 };
+      }
+      competencyMap[subSubject].totalMarks += (s.totalMarks || 100);
+      competencyMap[subSubject].scoredMarks += (s.score || 0);
+      competencyMap[subSubject].count += 1;
+    });
+
+    let competencyRadar = Object.values(competencyMap).map(item => {
+      const score = item.totalMarks > 0 
+        ? Math.round((item.scoredMarks / item.totalMarks) * 100) 
+        : 0;
+      return {
+        subject: item.subject,
+        score,
+        fullMark: 100
+      };
+    });
+
+    if (competencyRadar.length === 0) {
+      competencyRadar = [
+        { subject: "Atmospheric Dynamics", score: avgScorePct, fullMark: 100 },
+        { subject: "Radar Meteorology", score: avgScorePct, fullMark: 100 },
+        { subject: "Satellite Meteorology", score: avgScorePct, fullMark: 100 },
+        { subject: "Numerical Weather Prediction", score: avgScorePct, fullMark: 100 }
+      ];
+    }
 
     return res.json({
       success: true,

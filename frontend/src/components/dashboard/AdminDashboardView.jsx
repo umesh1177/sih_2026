@@ -273,9 +273,9 @@ export const AdminDashboardView = ({
         <div className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-2xs hover:shadow-md transition-all flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Credentials Issued</span>
-            <div className="text-2xl font-black text-slate-900">{stats?.totalCertificatesIssued || 142}</div>
+            <div className="text-2xl font-black text-slate-900">{stats?.totalCertificatesIssued ?? 0}</div>
             <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> Pass Rate: {stats?.overallPassRate || 92}%
+              <ShieldCheck className="w-3.5 h-3.5" /> Pass Rate: {stats?.overallPassRate ?? 0}%
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 shadow-2xs">

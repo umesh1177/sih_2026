@@ -2551,11 +2551,11 @@ export const TrainerScheduleAssessmentView = ({
                         <span>Easy Difficulty</span>
                       </span>
                       <span className="text-emerald-700">
-                        {quizAnalytics?.difficultyPerformance?.Easy?.accuracy || 92}% Accuracy
+                        {quizAnalytics?.difficultyPerformance?.Easy?.accuracy ?? 0}% Accuracy
                       </span>
                     </div>
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Easy?.accuracy || 92}%` }} />
+                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Easy?.accuracy ?? 0}%` }} />
                     </div>
                     <p className="text-[10px] text-slate-400 font-medium">
                       Fundamental concepts and direct formula recall
@@ -2570,11 +2570,11 @@ export const TrainerScheduleAssessmentView = ({
                         <span>Medium Difficulty</span>
                       </span>
                       <span className="text-blue-700">
-                        {quizAnalytics?.difficultyPerformance?.Medium?.accuracy || 76}% Accuracy
+                        {quizAnalytics?.difficultyPerformance?.Medium?.accuracy ?? 0}% Accuracy
                       </span>
                     </div>
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-600 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Medium?.accuracy || 76}%` }} />
+                      <div className="bg-blue-600 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Medium?.accuracy ?? 0}%` }} />
                     </div>
                     <p className="text-[10px] text-slate-400 font-medium">
                       Operational meteorological scenarios & synthesis
@@ -2589,11 +2589,11 @@ export const TrainerScheduleAssessmentView = ({
                         <span>Hard Difficulty</span>
                       </span>
                       <span className="text-amber-700">
-                        {quizAnalytics?.difficultyPerformance?.Hard?.accuracy || 58}% Accuracy
+                        {quizAnalytics?.difficultyPerformance?.Hard?.accuracy ?? 0}% Accuracy
                       </span>
                     </div>
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-amber-500 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Hard?.accuracy || 58}%` }} />
+                      <div className="bg-amber-500 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Hard?.accuracy ?? 0}%` }} />
                     </div>
                     <p className="text-[10px] text-slate-400 font-medium">
                       Discriminative analysis & advanced diagnostic equations

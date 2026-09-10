@@ -976,7 +976,11 @@ export const CourseOverviewPage = ({
                           <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                             <span className="text-xs font-black text-amber-900">
-                              {(((fb.trainerRating || 5) + (fb.contentRating || 5) + (fb.relevanceRating || 5)) / 3).toFixed(1)} / 5.0
+                              {(() => {
+                                const validRatings = [fb.trainerRating, fb.contentRating, fb.relevanceRating, fb.rating].filter(r => typeof r === "number" && r > 0);
+                                if (validRatings.length === 0) return "Not rated";
+                                return `${(validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(1)} / 5.0`;
+                              })()}
                             </span>
                           </div>
                           <span className="text-[10px] text-slate-400 font-medium">

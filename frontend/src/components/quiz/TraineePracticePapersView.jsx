@@ -937,54 +937,15 @@ export const TraineePracticePapersView = ({
                 const qList = selectedAttemptForAnalytics.paper?.questions || [];
                 const ansMap = selectedAttemptForAnalytics.answers || {};
 
-                // Synthesize list if matching questions exist or fallback to standard questions
-                const displayQuestions = qList.length > 0 ? qList : [
-                  {
-                    id: "q_demo_1",
-                    question: "In numerical weather prediction, what is the primary advantage of the Arakawa C-grid?",
-                    topic: "Atmospheric Dynamics",
-                    options: [
-                      "Staggering velocity components on cell edges eliminates high-frequency 2Δx pressure checkerboarding",
-                      "It converts non-hydrostatic systems into simplified barotropic equilibrium",
-                      "It prevents all vertical mass exchange across sigma coordinate interfaces",
-                      "It removes the need for Courant-Friedrichs-Lewy (CFL) time-step constraints"
-                    ],
-                    correctAnswer: 0,
-                    marks: 3,
-                    difficulty: "Medium",
-                    explanation: "Arakawa C-grid optimizes phase speed accuracy for high-frequency gravity and inertia-gravity waves."
-                  },
-                  {
-                    id: "q_demo_2",
-                    question: "Which Courant-Friedrichs-Lewy (CFL) stability criterion governs explicit horizontal advection schemes?",
-                    topic: "Numerical Modeling",
-                    options: [
-                      "CFL = (u · Δt) / Δx ≤ 1.0",
-                      "CFL = (u · Δx) / Δt ≥ 2.0",
-                      "CFL = (g · Δz) / u² = 0",
-                      "CFL = (Δx · Δy) / Δt > 100"
-                    ],
-                    correctAnswer: 0,
-                    marks: 3,
-                    difficulty: "Hard",
-                    explanation: "Numerical stability in explicit advection requires that physical information propagates slower than the numerical grid step."
-                  },
-                  {
-                    id: "q_demo_3",
-                    question: "In dual-polarization weather radar, what physical property does Differential Reflectivity (ZDR) primarily characterize?",
-                    topic: "Radar Interpretation",
-                    options: [
-                      "Echo top height above sea level",
-                      "The median oblateness / eccentricity of hydrometeors (horizontal vs vertical axis ratio)",
-                      "Radial velocity toward the radar antenna",
-                      "Total atmospheric precipitable water"
-                    ],
-                    correctAnswer: 1,
-                    marks: 3,
-                    difficulty: "Medium",
-                    explanation: "ZDR is calculated as 10 · log10(Zh / Zv), giving direct insight into hydrometeor geometric eccentricity."
-                  }
-                ];
+                const displayQuestions = qList;
+
+                if (displayQuestions.length === 0) {
+                  return (
+                    <div className="p-12 text-center text-slate-400 font-medium text-xs">
+                      No question breakdown available for this attempt.
+                    </div>
+                  );
+                }
 
                 const filtered = displayQuestions.filter((q, qIdx) => {
                   const ans = ansMap[q.id] || ansMap[`q_${qIdx + 1}`] || ansMap[`q${qIdx + 1}`] || {};

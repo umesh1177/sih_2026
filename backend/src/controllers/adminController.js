@@ -7,21 +7,69 @@ export const getAdminStats = (req, res) => {
     const pendingUsers = db.users.filter(u => u.status === "pending");
     const courses = db.getCourses();
     const quizzes = db.getQuizzes();
-    const submissions = db.quizSubmissions;
+    const submissions = db.quizSubmissions || [];
 
     const totalCertificates = submissions.filter(s => s.certificateGenerated).length;
     const passedCount = submissions.filter(s => s.passed).length;
     const overallPassRate = submissions.length > 0 ? Math.round((passedCount / submissions.length) * 100) : 0;
+    const avgScore = submissions.length > 0 
+      ? Math.round(submissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / submissions.length) 
+      : 0;
 
     // Dynamic department-wise distribution
     const deptMap = {};
     db.users.forEach(u => {
-      const d = u.department || "General Division";
-      if (!deptMap[d]) deptMap[d] = { name: d, count: 0, activeTrainees: 0 };
+      const d = u.department || "General Meteorology Division";
+      if (!deptMap[d]) deptMap[d] = { name: d, count: 0, activeTrainees: 0, totalScore: 0, subCount: 0 };
       deptMap[d].count += 1;
       if (u.role === "trainee") deptMap[d].activeTrainees += 1;
     });
-    const deptDistribution = Object.values(deptMap);
+
+    submissions.forEach(s => {
+      const u = db.findUserById(s.traineeId);
+      const d = u?.department || "General Meteorology Division";
+      if (deptMap[d]) {
+        deptMap[d].totalScore += (s.percentage || 0);
+        deptMap[d].subCount += 1;
+      }
+    });
+
+    const deptDistribution = Object.values(deptMap).map(d => ({
+      name: d.name,
+      count: d.count,
+      activeTrainees: d.activeTrainees,
+      avgScore: d.subCount > 0 ? Math.round(d.totalScore / d.subCount) : 0
+    }));
+
+    // Dynamic Regional Station/Center distribution
+    const centerMap = {};
+    const totalTraineesCount = trainees.length || 1;
+    trainees.forEach(t => {
+      const station = t.station || "National Meteorological Centre";
+      if (!centerMap[station]) centerMap[station] = 0;
+      centerMap[station] += 1;
+    });
+
+    const centers = Object.entries(centerMap).map(([center, count]) => ({
+      center,
+      count,
+      participants: `${Math.round((count / totalTraineesCount) * 100)}%`,
+      status: count >= 5 ? "Active Lead" : "Operational"
+    }));
+
+    // Dynamic Grade Distribution
+    const distinctionCount = submissions.filter(s => s.percentage >= 90).length;
+    const firstClassCount = submissions.filter(s => s.percentage >= 75 && s.percentage < 90).length;
+    const passCount = submissions.filter(s => s.percentage >= 60 && s.percentage < 75).length;
+    const remedialCount = submissions.filter(s => s.percentage < 60).length;
+    const totalSubs = submissions.length || 1;
+
+    const gradeDistribution = {
+      distinction: { count: distinctionCount, percentage: submissions.length > 0 ? ((distinctionCount / totalSubs) * 100).toFixed(1) : "0.0" },
+      firstClass: { count: firstClassCount, percentage: submissions.length > 0 ? ((firstClassCount / totalSubs) * 100).toFixed(1) : "0.0" },
+      passing: { count: passCount, percentage: submissions.length > 0 ? ((passCount / totalSubs) * 100).toFixed(1) : "0.0" },
+      remedial: { count: remedialCount, percentage: submissions.length > 0 ? ((remedialCount / totalSubs) * 100).toFixed(1) : "0.0" }
+    };
 
     // Dynamic monthly certifications aggregated from real submissions
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -36,8 +84,7 @@ export const getAdminStats = (req, res) => {
     const monthlyCertifications = Object.values(monthCounts).length > 0
       ? Object.values(monthCounts)
       : [
-          { month: "Jan", certificates: 0, enrollments: 0 },
-          { month: "Feb", certificates: 0, enrollments: 0 }
+          { month: "Jan", certificates: totalCertificates, enrollments: totalTraineesCount }
         ];
 
     return res.json({
@@ -50,13 +97,20 @@ export const getAdminStats = (req, res) => {
         totalQuizzesScheduled: quizzes.length,
         totalCertificatesIssued: totalCertificates,
         overallPassRate: overallPassRate,
+        averageScore: avgScore,
         deptDistribution,
+        centers,
+        gradeDistribution,
         monthlyCertifications
       }
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
+};
+
+export const getPlatformAnalytics = (req, res) => {
+  return getAdminStats(req, res);
 };
 
 export const getPendingUsers = (req, res) => {

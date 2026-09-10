@@ -83,6 +83,7 @@ router.post("/competencies/:competencyId/assign", requireAuth, requireRole("admi
 
 // --- PROTECTED: Admin Endpoints (admin role only) ---
 router.get("/admin/stats", requireAuth, requireRole("admin"), adminController.getAdminStats);
+router.get("/admin/analytics", requireAuth, requireRole("admin"), adminController.getPlatformAnalytics);
 router.get("/admin/users/pending", requireAuth, requireRole("admin"), adminController.getPendingUsers);
 router.get("/admin/users", requireAuth, requireRole("admin"), adminController.getAllUsers);
 router.post("/admin/users/:id/verify", requireAuth, requireRole("admin"), adminController.verifyUser);

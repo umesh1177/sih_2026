@@ -67,7 +67,7 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
       const payload = {
         courseId: course.id,
         traineeId: currentUser?.id || "u_trainee_1",
-        traineeName: currentUser?.name || "Rahul Sharma",
+        traineeName: currentUser?.name || currentUser?.email || "Officer Trainee",
         ...feedbackForm
       };
       const res = await api.submitFeedback(payload);

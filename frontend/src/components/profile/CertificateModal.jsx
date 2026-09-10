@@ -5,7 +5,7 @@ export const CertificateModal = ({ isOpen, onClose, submission, courseTitle, tra
   if (!isOpen) return null;
 
   const certId = submission?.certificateId || "MOES-IMD-CERT-2025-0981";
-  const name = traineeName || submission?.traineeName || "Rahul Sharma";
+  const name = traineeName || submission?.traineeName || currentUser?.name || currentUser?.email || "Officer Trainee";
   const course = courseTitle || submission?.quizTitle || "Advanced Numerical Weather Prediction (NWP)";
   const date = submission?.submittedAt ? new Date(submission.submittedAt).toLocaleDateString("en-IN", {
     day: "numeric",

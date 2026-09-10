@@ -139,7 +139,7 @@ export const TraineeDashboardView = ({
               </span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Officer {currentUser?.name || "Rahul Sharma"}
+              Officer {currentUser?.name || currentUser?.email || "Officer Trainee"}
             </h1>
             <p className="text-xs text-slate-500 font-medium">
               {currentUser?.designation || "Trainee Cadre"} • {currentUser?.station || "Regional Training Center"}
