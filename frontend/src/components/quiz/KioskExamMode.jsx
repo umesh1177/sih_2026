@@ -37,12 +37,20 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
   const [reviewMode, setReviewMode] = useState(false);
 
   // ⚡ Adaptive Testing Engine State
-  const [adaptiveDifficulty, setAdaptiveDifficulty] = useState(quiz?.initialDifficulty || "Medium");
+  const isAdaptiveQuiz = quiz?.isAdaptive !== false;
+  const initialDiff = quiz?.initialDifficulty === "Easy" ? "Easy" : (quiz?.initialDifficulty === "Hard" ? "Hard" : "Moderate");
+  const [currentDifficulty, setCurrentDifficulty] = useState(initialDiff);
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+  const [consecutiveWrong, setConsecutiveWrong] = useState(0);
   const [adaptiveToast, setAdaptiveToast] = useState("");
-  const [adaptiveTrajectory, setAdaptiveTrajectory] = useState([quiz?.initialDifficulty || "Medium"]);
+  const [adaptiveTrajectory, setAdaptiveTrajectory] = useState([initialDiff]);
+  const [difficultyHistory, setDifficultyHistory] = useState([
+    { questionNumber: 1, difficulty: initialDiff, topic: quiz?.subjectName || "Atmospheric Dynamics" }
+  ]);
   const [questionTimes, setQuestionTimes] = useState({}); // { [questionId]: secondsSpent }
 
-  const questions = quiz?.questions && quiz.questions.length > 0 ? quiz.questions : [
+  // Default fallback questions with Easy, Moderate, Hard coverage
+  const defaultFallbackQuestions = [
     {
       id: "q_demo_1",
       question: "In numerical weather prediction (NWP), what is the primary role of the Arakawa C-grid staggering?",
@@ -54,7 +62,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       ],
       correctAnswer: 0,
       marks: 3,
-      difficulty: "Medium",
+      difficulty: "Moderate",
       subjectName: "Atmospheric Dynamics",
       explanation: "Arakawa C-grid offers superior dispersion properties for high-frequency gravity and inertia-gravity waves."
     },
@@ -69,7 +77,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       ],
       correctAnswer: 1,
       marks: 3,
-      difficulty: "Medium",
+      difficulty: "Moderate",
       subjectName: "Doppler Radar Meteorology",
       explanation: "ZDR = 10 * log10(Zh / Zv), giving direct insights into hydrometeor geometric oblateness."
     },
@@ -99,13 +107,104 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       ],
       correctAnswer: 0,
       marks: 3,
-      difficulty: "Medium",
+      difficulty: "Moderate",
       subjectName: "Numerical Modeling",
       explanation: "The Courant-Friedrichs-Lewy condition dictates that the physical domain of dependence must lie within the numerical domain."
+    },
+    {
+      id: "q_demo_5",
+      question: "What meteorological instrument is primarily used to measure solar irradiance and direct beam sunshine?",
+      options: [
+        "Pyrheliometer",
+        "Barometer",
+        "Anemometer",
+        "Psychrometer"
+      ],
+      correctAnswer: 0,
+      marks: 2,
+      difficulty: "Easy",
+      subjectName: "Meteorological Instrumentation",
+      explanation: "A pyrheliometer measures direct beam solar irradiance at normal incidence."
+    },
+    {
+      id: "q_demo_6",
+      question: "In 4D-Var data assimilation, how is the gradient of the cost function with respect to initial state vector calculated?",
+      options: [
+        "Integrating the adjoint model backward in time over the assimilation window",
+        "Direct forward empirical interpolation",
+        "Applying random Monte Carlo perturbations",
+        "Eliminating covariance matrices completely"
+      ],
+      correctAnswer: 0,
+      marks: 4,
+      difficulty: "Hard",
+      subjectName: "Data Assimilation",
+      explanation: "Adjoint model integration backward in time provides the exact gradient for quasi-Newton optimization."
+    },
+    {
+      id: "q_demo_7",
+      question: "Which cloud type is characterized as high-level, thin, and composed almost entirely of ice crystals?",
+      options: [
+        "Cirrus",
+        "Stratus",
+        "Cumulus",
+        "Nimbostratus"
+      ],
+      correctAnswer: 0,
+      marks: 2,
+      difficulty: "Easy",
+      subjectName: "Cloud Physics",
+      explanation: "Cirrus clouds are high-altitude hair-like clouds composed of delicate ice crystals."
     }
   ];
 
+  // Helper to normalize difficulty level strings
+  const normalizeDiff = (d) => {
+    if (!d) return "Moderate";
+    const lower = String(d).toLowerCase();
+    if (lower.includes("easy")) return "Easy";
+    if (lower.includes("hard") || lower.includes("adv")) return "Hard";
+    return "Moderate";
+  };
+
+  // Full Pool of Available Questions
+  const allPoolQuestions = React.useMemo(() => {
+    const pool = (quiz?.questions && quiz.questions.length > 0) ? quiz.questions : defaultFallbackQuestions;
+    return pool.map((q, idx) => ({
+      ...q,
+      id: q.id || `q_p_${idx}`,
+      difficulty: normalizeDiff(q.difficulty)
+    }));
+  }, [quiz]);
+
+  // Active Questions Ordered Dynamically for the candidate
+  const [activeQuestions, setActiveQuestions] = useState(() => {
+    if (!isAdaptiveQuiz) return allPoolQuestions;
+
+    // Start with Moderate question
+    const moderateQ = allPoolQuestions.find(q => q.difficulty === initialDiff) || allPoolQuestions[0];
+    const rest = allPoolQuestions.filter(q => q.id !== moderateQ.id);
+    return [moderateQ, ...rest];
+  });
+
+  const questions = activeQuestions;
   const currentQuestion = questions[currentIndex] || questions[0];
+
+  // Helper to evaluate answer correctness
+  const checkAnswerCorrectness = (q, userAns) => {
+    if (userAns === undefined || userAns === null || userAns === "") return false;
+    const qType = q.type || (Array.isArray(q.options) && q.options.length > 0 ? "mcq" : "one_word");
+    if (qType === "one_word" || qType === "short_answer") {
+      const userStr = String(userAns).trim().toLowerCase();
+      const accepted = [
+        q.expectedAnswer,
+        q.correctAnswer,
+        ...(Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers : [])
+      ].filter(Boolean).map(a => String(a).trim().toLowerCase());
+      return userStr.length > 0 && accepted.includes(userStr);
+    }
+    return userAns === q.correctAnswer;
+  };
 
   // Request Fullscreen when kiosk launches
   useEffect(() => {
@@ -142,21 +241,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         totalMarks += qMarks;
         const userAns = answers[q.id];
         const qType = q.type || (Array.isArray(q.options) && q.options.length > 0 ? "mcq" : "one_word");
-        const isShortAns = qType === "one_word" || qType === "short_answer";
-
-        let isCorrect = false;
-        if (isShortAns) {
-          const userStr = String(userAns || "").trim().toLowerCase();
-          const accepted = [
-            q.expectedAnswer,
-            q.correctAnswer,
-            ...(Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers : [])
-          ].filter(Boolean).map(a => String(a).trim().toLowerCase());
-          
-          isCorrect = userStr.length > 0 && accepted.includes(userStr);
-        } else {
-          isCorrect = userAns !== undefined && userAns === q.correctAnswer;
-        }
+        const isCorrect = checkAnswerCorrectness(q, userAns);
 
         if (isCorrect) {
           score += qMarks;
@@ -164,6 +249,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         }
 
         const qTimeSec = questionTimes[q.id] || avgTimePerQuestionSec || 35;
+        const qAssignedDifficulty = difficultyHistory.find(h => h.questionNumber === idx + 1)?.difficulty || q.difficulty || "Moderate";
 
         questionAnalysis.push({
           questionId: q.id,
@@ -171,7 +257,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           question: q.question,
           type: qType,
           topic: q.subjectName || q.topic || quiz?.subjectName || "Atmospheric Dynamics",
-          difficulty: q.difficulty || "Medium",
+          difficulty: qAssignedDifficulty,
           timeSpent: qTimeSec,
           timeSpentText: `${qTimeSec} sec`,
           attempts: userAns !== undefined && userAns !== "" ? 1 : 0,
@@ -226,6 +312,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         timeTakenSeconds: totalTimeSecs,
         submittedAt: new Date().toISOString(),
         adaptiveTrajectory,
+        difficultyHistory,
         questionAnalysis
       };
 
@@ -272,14 +359,15 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         averageTimeText: "38 sec/question",
         status: disqualified ? "disqualified" : "passed",
         isDisqualified: disqualified,
-        adaptiveTrajectory: ["Medium", "Hard", "Hard"],
+        adaptiveTrajectory,
+        difficultyHistory,
         resultId: `sub_${Date.now()}`
       });
     } finally {
       setSubmitting(false);
       setShowSubmitModal(false);
     }
-  }, [answers, currentUser, questions, questionTimes, quiz, submitting, tabSwitchCount, timeLeftSeconds, adaptiveTrajectory]);
+  }, [answers, currentUser, questions, questionTimes, quiz, submitting, tabSwitchCount, timeLeftSeconds, adaptiveTrajectory, difficultyHistory]);
 
   // Countdown timer & Per-Question Time Tracking
   useEffect(() => {
@@ -378,9 +466,120 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     };
   }, [currentUser, handleSubmitQuiz, isDisqualified, quiz, submissionResult]);
 
+  // ⚡ Adaptive Learning Engine Rule & Next Question Selector
+  const processAdaptiveTransition = (targetNextIndex) => {
+    if (!isAdaptiveQuiz) return;
+
+    // Check if current question was answered correctly
+    const currentAns = answers[currentQuestion.id];
+    const isCorrect = checkAnswerCorrectness(currentQuestion, currentAns);
+
+    let nextDifficulty = currentDifficulty;
+    let nextStreakCorrect = consecutiveCorrect;
+    let nextStreakWrong = consecutiveWrong;
+
+    if (isCorrect) {
+      nextStreakCorrect += 1;
+      nextStreakWrong = 0;
+      if (nextStreakCorrect >= 3) {
+        // 3 consecutive correct -> increase difficulty (Boundary: Hard stays Hard)
+        if (currentDifficulty === "Easy") {
+          nextDifficulty = "Moderate";
+        } else if (currentDifficulty === "Moderate") {
+          nextDifficulty = "Hard";
+        } else if (currentDifficulty === "Hard") {
+          nextDifficulty = "Hard";
+        }
+        nextStreakCorrect = 0;
+        setAdaptiveToast(`🔥 3 Consecutive Correct! Difficulty escalated to ${nextDifficulty}`);
+        setTimeout(() => setAdaptiveToast(""), 3500);
+      }
+    } else {
+      nextStreakWrong += 1;
+      nextStreakCorrect = 0;
+      if (nextStreakWrong >= 3) {
+        // 3 consecutive incorrect -> decrease difficulty (Boundary: Easy stays Easy)
+        if (currentDifficulty === "Hard") {
+          nextDifficulty = "Moderate";
+        } else if (currentDifficulty === "Moderate") {
+          nextDifficulty = "Easy";
+        } else if (currentDifficulty === "Easy") {
+          nextDifficulty = "Easy";
+        }
+        nextStreakWrong = 0;
+        setAdaptiveToast(`📉 3 Consecutive Incorrect. Difficulty adjusted to ${nextDifficulty}`);
+        setTimeout(() => setAdaptiveToast(""), 3500);
+      }
+    }
+
+    setConsecutiveCorrect(nextStreakCorrect);
+    setConsecutiveWrong(nextStreakWrong);
+    setCurrentDifficulty(nextDifficulty);
+
+    // If advancing to a new question index not yet assigned
+    if (targetNextIndex >= 0 && targetNextIndex < activeQuestions.length) {
+      const alreadyAssigned = activeQuestions[targetNextIndex];
+      // If the already assigned question does not match target difficulty and an unanswered matching question exists, swap
+      const usedIds = activeQuestions.slice(0, targetNextIndex).map(q => q.id);
+      const remainingPool = allPoolQuestions.filter(q => !usedIds.includes(q.id) && q.id !== alreadyAssigned.id);
+
+      // Find question matching targetDifficulty and topic
+      let candidate = remainingPool.find(q => q.difficulty === nextDifficulty && q.subjectName === currentQuestion.subjectName)
+        || remainingPool.find(q => q.difficulty === nextDifficulty);
+
+      // Graceful fallback to nearest difficulty if insufficient questions at target
+      if (!candidate) {
+        if (nextDifficulty === "Hard") {
+          candidate = remainingPool.find(q => q.difficulty === "Moderate") || remainingPool.find(q => q.difficulty === "Easy");
+        } else if (nextDifficulty === "Easy") {
+          candidate = remainingPool.find(q => q.difficulty === "Moderate") || remainingPool.find(q => q.difficulty === "Hard");
+        } else {
+          candidate = remainingPool.find(q => q.difficulty === "Easy") || remainingPool.find(q => q.difficulty === "Hard");
+        }
+      }
+
+      if (candidate && alreadyAssigned.difficulty !== nextDifficulty) {
+        setActiveQuestions(prev => {
+          const nextArr = [...prev];
+          const oldTarget = nextArr[targetNextIndex];
+          const candIdx = nextArr.findIndex(q => q.id === candidate.id);
+          if (candIdx !== -1) {
+            nextArr[targetNextIndex] = candidate;
+            nextArr[candIdx] = oldTarget;
+          } else {
+            nextArr[targetNextIndex] = candidate;
+          }
+          return nextArr;
+        });
+      }
+
+      // Record difficulty history for analytics
+      setDifficultyHistory(prev => {
+        const nextHist = [...prev];
+        const assignedQ = candidate || alreadyAssigned;
+        const entry = {
+          questionNumber: targetNextIndex + 1,
+          difficulty: nextDifficulty,
+          questionId: assignedQ.id,
+          topic: assignedQ.subjectName || assignedQ.topic || "Atmospheric Dynamics"
+        };
+        const existingIdx = nextHist.findIndex(h => h.questionNumber === targetNextIndex + 1);
+        if (existingIdx !== -1) {
+          nextHist[existingIdx] = entry;
+        } else {
+          nextHist.push(entry);
+        }
+        return nextHist;
+      });
+
+      setAdaptiveTrajectory(prev => [...prev, nextDifficulty]);
+    }
+  };
+
   // Navigate question
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
+    processAdaptiveTransition(idx);
     setCurrentIndex(idx);
     const targetQ = questions[idx];
     if (targetQ) {
@@ -388,41 +587,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     }
   };
 
-  // Toggle answer with Adaptive Morale Engine
+  // Select Option for MCQ
   const handleSelectOption = (optIdx) => {
     const newAnswers = { ...answers, [currentQuestion.id]: optIdx };
     setAnswers(newAnswers);
-
-    // Adaptive Engine calculation for practice mode / adaptive quiz
-    if (quiz?.isAdaptive !== false) {
-      const answeredKeys = Object.keys(newAnswers);
-      if (answeredKeys.length >= 2) {
-        const recentAnswers = answeredKeys.map(k => {
-          const q = questions.find(item => item.id === k);
-          return q ? newAnswers[k] === q.correctAnswer : false;
-        });
-
-        const lastThree = recentAnswers.slice(-3);
-        const lastTwo = recentAnswers.slice(-2);
-        
-        // 1. Accuracy Streak: Adjust difficulty dynamically behind the scenes without revealing recovery rules to trainee
-        if (lastThree.length === 3 && lastThree.every(v => v === false)) {
-          setAdaptiveDifficulty("Easy");
-          setAdaptiveTrajectory(prev => [...prev, "Easy"]);
-        } else if (lastTwo.length === 2 && lastTwo.every(v => v === false) && adaptiveDifficulty.includes("Hard")) {
-          setAdaptiveDifficulty("Medium");
-          setAdaptiveTrajectory(prev => [...prev, "Medium"]);
-        }
-        // 2. High Accuracy Streak: Scale up difficulty
-        else if (lastThree.length === 3 && lastThree.every(v => v === true)) {
-          setAdaptiveDifficulty("Hard");
-          setAdaptiveTrajectory(prev => [...prev, "Hard"]);
-        } else if (lastTwo.length === 2 && lastTwo.every(v => v === true) && adaptiveDifficulty.includes("Easy")) {
-          setAdaptiveDifficulty("Medium");
-          setAdaptiveTrajectory(prev => [...prev, "Medium"]);
-        }
-      }
-    }
   };
 
   // Toggle review flag
@@ -559,27 +727,58 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             </div>
           )}
 
-          {/* Adaptive Difficulty Trajectory Milestone */}
+          {/* ⚡ Performance-Based Adaptive Difficulty Progression Trail ⚡ */}
           {!isDisq && (
-            <div className="p-4 bg-blue-50/70 rounded-2xl border border-blue-200 text-left space-y-1.5 text-xs">
+            <div className="p-4 bg-gradient-to-br from-blue-50/90 via-indigo-50/60 to-purple-50/60 rounded-3xl border border-blue-200 text-left space-y-3 text-xs shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="font-black text-blue-900 flex items-center gap-1.5">
+                <span className="font-black text-blue-950 flex items-center gap-1.5 text-xs">
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>Adaptive Difficulty Calibration Path:</span>
+                  <span>Adaptive Learning & Difficulty Progression Trail</span>
                 </span>
-                <span className="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200">
-                  Dynamic Engine
+                <span className="text-[10px] font-black uppercase text-blue-800 bg-white px-2.5 py-0.5 rounded-full border border-blue-200 shadow-2xs">
+                  3-Streak Calibration Engine
                 </span>
               </div>
-              <div className="flex items-center gap-2 flex-wrap pt-1">
-                {adaptiveTrajectory.map((milestone, idx) => (
-                  <span key={idx} className="flex items-center gap-1 text-[11px] font-bold text-slate-700">
-                    <span className="px-2 py-0.5 bg-white rounded border border-slate-200 shadow-2xs">
-                      {milestone}
-                    </span>
-                    {idx < adaptiveTrajectory.length - 1 && <span className="text-slate-400">➔</span>}
-                  </span>
-                ))}
+
+              {/* Sequential Badges Trail */}
+              <div className="p-3 bg-white/90 rounded-2xl border border-blue-100 space-y-2">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Chronological Question Transitions (Performance History):
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-[11px]">
+                  {(submissionResult.difficultyHistory && submissionResult.difficultyHistory.length > 0
+                    ? submissionResult.difficultyHistory
+                    : difficultyHistory
+                  ).map((h, idx) => {
+                    const diff = h.difficulty || "Moderate";
+                    const isEasy = diff === "Easy";
+                    const isHard = diff === "Hard";
+                    const isMod = !isEasy && !isHard;
+
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-2 rounded-xl border flex items-center justify-between font-bold ${
+                          isHard 
+                            ? "bg-purple-50 border-purple-200 text-purple-900"
+                            : isMod
+                            ? "bg-blue-50 border-blue-200 text-blue-900"
+                            : "bg-emerald-50 border-emerald-200 text-emerald-900"
+                        }`}
+                      >
+                        <span className="font-mono text-[10px]">Q{h.questionNumber || idx + 1}</span>
+                        <span className="text-[10px] font-black uppercase">{diff}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-600 pt-1">
+                <span>Rule: 3 consecutive correct ➔ ↑ Difficulty | 3 consecutive incorrect ➔ ↓ Difficulty</span>
+                <span className="font-bold text-indigo-900 font-mono">
+                  Final Level: {currentDifficulty}
+                </span>
               </div>
             </div>
           )}
@@ -770,15 +969,41 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       </header>
 
       {/* ⚡ LIVE ADAPTIVE DIFFICULTY TELEMETRY BAR ⚡ */}
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-emerald-50/40 border-b border-blue-200/80 px-4 sm:px-6 py-2 flex items-center justify-between text-xs shrink-0 shadow-2xs">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white flex items-center gap-1 shadow-2xs">
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-purple-50/40 border-b border-blue-200/80 px-4 sm:px-6 py-2 flex items-center justify-between text-xs shrink-0 shadow-2xs flex-wrap gap-2">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white flex items-center gap-1 shadow-2xs">
             <Sparkles className="w-3 h-3 text-amber-300" />
             ADAPTIVE ENGINE
           </span>
-          <span className="font-bold text-slate-800">
-            Active Difficulty: <b className="text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 font-mono text-[11px]">{adaptiveDifficulty}</b>
+          <span className="font-bold text-slate-800 flex items-center gap-1.5">
+            Active Difficulty: 
+            <b className={`px-2.5 py-0.5 rounded-full font-mono text-[11px] font-black uppercase border ${
+              currentDifficulty === "Hard" 
+                ? "bg-purple-100 text-purple-900 border-purple-300"
+                : currentDifficulty === "Moderate"
+                ? "bg-blue-100 text-blue-900 border-blue-300"
+                : "bg-emerald-100 text-emerald-900 border-emerald-300"
+            }`}>
+              {currentDifficulty}
+            </b>
           </span>
+          {isAdaptiveQuiz && (
+            <span className="text-[11px] text-slate-500 font-bold hidden md:inline">
+              {consecutiveCorrect > 0 ? (
+                <span className="text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                  🔥 Streak: {consecutiveCorrect}/3 Correct (Escalation to {currentDifficulty === "Easy" ? "Moderate" : "Hard"})
+                </span>
+              ) : consecutiveWrong > 0 ? (
+                <span className="text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
+                  📉 Streak: {consecutiveWrong}/3 Incorrect (Adjusting to {currentDifficulty === "Hard" ? "Moderate" : "Easy"})
+                </span>
+              ) : (
+                <span className="text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+                  🎯 Calibrating: 3-Streak Transition Rule
+                </span>
+              )}
+            </span>
+          )}
         </div>
 
         {adaptiveToast ? (
@@ -787,8 +1012,8 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             <span>{adaptiveToast}</span>
           </div>
         ) : (
-          <span className="text-[11px] font-semibold text-emerald-700 hidden sm:inline">
-            ⚡ Dynamic calibration active
+          <span className="text-[11px] font-semibold text-blue-800 hidden sm:inline">
+            ⚡ Performance-based dynamic questions enabled
           </span>
         )}
       </div>

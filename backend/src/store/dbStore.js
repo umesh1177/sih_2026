@@ -735,6 +735,8 @@ class DatabaseStore {
       trainerFeedback: isDisqualified ? "Attempt Disqualified due to repeated context exit violations (Security Rule)." : "",
       certificateGenerated: passed,
       certificateId: passed ? `MOES-IMD-CERT-2025-${Math.floor(1000 + Math.random() * 9000)}` : null,
+      adaptiveTrajectory: submissionData.adaptiveTrajectory || ["Moderate"],
+      difficultyHistory: submissionData.difficultyHistory || [],
       questionAnalysis: submissionData.questionAnalysis || []
     };
 

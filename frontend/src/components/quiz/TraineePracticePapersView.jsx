@@ -853,9 +853,48 @@ export const TraineePracticePapersView = ({
                 </div>
                 <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Adaptive Path:</span>
-                  <b className="text-purple-700 truncate">{selectedAttemptForAnalytics.adaptiveTrajectory ? (Array.isArray(selectedAttemptForAnalytics.adaptiveTrajectory) ? selectedAttemptForAnalytics.adaptiveTrajectory.join(" ➔ ") : selectedAttemptForAnalytics.adaptiveTrajectory) : "Medium ➔ Hard"}</b>
+                  <b className="text-purple-700 truncate">{selectedAttemptForAnalytics.adaptiveTrajectory ? (Array.isArray(selectedAttemptForAnalytics.adaptiveTrajectory) ? selectedAttemptForAnalytics.adaptiveTrajectory.join(" ➔ ") : selectedAttemptForAnalytics.adaptiveTrajectory) : "Moderate ➔ Hard"}</b>
                 </div>
               </div>
+
+              {/* ⚡ Chronological Difficulty Transitions Trail ⚡ */}
+              {selectedAttemptForAnalytics.difficultyHistory && selectedAttemptForAnalytics.difficultyHistory.length > 0 && (
+                <div className="p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-purple-50/70 rounded-2xl border border-blue-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-blue-950 text-xs flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Adaptive Difficulty Progression Trail</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500">
+                      Rule: 3 Correct ➔ ↑ Level | 3 Wrong ➔ ↓ Level
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 text-[11px]">
+                    {selectedAttemptForAnalytics.difficultyHistory.map((h, idx) => {
+                      const diff = h.difficulty || "Moderate";
+                      const isHard = diff === "Hard";
+                      const isEasy = diff === "Easy";
+                      const isMod = !isHard && !isEasy;
+
+                      return (
+                        <div
+                          key={idx}
+                          className={`p-2 rounded-xl border flex items-center justify-between font-bold ${
+                            isHard 
+                              ? "bg-purple-100/90 border-purple-300 text-purple-900"
+                              : isMod 
+                              ? "bg-blue-100/90 border-blue-300 text-blue-900"
+                              : "bg-emerald-100/90 border-emerald-300 text-emerald-900"
+                          }`}
+                        >
+                          <span className="font-mono text-[10px]">Q{h.questionNumber || idx + 1}</span>
+                          <span className="text-[10px] font-black uppercase">{diff}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Filter controls */}
