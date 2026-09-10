@@ -1,0 +1,14 @@
+{
+  "name": "capacity-connect-sih",
+  "version": "1.0.0",
+  "description": "CAPACITY CONNECT - Digital Capacity Building and Learning Management Portal (MoES / IMD - PS ID: 26075)",
+  "scripts": {
+    "start:backend": "cd backend && node src/server.js",
+    "start:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "zip": "powershell -Command \"Compress-Archive -Path backend, frontend, README.md, package.json -DestinationPath CapacityConnect_MoES_IMD_SIH26075.zip -Force\""
+  },
+  "keywords": ["moes", "imd", "lms", "capacity-building", "sih", "smart-education"],
+  "author": "MoES IMD Team",
+  "license": "MIT"
+}

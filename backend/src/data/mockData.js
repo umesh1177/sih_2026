@@ -1,0 +1,814 @@
+// Rich Mock Seed Data for CAPACITY CONNECT - MoES / IMD Portal
+// Full Indian officer profiles, 6 courses, 40+ questions, 5 quizzes, competency matrix
+
+export const initialData = {
+  users: [
+    // ─── ADMINS ───
+    {
+      id: "u_admin_1",
+      name: "Dr. Mrutyunjay Mohapatra",
+      email: "admin@imd.gov.in",
+      role: "admin",
+      department: "Directorate General of Meteorology, New Delhi",
+      designation: "Director General & Chief Admin",
+      status: "approved",
+      bio: "Director General of IMD and Head of MoES capacity building initiative. 28+ years in atmospheric science.",
+      qualifications: "Ph.D. Meteorology (IIT Delhi), M.Sc. Physics (IIT Roorkee)",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-10T09:00:00.000Z"
+    },
+    {
+      id: "u_admin_2",
+      name: "Dr. Vijay Kumar Soni",
+      email: "vijay.soni@imd.gov.in",
+      role: "admin",
+      department: "Agrimet Division & Training Centre, Pune",
+      designation: "Deputy Director General (Agrimet) & Training Head",
+      status: "approved",
+      bio: "Heads the MoES national training coordination cell across 36 state meteorological offices.",
+      qualifications: "Ph.D. Agrometeorology (IARI), M.Sc. Meteorology",
+      avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-11T10:00:00.000Z"
+    },
+
+    // ─── TRAINERS ───
+    {
+      id: "u_trainer_1",
+      name: "Dr. Amit Sengupta",
+      email: "amit.sengupta@imd.gov.in",
+      role: "trainer",
+      department: "Numerical Weather Prediction Division, New Delhi",
+      designation: "Scientist 'F' & Senior Meteorologist",
+      specialization: ["Numerical Weather Prediction", "WRF / GFS Modeling", "Ensemble Prediction"],
+      experienceYears: 18,
+      qualifications: "Ph.D. in Atmospheric Sciences (IIT Delhi), M.Sc. Meteorology (Pune University)",
+      status: "approved",
+      bio: "Lead trainer for global and regional NWP models with 18+ years of operational weather forecasting experience at MoES.",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-12T10:30:00.000Z"
+    },
+    {
+      id: "u_trainer_2",
+      name: "Dr. Sunita Kulkarni",
+      email: "sunita.k@imd.gov.in",
+      role: "trainer",
+      department: "Radar & Satellite Meteorology Division, Pune",
+      designation: "Scientist 'E' & Radar Specialist",
+      specialization: ["Doppler Weather Radar", "INSAT-3DR Products", "Nowcasting"],
+      experienceYears: 14,
+      qualifications: "Ph.D. in Radar Remote Sensing (ISRO/IISC), B.Tech Electronics",
+      status: "approved",
+      bio: "Expert in dual-polarization S/X band Doppler radars and convective storm nowcasting algorithms.",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-14T11:00:00.000Z"
+    },
+    {
+      id: "u_trainer_3",
+      name: "Dr. Rajiv Roy",
+      email: "rajiv.roy@imd.gov.in",
+      role: "trainer",
+      department: "Cyclone Warning Division, Regional Meteorological Centre Kolkata",
+      designation: "Scientist 'E' & Marine Forecaster",
+      specialization: ["Tropical Cyclogenesis", "Storm Surge Modeling", "Ocean Meteorology"],
+      experienceYears: 12,
+      qualifications: "M.Tech Ocean Engineering (IIT Kharagpur), M.Sc. Physics",
+      status: "approved",
+      bio: "Specialized in Bay of Bengal tropical cyclone track prediction and coastal vulnerability assessment.",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-15T14:20:00.000Z"
+    },
+    {
+      id: "u_trainer_4",
+      name: "Dr. Laxminarayan Patra",
+      email: "ln.patra@imd.gov.in",
+      role: "trainer",
+      department: "Seismology Division, IMD New Delhi",
+      designation: "Scientist 'E' & Earthquake Monitoring Expert",
+      specialization: ["Seismology", "Broadband Seismic Networks", "Earthquake Early Warning"],
+      experienceYears: 16,
+      qualifications: "Ph.D. Geophysics (Hyderabad University), M.Sc. Physics",
+      status: "approved",
+      bio: "National trainer for NSeIS broadband seismic network operation and earthquake hazard assessment.",
+      avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-16T09:00:00.000Z"
+    },
+    {
+      id: "u_trainer_5",
+      name: "Dr. Meenakshi Sundaram",
+      email: "meenakshi.s@imd.gov.in",
+      role: "trainer",
+      department: "Agrometeorology Division, Pune",
+      designation: "Scientist 'D'",
+      specialization: ["Agrometeorology", "Drought Monitoring", "Crop Weather Modeling"],
+      experienceYears: 9,
+      qualifications: "Ph.D. in Agricultural Meteorology (IARI New Delhi)",
+      status: "pending",
+      bio: "Awaiting approval for conducting training modules on Block-Level Agromet Advisory Services.",
+      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-02-01T08:15:00.000Z"
+    },
+    {
+      id: "u_trainer_6",
+      name: "Dr. Parthasarathi Mukhopadhyay",
+      email: "partha.m@imd.gov.in",
+      role: "trainer",
+      department: "Climate Research & Services, Pune",
+      designation: "Scientist 'G' & Climate Modeler",
+      specialization: ["Climate Modeling", "CMIP6", "Monsoon Dynamics", "ENSO Teleconnections"],
+      experienceYears: 22,
+      qualifications: "Ph.D. Atmospheric Sciences (Jadavpur University), Post-Doc ECMWF Reading UK",
+      status: "approved",
+      bio: "Lead climate modeler for India's CMIP6 contribution and Indian Summer Monsoon prediction framework.",
+      avatar: "https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-18T11:30:00.000Z"
+    },
+
+    // ─── TRAINEES ───
+    {
+      id: "u_trainee_1",
+      name: "Rahul Sharma",
+      email: "rahul.sharma@imd.gov.in",
+      role: "trainee",
+      department: "Meteorological Centre, Jaipur",
+      designation: "Scientist 'B' (Trainee)",
+      status: "approved",
+      interests: ["NWP Models", "Satellite Imagery", "Severe Weather Warnings"],
+      skills: ["Python for Meteorology", "Synoptic Analysis", "QGIS", "Data Assimilation"],
+      qualifications: "M.Sc. Physics (University of Rajasthan), Advanced PG Diploma in Meteorology (IMD Pune)",
+      experience: "2 years as Trainee Scientific Assistant at IMD Jaipur Field Station.",
+      certificates: [
+        { title: "Basic Meteorological Forecaster (BMF)", issuer: "IMD Training Centre Pune", year: "2024" },
+        { title: "Python in Atmospheric Sciences", issuer: "MoES Digital Academy", year: "2024" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-20T10:00:00.000Z"
+    },
+    {
+      id: "u_trainee_2",
+      name: "Priya Varma",
+      email: "priya.varma@imd.gov.in",
+      role: "trainee",
+      department: "Cyclone Warning Centre, Visakhapatnam",
+      designation: "Assistant Meteorologist Grade-I",
+      status: "approved",
+      interests: ["Cyclone Tracking", "Radar Meteorology", "Disaster Management"],
+      skills: ["Radar Data Interpretation", "Dvorak Technique", "Weather Chart Analysis"],
+      qualifications: "B.Tech Atmospheric Technology (CUSAT Cochin)",
+      experience: "3 years in Coastal Weather Observation & Radar Monitoring.",
+      certificates: [
+        { title: "Radar Meteorology Fundamentals", issuer: "MoES IMD", year: "2024" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-22T12:00:00.000Z"
+    },
+    {
+      id: "u_trainee_3",
+      name: "Arjun Bose",
+      email: "arjun.bose@imd.gov.in",
+      role: "trainee",
+      department: "Regional Meteorological Centre, Kolkata",
+      designation: "Scientist 'B' (Probationer)",
+      status: "approved",
+      interests: ["Cyclone Warning Systems", "Bay of Bengal Meteorology", "Storm Surge"],
+      skills: ["GIS for Disaster Management", "BHUVAN Portal", "AWS Station Maintenance"],
+      qualifications: "M.Sc. Meteorology (University of Calcutta), PGDM (IMD Pune 2024)",
+      experience: "1.5 years at Alipore Met Office, cyclone watch roster duty.",
+      certificates: [
+        { title: "Cyclone Warning Forecaster", issuer: "RSMC Kolkata", year: "2024" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-24T09:30:00.000Z"
+    },
+    {
+      id: "u_trainee_4",
+      name: "Meena Reddy",
+      email: "meena.reddy@imd.gov.in",
+      role: "trainee",
+      department: "Meteorological Centre, Hyderabad",
+      designation: "Scientific Assistant Grade-I",
+      status: "approved",
+      interests: ["Satellite Meteorology", "INSAT Products", "Urban Flood Forecasting"],
+      skills: ["SNAP/BEAM Satellite Software", "Python (Pandas, Matplotlib)", "Cloud Microphysics"],
+      qualifications: "M.Sc. Remote Sensing & GIS (NRSC Hyderabad), B.Sc. Physics",
+      experience: "2.5 years at Hyderabad Met Centre, satellite imagery dissemination.",
+      certificates: [
+        { title: "INSAT-3DR Product Interpretation", issuer: "SAC ISRO", year: "2024" },
+        { title: "Satellite Meteorology Basics", issuer: "MoES Digital Academy", year: "2023" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-26T11:00:00.000Z"
+    },
+    {
+      id: "u_trainee_5",
+      name: "Kiran Patel",
+      email: "kiran.patel@imd.gov.in",
+      role: "trainee",
+      department: "Meteorological Centre, Ahmedabad",
+      designation: "Scientist 'B' (Trainee)",
+      status: "approved",
+      interests: ["Heat Wave Monitoring", "Climate Extremes", "Agrometeorology"],
+      skills: ["R Language for Climate Analysis", "Drought Indices (SPI/PDSI)", "Heat Index Computation"],
+      qualifications: "M.Sc. Statistics & Climatology (Gujarat University), B.Sc. Physics",
+      experience: "1 year at Ahmedabad Met Centre, heat wave early warning dissemination.",
+      certificates: [
+        { title: "Climate Data Analysis using R", issuer: "ICAR-CRIDA", year: "2024" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-28T14:00:00.000Z"
+    },
+    {
+      id: "u_trainee_6",
+      name: "Nandita Singh",
+      email: "nandita.singh@imd.gov.in",
+      role: "trainee",
+      department: "Met Centre, Lucknow",
+      designation: "Scientific Assistant Grade-II",
+      status: "approved",
+      interests: ["Fog Forecasting", "Cold Wave Alerts", "Aviation Meteorology"],
+      skills: ["TAF/SIGMET Writing", "METAR Interpretation", "Fog Index Calculation"],
+      qualifications: "M.Sc. Physics (Allahabad University), Diploma Aviation Meteorology",
+      experience: "3 years at CSFO Lucknow airport meteorological unit.",
+      certificates: [
+        { title: "Aviation Meteorology Observer", issuer: "DGCA India", year: "2023" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-01-30T10:30:00.000Z"
+    },
+    {
+      id: "u_trainee_7",
+      name: "Suresh Nair",
+      email: "suresh.nair@imd.gov.in",
+      role: "trainee",
+      department: "Meteorological Centre, Thiruvananthapuram",
+      designation: "Scientist 'B' (Kerala Region)",
+      status: "approved",
+      interests: ["Heavy Rainfall Events", "Southwest Monsoon", "Coastal Meteorology"],
+      skills: ["Heavy Rain Warning Framework", "IMD Color Code System", "SWFDP Network"],
+      qualifications: "M.Sc. Meteorology (Cochin University of Science & Technology)",
+      experience: "2 years in southwest monsoon monitoring and flood warning dissemination for Kerala.",
+      certificates: [
+        { title: "Flood Meteorology Specialist", issuer: "NIDM India", year: "2024" }
+      ],
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-02-02T09:00:00.000Z"
+    },
+    {
+      id: "u_trainee_pending",
+      name: "Aniket Deshmukh",
+      email: "aniket.d@imd.gov.in",
+      role: "trainee",
+      department: "Regional Meteorological Centre, Mumbai",
+      designation: "Scientific Assistant Grade-II",
+      status: "pending",
+      interests: ["Urban Flood Forecasting", "Nowcasting", "Doppler Radar"],
+      skills: ["Surface Observations", "AWS Data Analysis"],
+      qualifications: "B.Sc. Physics (Mumbai University)",
+      experience: "1 year field station maintenance & weather bulletin compilation.",
+      certificates: [],
+      avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-02-04T15:30:00.000Z"
+    },
+    {
+      id: "u_trainee_pending2",
+      name: "Divya Menon",
+      email: "divya.menon@imd.gov.in",
+      role: "trainee",
+      department: "Met Centre, Chennai",
+      designation: "Scientific Assistant Grade-I",
+      status: "pending",
+      interests: ["Northeast Monsoon", "Bay of Bengal Systems", "Tamil Nadu Weather"],
+      skills: ["Observation Networks", "AWS Maintenance"],
+      qualifications: "M.Sc. Physics (Anna University)",
+      experience: "6 months at Chennai Nungambakkam Observatory.",
+      certificates: [],
+      avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=250",
+      createdAt: "2025-02-10T13:00:00.000Z"
+    }
+  ],
+
+  courses: [
+    {
+      id: "crs_nwp_101",
+      code: "MOES-IMD-NWP-2025",
+      title: "Advanced Numerical Weather Prediction (NWP) & Data Assimilation",
+      category: "Atmospheric Modeling",
+      level: "Advanced",
+      duration: "6 Weeks (48 Hours)",
+      creditHours: 4,
+      department: "Numerical Weather Prediction Division",
+      leadTrainerId: "u_trainer_1",
+      leadTrainerName: "Dr. Amit Sengupta",
+      thumbnail: "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&q=80&w=800",
+      description: "Master modern atmospheric dynamics, grid generation, parameterizations, WRF/GFS model physics, ensemble prediction systems (EPS), and 3D/4D-Var data assimilation for operational weather forecasting in India.",
+      prerequisites: ["Fluid Dynamics Fundamentals", "Basic Meteorology", "Linux & Shell Scripting"],
+      enrolledTraineeIds: ["u_trainee_1", "u_trainee_3", "u_trainee_5"],
+      competenciesGained: ["NWP Grid Physics", "WRF Execution", "Data Assimilation", "EPS Probability Mapping"],
+      subjects: [
+        {
+          id: "sub_nwp_01",
+          name: "Subject 1: Governing Equations & Atmospheric Dynamics",
+          modules: [
+            {
+              id: "mod_01",
+              title: "Module 1: Navier-Stokes & Primitive Equation Systems",
+              duration: "4 Hours",
+              materials: [
+                { id: "mat_01", title: "Lecture 1: Primitive Equations in Sigma & Pressure Coordinates", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "45 mins", allowDownload: false },
+                { id: "mat_02", title: "Presentation: Atmospheric Governing Equations Deck", type: "presentation", pages: 34, allowDownload: true },
+                { id: "mat_03", title: "Study Guide: Boundary Layer Parameterization Notes", type: "pdf", size: "2.4 MB", allowDownload: true }
+              ]
+            },
+            {
+              id: "mod_02",
+              title: "Module 2: Discretization & Spatial-Temporal Grid Staggering",
+              duration: "6 Hours",
+              materials: [
+                { id: "mat_04", title: "Lecture 2: Arakawa Grids (A-E) & CFL Condition", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "52 mins", allowDownload: false },
+                { id: "mat_05", title: "Lab Manual: Configuring WRF Preprocessing System (WPS)", type: "pdf", size: "5.1 MB", allowDownload: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: "sub_nwp_02",
+          name: "Subject 2: Data Assimilation & Satellite Radiance Ingestion",
+          modules: [
+            {
+              id: "mod_03",
+              title: "Module 3: 3D-Var / 4D-Var & Kalman Filtering in NWP",
+              duration: "5 Hours",
+              materials: [
+                { id: "mat_06", title: "Lecture 3: Assimilating INSAT-3DR and Doppler Radar Reflectivity", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "48 mins", allowDownload: false },
+                { id: "mat_07", title: "Slide Deck: Background Error Covariance (B-Matrix) Estimation", type: "presentation", pages: 42, allowDownload: true }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "crs_dwr_102",
+      code: "MOES-IMD-DWR-2025",
+      title: "Doppler Weather Radar (DWR) Operational Data Interpretation & Nowcasting",
+      category: "Radar & Remote Sensing",
+      level: "Intermediate",
+      duration: "4 Weeks (32 Hours)",
+      creditHours: 3,
+      department: "Radar & Satellite Meteorology Division",
+      leadTrainerId: "u_trainer_2",
+      leadTrainerName: "Dr. Sunita Kulkarni",
+      thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+      description: "Hands-on operational capacity building on dual-polarization S/C/X band Doppler weather radars. Covers reflectivity (Z), radial velocity (V), differential reflectivity (ZDR), KDP, and convective cell tracking for urban flood & severe weather nowcasting.",
+      prerequisites: ["Electromagnetic Wave Theory", "Basic Meteorological Observations"],
+      enrolledTraineeIds: ["u_trainee_1", "u_trainee_2", "u_trainee_4"],
+      competenciesGained: ["Dual-Pol Signatures", "Mesocyclone Detection", "TITAN Cell Tracking", "QPE Estimation"],
+      subjects: [
+        {
+          id: "sub_dwr_01",
+          name: "Subject 1: Radar Hardware, Scan Strategies & Base Products",
+          modules: [
+            {
+              id: "mod_dwr_01",
+              title: "Module 1: PPI, RHI, MAX(Z) and Radial Velocity De-aliasing",
+              duration: "6 Hours",
+              materials: [
+                { id: "mat_dwr_01", title: "Masterclass: Nyquist Velocity & Dual-PRF Algorithms", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "40 mins", allowDownload: false },
+                { id: "mat_dwr_02", title: "DWR Product Atlas (CAPPI, PACP, SRI, ETOP)", type: "pdf", size: "8.7 MB", allowDownload: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: "sub_dwr_02",
+          name: "Subject 2: Severe Storm Signatures & Hydrometeor Classification",
+          modules: [
+            {
+              id: "mod_dwr_02",
+              title: "Module 2: Hook Echo, BWER, Microbursts & Hail Core Detection",
+              duration: "8 Hours",
+              materials: [
+                { id: "mat_dwr_03", title: "Lecture: Dual-Pol Fuzzy Logic Hydrometeor Classification (HCA)", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "60 mins", allowDownload: false },
+                { id: "mat_dwr_04", title: "Case Study: Mumbai 2005 Extreme Rainfall — DWR Analysis", type: "pdf", size: "4.2 MB", allowDownload: true }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "crs_cyc_103",
+      code: "MOES-IMD-CYC-2025",
+      title: "Tropical Cyclone Forecasting, Track Prediction & Storm Surge Modeling",
+      category: "Cyclone & Marine Meteorology",
+      level: "Advanced",
+      duration: "5 Weeks (40 Hours)",
+      creditHours: 4,
+      department: "Cyclone Warning Division",
+      leadTrainerId: "u_trainer_3",
+      leadTrainerName: "Dr. Rajiv Roy",
+      thumbnail: "https://images.unsplash.com/photo-1504608524841-42584120d1d0?auto=format&fit=crop&q=80&w=800",
+      description: "Comprehensive training on Bay of Bengal and Arabian Sea cyclone genesis, intensification, track prediction using multi-model ensemble approach (IMD-GFS, ECMWF, HWRF), storm surge modeling using ADCIRC and post-landfall impact assessment.",
+      prerequisites: ["Tropical Meteorology Basics", "Ocean-Atmosphere Interaction"],
+      enrolledTraineeIds: ["u_trainee_2", "u_trainee_3", "u_trainee_7"],
+      competenciesGained: ["Cyclone Track Prediction", "Dvorak Technique", "Storm Surge Modeling", "RSMC Alert Protocols"],
+      subjects: [
+        {
+          id: "sub_cyc_01",
+          name: "Subject 1: Tropical Cyclone Dynamics & Intensification",
+          modules: [
+            {
+              id: "mod_cyc_01",
+              title: "Module 1: Genesis Potential Index & Warm Core Structure",
+              duration: "5 Hours",
+              materials: [
+                { id: "mat_cyc_01", title: "Lecture: Carnot Heat Engine Model of Tropical Cyclones", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "50 mins", allowDownload: false },
+                { id: "mat_cyc_02", title: "Case Study: Cyclone Amphan (2020) — Intensification & Track", type: "pdf", size: "6.1 MB", allowDownload: true }
+              ]
+            },
+            {
+              id: "mod_cyc_02",
+              title: "Module 2: Dvorak Technique & Satellite-Based Intensity Estimation",
+              duration: "4 Hours",
+              materials: [
+                { id: "mat_cyc_03", title: "Workshop: Applying Dvorak Pattern Recognition to INSAT-3DR IR Images", type: "presentation", pages: 48, allowDownload: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: "sub_cyc_02",
+          name: "Subject 2: Storm Surge Modeling & Coastal Impact",
+          modules: [
+            {
+              id: "mod_cyc_03",
+              title: "Module 3: ADCIRC Storm Surge Model Setup & Validation",
+              duration: "6 Hours",
+              materials: [
+                { id: "mat_cyc_04", title: "Lecture: ADCIRC Grid Setup for Indian Coastline", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "55 mins", allowDownload: false },
+                { id: "mat_cyc_05", title: "Lab Manual: Running SLOSH Model for Coastal Odisha", type: "pdf", size: "3.8 MB", allowDownload: true }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "crs_sat_104",
+      code: "MOES-IMD-SAT-2025",
+      title: "INSAT-3DR & INSAT-3DS Satellite Meteorology & Product Interpretation",
+      category: "Satellite Meteorology",
+      level: "Intermediate",
+      duration: "3 Weeks (24 Hours)",
+      creditHours: 2,
+      department: "Satellite Meteorology Division, New Delhi",
+      leadTrainerId: "u_trainer_2",
+      leadTrainerName: "Dr. Sunita Kulkarni",
+      thumbnail: "https://images.unsplash.com/photo-1516912481808-3406841bd33c?auto=format&fit=crop&q=80&w=800",
+      description: "Complete guide to INSAT-3DR & 3DS geostationary satellite products — visible (VIS), infrared (TIR), water vapour (WV), shortwave IR (SWIR), sounder temperature-humidity profiles, cloud properties, sea surface temperature (SST) and Outgoing Longwave Radiation (OLR).",
+      prerequisites: ["Electromagnetic Spectrum Basics", "Basic Satellite Orbits"],
+      enrolledTraineeIds: ["u_trainee_4", "u_trainee_6", "u_trainee_2"],
+      competenciesGained: ["Multi-Spectral Imagery", "Cloud Classification", "OLR / SST Products", "Atmospheric Sounder"],
+      subjects: [
+        {
+          id: "sub_sat_01",
+          name: "Subject 1: INSAT-3DR Imager Channels & Cloud Classification",
+          modules: [
+            {
+              id: "mod_sat_01",
+              title: "Module 1: 6-Channel Imager Products & Interpretation",
+              duration: "4 Hours",
+              materials: [
+                { id: "mat_sat_01", title: "Lecture: INSAT-3DR Image Interpretation for Convective Monitoring", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "35 mins", allowDownload: false },
+                { id: "mat_sat_02", title: "Cloud Classification Atlas for Indian Region", type: "pdf", size: "12.4 MB", allowDownload: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: "sub_sat_02",
+          name: "Subject 2: Sounder Products & Derived Parameters",
+          modules: [
+            {
+              id: "mod_sat_02",
+              title: "Module 2: Temperature-Humidity Profiles & Lifted Index from Sounder",
+              duration: "3 Hours",
+              materials: [
+                { id: "mat_sat_03", title: "Tutorial: Extracting CAPE/LI from INSAT-3DR Sounder Data", type: "presentation", pages: 28, allowDownload: true }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "crs_agro_105",
+      code: "MOES-IMD-AGRO-2025",
+      title: "Agromet Advisory Services & Crop Weather Modeling for Indian Agriculture",
+      category: "Agrometeorology",
+      level: "Beginner to Intermediate",
+      duration: "4 Weeks (32 Hours)",
+      creditHours: 3,
+      department: "Agrometeorology Division, Pune",
+      leadTrainerId: "u_trainer_5",
+      leadTrainerName: "Dr. Meenakshi Sundaram",
+      thumbnail: "https://images.unsplash.com/photo-1581093804475-577d72e35330?auto=format&fit=crop&q=80&w=800",
+      description: "Training on Block-Level Agromet Advisory Services (FASAL, MEGHDOOT App), district-level weather bulletins, crop-specific heat unit accumulation models, drought monitoring using SPI/PDSI and kharif/rabi crop yield forecasting.",
+      prerequisites: ["Basic Meteorological Observations", "Elementary Statistics"],
+      enrolledTraineeIds: ["u_trainee_5", "u_trainee_6"],
+      competenciesGained: ["Agromet Bulletin Writing", "MEGHDOOT Advisory", "SPI/PDSI Drought Index", "Crop Model Validation"],
+      subjects: [
+        {
+          id: "sub_agro_01",
+          name: "Subject 1: Agromet Observations & Advisory Framework",
+          modules: [
+            {
+              id: "mod_agro_01",
+              title: "Module 1: AMFU Setup, Crop Phenological Observations & Bulletin Formats",
+              duration: "4 Hours",
+              materials: [
+                { id: "mat_agro_01", title: "Lecture: Agro-Meteorological Field Units (AMFU) Network in India", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "38 mins", allowDownload: false },
+                { id: "mat_agro_02", title: "Manual: Writing District-Level Agromet Advisory Bulletins", type: "pdf", size: "2.8 MB", allowDownload: true }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "crs_cli_106",
+      code: "MOES-IMD-CLI-2025",
+      title: "Indian Summer Monsoon Dynamics, Climate Variability & Long-Range Forecasting",
+      category: "Climate Science",
+      level: "Advanced",
+      duration: "8 Weeks (64 Hours)",
+      creditHours: 5,
+      department: "Climate Research & Services Division, Pune",
+      leadTrainerId: "u_trainer_6",
+      leadTrainerName: "Dr. Parthasarathi Mukhopadhyay",
+      thumbnail: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&q=80&w=800",
+      description: "In-depth study of Indian Summer Monsoon (ISM) onset, active/break cycles, inter-annual variability driven by ENSO/IOD/MJO teleconnections, CMIP6 model projections for India, and operational long-range seasonal forecast (LRF) methodology used at IMD.",
+      prerequisites: ["Synoptic Meteorology", "Basic Statistics & Time Series", "Climate Data Analysis"],
+      enrolledTraineeIds: ["u_trainee_1", "u_trainee_4", "u_trainee_7"],
+      competenciesGained: ["ENSO Teleconnection Analysis", "ISM Onset Prediction", "CMIP6 Downscaling", "Seasonal LRF"],
+      subjects: [
+        {
+          id: "sub_cli_01",
+          name: "Subject 1: Monsoon Dynamics & Variability",
+          modules: [
+            {
+              id: "mod_cli_01",
+              title: "Module 1: ISM Onset, Active-Break Cycles & Low Pressure Systems",
+              duration: "6 Hours",
+              materials: [
+                { id: "mat_cli_01", title: "Lecture: Heat Low over Thar Desert & Monsoon Trough Variability", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "55 mins", allowDownload: false },
+                { id: "mat_cli_02", title: "Research Paper Collection: ISM Active-Break Mechanisms", type: "pdf", size: "9.2 MB", allowDownload: true }
+              ]
+            },
+            {
+              id: "mod_cli_02",
+              title: "Module 2: ENSO, IOD & MJO Teleconnections to Indian Monsoon",
+              duration: "5 Hours",
+              materials: [
+                { id: "mat_cli_03", title: "Lecture: El Niño Impact on ISM Deficit Years (1972, 1982, 2002, 2023)", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "60 mins", allowDownload: false },
+                { id: "mat_cli_04", title: "Data Practicum: Calculating Oceanic Niño Index (ONI) & IOD DMI", type: "presentation", pages: 36, allowDownload: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: "sub_cli_02",
+          name: "Subject 2: Long-Range Forecasting & Climate Projections",
+          modules: [
+            {
+              id: "mod_cli_03",
+              title: "Module 3: IMD Statistical Forecast Models & CMIP6 Projections",
+              duration: "8 Hours",
+              materials: [
+                { id: "mat_cli_05", title: "Lecture: Ensemble Mean vs Probabilistic Seasonal Forecast Verification", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "65 mins", allowDownload: false }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  questionBank: [
+    // ─── NWP Questions ───
+    { id: "qb_001", question: "Which coordinate system is most commonly used in operational NWP models to handle terrain-following levels?", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Pressure (p) coordinates", "Sigma (σ) coordinates", "Height (z) coordinates", "Isentropic (θ) coordinates"], correctAnswer: 1, explanation: "Sigma coordinates follow terrain contours, avoiding computational complications near steep orography like the Himalayas." },
+    { id: "qb_002", question: "In the context of 3D-Var data assimilation, what does the B-matrix represent?", subjectId: "sub_nwp_02", subjectName: "Data Assimilation", module: "Module 3", marks: 2, type: "MCQ", difficulty: "Hard", options: ["Boundary condition error matrix", "Background error covariance matrix", "Bias correction operator", "Burgers equation solver"], correctAnswer: 1, explanation: "The B-matrix (background error covariance) defines how analysis increments are spread in space during 3D-Var minimization." },
+    { id: "qb_003", question: "The Courant-Friedrichs-Lewy (CFL) condition in explicit NWP schemes requires the Courant number (C) to be:", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["C > 1 for stability", "C = 0 always", "C ≤ 1 for computational stability", "C = 2π for wave solutions"], correctAnswer: 2, explanation: "CFL condition mandates that Courant number ≤ 1, meaning the wave cannot traverse more than one grid cell per timestep." },
+    { id: "qb_004", question: "Which global NWP model is jointly used by IMD for Tropical Cyclone track forecasting in coordination with RSMC services?", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Easy", options: ["Only GFS (NCMRWF)", "ECMWF IFS alone", "Multi-model ensemble: GFS, ECMWF, HWRF, UM", "NCMRWF T574 only"], correctAnswer: 2, explanation: "IMD uses a multi-model ensemble approach combining GFS, ECMWF, HWRF, and UK Met Office UM for consensus track guidance." },
+    { id: "qb_005", question: "In WRF model physics, which Planetary Boundary Layer (PBL) scheme uses a non-local K-profile approach suitable for convective boundary layers?", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Hard", options: ["MYJ (Mellor-Yamada-Janjic)", "YSU (Yonsei University)", "ACM2 (Asymmetric Convective)", "TEMF"], correctAnswer: 1, explanation: "YSU scheme employs non-local mixing with an explicit treatment of entrainment at the top of the convective boundary layer." },
+    // ─── Radar/DWR Questions ───
+    { id: "qb_006", question: "In a dual-polarization Doppler radar, which variable best distinguishes between rain and hail?", subjectId: "sub_dwr_02", subjectName: "Severe Storm Signatures", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Reflectivity (Z)", "Radial Velocity (V)", "Differential Reflectivity (ZDR)", "Spectrum Width (W)"], correctAnswer: 2, explanation: "ZDR is near 0 dB for spherical hailstones but is typically 1–3 dB for oblate raindrops, enabling discrimination." },
+    { id: "qb_007", question: "The maximum unambiguous velocity (Nyquist velocity) of a Doppler radar is proportional to:", subjectId: "sub_dwr_01", subjectName: "Radar Hardware & Products", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Pulse Repetition Frequency (PRF)", "Wavelength only", "PRF × Wavelength / 4", "Antenna rotation rate"], correctAnswer: 2, explanation: "Va = PRF × λ / 4. Higher PRF or longer wavelength (S-band > C-band > X-band) provides higher unambiguous velocity range." },
+    { id: "qb_008", question: "Which radar scan product provides the maximum reflectivity in a column at each horizontal location?", subjectId: "sub_dwr_01", subjectName: "Radar Hardware & Products", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Easy", options: ["PPI (Plan Position Indicator)", "RHI (Range Height Indicator)", "MAX(Z) / CMAX Product", "CAPPI at 3 km"], correctAnswer: 2, explanation: "MAX(Z) or Column Maximum Reflectivity product shows the highest Z value at each map point, useful for convection identification." },
+    { id: "qb_009", question: "A hook echo in a radar PPI scan is a signature associated with:", subjectId: "sub_dwr_02", subjectName: "Severe Storm Signatures", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Stratiform precipitation", "Mesocyclone / supercell thunderstorm (possible tornado)", "Sea breeze front", "Bright band of melting snow"], correctAnswer: 1, explanation: "Hook echo forms due to the rotating updraft of a supercell mesocyclone drawing precipitation cyclonically, often preceding tornado development." },
+    { id: "qb_010", question: "The Specific Differential Phase (KDP) is particularly useful for quantitative precipitation estimation (QPE) because it:", subjectId: "sub_dwr_02", subjectName: "Severe Storm Signatures", module: "Module 2", marks: 3, type: "MCQ", difficulty: "Hard", options: ["Is independent of radar calibration and hail contamination", "Measures vertical reflectivity gradient only", "Works only in snow", "Requires dual-PRF operation"], correctAnswer: 0, explanation: "KDP is immune to radar miscalibration, partial beam blockage, and hail contamination, making it superior for rain-rate estimation." },
+    // ─── Cyclone Questions ───
+    { id: "qb_011", question: "The Dvorak technique for tropical cyclone intensity estimation primarily uses:", subjectId: "sub_cyc_01", subjectName: "Cyclone Dynamics", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Microwave sea surface temperature", "Infrared satellite imagery cloud patterns", "Ocean heat content (OHC) maps", "Dropsonde wind profiles"], correctAnswer: 1, explanation: "Dvorak technique uses IR (and visible) geostationary satellite imagery to classify cloud pattern and estimate T-number/central pressure." },
+    { id: "qb_012", question: "Which ocean basin has the highest frequency of tropical cyclone formation in the Indian Ocean region?", subjectId: "sub_cyc_01", subjectName: "Cyclone Dynamics", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Easy", options: ["Arabian Sea only", "Bay of Bengal", "South Indian Ocean (30°S)", "Both BOB and AS equally"], correctAnswer: 1, explanation: "Bay of Bengal accounts for ~80% of North Indian Ocean tropical cyclone activity due to warm SSTs, low wind shear, and moisture convergence." },
+    { id: "qb_013", question: "Rapid Intensification (RI) of a tropical cyclone is defined by IMD/WMO as an increase in maximum sustained winds of at least:", subjectId: "sub_cyc_01", subjectName: "Cyclone Dynamics", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Hard", options: ["10 knots in 12 hours", "30 knots in 24 hours", "50 knots in 48 hours", "20 knots in 6 hours"], correctAnswer: 1, explanation: "WMO defines RI as an increase of ≥30 knots (≈55 km/h) in maximum sustained winds within a 24-hour period." },
+    { id: "qb_014", question: "The ADCIRC model used for storm surge forecasting is a:", subjectId: "sub_cyc_02", subjectName: "Storm Surge Modeling", module: "Module 3", marks: 2, type: "MCQ", difficulty: "Hard", options: ["Global atmospheric model", "Finite element shallow water equation model", "Coupled ocean-atmosphere GCM", "Statistical regression surge model"], correctAnswer: 1, explanation: "ADCIRC (Advanced Circulation Model) solves depth-integrated shallow water equations on unstructured finite element grids for storm surge." },
+    { id: "qb_015", question: "Cyclone Amphan (May 2020) was the first Super Cyclonic Storm in the Bay of Bengal since:", subjectId: "sub_cyc_01", subjectName: "Cyclone Dynamics", module: "Module 1", marks: 1, type: "MCQ", difficulty: "Easy", options: ["Cyclone Orissa (1999)", "Cyclone Aila (2009)", "Cyclone Phailin (2013)", "Cyclone Fani (2019)"], correctAnswer: 0, explanation: "Amphan was the first Super Cyclonic Storm (≥130 kt) in BOB since the 1999 Odisha Super Cyclone." },
+    // ─── Satellite Meteorology Questions ───
+    { id: "qb_016", question: "The INSAT-3DR geostationary satellite carries which two primary instruments for meteorological observation?", subjectId: "sub_sat_01", subjectName: "INSAT Satellite Products", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Easy", options: ["SAR + Scatterometer", "6-Channel Imager + 19-Channel Sounder", "GPS-RO + Altimeter", "OLR Radiometer + Lidar"], correctAnswer: 1, explanation: "INSAT-3DR carries a 6-channel multispectral Imager and a 19-channel Sounder providing vertical temperature-humidity profiles." },
+    { id: "qb_017", question: "In satellite meteorology, which channel is most useful for detecting high-level cirrus clouds and upper tropospheric moisture?", subjectId: "sub_sat_01", subjectName: "INSAT Satellite Products", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Visible (0.65 μm)", "Shortwave IR (3.9 μm)", "Water Vapour channel (6.7 μm)", "Thermal IR (10.8 μm)"], correctAnswer: 2, explanation: "The 6.7 μm water vapour channel is sensitive to upper tropospheric moisture (300-500 hPa) and high cloud tops." },
+    { id: "qb_018", question: "Outgoing Longwave Radiation (OLR) values less than 200 W/m² over the Indian region during summer typically indicate:", subjectId: "sub_sat_02", subjectName: "Sounder Products", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Clear sky desert conditions", "Deep convection and organized convective systems", "Shallow stratocumulus clouds", "Arctic air outbreaks"], correctAnswer: 1, explanation: "Low OLR (<200 W/m²) indicates high, cold cloud tops associated with deep convective systems like TCCs and MCSs." },
+    // ─── Agrometeorology Questions ───
+    { id: "qb_019", question: "The MEGHDOOT App developed by ICAR-IMD provides agromet advisories at what spatial scale?", subjectId: "sub_agro_01", subjectName: "Agromet Advisory Services", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Easy", options: ["National level only", "State level", "District and Block level", "Village Panchayat level only"], correctAnswer: 2, explanation: "MEGHDOOT provides district-to-block level weather-based agromet advisories to farmers across India." },
+    { id: "qb_020", question: "The Standardized Precipitation Index (SPI) for drought monitoring is computed over a reference period. A SPI value of -2.0 indicates:", subjectId: "sub_agro_01", subjectName: "Agromet Advisory Services", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Mildly dry conditions", "Moderately dry conditions", "Severely dry conditions", "Extremely dry conditions"], correctAnswer: 3, explanation: "SPI ≤ -2.0 classifies as 'Extreme Drought' according to the McKee et al. (1993) scale." },
+    // ─── Climate Science Questions ───
+    { id: "qb_021", question: "The Indian Ocean Dipole (IOD) is characterized by which SST pattern?", subjectId: "sub_cli_01", subjectName: "Monsoon Dynamics", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Warm western Indian Ocean & cold eastern Indian Ocean (positive IOD)", "Uniform cooling across the Indian Ocean", "Cold western & warm eastern Indian Ocean (negative IOD = positive IOD)", "SST anomaly only in the Arabian Sea"], correctAnswer: 0, explanation: "Positive IOD: anomalously warm SST in western Indian Ocean (Arabian Sea) and cool SST near Java/Sumatra — tends to enhance Indian monsoon." },
+    { id: "qb_022", question: "During an El Niño year, the Indian Summer Monsoon (ISM) rainfall tends to:", subjectId: "sub_cli_01", subjectName: "Monsoon Dynamics", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Always be above normal", "Be below normal in most cases due to Walker Circulation weakening", "Have no statistical association", "Always produce drought"], correctAnswer: 1, explanation: "El Niño weakens the Walker Circulation, suppresses convection over India, and statistically tends to produce below-normal ISM (not guaranteed)." },
+    { id: "qb_023", question: "Which phase of the Madden-Julian Oscillation (MJO) is most favorable for the onset of the Indian Summer Monsoon?", subjectId: "sub_cli_01", subjectName: "Monsoon Dynamics", module: "Module 2", marks: 3, type: "MCQ", difficulty: "Hard", options: ["Phase 1-2 (Western Hemisphere / Africa)", "Phase 3-4 (Indian Ocean enhanced convection)", "Phase 6-7 (Maritime Continent suppressed)", "Phase 8 (Western Pacific)"], correctAnswer: 1, explanation: "MJO Phase 3-4 brings enhanced convective envelope over the Indian Ocean, triggering early or active monsoon onset conditions." },
+    { id: "qb_024", question: "In the context of Indian monsoon forecasting, what does the acronym MMCFS stand for?", subjectId: "sub_cli_02", subjectName: "LRF & Climate Projections", module: "Module 3", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Multi-Model Coupled Forecast System", "Monsoon Model Climate Forecast Suite", "Monthly Maximum Cumulative Forecast Scheme", "Multi-Model Climate Forecast System"], correctAnswer: 0, explanation: "MMCFS (Multi-Model Coupled Forecast System) is IMD's operational seasonal forecast system using coupled ocean-atmosphere model ensembles." },
+    { id: "qb_025", question: "Under CMIP6 projections (SSP5-8.5 high emission scenario), Indian mean annual temperature by 2100 is projected to increase by approximately:", subjectId: "sub_cli_02", subjectName: "LRF & Climate Projections", module: "Module 3", marks: 2, type: "MCQ", difficulty: "Hard", options: ["0.5–1.0°C", "1.0–2.0°C", "4.0–6.0°C", "7.0–9.0°C"], correctAnswer: 2, explanation: "CMIP6 SSP5-8.5 projections for India indicate 4–6°C warming relative to pre-industrial baseline by end of 21st century (MoES-IITM report 2020)." },
+    // ─── General Meteorology ───
+    { id: "qb_026", question: "The standard lapse rate of temperature in the troposphere (ICAO ISA) is:", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 1", marks: 1, type: "MCQ", difficulty: "Easy", options: ["5.5°C per 1000 m", "6.5°C per 1000 m", "9.8°C per 1000 m (dry adiabatic)", "2.0°C per 1000 m"], correctAnswer: 1, explanation: "ICAO International Standard Atmosphere specifies a standard environmental lapse rate of 6.5°C/km in the troposphere." },
+    { id: "qb_027", question: "Which thermodynamic parameter represents the temperature a parcel would have if brought to 1000 hPa adiabatically?", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Equivalent potential temperature (θe)", "Potential temperature (θ)", "Wet bulb temperature (Tw)", "Virtual temperature (Tv)"], correctAnswer: 1, explanation: "Potential temperature θ = T × (P₀/P)^(R/Cp) is conserved during dry adiabatic processes and represents temperature brought to 1000 hPa." },
+    { id: "qb_028", question: "The CAPE (Convective Available Potential Energy) value greater than 2500 J/kg indicates:", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 2", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Stable atmosphere with no convection risk", "Marginal instability", "Moderate instability for thunderstorms", "Extreme instability with severe thunderstorm potential"], correctAnswer: 3, explanation: "CAPE > 2500 J/kg indicates extreme atmospheric instability, associated with potential for severe/supercell thunderstorms, large hail, and tornadoes." },
+    { id: "qb_029", question: "Which institution in India operates the National Seismic Monitoring Network (NSeIS) of broadband seismographs?", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 1", marks: 1, type: "MCQ", difficulty: "Easy", options: ["NGRI Hyderabad", "IMD (India Meteorological Department)", "NRSC Hyderabad", "GSI (Geological Survey of India)"], correctAnswer: 1, explanation: "IMD operates the National Seismic Monitoring Network (NSeIS) with 115+ broadband seismographs across India." },
+    { id: "qb_030", question: "Geopotential Height (Z) at a pressure level is different from geometric height (z) because it accounts for:", subjectId: "sub_nwp_01", subjectName: "Governing Equations", module: "Module 1", marks: 2, type: "MCQ", difficulty: "Medium", options: ["Centrifugal force only", "Variation of gravity with latitude and altitude", "Coriolis force contribution", "Temperature lapse rate only"], correctAnswer: 1, explanation: "Geopotential height Z = Φ/g₀ where Φ is geopotential integrating g(φ,z) variation with latitude and elevation — g decreases with altitude." }
+  ],
+
+  quizzes: [
+    {
+      id: "quiz_nwp_2025_01",
+      title: "NWP & Data Assimilation — Level 2 Proficiency Assessment",
+      courseId: "crs_nwp_101",
+      courseName: "Advanced NWP & Data Assimilation",
+      trainerId: "u_trainer_1",
+      trainerName: "Dr. Amit Sengupta",
+      department: "Numerical Weather Prediction Division, New Delhi",
+      totalMarks: 20,
+      passMarks: 12,
+      durationMinutes: 30,
+      scheduledStartTime: "2025-03-01T09:00:00.000Z",
+      deadlineTime: "2025-03-15T23:59:59.000Z",
+      status: "published",
+      isKioskModeRequired: true,
+      questions: [
+        { id: "qb_001", question: "Which coordinate system is most commonly used in operational NWP models to handle terrain-following levels?", marks: 2, type: "MCQ", options: ["Pressure (p) coordinates", "Sigma (σ) coordinates", "Height (z) coordinates", "Isentropic (θ) coordinates"], correctAnswer: 1 },
+        { id: "qb_002", question: "In the context of 3D-Var data assimilation, what does the B-matrix represent?", marks: 2, type: "MCQ", options: ["Boundary condition error matrix", "Background error covariance matrix", "Bias correction operator", "Burgers equation solver"], correctAnswer: 1 },
+        { id: "qb_003", question: "The CFL condition in explicit NWP schemes requires the Courant number (C) to be:", marks: 2, type: "MCQ", options: ["C > 1 for stability", "C = 0 always", "C ≤ 1 for computational stability", "C = 2π for wave solutions"], correctAnswer: 2 },
+        { id: "qb_004", question: "Which global NWP model is jointly used by IMD for Tropical Cyclone track forecasting?", marks: 2, type: "MCQ", options: ["Only GFS (NCMRWF)", "ECMWF IFS alone", "Multi-model ensemble: GFS, ECMWF, HWRF, UM", "NCMRWF T574 only"], correctAnswer: 2 },
+        { id: "qb_005", question: "In WRF model physics, which PBL scheme uses a non-local K-profile approach for convective boundary layers?", marks: 2, type: "MCQ", options: ["MYJ (Mellor-Yamada-Janjic)", "YSU (Yonsei University)", "ACM2 (Asymmetric Convective)", "TEMF"], correctAnswer: 1 },
+        { id: "qb_026", question: "The standard lapse rate of temperature in the troposphere (ICAO ISA) is:", marks: 2, type: "MCQ", options: ["5.5°C per 1000 m", "6.5°C per 1000 m", "9.8°C per 1000 m (dry adiabatic)", "2.0°C per 1000 m"], correctAnswer: 1 },
+        { id: "qb_027", question: "Which thermodynamic parameter represents the temperature a parcel would have if brought to 1000 hPa adiabatically?", marks: 2, type: "MCQ", options: ["Equivalent potential temperature (θe)", "Potential temperature (θ)", "Wet bulb temperature (Tw)", "Virtual temperature (Tv)"], correctAnswer: 1 },
+        { id: "qb_028", question: "The CAPE value greater than 2500 J/kg indicates:", marks: 2, type: "MCQ", options: ["Stable atmosphere", "Marginal instability", "Moderate instability", "Extreme instability with severe thunderstorm potential"], correctAnswer: 3 },
+        { id: "qb_030", question: "Geopotential Height (Z) at a pressure level is different from geometric height because it accounts for:", marks: 2, type: "MCQ", options: ["Centrifugal force only", "Variation of gravity with latitude and altitude", "Coriolis force only", "Temperature lapse rate only"], correctAnswer: 1 },
+        { id: "qb_029", question: "Which institution in India operates the National Seismic Monitoring Network (NSeIS)?", marks: 2, type: "MCQ", options: ["NGRI Hyderabad", "IMD (India Meteorological Department)", "NRSC Hyderabad", "GSI"], correctAnswer: 1 }
+      ]
+    },
+    {
+      id: "quiz_dwr_2025_02",
+      title: "Doppler Weather Radar Operations — Certification Assessment",
+      courseId: "crs_dwr_102",
+      courseName: "DWR Operational Data Interpretation & Nowcasting",
+      trainerId: "u_trainer_2",
+      trainerName: "Dr. Sunita Kulkarni",
+      department: "Radar & Satellite Meteorology Division, Pune",
+      totalMarks: 20,
+      passMarks: 14,
+      durationMinutes: 25,
+      scheduledStartTime: "2025-03-05T10:00:00.000Z",
+      deadlineTime: "2025-03-20T23:59:59.000Z",
+      status: "published",
+      isKioskModeRequired: true,
+      questions: [
+        { id: "qb_006", question: "In a dual-polarization Doppler radar, which variable best distinguishes between rain and hail?", marks: 2, type: "MCQ", options: ["Reflectivity (Z)", "Radial Velocity (V)", "Differential Reflectivity (ZDR)", "Spectrum Width (W)"], correctAnswer: 2 },
+        { id: "qb_007", question: "The maximum unambiguous velocity (Nyquist velocity) of a Doppler radar is proportional to:", marks: 2, type: "MCQ", options: ["Pulse Repetition Frequency (PRF)", "Wavelength only", "PRF × Wavelength / 4", "Antenna rotation rate"], correctAnswer: 2 },
+        { id: "qb_008", question: "Which radar scan product provides the maximum reflectivity in a column at each horizontal location?", marks: 2, type: "MCQ", options: ["PPI (Plan Position Indicator)", "RHI (Range Height Indicator)", "MAX(Z) / CMAX Product", "CAPPI at 3 km"], correctAnswer: 2 },
+        { id: "qb_009", question: "A hook echo in a radar PPI scan is a signature associated with:", marks: 2, type: "MCQ", options: ["Stratiform precipitation", "Mesocyclone / supercell thunderstorm", "Sea breeze front", "Bright band of melting snow"], correctAnswer: 1 },
+        { id: "qb_010", question: "The Specific Differential Phase (KDP) is particularly useful for QPE because it:", marks: 3, type: "MCQ", options: ["Is independent of radar calibration and hail contamination", "Measures vertical reflectivity gradient only", "Works only in snow", "Requires dual-PRF operation"], correctAnswer: 0 },
+        { id: "qb_017", question: "In satellite meteorology, which channel is most useful for detecting upper tropospheric moisture?", marks: 2, type: "MCQ", options: ["Visible (0.65 μm)", "Shortwave IR (3.9 μm)", "Water Vapour channel (6.7 μm)", "Thermal IR (10.8 μm)"], correctAnswer: 2 },
+        { id: "qb_018", question: "OLR values less than 200 W/m² over India during summer typically indicate:", marks: 2, type: "MCQ", options: ["Clear sky desert conditions", "Deep convection and organized convective systems", "Shallow stratocumulus clouds", "Arctic air outbreaks"], correctAnswer: 1 },
+        { id: "qb_016", question: "The INSAT-3DR satellite carries which two primary instruments?", marks: 2, type: "MCQ", options: ["SAR + Scatterometer", "6-Channel Imager + 19-Channel Sounder", "GPS-RO + Altimeter", "OLR Radiometer + Lidar"], correctAnswer: 1 }
+      ]
+    },
+    {
+      id: "quiz_cyc_2025_03",
+      title: "Tropical Cyclone Forecasting & Storm Surge — Level 2 Assessment",
+      courseId: "crs_cyc_103",
+      courseName: "Tropical Cyclone Forecasting & Storm Surge Modeling",
+      trainerId: "u_trainer_3",
+      trainerName: "Dr. Rajiv Roy",
+      department: "Cyclone Warning Division, Kolkata",
+      totalMarks: 20,
+      passMarks: 12,
+      durationMinutes: 30,
+      scheduledStartTime: "2025-03-10T09:00:00.000Z",
+      deadlineTime: "2025-03-25T23:59:59.000Z",
+      status: "published",
+      isKioskModeRequired: true,
+      questions: [
+        { id: "qb_011", question: "The Dvorak technique for tropical cyclone intensity estimation primarily uses:", marks: 2, type: "MCQ", options: ["Microwave sea surface temperature", "Infrared satellite imagery cloud patterns", "Ocean heat content (OHC) maps", "Dropsonde wind profiles"], correctAnswer: 1 },
+        { id: "qb_012", question: "Which ocean basin has the highest frequency of TC formation in the Indian Ocean region?", marks: 2, type: "MCQ", options: ["Arabian Sea only", "Bay of Bengal", "South Indian Ocean (30°S)", "Both BOB and AS equally"], correctAnswer: 1 },
+        { id: "qb_013", question: "Rapid Intensification (RI) is defined as an increase in max sustained winds of at least:", marks: 2, type: "MCQ", options: ["10 knots in 12 hours", "30 knots in 24 hours", "50 knots in 48 hours", "20 knots in 6 hours"], correctAnswer: 1 },
+        { id: "qb_014", question: "The ADCIRC model used for storm surge forecasting is a:", marks: 2, type: "MCQ", options: ["Global atmospheric model", "Finite element shallow water equation model", "Coupled ocean-atmosphere GCM", "Statistical regression surge model"], correctAnswer: 1 },
+        { id: "qb_015", question: "Cyclone Amphan (May 2020) was the first Super Cyclonic Storm in BOB since:", marks: 2, type: "MCQ", options: ["Cyclone Orissa (1999)", "Cyclone Aila (2009)", "Cyclone Phailin (2013)", "Cyclone Fani (2019)"], correctAnswer: 0 },
+        { id: "qb_004", question: "Which multi-model ensemble approach is used by IMD for cyclone track forecasting?", marks: 2, type: "MCQ", options: ["Only GFS (NCMRWF)", "ECMWF IFS alone", "Multi-model ensemble: GFS, ECMWF, HWRF, UM", "NCMRWF T574 only"], correctAnswer: 2 },
+        { id: "qb_028", question: "CAPE > 2500 J/kg indicates:", marks: 2, type: "MCQ", options: ["Stable atmosphere", "Marginal instability", "Moderate instability", "Extreme instability with severe thunderstorm potential"], correctAnswer: 3 },
+        { id: "qb_026", question: "The standard environmental lapse rate per ICAO ISA is:", marks: 2, type: "MCQ", options: ["5.5°C per 1000 m", "6.5°C per 1000 m", "9.8°C per 1000 m", "2.0°C per 1000 m"], correctAnswer: 1 },
+        { id: "qb_027", question: "Potential temperature (θ) represents the temperature a parcel would have if brought to:", marks: 2, type: "MCQ", options: ["500 hPa level", "700 hPa level", "1000 hPa adiabatically", "Sea level using moist adiabat"], correctAnswer: 2 }
+      ]
+    },
+    {
+      id: "quiz_cli_2025_04",
+      title: "Indian Monsoon & Climate Variability — Foundational Assessment",
+      courseId: "crs_cli_106",
+      courseName: "Indian Summer Monsoon Dynamics & Long-Range Forecasting",
+      trainerId: "u_trainer_6",
+      trainerName: "Dr. Parthasarathi Mukhopadhyay",
+      department: "Climate Research & Services, Pune",
+      totalMarks: 20,
+      passMarks: 13,
+      durationMinutes: 25,
+      scheduledStartTime: "2025-03-15T10:00:00.000Z",
+      deadlineTime: "2025-03-30T23:59:59.000Z",
+      status: "published",
+      isKioskModeRequired: true,
+      questions: [
+        { id: "qb_021", question: "The Indian Ocean Dipole (IOD) positive phase is characterized by:", marks: 2, type: "MCQ", options: ["Warm western Indian Ocean & cold eastern Indian Ocean", "Uniform cooling across the Indian Ocean", "Cold western & warm eastern Indian Ocean", "SST anomaly only in the Arabian Sea"], correctAnswer: 0 },
+        { id: "qb_022", question: "During an El Niño year, the Indian Summer Monsoon (ISM) rainfall tends to:", marks: 2, type: "MCQ", options: ["Always be above normal", "Be below normal in most cases", "Have no statistical association", "Always produce drought"], correctAnswer: 1 },
+        { id: "qb_023", question: "Which MJO phase is most favorable for the onset of the Indian Summer Monsoon?", marks: 3, type: "MCQ", options: ["Phase 1-2 (Western Hemisphere)", "Phase 3-4 (Indian Ocean enhanced convection)", "Phase 6-7 (Maritime Continent suppressed)", "Phase 8 (Western Pacific)"], correctAnswer: 1 },
+        { id: "qb_024", question: "What does MMCFS stand for in Indian monsoon forecasting?", marks: 2, type: "MCQ", options: ["Multi-Model Coupled Forecast System", "Monsoon Model Climate Forecast Suite", "Monthly Maximum Cumulative Forecast Scheme", "Multi-Model Climate Forecast System"], correctAnswer: 0 },
+        { id: "qb_025", question: "Under CMIP6 SSP5-8.5, Indian mean annual temperature by 2100 is projected to increase by:", marks: 2, type: "MCQ", options: ["0.5–1.0°C", "1.0–2.0°C", "4.0–6.0°C", "7.0–9.0°C"], correctAnswer: 2 },
+        { id: "qb_019", question: "The MEGHDOOT App provides agromet advisories at what spatial scale?", marks: 2, type: "MCQ", options: ["National level only", "State level", "District and Block level", "Village Panchayat level only"], correctAnswer: 2 },
+        { id: "qb_020", question: "A SPI value of -2.0 indicates:", marks: 2, type: "MCQ", options: ["Mildly dry", "Moderately dry", "Severely dry", "Extremely dry"], correctAnswer: 3 },
+        { id: "qb_018", question: "OLR < 200 W/m² over India during summer indicates:", marks: 2, type: "MCQ", options: ["Clear sky desert", "Deep convection", "Shallow stratocumulus", "Arctic air outbreak"], correctAnswer: 1 }
+      ]
+    },
+    {
+      id: "quiz_gen_2025_05",
+      title: "IMD Officers Foundational Meteorology — All-India Grand Assessment",
+      courseId: "crs_nwp_101",
+      courseName: "CAPACITY CONNECT — Grand Assessment",
+      trainerId: "u_admin_1",
+      trainerName: "Dr. Mrutyunjay Mohapatra",
+      department: "Directorate General of Meteorology",
+      totalMarks: 30,
+      passMarks: 18,
+      durationMinutes: 40,
+      scheduledStartTime: "2025-04-01T09:00:00.000Z",
+      deadlineTime: "2025-04-30T23:59:59.000Z",
+      status: "published",
+      isKioskModeRequired: true,
+      questions: [
+        { id: "qb_001", question: "Which coordinate system is used in NWP for terrain-following levels?", marks: 2, type: "MCQ", options: ["Pressure coordinates", "Sigma coordinates", "Height coordinates", "Isentropic coordinates"], correctAnswer: 1 },
+        { id: "qb_006", question: "Which dual-pol variable best distinguishes rain from hail?", marks: 2, type: "MCQ", options: ["Reflectivity (Z)", "Radial Velocity (V)", "Differential Reflectivity (ZDR)", "Spectrum Width (W)"], correctAnswer: 2 },
+        { id: "qb_011", question: "The Dvorak technique uses which data source for TC intensity estimation?", marks: 2, type: "MCQ", options: ["Microwave SST", "Infrared satellite imagery", "Ocean heat content maps", "Dropsonde profiles"], correctAnswer: 1 },
+        { id: "qb_016", question: "INSAT-3DR carries which two meteorological instruments?", marks: 2, type: "MCQ", options: ["SAR + Scatterometer", "6-Channel Imager + 19-Channel Sounder", "GPS-RO + Altimeter", "OLR Radiometer + Lidar"], correctAnswer: 1 },
+        { id: "qb_019", question: "MEGHDOOT App provides agromet advisories at what scale?", marks: 2, type: "MCQ", options: ["National level", "State level", "District and Block level", "Village level only"], correctAnswer: 2 },
+        { id: "qb_021", question: "Positive IOD phase shows:", marks: 2, type: "MCQ", options: ["Warm W. Indian Ocean & cold E. Indian Ocean", "Uniform cooling", "Cold W. & warm E. Indian Ocean", "SST only in Arabian Sea"], correctAnswer: 0 },
+        { id: "qb_026", question: "Standard ICAO ISA tropospheric lapse rate is:", marks: 2, type: "MCQ", options: ["5.5°C/km", "6.5°C/km", "9.8°C/km", "2.0°C/km"], correctAnswer: 1 },
+        { id: "qb_028", question: "CAPE > 2500 J/kg indicates:", marks: 2, type: "MCQ", options: ["Stable atmosphere", "Marginal instability", "Moderate instability", "Extreme instability"], correctAnswer: 3 },
+        { id: "qb_012", question: "Which ocean basin has highest TC frequency in North Indian Ocean?", marks: 2, type: "MCQ", options: ["Arabian Sea only", "Bay of Bengal", "South Indian Ocean", "Both equally"], correctAnswer: 1 },
+        { id: "qb_022", question: "During El Niño, ISM rainfall tends to:", marks: 2, type: "MCQ", options: ["Always above normal", "Be below normal in most cases", "No association", "Always drought"], correctAnswer: 1 },
+        { id: "qb_003", question: "CFL condition requires Courant number to be:", marks: 2, type: "MCQ", options: ["C > 1", "C = 0", "C ≤ 1", "C = 2π"], correctAnswer: 2 },
+        { id: "qb_007", question: "Nyquist velocity of a Doppler radar is proportional to:", marks: 2, type: "MCQ", options: ["PRF", "Wavelength only", "PRF × Wavelength / 4", "Antenna rotation rate"], correctAnswer: 2 },
+        { id: "qb_013", question: "Rapid Intensification (RI) is defined as ≥ how many knots in 24 hours?", marks: 2, type: "MCQ", options: ["10 knots", "30 knots", "50 knots", "20 knots"], correctAnswer: 1 },
+        { id: "qb_017", question: "Which satellite channel detects upper tropospheric moisture?", marks: 2, type: "MCQ", options: ["Visible 0.65μm", "Shortwave IR 3.9μm", "Water Vapour 6.7μm", "Thermal IR 10.8μm"], correctAnswer: 2 },
+        { id: "qb_025", question: "CMIP6 SSP5-8.5 India temperature rise by 2100:", marks: 2, type: "MCQ", options: ["0.5–1.0°C", "1.0–2.0°C", "4.0–6.0°C", "7.0–9.0°C"], correctAnswer: 2 }
+      ]
+    }
+  ],
+
+  quizSubmissions: [
+    { id: "subm_001", quizId: "quiz_nwp_2025_01", quizTitle: "NWP & Data Assimilation Assessment", traineeId: "u_trainee_1", traineeName: "Rahul Sharma", traineeEmail: "rahul.sharma@imd.gov.in", score: 20, totalMarks: 20, percentage: 100, passed: true, timeTakenSeconds: 1420, tabSwitchCount: 0, submittedAt: "2025-03-05T10:25:00.000Z", gradedBy: "auto", certificateGenerated: true, certificateId: "MOES-IMD-CERT-2025-0981" },
+    { id: "subm_002", quizId: "quiz_dwr_2025_02", quizTitle: "DWR Certification Assessment", traineeId: "u_trainee_2", traineeName: "Priya Varma", traineeEmail: "priya.varma@imd.gov.in", score: 15, totalMarks: 16, percentage: 94, passed: true, timeTakenSeconds: 980, tabSwitchCount: 0, submittedAt: "2025-03-08T11:10:00.000Z", gradedBy: "auto", certificateGenerated: true, certificateId: "MOES-IMD-CERT-2025-1042" },
+    { id: "subm_003", quizId: "quiz_cyc_2025_03", quizTitle: "Cyclone Forecasting Assessment", traineeId: "u_trainee_3", traineeName: "Arjun Bose", traineeEmail: "arjun.bose@imd.gov.in", score: 16, totalMarks: 18, percentage: 89, passed: true, timeTakenSeconds: 1200, tabSwitchCount: 1, submittedAt: "2025-03-15T14:30:00.000Z", gradedBy: "auto", certificateGenerated: true, certificateId: "MOES-IMD-CERT-2025-1115" },
+    { id: "subm_004", quizId: "quiz_dwr_2025_02", quizTitle: "DWR Certification Assessment", traineeId: "u_trainee_4", traineeName: "Meena Reddy", traineeEmail: "meena.reddy@imd.gov.in", score: 13, totalMarks: 16, percentage: 81, passed: true, timeTakenSeconds: 1150, tabSwitchCount: 0, submittedAt: "2025-03-10T09:45:00.000Z", gradedBy: "auto", certificateGenerated: true, certificateId: "MOES-IMD-CERT-2025-1198" },
+    { id: "subm_005", quizId: "quiz_gen_2025_05", quizTitle: "Grand Assessment", traineeId: "u_trainee_5", traineeName: "Kiran Patel", traineeEmail: "kiran.patel@imd.gov.in", score: 22, totalMarks: 30, percentage: 73, passed: true, timeTakenSeconds: 1900, tabSwitchCount: 0, submittedAt: "2025-04-05T11:30:00.000Z", gradedBy: "auto", certificateGenerated: false, certificateId: null },
+    { id: "subm_006", quizId: "quiz_nwp_2025_01", quizTitle: "NWP & Data Assimilation Assessment", traineeId: "u_trainee_3", traineeName: "Arjun Bose", traineeEmail: "arjun.bose@imd.gov.in", score: 16, totalMarks: 20, percentage: 80, passed: true, timeTakenSeconds: 1650, tabSwitchCount: 0, submittedAt: "2025-03-06T12:00:00.000Z", gradedBy: "auto", certificateGenerated: true, certificateId: "MOES-IMD-CERT-2025-1245" }
+  ],
+
+  competencyFramework: [
+    { id: "comp_01", name: "Numerical Weather Prediction & Ensemble Systems", level: "Advanced", targetRole: "Operational Meteorologist / Forecaster", currentlyAssigned: true, suggestedTrainers: ["Dr. Amit Sengupta", "Dr. Parthasarathi Mukhopadhyay"], requiredSkills: ["WRF Configuration", "ECMWF IFS Usage", "EPS Probability Maps"], enrolledTraineeCount: 3 },
+    { id: "comp_02", name: "Doppler Radar Interpretation & Nowcasting", level: "Intermediate", targetRole: "Radar Meteorologist / Warning Officer", currentlyAssigned: true, suggestedTrainers: ["Dr. Sunita Kulkarni"], requiredSkills: ["Dual-Pol Products", "TITAN Cell Tracking", "Severe Storm Signatures"], enrolledTraineeCount: 3 },
+    { id: "comp_03", name: "Tropical Cyclone Forecasting & RSMC Operations", level: "Advanced", targetRole: "Cyclone Warning Specialist", currentlyAssigned: true, suggestedTrainers: ["Dr. Rajiv Roy"], requiredSkills: ["Dvorak Technique", "Storm Surge Modeling", "RSMC Alert Protocols"], enrolledTraineeCount: 2 },
+    { id: "comp_04", name: "Satellite Meteorology & Remote Sensing", level: "Intermediate", targetRole: "Satellite Data Analyst", currentlyAssigned: true, suggestedTrainers: ["Dr. Sunita Kulkarni"], requiredSkills: ["Multi-Spectral Imagery", "OLR/SST Products", "Cloud Classification"], enrolledTraineeCount: 2 },
+    { id: "comp_05", name: "Agrometeorology & Agromet Advisory Services", level: "Beginner to Intermediate", targetRole: "Agromet Officer (AMO)", currentlyAssigned: false, suggestedTrainers: ["Dr. Meenakshi Sundaram"], requiredSkills: ["Agromet Bulletin Writing", "MEGHDOOT App", "Drought Monitoring"], enrolledTraineeCount: 1 },
+    { id: "comp_06", name: "Climate Modelling & Long-Range Forecasting", level: "Expert", targetRole: "Climate Research Scientist", currentlyAssigned: true, suggestedTrainers: ["Dr. Parthasarathi Mukhopadhyay"], requiredSkills: ["CMIP6 Analysis", "Monsoon LRF", "ENSO Teleconnections"], enrolledTraineeCount: 2 },
+    { id: "comp_07", name: "Aviation Meteorology & SIGMET Writing", level: "Intermediate", targetRole: "Aviation Met Observer / AMOS", currentlyAssigned: false, suggestedTrainers: ["Dr. Amit Sengupta"], requiredSkills: ["TAF/METAR Formats", "SIGMET Criteria", "LLWS Detection"], enrolledTraineeCount: 1 },
+    { id: "comp_08", name: "Seismology & Earthquake Early Warning", level: "Intermediate", targetRole: "Seismologist / Geophysicist", currentlyAssigned: true, suggestedTrainers: ["Dr. Laxminarayan Patra"], requiredSkills: ["Broadband Seismograph Operation", "Magnitude Computation", "ShakeMap Generation"], enrolledTraineeCount: 0 }
+  ],
+
+  announcements: [
+    { id: "ann_01", title: "MoES Launches Digital Capacity Building Initiative — All RMC Officers to Complete Level-1 Assessment by Q2 2025", category: "National Directive", date: "2025-02-14", urgent: true, content: "The Ministry of Earth Sciences mandates all Scientific Assistants and Trainee Meteorologists to complete Level-1 Competency Assessments on the CAPACITY CONNECT portal by 30 June 2025. Non-compliance will be noted in annual performance reports.", author: "Director General Office, New Delhi" },
+    { id: "ann_02", title: "New Doppler Weather Radar (DWR) Dual-Pol Certification Cohort — Enrollments Open", category: "Training Cohort", date: "2025-02-10", urgent: false, content: "Enrollments are now open for the 4-week intensive training on Dual-Polarization radar data interpretation led by Dr. Sunita Kulkarni. Limited to 30 candidates. Apply via the Course Catalog.", author: "IMD Training Centre Pune" },
+    { id: "ann_03", title: "Achievement: IMD Completes 10,000 Trainee Certifications Across 36 State Meteorological Offices", category: "Milestone", date: "2025-02-01", urgent: false, content: "National capacity building in weather forecasting accuracy reaches record high with 94.8% assessment pass rate across all CAPACITY CONNECT courses.", author: "MoES Capacity Cell, New Delhi" },
+    { id: "ann_04", title: "CYCLONE SEASON 2025 PREPAREDNESS: All Coastal Station Officers Mandated to Complete Cyclone Forecasting Assessment", category: "Operational Directive", date: "2025-03-01", urgent: true, content: "With pre-monsoon cyclone season beginning April 2025, all officers at coastal and island stations (Andaman, Lakshadweep, Odisha, AP, TN, Gujarat) must complete the Tropical Cyclone Forecasting & Storm Surge Assessment before 31 March 2025.", author: "Cyclone Warning Division, New Delhi" },
+    { id: "ann_05", title: "New IMD Training Facility Inaugurated at Pune — 200-Seat State-of-the-Art Kiosk Assessment Center", category: "Infrastructure", date: "2025-02-20", urgent: false, content: "A new 200-seat high-tech training and assessment center has been commissioned at IMD Headquarters Pune, equipped with biometric kiosk exam stations and real-time weather data dashboards.", author: "IMD Infrastructure Division" },
+    { id: "ann_06", title: "Grand Assessment 2025: All-India Foundational Meteorology Test — Register Now", category: "Assessment", date: "2025-03-20", urgent: false, content: "The Annual All-India IMD Officers Foundational Assessment covering NWP, Radar, Cyclone, Satellite and Climate modules will be conducted on 1 April 2025. All Grade-I Scientific Assistants and above must participate.", author: "DG Office, IMD India" }
+  ],
+
+  feedbacks: [
+    { id: "fb_001", courseId: "crs_nwp_101", traineeId: "u_trainee_1", traineeName: "Rahul Sharma", trainerRating: 5, contentRating: 5, relevanceRating: 5, comment: "Exceptional course! Dr. Sengupta's explanation of 4D-Var and WRF model physics is world-class. The hands-on WPS configuration lab was very practical.", createdAt: "2025-03-07T10:30:00.000Z" },
+    { id: "fb_002", courseId: "crs_dwr_102", traineeId: "u_trainee_2", traineeName: "Priya Varma", trainerRating: 5, contentRating: 4, relevanceRating: 5, comment: "Very relevant for my work at Vizag DWR station. The dual-pol case study on Mumbai 2005 was eye-opening. Would love a hands-on DWR simulation lab.", createdAt: "2025-03-09T14:00:00.000Z" },
+    { id: "fb_003", courseId: "crs_cyc_103", traineeId: "u_trainee_3", traineeName: "Arjun Bose", trainerRating: 5, contentRating: 5, relevanceRating: 5, comment: "Dr. Roy's case study on Cyclone Amphan was brilliant. The ADCIRC storm surge lab should be made mandatory for all BOB coastal station officers.", createdAt: "2025-03-16T09:00:00.000Z" },
+    { id: "fb_004", courseId: "crs_sat_104", traineeId: "u_trainee_4", traineeName: "Meena Reddy", trainerRating: 4, contentRating: 5, relevanceRating: 5, comment: "The INSAT-3DR sounder product interpretation was extremely valuable. I now use these techniques daily for convective monitoring at Hyderabad.", createdAt: "2025-03-12T11:30:00.000Z" }
+  ]
+};
