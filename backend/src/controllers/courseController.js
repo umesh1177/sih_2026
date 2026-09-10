@@ -196,15 +196,6 @@ export const deleteLearningMaterial = (req, res) => {
   }
 };
 
-export const getTrainersWorkload = (req, res) => {
-  try {
-    const workloads = db.getTrainersWorkload();
-    return res.json({ success: true, count: workloads.length, workloads });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
-};
-
 export const getTrainerEnrolledTrainees = (req, res) => {
   try {
     const trainerName = req.query.trainerName || req.user?.name;
