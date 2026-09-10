@@ -18,15 +18,21 @@ import {
   Star,
   Layers,
   ArrowUpRight,
-  FileQuestion
+  FileQuestion,
+  Lock,
+  Unlock,
+  Sliders
 } from "lucide-react";
+import { CertificateEligibilityGatekeeper } from "./CertificateEligibilityGatekeeper";
 import { api } from "../../services/api";
 
-export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate }) => {
+export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, onOpenStudio }) => {
+  const [mainViewTab, setMainViewTab] = useState("eligibility"); // "eligibility" | "verified"
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedId, setCopiedId] = useState(null);
   const [certificates, setCertificates] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -212,43 +218,87 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate }
 
       </div>
 
-      {/* ═════════ SEARCH & FILTER CONTROLS ═════════ */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        
-        {/* Search */}
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-          <input
-            type="text"
-            placeholder="Search credentials or competency skills..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
-          />
-        </div>
+      {/* ═════════ PRIMARY VIEW SELECTOR (Rule 15 Eligibility vs Issued Certificates) ═════════ */}
+      <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 overflow-x-auto">
+        <button
+          onClick={() => setMainViewTab("eligibility")}
+          className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 shrink-0 ${
+            mainViewTab === "eligibility"
+              ? "bg-white text-indigo-900 shadow-sm"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4 text-indigo-600" />
+          <span>Certificate Eligibility Gatekeeper (Rule 15 Checklist)</span>
+        </button>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {[
-            { id: "all", label: "All Credentials" },
-            { id: "distinction", label: "🌟 Distinction Honors" }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveFilter(tab.id)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                activeFilter === tab.id
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <button
+          onClick={() => setMainViewTab("verified")}
+          className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 shrink-0 ${
+            mainViewTab === "verified"
+              ? "bg-white text-indigo-900 shadow-sm"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <Award className="w-4 h-4 text-blue-600" />
+          <span>Verified Accreditations ({certificates.length})</span>
+        </button>
       </div>
 
-      {/* ═════════ CREDENTIALS SHOWCASE GRID ═════════ */}
+      {/* ─── TAB 1: CERTIFICATE ELIGIBILITY GATEKEEPER ─── */}
+      {mainViewTab === "eligibility" && (
+        <CertificateEligibilityGatekeeper
+          currentUser={currentUser}
+          courses={courses}
+          onOpenStudio={onOpenStudio}
+          onClaimCertificate={(cert) => {
+            if (onOpenCertificate) {
+              onOpenCertificate(cert.submission, cert.courseTitle, cert.traineeName);
+            }
+          }}
+        />
+      )}
+
+      {/* ─── TAB 2: VERIFIED ACCREDITATIONS & CERTIFICATES SHOWCASE ─── */}
+      {mainViewTab === "verified" && (
+        <div className="space-y-6">
+          {/* ═════════ SEARCH & FILTER CONTROLS ═════════ */}
+          <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            
+            {/* Search */}
+            <div className="relative w-full sm:w-80">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <input
+                type="text"
+                placeholder="Search credentials or competency skills..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+              />
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[
+                { id: "all", label: "All Credentials" },
+                { id: "distinction", label: "🌟 Distinction Honors" }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveFilter(tab.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    activeFilter === tab.id
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ═════════ CREDENTIALS SHOWCASE GRID ═════════ */}
       {loading ? (
         <div className="py-16 text-center space-y-3">
           <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -381,6 +431,8 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate }
               </div>
             );
           })}
+        </div>
+      )}
         </div>
       )}
 

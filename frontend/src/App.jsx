@@ -514,6 +514,10 @@ const MainApp = () => {
           {activeTab === "certificates" && (
             <CredentialsCertificationsView
               currentUser={currentUser}
+              onOpenStudio={(course) => {
+                setSelectedOverviewCourse(null);
+                setActiveStudioCourse(course);
+              }}
               onOpenCertificate={(submission, courseTitle, traineeName) => {
                 setCertificateData({ submission, courseTitle, traineeName });
               }}
