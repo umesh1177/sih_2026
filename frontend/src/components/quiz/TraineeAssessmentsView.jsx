@@ -84,17 +84,19 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       quizId: sub.quizId,
       title: sub.quizTitle || quizObj.title || "Scheduled Assessment",
       subjects: quizObj.subjects || (quizObj.courseName ? [quizObj.courseName] : ["Core Modules"]),
-      score: `${sub.score} / ${sub.totalMarks} (${sub.percentage}%)`,
+      score: sub.isDisqualified ? "0 / 0 (Disqualified)" : `${sub.score} / ${sub.totalMarks} (${sub.percentage}%)`,
       scoreNum: sub.score,
       totalMarks: sub.totalMarks,
       percentage: sub.percentage,
       passed: sub.passed,
-      status: "Submitted",
+      status: sub.isDisqualified ? "Disqualified" : "Submitted",
+      isDisqualified: !!sub.isDisqualified,
+      disqualificationReason: sub.disqualificationReason || "Integrity rule violation (context switch)",
       submittedAt: submittedDate,
       timeTaken: timeTakenFormatted,
       timeTakenSeconds: sub.timeTakenSeconds || 0,
       durationMinutes: quizObj.durationMinutes || 30,
-      accuracy: sub.percentage,
+      accuracy: sub.isDisqualified ? 0 : sub.percentage,
       attempted: quizObj.questions ? quizObj.questions.length : (sub.answers ? Object.keys(sub.answers).length : 0),
       isPending: sub.isPending || false,
       answers: sub.answers || {},
@@ -103,8 +105,9 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
   });
 
   const availableQuizzes = allQuizzes.filter(q => {
-    // If already submitted by this trainee, it belongs in Completed
-    if (submissionMap.has(q.id)) return false;
+    const existingSub = submissionMap.get(q.id);
+    // If normally submitted and NOT disqualified, it belongs exclusively in Completed
+    if (existingSub && !existingSub.isDisqualified) return false;
 
     // Check scheduling time
     if (q.scheduledStartTime) {
@@ -118,14 +121,21 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
     }
 
     return true;
-  }).map(q => ({
-    ...q,
-    startsDate: q.scheduledStartTime ? new Date(q.scheduledStartTime).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "Open Assessment",
-    startsRelative: "Live Now",
-    endsDate: q.deadlineTime ? new Date(q.deadlineTime).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "Open Deadline",
-    endsRelative: "Active Window",
-    subjects: q.subjects || (q.courseName ? [q.courseName] : ["Core Curriculum"])
-  }));
+  }).map(q => {
+    const existingSub = submissionMap.get(q.id);
+    const isDisq = !!existingSub?.isDisqualified;
+
+    return {
+      ...q,
+      isDisqualified: isDisq,
+      disqualificationReason: existingSub?.disqualificationReason || "Security rule violation: Multiple window/tab switches detected.",
+      startsDate: q.scheduledStartTime ? new Date(q.scheduledStartTime).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "Open Assessment",
+      startsRelative: "Live Now",
+      endsDate: q.deadlineTime ? new Date(q.deadlineTime).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "Open Deadline",
+      endsRelative: "Active Window",
+      subjects: q.subjects || (q.courseName ? [q.courseName] : ["Core Curriculum"])
+    };
+  });
 
   const upcomingQuizzes = allQuizzes.filter(q => {
     if (submissionMap.has(q.id)) return false;
@@ -249,11 +259,30 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[11px] font-bold shrink-0">
-                        <Clock className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Live Now</span>
-                      </div>
+                      {quiz.isDisqualified ? (
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 border border-red-200 rounded-full text-[11px] font-bold shrink-0">
+                          <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                          <span>Disqualified</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[11px] font-bold shrink-0">
+                          <Clock className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Live Now</span>
+                        </div>
+                      )}
                     </div>
+
+                    {quiz.isDisqualified && (
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-[11px] text-red-900 space-y-1">
+                        <div className="font-extrabold flex items-center gap-1 text-red-800">
+                          <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                          <span>Security Violation: Disqualified</span>
+                        </div>
+                        <p className="text-red-700 leading-snug">
+                          Exam locked due to repeated tab switching. You cannot start or enter this exam until your Lead Trainer grants a second chance.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
                       <div className="space-y-0.5">
@@ -303,13 +332,24 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => onStartExam(quiz)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all transform hover:scale-[1.02] active:scale-95"
-                    >
-                      <PlayCircle className="w-3.5 h-3.5" />
-                      <span>Start</span>
-                    </button>
+                    {quiz.isDisqualified ? (
+                      <button
+                        disabled
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-red-100 border border-red-300 text-red-700 font-bold rounded-xl text-xs cursor-not-allowed opacity-90 shadow-2xs"
+                        title="Disqualified: Trainee cannot enter this assessment without trainer second chance permission."
+                      >
+                        <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                        <span>Locked (Disqualified)</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => onStartExam(quiz)}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all transform hover:scale-[1.02] active:scale-95"
+                      >
+                        <PlayCircle className="w-3.5 h-3.5" />
+                        <span>Start</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -488,14 +528,21 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                       </td>
 
                       <td className="py-4 px-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
-                          row.passed
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : "bg-red-50 text-red-800 border-red-200"
-                        }`}>
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>{row.passed ? "Passed" : "Needs Retest"}</span>
-                        </span>
+                        {row.isDisqualified ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border bg-red-50 text-red-800 border-red-200">
+                            <AlertCircle className="w-3 h-3 text-red-600" />
+                            <span>Disqualified</span>
+                          </span>
+                        ) : (
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+                            row.passed
+                              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                              : "bg-amber-50 text-amber-800 border-amber-200"
+                          }`}>
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>{row.passed ? "Passed" : "Needs Retest"}</span>
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-4 px-4 text-slate-500 font-medium whitespace-nowrap">

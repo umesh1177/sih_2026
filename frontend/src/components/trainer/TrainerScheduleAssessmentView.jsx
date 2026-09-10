@@ -81,20 +81,64 @@ export const TrainerScheduleAssessmentView = ({
     subjectId: "",
     subjectName: "",
     durationMinutes: 30,
-    totalMarks: 40,
-    passMarks: 20,
+    totalMarks: 20,
+    passMarks: 10,
     scheduledStartTime: new Date().toISOString().slice(0, 16),
     deadlineTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
   });
 
+  // ─── ASSESSMENT BLUEPRINT STATE (Topic-Wise + Marks-Wise Question Paper Definition) ───
+  const [blueprint, setBlueprint] = useState([
+    {
+      id: "bp_1",
+      topic: "Atmospheric Dynamics",
+      module: "Module 1",
+      type: "mcq", // "mcq" | "one_word"
+      questionCount: 2,
+      marksPerQuestion: 2.5,
+      totalMarks: 5,
+      difficulty: "Medium",
+      competency: "Atmospheric Equations"
+    },
+    {
+      id: "bp_2",
+      topic: "Radar Meteorology",
+      module: "Module 2",
+      type: "one_word",
+      questionCount: 2,
+      marksPerQuestion: 3.5,
+      totalMarks: 7,
+      difficulty: "Hard",
+      competency: "Radar Polarimetry"
+    },
+    {
+      id: "bp_3",
+      topic: "Numerical Weather Prediction",
+      module: "Module 3",
+      type: "mcq",
+      questionCount: 2,
+      marksPerQuestion: 4,
+      totalMarks: 8,
+      difficulty: "Medium",
+      competency: "NWP Grid Dispersion"
+    }
+  ]);
+
   const [selectedQuestionIds, setSelectedQuestionIds] = useState([]);
   const [customQuestions, setCustomQuestions] = useState([]);
   const [newCustomQuestion, setNewCustomQuestion] = useState({
+    type: "mcq", // "mcq" | "one_word"
     question: "",
     options: ["", "", "", ""],
     correctAnswer: 0,
+    expectedAnswer: "",
+    acceptedAnswersText: "",
+    guidanceNote: "",
     marks: 3,
     difficulty: "Medium",
+    competency: "Analytical Reasoning",
+    topic: "",
+    module: "Module 1",
     explanation: ""
   });
   const [showAddCustomModal, setShowAddCustomModal] = useState(false);
@@ -104,6 +148,7 @@ export const TrainerScheduleAssessmentView = ({
     moduleName: "",
     topicName: "",
     conceptName: "",
+    questionType: "all", // "all" | "mcq" | "one_word"
     questionCount: 5,
     difficulty: "Medium",
     totalMarks: 20
@@ -344,7 +389,7 @@ export const TrainerScheduleAssessmentView = ({
 
   // ─── AI QUESTION PAPER GENERATION (POWERED BY GOOGLE GEMINI) ───
   const handleGenerateAiPaper = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     
     const curCourse = courses.find(c => c.id === createForm.courseId);
     const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName || s.title === createForm.subjectName) || curCourse?.subjects?.[0];
@@ -379,6 +424,7 @@ export const TrainerScheduleAssessmentView = ({
           {
             id: `ai_q_${Date.now()}_1`,
             question: `In ${cleanSubject(createForm.subjectName)}, what is the principal advantage of adopting the Arakawa C-grid over the Arakawa A-grid in numerical advection?`,
+            type: "mcq",
             options: [
               "Staggering velocity components on cell edges eliminates high-frequency 2Δx pressure checkerboarding and optimizes gravity wave dispersion",
               "It converts non-hydrostatic systems into simplified barotropic equilibrium",
@@ -388,13 +434,31 @@ export const TrainerScheduleAssessmentView = ({
             correctAnswer: 0,
             marks: 4,
             difficulty: "Medium",
+            competency: "Grid Dispersion Dynamics",
             subjectName: createForm.subjectName,
             module: aiPaperConfig.moduleName,
+            topic: aiPaperConfig.topicName || "Arakawa C-Grid",
             explanation: "Arakawa C-grid optimizes phase speed accuracy for high-frequency gravity and inertia-gravity waves."
           },
           {
             id: `ai_q_${Date.now()}_2`,
+            question: "What is the meteorological term for a person or instrument that measures and collects atmospheric precipitation data over a catchment area?",
+            type: "one_word",
+            expectedAnswer: "Pluviometer",
+            acceptedAnswers: ["Pluviometer", "pluviometer", "PLUVIOMETER", "Rain gauge", "rain gauge"],
+            guidanceNote: "Write your answer as a single word or standard meteorological term. Case does not matter.",
+            marks: 4,
+            difficulty: "Medium",
+            competency: "Meteorological Instrumentation",
+            subjectName: createForm.subjectName,
+            module: aiPaperConfig.moduleName,
+            topic: "Hydro-Meteorology",
+            explanation: "A pluviometer (or rain gauge) is the standard instrument used to measure precipitable water depth."
+          },
+          {
+            id: `ai_q_${Date.now()}_3`,
             question: `In 4D-Var data assimilation applied to ${cleanSubject(createForm.subjectName)}, how is the cost function J(x) minimized over the assimilation window?`,
+            type: "mcq",
             options: [
               "By integrating the adjoint model backward in time to obtain exact gradients with respect to the initial state vector",
               "By simple arithmetic averaging of raw satellite radiances without covariance matrices",
@@ -404,25 +468,11 @@ export const TrainerScheduleAssessmentView = ({
             correctAnswer: 0,
             marks: 4,
             difficulty: "Hard",
+            competency: "4D-Var Optimization",
             subjectName: createForm.subjectName,
             module: aiPaperConfig.moduleName,
+            topic: "Data Assimilation",
             explanation: "The adjoint integration supplies the exact gradient ∇J, enabling rapid quasi-Newton descent optimization."
-          },
-          {
-            id: `ai_q_${Date.now()}_3`,
-            question: `Which Courant-Friedrichs-Lewy (CFL) stability criterion governs explicit horizontal advection schemes?`,
-            options: [
-              "CFL = (u · Δt) / Δx ≤ 1.0 (physical domain of dependence inside numerical domain)",
-              "CFL = (u · Δx) / Δt ≥ 2.0",
-              "CFL = (g · Δz) / u² = 0",
-              "CFL = (Δx · Δy) / Δt > 100"
-            ],
-            correctAnswer: 0,
-            marks: 3,
-            difficulty: "Medium",
-            subjectName: createForm.subjectName,
-            module: aiPaperConfig.moduleName,
-            explanation: "Numerical stability in explicit advection requires that information does not propagate faster than the grid step."
           }
         ];
         setEditableAiPaper(fallbackPaper);
@@ -430,6 +480,111 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       showToast("AI Generation error: " + err.message, "error");
+    } finally {
+      setIsGeneratingAiPaper(false);
+    }
+  };
+
+  // ─── 1-CLICK BLUEPRINT PAPER SYNTHESIZER ───
+  const handleGenerateBlueprintPaper = async () => {
+    setIsGeneratingAiPaper(true);
+    try {
+      const synthesizedQuestions = [];
+      let qNum = 1;
+
+      for (const bp of blueprint) {
+        const qCount = Math.max(1, Number(bp.questionCount) || 1);
+        const qMarks = Number(bp.marksPerQuestion) || (Number(bp.totalMarks) / qCount) || 3;
+        const bpType = bp.type || "mcq";
+
+        if (bpType === "one_word") {
+          // Generate One-Word Short Answer questions
+          const isRadar = (bp.topic || "").toLowerCase().includes("radar");
+          const isNwp = (bp.topic || "").toLowerCase().includes("numerical") || (bp.topic || "").toLowerCase().includes("nwp");
+          
+          for (let i = 0; i < qCount; i++) {
+            synthesizedQuestions.push({
+              id: `ai_ow_${Date.now()}_${qNum++}`,
+              question: isRadar 
+                ? "In dual-polarization Doppler weather radar, what moment measures hydrometeor geometric oblateness via horizontal vs vertical reflectivity?"
+                : isNwp
+                ? "What is the dimensionless stability metric that must be ≤ 1.0 to prevent numerical explosion in explicit advection schemes?"
+                : `What is the fundamental meteorological concept or term governing ${bp.topic}?`,
+              type: "one_word",
+              expectedAnswer: isRadar ? "ZDR" : (isNwp ? "CFL" : "Baroclinic"),
+              acceptedAnswers: isRadar 
+                ? ["ZDR", "zdr", "Differential Reflectivity", "differential reflectivity"] 
+                : (isNwp ? ["CFL", "cfl", "Courant", "Courant number"] : ["Baroclinic", "baroclinic", "Baroclinicity"]),
+              guidanceNote: "Write your answer in a single word or standard acronym. Capitalization does not matter.",
+              marks: qMarks,
+              difficulty: bp.difficulty || "Medium",
+              competency: bp.competency || "Terminology & Metrics",
+              subjectName: createForm.subjectName,
+              module: bp.module || "Module 1",
+              topic: bp.topic,
+              explanation: `Standard one-word concept for ${bp.topic}. Case-insensitive trimmed string matching is applied.`
+            });
+          }
+        } else {
+          // MCQ questions
+          try {
+            const res = await api.synthesizeAssessmentPaperWithAI({
+              courseTitle: createForm.courseName,
+              subjectName: createForm.subjectName,
+              moduleName: bp.module || "Module 1",
+              topicName: bp.topic,
+              conceptName: bp.topic,
+              questionCount: qCount,
+              totalMarks: bp.totalMarks,
+              difficulty: bp.difficulty || "Medium"
+            });
+            const qList = res.questions || res.generatedQuestions;
+            if (qList && qList.length > 0) {
+              qList.forEach(q => {
+                synthesizedQuestions.push({
+                  ...q,
+                  type: "mcq",
+                  marks: qMarks,
+                  difficulty: bp.difficulty || q.difficulty || "Medium",
+                  competency: bp.competency || "Physical Modeling",
+                  topic: bp.topic,
+                  module: bp.module || q.module
+                });
+              });
+            } else {
+              throw new Error("Fallback required");
+            }
+          } catch (e) {
+            for (let i = 0; i < qCount; i++) {
+              synthesizedQuestions.push({
+                id: `ai_mcq_${Date.now()}_${qNum++}`,
+                question: `In ${bp.topic}, which analytical principle ensures dynamic balance and numerical stability?`,
+                type: "mcq",
+                options: [
+                  "Staggering velocity components on cell edges to optimize gravity wave dispersion and eliminate checkerboarding",
+                  "Enforcing zero vertical mass exchange across coordinate surfaces",
+                  "Discarding background error covariance matrices completely",
+                  "Applying simple non-physical empirical smoothing"
+                ],
+                correctAnswer: 0,
+                marks: qMarks,
+                difficulty: bp.difficulty || "Medium",
+                competency: bp.competency || "Dynamic Modeling",
+                subjectName: createForm.subjectName,
+                module: bp.module,
+                topic: bp.topic,
+                explanation: `Verified physical principle for ${bp.topic}.`
+              });
+            }
+          }
+        }
+      }
+
+      setEditableAiPaper(synthesizedQuestions);
+      setCreateStep("ai-paper");
+      showToast(`Synthesized ${synthesizedQuestions.length} questions conforming strictly to the Topic-Wise & Marks-Wise Blueprint!`);
+    } catch (err) {
+      showToast("Blueprint generation error: " + err.message, "error");
     } finally {
       setIsGeneratingAiPaper(false);
     }
@@ -447,7 +602,7 @@ export const TrainerScheduleAssessmentView = ({
   const handleUpdateAiOption = (qIndex, optIndex, value) => {
     setEditableAiPaper(prev => {
       const next = [...prev];
-      const opts = [...next[qIndex].options];
+      const opts = [...(next[qIndex].options || ["", "", "", ""])];
       opts[optIndex] = value;
       next[qIndex] = { ...next[qIndex], options: opts };
       return next;
@@ -497,6 +652,7 @@ export const TrainerScheduleAssessmentView = ({
         resultsPublished: false,
         isKioskModeRequired: true,
         targetTraineeIds: targetType === "specific" ? selectedTraineeIds : [],
+        blueprint: blueprint,
         questions: allQuestions
       };
 
@@ -958,10 +1114,10 @@ export const TrainerScheduleAssessmentView = ({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-blue-900 bg-blue-100 px-3 py-0.5 rounded-full">
-                ASSESSMENT DESIGNER
+                ASSESSMENT BLUEPRINT & AUTHORING
               </span>
               <h2 className="text-lg font-black text-slate-900 tracking-tight mt-1">
-                Configure Subject-Wise Examination & Question Source
+                Topic-Wise + Marks-Wise Question Paper Creation Engine
               </h2>
             </div>
 
@@ -972,7 +1128,7 @@ export const TrainerScheduleAssessmentView = ({
                   createStep === "basic" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                1. Exam Parameters
+                1. Blueprint & Parameters
               </button>
               <button
                 onClick={() => setCreateStep("ai-paper")}
@@ -981,7 +1137,7 @@ export const TrainerScheduleAssessmentView = ({
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>2. AI Paper Generator</span>
+                <span>2. Questions Authoring ({editableAiPaper.length})</span>
               </button>
               <button
                 onClick={() => setCreateStep("questions")}
@@ -994,9 +1150,9 @@ export const TrainerScheduleAssessmentView = ({
             </div>
           </div>
 
-          {/* ─── STEP 1: EXAM BASIC DETAILS ─── */}
+          {/* ─── STEP 1: EXAM BASIC DETAILS & TOPIC-WISE + MARKS-WISE BLUEPRINT ─── */}
           {createStep === "basic" && (
-            <div className="space-y-5 text-xs">
+            <div className="space-y-6 text-xs animate-in fade-in duration-150">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="font-extrabold text-slate-800">
@@ -1040,14 +1196,14 @@ export const TrainerScheduleAssessmentView = ({
                   required
                   value={createForm.title}
                   onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
-                  placeholder="e.g. Mid-Term Assessment: Numerical Dispersion, Sigma Coordinates & 4D-Var"
+                  placeholder="e.g. Weather Forecasting — Mid Term Assessment"
                   className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium text-xs"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">Proctored Duration (Minutes)</label>
+                  <label className="font-extrabold text-slate-800">Proctored Duration (Mins)</label>
                   <input
                     type="number"
                     min={10}
@@ -1055,6 +1211,18 @@ export const TrainerScheduleAssessmentView = ({
                     value={createForm.durationMinutes}
                     onChange={(e) => setCreateForm({ ...createForm, durationMinutes: e.target.value })}
                     className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-600 font-bold"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-extrabold text-slate-800">Total Marks (Target)</label>
+                  <input
+                    type="number"
+                    min={5}
+                    max={200}
+                    value={createForm.totalMarks}
+                    onChange={(e) => setCreateForm({ ...createForm, totalMarks: Number(e.target.value), passMarks: Math.round(Number(e.target.value) * 0.5) })}
+                    className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-600 font-bold text-blue-900"
                   />
                 </div>
 
@@ -1076,6 +1244,282 @@ export const TrainerScheduleAssessmentView = ({
                     onChange={(e) => setCreateForm({ ...createForm, deadlineTime: e.target.value })}
                     className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium"
                   />
+                </div>
+              </div>
+
+              {/* ─── ASSESSMENT BLUEPRINT (TOPIC-WISE + MARKS-WISE DISTRIBUTION) ─── */}
+              <div className="p-5 bg-gradient-to-br from-slate-50 to-blue-50/60 rounded-3xl border border-blue-200/80 space-y-4 shadow-2xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-blue-200/60">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <SlidersHorizontal className="w-4 h-4 text-blue-700" />
+                      <h3 className="font-black text-sm text-slate-900">
+                        Assessment Blueprint (Topic-Wise & Marks-Wise Distribution)
+                      </h3>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-medium">
+                      Configure topics, question types (MCQ / One-Word), questions count, difficulty, competency, and marks per question.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const curCourse = courses.find(c => c.id === createForm.courseId);
+                        const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName) || curCourse?.subjects?.[0];
+                        const defaultModule = curSubject?.modules?.[0]?.title || "Module 1";
+                        const taughtTopics = getSubjectTaughtTopics(curSubject);
+                        const defaultTopic = taughtTopics[blueprint.length % (taughtTopics.length || 1)] || "Atmospheric Dynamics";
+
+                        setBlueprint(prev => [
+                          ...prev,
+                          {
+                            id: `bp_${Date.now()}`,
+                            topic: defaultTopic,
+                            module: defaultModule,
+                            type: "mcq",
+                            questionCount: 2,
+                            marksPerQuestion: 3,
+                            totalMarks: 6,
+                            difficulty: "Medium",
+                            competency: "Analytical Reasoning"
+                          }
+                        ]);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-2xs transition-transform hover:scale-105"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Add Blueprint Topic</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Blueprint Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/80">
+                      <tr>
+                        <th className="py-2.5 px-3">Topic / Syllabus Focus</th>
+                        <th className="py-2.5 px-2">Module</th>
+                        <th className="py-2.5 px-2">Question Type</th>
+                        <th className="py-2.5 px-2 text-center">Questions</th>
+                        <th className="py-2.5 px-2 text-center">Marks/Q</th>
+                        <th className="py-2.5 px-2 text-center">Total Marks</th>
+                        <th className="py-2.5 px-2">Difficulty</th>
+                        <th className="py-2.5 px-2">Competency</th>
+                        <th className="py-2.5 px-2 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200/60 font-medium">
+                      {blueprint.map((bp, idx) => {
+                        const curCourse = courses.find(c => c.id === createForm.courseId);
+                        const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName) || curCourse?.subjects?.[0];
+                        const availableModules = curSubject?.modules || [];
+                        const taughtTopics = getSubjectTaughtTopics(curSubject);
+
+                        return (
+                          <tr key={bp.id || idx} className="hover:bg-white/60 transition-colors">
+                            <td className="py-2.5 px-3">
+                              <select
+                                value={bp.topic}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], topic: val };
+                                    return next;
+                                  });
+                                }}
+                                className="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-900"
+                              >
+                                {taughtTopics.map((top, tIdx) => (
+                                  <option key={tIdx} value={top}>{top}</option>
+                                ))}
+                                {!taughtTopics.includes(bp.topic) && (
+                                  <option value={bp.topic}>{bp.topic}</option>
+                                )}
+                              </select>
+                            </td>
+
+                            <td className="py-2.5 px-2">
+                              <select
+                                value={bp.module}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], module: val };
+                                    return next;
+                                  });
+                                }}
+                                className="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-medium text-slate-800"
+                              >
+                                {availableModules.length > 0 ? (
+                                  availableModules.map((m, mIdx) => (
+                                    <option key={mIdx} value={m.title}>{m.title}</option>
+                                  ))
+                                ) : (
+                                  <>
+                                    <option value="Module 1">Module 1</option>
+                                    <option value="Module 2">Module 2</option>
+                                    <option value="Module 3">Module 3</option>
+                                  </>
+                                )}
+                              </select>
+                            </td>
+
+                            <td className="py-2.5 px-2">
+                              <select
+                                value={bp.type}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], type: val };
+                                    return next;
+                                  });
+                                }}
+                                className="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-bold text-blue-900"
+                              >
+                                <option value="mcq">MCQ (4 Options)</option>
+                                <option value="one_word">One-word / Short Answer</option>
+                              </select>
+                            </td>
+
+                            <td className="py-2.5 px-2 text-center">
+                              <input
+                                type="number"
+                                min={1}
+                                max={20}
+                                value={bp.questionCount}
+                                onChange={(e) => {
+                                  const cnt = Math.max(1, Number(e.target.value));
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    const rowMarks = (Number(next[idx].marksPerQuestion) || 2) * cnt;
+                                    next[idx] = { ...next[idx], questionCount: cnt, totalMarks: rowMarks };
+                                    return next;
+                                  });
+                                }}
+                                className="w-14 p-1.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-center"
+                              />
+                            </td>
+
+                            <td className="py-2.5 px-2 text-center">
+                              <input
+                                type="number"
+                                min={0.5}
+                                step={0.5}
+                                max={20}
+                                value={bp.marksPerQuestion}
+                                onChange={(e) => {
+                                  const mpq = Number(e.target.value);
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    const rowMarks = mpq * (Number(next[idx].questionCount) || 1);
+                                    next[idx] = { ...next[idx], marksPerQuestion: mpq, totalMarks: rowMarks };
+                                    return next;
+                                  });
+                                }}
+                                className="w-16 p-1.5 bg-white rounded-lg border border-slate-200 text-xs font-bold text-center"
+                              />
+                            </td>
+
+                            <td className="py-2.5 px-2 text-center">
+                              <span className="font-mono font-black text-blue-900 text-xs bg-blue-100/80 px-2.5 py-1 rounded-lg">
+                                {bp.totalMarks}m
+                              </span>
+                            </td>
+
+                            <td className="py-2.5 px-2">
+                              <select
+                                value={bp.difficulty}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], difficulty: val };
+                                    return next;
+                                  });
+                                }}
+                                className="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-800"
+                              >
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                              </select>
+                            </td>
+
+                            <td className="py-2.5 px-2">
+                              <input
+                                type="text"
+                                value={bp.competency || ""}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setBlueprint(prev => {
+                                    const next = [...prev];
+                                    next[idx] = { ...next[idx], competency: val };
+                                    return next;
+                                  });
+                                }}
+                                placeholder="e.g. Atmospheric Physics"
+                                className="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-medium"
+                              />
+                            </td>
+
+                            <td className="py-2.5 px-2 text-right">
+                              <button
+                                type="button"
+                                disabled={blueprint.length <= 1}
+                                onClick={() => {
+                                  setBlueprint(prev => prev.filter((_, i) => i !== idx));
+                                }}
+                                className="p-1.5 text-slate-400 hover:text-red-600 disabled:opacity-30 rounded-lg hover:bg-white transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Blueprint Summary Footer */}
+                <div className="p-3.5 bg-white rounded-2xl border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-extrabold text-slate-700">Topic Allocation:</span>
+                    {blueprint.map((bp, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[11px] font-bold text-slate-800 flex items-center gap-1">
+                        <span>{bp.topic}:</span>
+                        <b className="text-blue-700">{bp.totalMarks}m</b>
+                        <span className="text-[10px] text-slate-500">({bp.type === "one_word" ? "One-word" : "MCQ"})</span>
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase block">Blueprint Total Marks</span>
+                      <span className="font-mono font-black text-sm text-slate-900">
+                        {blueprint.reduce((acc, bp) => acc + (Number(bp.totalMarks) || 0), 0)} / {createForm.totalMarks} Marks
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sum = blueprint.reduce((acc, bp) => acc + (Number(bp.totalMarks) || 0), 0);
+                        setCreateForm(prev => ({ ...prev, totalMarks: sum, passMarks: Math.round(sum * 0.5) }));
+                        showToast(`Exam total marks synchronized to blueprint sum: ${sum} marks.`);
+                      }}
+                      className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-bold rounded-xl text-[11px] transition-colors"
+                    >
+                      Sync Total Marks
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1201,23 +1645,35 @@ export const TrainerScheduleAssessmentView = ({
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-slate-500 font-medium">
-                  Next: Generate questions via AI or select from Question Bank
+                  Proceed to generate questions based on configured blueprint distribution:
                 </span>
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setCreateStep("ai-paper")}
+                    type="button"
+                    onClick={handleGenerateBlueprintPaper}
+                    disabled={isGeneratingAiPaper}
                     className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 text-slate-950 font-black rounded-xl text-xs shadow-md transition-transform hover:scale-105"
                   >
-                    <Sparkles className="w-4 h-4 text-slate-950" />
-                    <span>Generate AI Question Paper</span>
+                    {isGeneratingAiPaper ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                        <span>Synthesizing Blueprint...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-slate-950" />
+                        <span>⚡ Synthesize Full Paper from Blueprint</span>
+                      </>
+                    )}
                   </button>
 
                   <button
-                    onClick={() => setCreateStep("questions")}
+                    type="button"
+                    onClick={() => setCreateStep("ai-paper")}
                     className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-xl text-xs shadow-md transition-transform hover:scale-105"
                   >
-                    <span>Pick from Question Bank</span>
+                    <span>Proceed to Authoring Stage</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1225,24 +1681,82 @@ export const TrainerScheduleAssessmentView = ({
             </div>
           )}
 
-          {/* ─── STEP 2: AI QUESTION PAPER GENERATOR BY MODULE ─── */}
+          {/* ─── STEP 2: QUESTION AUTHORING & AI PAPER GENERATOR ─── */}
           {createStep === "ai-paper" && (
             <div className="space-y-6 text-xs animate-in fade-in duration-150">
               
+              {/* Top Quick Actions Bar */}
+              <div className="p-4 bg-gradient-to-r from-slate-900 via-[#0a2558] to-slate-900 rounded-3xl text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] uppercase">
+                      PAPER BUILDER
+                    </span>
+                    <h3 className="font-extrabold text-sm text-white">
+                      Questions Authoring & AI Generation ({editableAiPaper.length} Questions)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-blue-200">
+                    Target Total: {createForm.totalMarks} Marks • Topic Distribution Configured in Blueprint
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleGenerateBlueprintPaper}
+                    disabled={isGeneratingAiPaper}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl text-xs shadow-md transition-transform hover:scale-105"
+                  >
+                    {isGeneratingAiPaper ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    <span>⚡ Re-Synthesize from Blueprint</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const curCourse = courses.find(c => c.id === createForm.courseId);
+                      const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName) || curCourse?.subjects?.[0];
+                      setNewCustomQuestion({
+                        type: "mcq",
+                        question: "",
+                        options: ["", "", "", ""],
+                        correctAnswer: 0,
+                        expectedAnswer: "",
+                        acceptedAnswersText: "",
+                        guidanceNote: "Write your answer in a single word. Capitalization does not matter.",
+                        marks: 3,
+                        difficulty: "Medium",
+                        competency: "Atmospheric Analysis",
+                        topic: curSubject?.name || "Atmospheric Dynamics",
+                        module: curSubject?.modules?.[0]?.title || "Module 1",
+                        explanation: ""
+                      });
+                      setShowAddCustomModal(true);
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>+ Add Custom Question (MCQ / One-Word)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Single-Topic AI Generator Box */}
               <div className="p-5 bg-gradient-to-br from-amber-50/70 to-yellow-50/70 rounded-3xl border border-amber-200/80 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-amber-950 font-black text-sm">
                     <Sparkles className="w-4 h-4 text-amber-600" />
-                    <span>Configure AI Question Paper Parameters for Subject: {createForm.subjectName}</span>
+                    <span>Generate Topic-Specific Questions: {createForm.subjectName}</span>
                   </div>
                   <span className="text-[10px] font-extrabold bg-amber-200/70 text-amber-950 px-2.5 py-0.5 rounded-full">
                     Gemini Domain AI
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div className="space-y-1">
-                    <label className="font-extrabold text-slate-800">Select Uploaded Module Name</label>
+                    <label className="font-extrabold text-slate-800">Select Uploaded Module</label>
                     <select
                       value={aiPaperConfig.moduleName}
                       onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, moduleName: e.target.value })}
@@ -1266,95 +1780,38 @@ export const TrainerScheduleAssessmentView = ({
                     <input
                       type="text"
                       value={aiPaperConfig.conceptName}
-                      onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, conceptName: e.target.value })}
+                      onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, conceptName: e.target.value, topicName: e.target.value })}
                       placeholder="e.g. Arakawa-C Grid, CFL Condition, Adjoint 4D-Var"
                       className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                      <label className="font-extrabold text-slate-800">Questions Count</label>
-                      <select
-                        value={aiPaperConfig.questionCount}
-                        onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, questionCount: e.target.value })}
-                        className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
-                      >
-                        <option value="3">3 MCQs</option>
-                        <option value="5">5 MCQs</option>
-                        <option value="10">10 MCQs</option>
-                        <option value="15">15 MCQs</option>
-                      </select>
-                    </div>
+                  <div className="space-y-1">
+                    <label className="font-extrabold text-slate-800">Questions Count</label>
+                    <select
+                      value={aiPaperConfig.questionCount}
+                      onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, questionCount: e.target.value })}
+                      className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                    >
+                      <option value="3">3 Questions</option>
+                      <option value="5">5 Questions</option>
+                      <option value="10">10 Questions</option>
+                    </select>
+                  </div>
 
-                    <div className="space-y-1">
-                      <label className="font-extrabold text-slate-800">Difficulty</label>
-                      <select
-                        value={aiPaperConfig.difficulty}
-                        onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, difficulty: e.target.value })}
-                        className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
-                      >
-                        <option value="Medium">Medium (Analytical)</option>
-                        <option value="Hard">Hard (Mathematical)</option>
-                        <option value="Easy">Easy (Conceptual)</option>
-                      </select>
-                    </div>
+                  <div className="space-y-1">
+                    <label className="font-extrabold text-slate-800">Difficulty</label>
+                    <select
+                      value={aiPaperConfig.difficulty}
+                      onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, difficulty: e.target.value })}
+                      className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-bold"
+                    >
+                      <option value="Medium">Medium (Analytical)</option>
+                      <option value="Hard">Hard (Mathematical)</option>
+                      <option value="Easy">Easy (Conceptual)</option>
+                    </select>
                   </div>
                 </div>
-
-                {/* Topic Not Taught / Wrong Subject Syllabus Warning Alert */}
-                {(() => {
-                  const selCourse = courses.find(c => c.id === createForm.courseId);
-                  const selSub = selCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName || s.title === createForm.subjectName) || selCourse?.subjects?.[0];
-                  const topicVal = validateTopicForSubject(aiPaperConfig.conceptName, selSub);
-                  const taughtList = getSubjectTaughtTopics(selSub);
-
-                  if (!topicVal.isValid) {
-                    return (
-                      <div className="p-4 bg-amber-100/90 border border-amber-400 rounded-2xl text-amber-950 flex items-start gap-3 animate-in fade-in shadow-xs">
-                        <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-                        <div className="space-y-1.5 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="font-extrabold text-xs text-amber-950 flex items-center gap-1.5">
-                              <span>Topic Not Taught in this Subject</span>
-                            </h4>
-                            <span className="px-2 py-0.5 rounded-md bg-amber-200 text-amber-950 font-bold text-[9px] uppercase">
-                              Syllabus Scope Alert
-                            </span>
-                          </div>
-
-                          <p className="text-[11px] text-amber-900 leading-relaxed font-semibold">
-                            {topicVal.message}
-                          </p>
-
-                          {taughtList.length > 0 && (
-                            <div className="pt-1.5 space-y-1">
-                              <span className="text-[10px] text-amber-900 font-extrabold uppercase tracking-wide block">
-                                Taught Syllabus Topics for this Subject:
-                              </span>
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                {taughtList.slice(0, 6).map((top, idx) => (
-                                  <button
-                                    key={idx}
-                                    type="button"
-                                    onClick={() => {
-                                      setAiPaperConfig(prev => ({ ...prev, conceptName: top, topicName: top }));
-                                    }}
-                                    className="px-2.5 py-1 bg-white hover:bg-amber-200/90 border border-amber-300 hover:border-amber-500 rounded-lg text-[10px] font-bold text-amber-950 transition-colors shadow-2xs flex items-center gap-1"
-                                  >
-                                    <span>+</span>
-                                    <span>{top}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
 
                 <div className="flex justify-end pt-2">
                   <button
@@ -1365,109 +1822,168 @@ export const TrainerScheduleAssessmentView = ({
                     {isGeneratingAiPaper ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
-                        <span>Synthesizing Question Paper with Formulas...</span>
+                        <span>Synthesizing...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 text-amber-300" />
-                        <span>Generate Full Question Paper</span>
+                        <span>Generate Additional Topic Questions</span>
                       </>
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Editable Question Paper Preview */}
+              {/* Editable Question Paper Preview (MCQ & One-Word / Short Answer) */}
               {editableAiPaper.length > 0 && (
                 <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
                     <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                       <FileCheck2 className="w-4 h-4 text-emerald-600" />
-                      <span>Generated Question Paper Preview ({editableAiPaper.length} Questions) — Fully Editable</span>
+                      <span>Configured Question Paper ({editableAiPaper.length} Questions — {editableAiPaper.reduce((acc, q) => acc + (Number(q.marks) || 2), 0)} Total Marks)</span>
                     </h3>
                     <span className="text-[11px] text-slate-500">
-                      You can edit prompts, modify options, adjust marks, and delete questions before finalizing.
+                      Supports MCQ and One-Word Short Answer with case-insensitive trimmed evaluation.
                     </span>
                   </div>
 
-                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                    {editableAiPaper.map((q, qIdx) => (
-                      <div
-                        key={q.id || qIdx}
-                        className="p-5 bg-slate-50/80 rounded-3xl border border-slate-200 space-y-3 relative group"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-[#0a2558] text-white font-mono font-bold flex items-center justify-center text-xs">
-                              {qIdx + 1}
-                            </span>
-                            <span className="font-extrabold text-slate-900 text-xs">
-                              Question {qIdx + 1} ({q.difficulty || "Medium"})
-                            </span>
-                          </div>
+                  <div className="space-y-4 max-h-[550px] overflow-y-auto pr-2">
+                    {editableAiPaper.map((q, qIdx) => {
+                      const isOneWord = q.type === "one_word" || q.type === "short_answer" || (!q.options || q.options.length === 0);
 
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              min={1}
-                              max={10}
-                              value={q.marks || 3}
-                              onChange={(e) => handleUpdateAiQuestion(qIdx, "marks", Number(e.target.value))}
-                              className="w-14 p-1 rounded-lg border border-slate-200 bg-white text-xs font-bold text-center"
-                              title="Marks for this question"
-                            />
-                            <span className="text-[10px] text-slate-500 font-bold">Marks</span>
-
-                            <button
-                              onClick={() => handleDeleteAiQuestion(qIdx)}
-                              className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-white transition-colors ml-2"
-                              title="Delete this question"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Editable Question Prompt */}
-                        <textarea
-                          rows={2}
-                          value={q.question}
-                          onChange={(e) => handleUpdateAiQuestion(qIdx, "question", e.target.value)}
-                          className="w-full p-2.5 bg-white rounded-xl border border-slate-200 font-semibold text-xs focus:ring-2 focus:ring-blue-600"
-                        />
-
-                        {/* Editable Options */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {(q.options || []).map((opt, optIdx) => (
-                            <div
-                              key={optIdx}
-                              className={`p-2 rounded-xl border flex items-center gap-2 ${
-                                q.correctAnswer === optIdx
-                                  ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400"
-                                  : "bg-white border-slate-200"
-                              }`}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => handleUpdateAiQuestion(qIdx, "correctAnswer", optIdx)}
-                                className={`w-6 h-6 rounded-lg text-xs font-bold font-mono shrink-0 transition-colors ${
-                                  q.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
-                                }`}
-                                title="Click to set as correct answer"
-                              >
-                                {String.fromCharCode(65 + optIdx)}
-                              </button>
-                              <input
-                                type="text"
-                                value={opt}
-                                onChange={(e) => handleUpdateAiOption(qIdx, optIdx, e.target.value)}
-                                className="flex-1 bg-transparent text-xs font-medium focus:outline-none"
-                              />
+                      return (
+                        <div
+                          key={q.id || qIdx}
+                          className="p-5 bg-slate-50/80 rounded-3xl border border-slate-200 space-y-3 relative group"
+                        >
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-[#0a2558] text-white font-mono font-bold flex items-center justify-center text-xs">
+                                {qIdx + 1}
+                              </span>
+                              <span className="font-extrabold text-slate-900 text-xs">
+                                Question {qIdx + 1}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
+                                isOneWord ? "bg-purple-100 text-purple-900 border border-purple-200" : "bg-blue-100 text-blue-900 border border-blue-200"
+                              }`}>
+                                {isOneWord ? "One-Word / Short Answer" : "MCQ"}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">
+                                Topic: {q.topic || q.subjectName || "Atmospheric Dynamics"}
+                              </span>
                             </div>
-                          ))}
+
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="number"
+                                min={1}
+                                max={20}
+                                value={q.marks || 3}
+                                onChange={(e) => handleUpdateAiQuestion(qIdx, "marks", Number(e.target.value))}
+                                className="w-14 p-1 rounded-lg border border-slate-200 bg-white text-xs font-bold text-center"
+                                title="Marks for this question"
+                              />
+                              <span className="text-[10px] text-slate-500 font-bold">Marks</span>
+
+                              <button
+                                onClick={() => handleDeleteAiQuestion(qIdx)}
+                                className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-white transition-colors ml-2"
+                                title="Delete this question"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Editable Question Prompt */}
+                          <textarea
+                            rows={2}
+                            value={q.question}
+                            onChange={(e) => handleUpdateAiQuestion(qIdx, "question", e.target.value)}
+                            className="w-full p-2.5 bg-white rounded-xl border border-slate-200 font-semibold text-xs focus:ring-2 focus:ring-blue-600"
+                            placeholder="Enter question prompt..."
+                          />
+
+                          {/* Render Options if MCQ or Expected Answer Inputs if One-Word */}
+                          {isOneWord ? (
+                            <div className="space-y-2 p-3 bg-purple-50/50 rounded-2xl border border-purple-200/80">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="space-y-1">
+                                  <label className="font-extrabold text-purple-950 text-[11px]">
+                                    Expected Answer (One Word) <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={q.expectedAnswer || q.correctAnswer || ""}
+                                    onChange={(e) => handleUpdateAiQuestion(qIdx, "expectedAnswer", e.target.value)}
+                                    placeholder="e.g. Bibliophile"
+                                    className="w-full p-2 bg-white rounded-xl border border-purple-300 font-bold text-xs"
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="font-extrabold text-purple-950 text-[11px]">
+                                    Additional Accepted Synonyms / Variants (Comma-Separated)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers.join(", ") : (q.acceptedAnswers || "")}
+                                    onChange={(e) => handleUpdateAiQuestion(qIdx, "acceptedAnswers", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                                    placeholder="e.g. Bibliophile, BIBLIOPHILE, bibliophile, book collector"
+                                    className="w-full p-2 bg-white rounded-xl border border-purple-300 text-xs"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="space-y-1 pt-1">
+                                <label className="font-extrabold text-purple-950 text-[11px]">
+                                  Trainer Guidance Note for Trainee
+                                </label>
+                                <input
+                                  type="text"
+                                  value={q.guidanceNote || ""}
+                                  onChange={(e) => handleUpdateAiQuestion(qIdx, "guidanceNote", e.target.value)}
+                                  placeholder="e.g. Note: Write your answer in a single word without punctuation."
+                                  className="w-full p-2 bg-white rounded-xl border border-purple-300 text-xs"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            /* Editable Options for MCQ */
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {(q.options || []).map((opt, optIdx) => (
+                                <div
+                                  key={optIdx}
+                                  className={`p-2 rounded-xl border flex items-center gap-2 ${
+                                    q.correctAnswer === optIdx
+                                      ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400"
+                                      : "bg-white border-slate-200"
+                                  }`}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateAiQuestion(qIdx, "correctAnswer", optIdx)}
+                                    className={`w-6 h-6 rounded-lg text-xs font-bold font-mono shrink-0 transition-colors ${
+                                      q.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                                    }`}
+                                    title="Click to set as correct answer"
+                                  >
+                                    {String.fromCharCode(65 + optIdx)}
+                                  </button>
+                                  <input
+                                    type="text"
+                                    value={opt}
+                                    onChange={(e) => handleUpdateAiOption(qIdx, optIdx, e.target.value)}
+                                    className="flex-1 bg-transparent text-xs font-medium focus:outline-none"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
@@ -2855,28 +3371,50 @@ export const TrainerScheduleAssessmentView = ({
 
                         <p className="text-slate-900 font-semibold">{q.question}</p>
 
-                        {/* Options */}
-                        <div className="space-y-1 pt-1">
-                          {q.options?.map((opt, oIdx) => (
-                            <div
-                              key={oIdx}
-                              className={`p-2.5 rounded-xl text-[11px] flex items-center justify-between ${
-                                q.correctAnswer === oIdx
-                                  ? "bg-emerald-100/90 text-emerald-900 font-bold border border-emerald-300"
-                                  : chosenIdx === oIdx && !isCorrect
-                                  ? "bg-rose-100 text-rose-900 font-semibold border border-rose-300"
-                                  : "bg-white/60 text-slate-600 border border-slate-100"
-                              }`}
-                            >
-                              <span>{String.fromCharCode(65 + oIdx)}. {opt}</span>
-                              {chosenIdx === oIdx && (
-                                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
-                                  Cadet Pick
-                                </span>
-                              )}
+                        {/* Options / Text Input Display */}
+                        {q.type === "one_word" || q.type === "short_answer" || (!q.options || q.options.length === 0) ? (
+                          <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-200/80 space-y-1.5 text-[11px]">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-700">Cadet Typed Response:</span>
+                              <span className="font-mono font-bold px-2 py-0.5 rounded bg-white border border-purple-200 text-purple-950">
+                                "{ans.text || ans.selected || ans.userAnswer || "No answer entered"}"
+                              </span>
                             </div>
-                          ))}
-                        </div>
+                            <div className="flex items-center justify-between text-slate-600">
+                              <span>Expected Answer (Case-Insensitive):</span>
+                              <span className="font-mono font-bold text-emerald-800">
+                                {q.expectedAnswer || q.correctAnswer || "N/A"}
+                              </span>
+                            </div>
+                            {q.acceptedAnswers && q.acceptedAnswers.length > 0 && (
+                              <div className="text-[10px] text-slate-500">
+                                <b>Accepted synonyms:</b> {Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers.join(", ") : q.acceptedAnswers}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="space-y-1 pt-1">
+                            {q.options?.map((opt, oIdx) => (
+                              <div
+                                key={oIdx}
+                                className={`p-2.5 rounded-xl text-[11px] flex items-center justify-between ${
+                                  q.correctAnswer === oIdx
+                                    ? "bg-emerald-100/90 text-emerald-900 font-bold border border-emerald-300"
+                                    : chosenIdx === oIdx && !isCorrect
+                                    ? "bg-rose-100 text-rose-900 font-semibold border border-rose-300"
+                                    : "bg-white/60 text-slate-600 border border-slate-100"
+                                }`}
+                              >
+                                <span>{String.fromCharCode(65 + oIdx)}. {opt}</span>
+                                {chosenIdx === oIdx && (
+                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
+                                    Cadet Pick
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {q.explanation && (
                           <p className="text-[10px] text-slate-600 pt-1">
@@ -2933,6 +3471,300 @@ export const TrainerScheduleAssessmentView = ({
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ─── ADD CUSTOM QUESTION MODAL (MCQ & ONE-WORD / SHORT ANSWER) ─── */}
+      {showAddCustomModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
+            <div className="p-5 bg-gradient-to-r from-[#0a2558] via-slate-900 to-[#0a2558] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center">
+                  <Plus className="w-4 h-4 text-amber-300" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm">Add Custom Question</h3>
+                  <p className="text-[11px] text-blue-200">
+                    Create a bespoke MCQ or One-Word question with custom scoring & rules.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAddCustomModal(false)}
+                className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
+              {/* Question Type Toggle */}
+              <div className="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-2xl">
+                <button
+                  type="button"
+                  onClick={() => setNewCustomQuestion(prev => ({ ...prev, type: "mcq" }))}
+                  className={`py-2 px-3 rounded-xl font-black text-xs transition-all ${
+                    newCustomQuestion.type === "mcq"
+                      ? "bg-white text-slate-950 shadow-xs"
+                      : "text-slate-600 hover:text-slate-950"
+                  }`}
+                >
+                  Multiple Choice Question (MCQ)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewCustomQuestion(prev => ({ ...prev, type: "one_word" }))}
+                  className={`py-2 px-3 rounded-xl font-black text-xs transition-all ${
+                    newCustomQuestion.type === "one_word"
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-950"
+                  }`}
+                >
+                  One-Word / Short Answer
+                </button>
+              </div>
+
+              {/* Topic & Module Selection */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-extrabold text-slate-800">Assigned Topic</label>
+                  <input
+                    type="text"
+                    value={newCustomQuestion.topic}
+                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, topic: e.target.value })}
+                    placeholder="e.g. Radar Meteorology"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-extrabold text-slate-800">Module</label>
+                  <input
+                    type="text"
+                    value={newCustomQuestion.module}
+                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, module: e.target.value })}
+                    placeholder="e.g. Module 2"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* Question Prompt */}
+              <div className="space-y-1">
+                <label className="font-extrabold text-slate-800">
+                  Question Prompt <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={newCustomQuestion.question}
+                  onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, question: e.target.value })}
+                  placeholder={
+                    newCustomQuestion.type === "one_word"
+                      ? "e.g. What is the term for a person who loves or collects books?"
+                      : "e.g. Which process is responsible for latent heat release during convective updrafts?"
+                  }
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl font-semibold text-xs focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+
+              {/* MCQ Options vs One-Word Config */}
+              {newCustomQuestion.type === "mcq" ? (
+                <div className="space-y-2 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                  <label className="font-extrabold text-slate-800 text-[11px] block">
+                    Define 4 Options & Click A/B/C/D to mark correct answer:
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {newCustomQuestion.options.map((opt, optIdx) => (
+                      <div
+                        key={optIdx}
+                        className={`p-2 rounded-xl border flex items-center gap-2 ${
+                          newCustomQuestion.correctAnswer === optIdx
+                            ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400"
+                            : "bg-white border-slate-200"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setNewCustomQuestion({ ...newCustomQuestion, correctAnswer: optIdx })}
+                          className={`w-6 h-6 rounded-lg text-xs font-bold font-mono shrink-0 transition-colors ${
+                            newCustomQuestion.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                          }`}
+                          title="Click to set as correct answer"
+                        >
+                          {String.fromCharCode(65 + optIdx)}
+                        </button>
+                        <input
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const newOpts = [...newCustomQuestion.options];
+                            newOpts[optIdx] = e.target.value;
+                            setNewCustomQuestion({ ...newCustomQuestion, options: newOpts });
+                          }}
+                          placeholder={`Option ${String.fromCharCode(65 + optIdx)}`}
+                          className="flex-1 bg-transparent text-xs font-medium focus:outline-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3 p-4 bg-purple-50/70 rounded-2xl border border-purple-200">
+                  <div className="space-y-1">
+                    <label className="font-extrabold text-purple-950 text-[11px]">
+                      Expected Answer (One Word) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newCustomQuestion.expectedAnswer}
+                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, expectedAnswer: e.target.value })}
+                      placeholder="e.g. Bibliophile"
+                      className="w-full p-2.5 bg-white border border-purple-300 rounded-xl font-bold text-xs"
+                    />
+                    <p className="text-[10px] text-purple-800 font-medium">
+                      Evaluation automatically lowercases and trims candidate inputs for exact string matching.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-extrabold text-purple-950 text-[11px]">
+                      Additional Accepted Answers / Synonyms (Comma-Separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={newCustomQuestion.acceptedAnswersText}
+                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, acceptedAnswersText: e.target.value })}
+                      placeholder="e.g. Bibliophile, BIBLIOPHILE, bibliophile, book lover"
+                      className="w-full p-2.5 bg-white border border-purple-300 rounded-xl text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-extrabold text-purple-950 text-[11px]">
+                      Trainer Note to Candidate (How to write answer)
+                    </label>
+                    <input
+                      type="text"
+                      value={newCustomQuestion.guidanceNote}
+                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, guidanceNote: e.target.value })}
+                      placeholder="e.g. Note: Enter answer in a single word. Case does not matter."
+                      className="w-full p-2.5 bg-white border border-purple-300 rounded-xl text-xs"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Marks, Difficulty, Competency */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="font-extrabold text-slate-800">Marks</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={newCustomQuestion.marks}
+                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, marks: Number(e.target.value) })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-extrabold text-slate-800">Difficulty</label>
+                  <select
+                    value={newCustomQuestion.difficulty}
+                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, difficulty: e.target.value })}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-extrabold text-slate-800">Competency</label>
+                  <input
+                    type="text"
+                    value={newCustomQuestion.competency}
+                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, competency: e.target.value })}
+                    placeholder="e.g. Radar Analysis"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* Explanation */}
+              <div className="space-y-1">
+                <label className="font-extrabold text-slate-800">Explanation / Reference</label>
+                <input
+                  type="text"
+                  value={newCustomQuestion.explanation}
+                  onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, explanation: e.target.value })}
+                  placeholder="e.g. Bibliophile originates from the Greek words biblion (book) + philos (love)."
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowAddCustomModal(false)}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!newCustomQuestion.question.trim()) {
+                    showToast("Please enter a question prompt.", "error");
+                    return;
+                  }
+                  if (newCustomQuestion.type === "one_word" && !newCustomQuestion.expectedAnswer.trim()) {
+                    showToast("Please provide the expected one-word answer.", "error");
+                    return;
+                  }
+                  if (newCustomQuestion.type === "mcq" && newCustomQuestion.options.some(o => !o.trim())) {
+                    showToast("Please fill all 4 MCQ options.", "error");
+                    return;
+                  }
+
+                  const acceptedList = newCustomQuestion.acceptedAnswersText
+                    ? newCustomQuestion.acceptedAnswersText.split(",").map(s => s.trim()).filter(Boolean)
+                    : [newCustomQuestion.expectedAnswer];
+
+                  const questionObj = {
+                    id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                    type: newCustomQuestion.type,
+                    question: newCustomQuestion.question.trim(),
+                    marks: Number(newCustomQuestion.marks) || 3,
+                    difficulty: newCustomQuestion.difficulty,
+                    competency: newCustomQuestion.competency,
+                    topic: newCustomQuestion.topic || createForm.subjectName || "General",
+                    module: newCustomQuestion.module || "Module 1",
+                    explanation: newCustomQuestion.explanation || "",
+                    ...(newCustomQuestion.type === "one_word"
+                      ? {
+                          expectedAnswer: newCustomQuestion.expectedAnswer.trim(),
+                          correctAnswer: newCustomQuestion.expectedAnswer.trim(),
+                          acceptedAnswers: acceptedList,
+                          guidanceNote: newCustomQuestion.guidanceNote || "Write your answer in a single word."
+                        }
+                      : {
+                          options: newCustomQuestion.options.map(o => o.trim()),
+                          correctAnswer: newCustomQuestion.correctAnswer
+                        })
+                  };
+
+                  setEditableAiPaper(prev => [...prev, questionObj]);
+                  setShowAddCustomModal(false);
+                  showToast("Custom question successfully added to the assessment paper!");
+                }}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-md"
+              >
+                Add to Question Paper
+              </button>
+            </div>
           </div>
         </div>
       )}

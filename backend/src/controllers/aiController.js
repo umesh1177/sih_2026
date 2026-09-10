@@ -68,13 +68,41 @@ export const extractJson = (text) => {
   }
 };
 
-// Helper: Strict Question Validator
+// Helper: Strict Question Validator (Supports both MCQ and One-Word / Short Answer)
 const validateAiQuestion = (q, defaultSubject, defaultTopic, defaultModule, defaultDifficulty, defaultMarks) => {
   if (!q || typeof q !== "object") return null;
   const questionText = typeof q.question === "string" ? q.question.trim() : "";
   if (questionText.length < 5) return null;
 
-  // Validate exactly 4 options
+  const marks = Number(q.marks) > 0 ? Number(q.marks) : (Number(defaultMarks) > 0 ? Number(defaultMarks) : 3);
+  const difficulty = ["Easy", "Medium", "Hard"].includes(q.difficulty) ? q.difficulty : (defaultDifficulty || "Medium");
+  const isOneWord = q.type === "one_word" || q.type === "short_answer" || (!q.options && q.expectedAnswer);
+
+  if (isOneWord) {
+    const expected = typeof q.expectedAnswer === "string" ? q.expectedAnswer.trim() : (typeof q.correctAnswer === "string" ? q.correctAnswer.trim() : "Standard Term");
+    const acceptedAnswers = Array.isArray(q.acceptedAnswers) 
+      ? q.acceptedAnswers.map(a => String(a).trim()).filter(Boolean)
+      : [expected];
+
+    return {
+      id: `ai_q_${uuidv4().substring(0, 8)}`,
+      question: questionText,
+      subjectName: q.subjectName || defaultSubject || "General Domain",
+      module: q.module || defaultModule || "Module 1",
+      topic: q.topic || defaultTopic || defaultSubject || "",
+      concept: q.concept || "",
+      type: "one_word",
+      expectedAnswer: expected,
+      acceptedAnswers: Array.from(new Set([expected, ...acceptedAnswers])),
+      guidanceNote: q.guidanceNote || "Write your answer as a single word or term. Capitalization does not matter.",
+      marks,
+      difficulty,
+      explanation: q.explanation || `Conceptually verified for ${q.topic || defaultTopic || defaultSubject}.`,
+      generatedByAI: true
+    };
+  }
+
+  // Validate exactly 4 options for MCQ
   if (!Array.isArray(q.options) || q.options.length !== 4) return null;
   const options = q.options.map(opt => typeof opt === "string" ? opt.trim() : String(opt || "").trim());
   if (options.some(opt => opt.length === 0)) return null;
@@ -92,9 +120,6 @@ const validateAiQuestion = (q, defaultSubject, defaultTopic, defaultModule, defa
     if (parsedIdx !== -1) correctAnswer = parsedIdx;
   }
 
-  const marks = Number(q.marks) > 0 ? Number(q.marks) : (Number(defaultMarks) > 0 ? Number(defaultMarks) : 3);
-  const difficulty = ["Easy", "Medium", "Hard"].includes(q.difficulty) ? q.difficulty : (defaultDifficulty || "Medium");
-
   return {
     id: `ai_q_${uuidv4().substring(0, 8)}`,
     question: questionText,
@@ -102,7 +127,7 @@ const validateAiQuestion = (q, defaultSubject, defaultTopic, defaultModule, defa
     module: q.module || defaultModule || "Module 1",
     topic: q.topic || defaultTopic || defaultSubject || "",
     concept: q.concept || "",
-    type: "MCQ",
+    type: "mcq",
     options,
     correctAnswer,
     marks,

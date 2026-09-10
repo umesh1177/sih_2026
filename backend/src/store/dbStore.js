@@ -656,6 +656,7 @@ class DatabaseStore {
       status: quizData.status || "published",
       isKioskModeRequired: true,
       targetTraineeIds: Array.isArray(quizData.targetTraineeIds) ? quizData.targetTraineeIds : [],
+      blueprint: Array.isArray(quizData.blueprint) ? quizData.blueprint : [],
       questions: quizData.questions || []
     };
     this.quizzes.unshift(newQuiz);
@@ -679,14 +680,33 @@ class DatabaseStore {
     // Auto-grade only if not disqualified
     if (!isDisqualified) {
       quiz.questions.forEach(q => {
-        const selected = answers[q.id];
-        if (selected !== undefined && selected === q.correctAnswer) {
-          totalScore += q.marks || 2;
+        const userAns = answers[q.id];
+        if (userAns !== undefined && userAns !== null) {
+          const qType = q.type || (Array.isArray(q.options) && q.options.length > 0 ? "mcq" : "one_word");
+          const qMarks = Number(q.marks) || 2;
+          
+          if (qType === "one_word" || qType === "short_answer") {
+            const cleanUser = String(userAns).trim().toLowerCase();
+            const accepted = [
+              q.expectedAnswer,
+              q.correctAnswer,
+              ...(Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers : [])
+            ].filter(Boolean).map(a => String(a).trim().toLowerCase());
+            
+            if (cleanUser.length > 0 && accepted.includes(cleanUser)) {
+              totalScore += qMarks;
+            }
+          } else {
+            // Standard MCQ
+            if (userAns === q.correctAnswer) {
+              totalScore += qMarks;
+            }
+          }
         }
       });
     }
 
-    const totalMarks = quiz.totalMarks || quiz.questions.reduce((acc, q) => acc + (q.marks || 2), 0);
+    const totalMarks = quiz.totalMarks || quiz.questions.reduce((acc, q) => acc + (Number(q.marks) || 2), 0);
     const percentage = isDisqualified ? 0 : Math.round((totalScore / (totalMarks || 1)) * 100);
     const passed = isDisqualified ? false : totalScore >= (quiz.passMarks || (totalMarks * 0.5));
 

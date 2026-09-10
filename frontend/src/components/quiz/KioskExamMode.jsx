@@ -138,10 +138,26 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       const questionAnalysis = [];
 
       questions.forEach((q, idx) => {
-        const qMarks = q.marks || 2;
+        const qMarks = Number(q.marks) || 2;
         totalMarks += qMarks;
         const userAns = answers[q.id];
-        const isCorrect = userAns !== undefined && userAns === q.correctAnswer;
+        const qType = q.type || (Array.isArray(q.options) && q.options.length > 0 ? "mcq" : "one_word");
+        const isShortAns = qType === "one_word" || qType === "short_answer";
+
+        let isCorrect = false;
+        if (isShortAns) {
+          const userStr = String(userAns || "").trim().toLowerCase();
+          const accepted = [
+            q.expectedAnswer,
+            q.correctAnswer,
+            ...(Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers : [])
+          ].filter(Boolean).map(a => String(a).trim().toLowerCase());
+          
+          isCorrect = userStr.length > 0 && accepted.includes(userStr);
+        } else {
+          isCorrect = userAns !== undefined && userAns === q.correctAnswer;
+        }
+
         if (isCorrect) {
           score += qMarks;
           correctCount++;
@@ -153,13 +169,17 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           questionId: q.id,
           questionNumber: idx + 1,
           question: q.question,
+          type: qType,
           topic: q.subjectName || q.topic || quiz?.subjectName || "Atmospheric Dynamics",
           difficulty: q.difficulty || "Medium",
           timeSpent: qTimeSec,
           timeSpentText: `${qTimeSec} sec`,
-          attempts: userAns !== undefined ? 1 : 0,
+          attempts: userAns !== undefined && userAns !== "" ? 1 : 0,
           selectedAnswer: userAns !== undefined ? userAns : null,
           correctAnswer: q.correctAnswer,
+          expectedAnswer: q.expectedAnswer,
+          acceptedAnswers: q.acceptedAnswers || [],
+          guidanceNote: q.guidanceNote || "",
           isCorrect,
           result: isCorrect ? "Correct" : "Incorrect",
           marksObtained: isCorrect ? qMarks : 0,
@@ -612,13 +632,31 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                         <span><b>Marks:</b> <span className="font-semibold">{qa.marksObtained}/{qa.totalMarks || 3}</span></span>
                       </div>
 
-                      <div className="text-[11px] space-y-1 pt-1">
-                        <p className="text-slate-700">
-                          Your Answer: <b>{qa.selectedAnswer !== null && qa.selectedAnswer !== undefined ? `Option ${String.fromCharCode(65 + qa.selectedAnswer)}` : "Unanswered"}</b>
-                        </p>
-                        <p className="text-emerald-800 font-bold">
-                          Correct Answer: Option {String.fromCharCode(65 + qa.correctAnswer)}
-                        </p>
+                      <div className="text-[11px] space-y-1.5 pt-1">
+                        {qa.type === "one_word" || qa.type === "short_answer" ? (
+                          <>
+                            <p className="text-slate-700">
+                              Your Answer: <b>{qa.selectedAnswer ? `"${qa.selectedAnswer}"` : "Unanswered"}</b>
+                            </p>
+                            <p className="text-emerald-800 font-bold">
+                              Expected Answer: "{qa.expectedAnswer || qa.correctAnswer || "Exact match"}" <span className="text-[10px] text-emerald-600 font-medium">(Case-insensitive trimmed match)</span>
+                            </p>
+                            {Array.isArray(qa.acceptedAnswers) && qa.acceptedAnswers.length > 0 && (
+                              <p className="text-slate-500 text-[10px]">
+                                Also Accepted: {qa.acceptedAnswers.map(a => `"${a}"`).join(", ")}
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-slate-700">
+                              Your Answer: <b>{qa.selectedAnswer !== null && qa.selectedAnswer !== undefined ? `Option ${String.fromCharCode(65 + qa.selectedAnswer)}` : "Unanswered"}</b>
+                            </p>
+                            <p className="text-emerald-800 font-bold">
+                              Correct Answer: Option {String.fromCharCode(65 + (typeof qa.correctAnswer === "number" ? qa.correctAnswer : 0))}
+                            </p>
+                          </>
+                        )}
                         {qa.explanation && (
                           <p className="text-slate-600 bg-white/80 p-2.5 rounded-xl border border-slate-200/60 mt-1">
                             💡 <b>Explanation:</b> {qa.explanation}
@@ -851,41 +889,89 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </h2>
             </div>
 
-            {/* Options Radio List */}
-            <div className="space-y-3">
-              {(currentQuestion.options || []).map((opt, optIdx) => {
-                const isSelected = answers[currentQuestion.id] === optIdx;
+            {/* Question Response Section (MCQ or One-Word / Short Answer) */}
+            {currentQuestion.type === "one_word" || currentQuestion.type === "short_answer" || (!currentQuestion.options || currentQuestion.options.length === 0) ? (
+              <div className="space-y-4">
+                {currentQuestion.guidanceNote && (
+                  <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-2xl flex items-start gap-3 text-xs text-blue-950 font-medium">
+                    <HelpCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5 flex-1">
+                      <span className="font-black text-[10px] uppercase tracking-wider text-blue-700 block">
+                        Trainer Guidance Note
+                      </span>
+                      <p className="text-xs text-blue-900 leading-relaxed font-semibold">
+                        {currentQuestion.guidanceNote}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-                return (
-                  <button
-                    key={optIdx}
-                    onClick={() => handleSelectOption(optIdx)}
-                    className={`w-full p-4 sm:p-5 rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-4 group ${
-                      isSelected
-                        ? "bg-blue-50/90 border-2 border-blue-600 text-blue-950 font-bold shadow-xs"
-                        : "bg-white border-slate-200/90 text-slate-700 hover:border-blue-300 hover:bg-slate-50/80 shadow-2xs"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 font-mono transition-colors ${
-                        isSelected 
-                          ? "bg-blue-600 text-white shadow-2xs" 
-                          : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
-                      }`}>
-                        {String.fromCharCode(65 + optIdx)}
+                <div className="p-6 bg-white border border-slate-200 rounded-3xl shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-800">
+                      Type Your One-Word / Short Answer:
+                    </label>
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                      Case-Insensitive Match
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    value={typeof answers[currentQuestion.id] === "string" ? answers[currentQuestion.id] : (answers[currentQuestion.id] !== undefined ? String(answers[currentQuestion.id]) : "")}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setAnswers(prev => ({ ...prev, [currentQuestion.id]: val }));
+                    }}
+                    placeholder="e.g. Bibliophile (Type exact word, case does not matter)..."
+                    className="w-full p-4 rounded-2xl border-2 border-blue-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-bold text-sm text-slate-900 focus:outline-none transition-all"
+                  />
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                    <span>Capital and lower case letters are evaluated as equal. Trimmed of extra spaces.</span>
+                    <span className="font-mono font-bold text-blue-700">
+                      {(answers[currentQuestion.id] || "").length} chars
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* MCQ Radio Options List */
+              <div className="space-y-3">
+                {(currentQuestion.options || []).map((opt, optIdx) => {
+                  const isSelected = answers[currentQuestion.id] === optIdx;
+
+                  return (
+                    <button
+                      key={optIdx}
+                      onClick={() => handleSelectOption(optIdx)}
+                      className={`w-full p-4 sm:p-5 rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-4 group ${
+                        isSelected
+                          ? "bg-blue-50/90 border-2 border-blue-600 text-blue-950 font-bold shadow-xs"
+                          : "bg-white border-slate-200/90 text-slate-700 hover:border-blue-300 hover:bg-slate-50/80 shadow-2xs"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 font-mono transition-colors ${
+                          isSelected 
+                            ? "bg-blue-600 text-white shadow-2xs" 
+                            : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
+                        }`}>
+                          {String.fromCharCode(65 + optIdx)}
+                        </div>
+                        <span className="leading-snug">{opt}</span>
                       </div>
-                      <span className="leading-snug">{opt}</span>
-                    </div>
 
-                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                      isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"
-                    }`}>
-                      {isSelected && <Check className="w-3 h-3 text-white" />}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
+                        isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"
+                      }`}>
+                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
           </div>
 
