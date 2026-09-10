@@ -28,7 +28,18 @@ import {
   X,
   ExternalLink,
   ChevronDown,
-  Bookmark
+  Bookmark,
+  Lock,
+  Unlock,
+  HelpCircle,
+  CheckSquare,
+  PlusCircle,
+  Database,
+  Sliders,
+  Check,
+  Search,
+  Filter,
+  AlertCircle
 } from "lucide-react";
 import { api } from "../../services/api";
 import { ContentGalleryPickerModal } from "./ContentGalleryPickerModal";
@@ -55,6 +66,11 @@ export const TrainerCurriculumStudio = ({
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [notification, setNotification] = useState(null);
 
+  // ─── CONTROLLED PROGRESSION PATH STATE (TRAINER MASTER TOGGLE) ───
+  const [isLockPathEnabled, setIsLockPathEnabled] = useState(
+    course?.controlledLearningPathEnabled !== false
+  );
+
   // New Module Creation State
   const [isCreateModuleModalOpen, setIsCreateModuleModalOpen] = useState(false);
   const [moduleForm, setModuleForm] = useState({
@@ -62,6 +78,33 @@ export const TrainerCurriculumStudio = ({
     duration: "4 Hours",
     description: ""
   });
+
+  // ─── VIDEO QUIZ AUTHORING MODAL STATE (AI / QUESTION BANK / MANUAL) ───
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [quizTargetModule, setQuizTargetModule] = useState(null);
+  const [quizTargetVideo, setQuizTargetVideo] = useState(null);
+  const [quizCreationMode, setQuizCreationMode] = useState("ai"); // "ai" | "bank" | "manual"
+  
+  // AI Generation Form
+  const [aiQuizTopic, setAiQuizTopic] = useState("");
+  const [aiQuizCount, setAiQuizCount] = useState(3);
+  const [aiQuizMarksPerQuestion, setAiQuizMarksPerQuestion] = useState(5);
+  const [aiQuizDifficulty, setAiQuizDifficulty] = useState("Medium");
+  const [generatingAiQuestions, setGeneratingAiQuestions] = useState(false);
+
+  // Question Bank Selection State
+  const [bankQuestions, setBankQuestions] = useState([]);
+  const [loadingBankQuestions, setLoadingBankQuestions] = useState(false);
+  const [bankSearchQuery, setBankSearchQuery] = useState("");
+  const [selectedBankQuestionIds, setSelectedBankQuestionIds] = useState([]);
+
+  // Prepared Quiz Questions List
+  const [stagedQuestions, setStagedQuestions] = useState([]);
+  const [quizTitle, setQuizTitle] = useState("");
+  const [quizDuration, setQuizDuration] = useState("15 Mins");
+  const [quizPassPercentage, setQuizPassPercentage] = useState(50);
+  const [enforcePrecedingVideoPrereq, setEnforcePrecedingVideoPrereq] = useState(true);
+  const [enforceDownstreamLockPrereq, setEnforceDownstreamLockPrereq] = useState(true);
 
   // Sync course state
   useEffect(() => {
@@ -75,6 +118,7 @@ export const TrainerCurriculumStudio = ({
       const res = await api.getCourseById(course.id);
       if (res.success && res.course) {
         setCurrentCourse(res.course);
+        setIsLockPathEnabled(res.course.controlledLearningPathEnabled !== false);
         if (!selectedSubjectId && res.course.subjects?.length > 0) {
           setSelectedSubjectId(res.course.subjects[0].id);
         }
@@ -89,6 +133,22 @@ export const TrainerCurriculumStudio = ({
     setTimeout(() => setNotification(null), 3500);
   };
 
+  // ─── TOGGLE CONTROLLED PROGRESSION PATH (MASTER ON/OFF) ───
+  const handleToggleControlledPath = async () => {
+    const nextState = !isLockPathEnabled;
+    setIsLockPathEnabled(nextState);
+    try {
+      await api.updateCourse(currentCourse.id, { controlledLearningPathEnabled: nextState });
+      showToast(
+        nextState 
+          ? "🔒 Controlled Learning Path enabled: Trainees must satisfy video 80% watch threshold & quiz passing gates." 
+          : "🔓 Open Exploration Mode enabled: All lock gates bypassed for trainees."
+      );
+    } catch (e) {
+      showToast("Controlled path mode updated locally.");
+    }
+  };
+
   const currentSubject = currentCourse?.subjects?.find(
     s => s.id === selectedSubjectId || s.name === selectedSubjectId
   ) || currentCourse?.subjects?.[0] || {
@@ -101,6 +161,7 @@ export const TrainerCurriculumStudio = ({
   // Calculate material totals
   const allModules = currentSubject?.modules || [];
   let totalVideos = 0;
+  let totalQuizzes = 0;
   let totalPpts = 0;
   let totalPdfs = 0;
   let totalManuals = 0;
@@ -108,7 +169,8 @@ export const TrainerCurriculumStudio = ({
   allModules.forEach(mod => {
     (mod.materials || []).forEach(mat => {
       const t = (mat.type || "").toLowerCase();
-      if (t.includes("video") || t.includes("lecture") || t.includes("mp4")) totalVideos++;
+      if (t === "quiz") totalQuizzes++;
+      else if (t.includes("video") || t.includes("lecture") || t.includes("mp4")) totalVideos++;
       else if (t.includes("ppt") || t.includes("presentation")) totalPpts++;
       else if (t.includes("manual") || t.includes("lab")) totalManuals++;
       else totalPdfs++;
@@ -197,308 +259,231 @@ export const TrainerCurriculumStudio = ({
     }
   };
 
-  // ─── PPT & PDF PREVIEW DEFINITIONS ───
-  const getPptSlides = (item) => {
-    const subjName = cleanSubject(currentSubject?.name || "Atmospheric Dynamics & Modeling");
-    const topic = cleanTopic(item.topic || item.title || "Atmospheric Primitive Equations");
-    const author = item.uploadedBy || currentUser?.name || "Dr. Amit Sengupta";
+  // ─── OPEN QUIZ CREATOR MODAL BELOW TARGET VIDEO ───
+  const handleOpenQuizModal = (moduleItem, videoItem = null) => {
+    setQuizTargetModule(moduleItem);
+    setQuizTargetVideo(videoItem);
 
-    return [
-      {
-        slideNum: 1,
-        title: item.title,
-        badge: "Slide 1 • Title & Operational Context",
-        render: (
-          <div className="h-full flex flex-col justify-between p-6 sm:p-10 text-white bg-gradient-to-br from-[#071739] via-[#0a2558] to-[#12397e] rounded-2xl shadow-inner">
-            <div className="flex items-center justify-between border-b border-white/15 pb-4">
-              <div className="flex items-center gap-2 text-amber-300 font-extrabold text-xs tracking-wider uppercase">
-                <Presentation className="w-4 h-4" />
-                <span>IMD / MoES Lecture Masterclass Deck</span>
-              </div>
-              <span className="text-xs font-mono text-blue-200">CURRICULUM DECK</span>
-            </div>
-            <div className="space-y-3 my-auto py-6">
-              <span className="px-3 py-1 bg-amber-400/20 text-amber-300 font-extrabold text-xs rounded-lg border border-amber-300/30 inline-block">
-                {subjName}
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight tracking-tight">
-                {item.title}
-              </h2>
-              <p className="text-xs text-blue-200 font-medium max-w-2xl">
-                Topic: <b className="text-white">{topic}</b>
-              </p>
-            </div>
-            <div className="pt-4 border-t border-white/15 flex items-center justify-between text-xs text-blue-200">
-              <span>Lead Instructor: <b className="text-white">{author}</b></span>
-              <span>Slide 1 of 5</span>
-            </div>
-          </div>
-        )
-      },
-      {
-        slideNum: 2,
-        title: "Primitive Equations & Hydrostatic System",
-        badge: "Slide 2 • Governing Mathematical Dynamics",
-        render: (
-          <div className="h-full flex flex-col justify-between p-6 sm:p-10 text-slate-900 bg-white border border-slate-200 rounded-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-[#0a2558]">1. Primitive Equations in Hydrostatic Framework</h3>
-              <span className="text-xs font-bold text-slate-400">{subjName}</span>
-            </div>
-            <div className="space-y-4 my-auto py-4">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <p className="font-bold text-xs text-slate-700">Momentum Conservation in σ-Coordinate System:</p>
-                <div className="p-3 bg-white rounded-xl border border-slate-200 font-mono text-xs text-blue-900 font-bold overflow-x-auto">
-                  d(v)/dt + f(k × v) = -∇Φ - σ α ∇p_s + F_friction
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-100">
-                  <h5 className="font-bold text-[#0a2558]">Hydrostatic Balance</h5>
-                  <p className="font-mono text-xs font-semibold text-slate-800">∂Φ / ∂ln(σ) = -R_d · T_v</p>
-                </div>
-                <div className="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100">
-                  <h5 className="font-bold text-indigo-900">Mass Continuity</h5>
-                  <p className="font-mono text-xs font-semibold text-slate-800">∂p_s/∂t + ∇·(p_s v) + ∂(p_s σ̇)/∂σ = 0</p>
-                </div>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Topic: {topic}</span>
-              <span>Slide 2 of 5</span>
-            </div>
-          </div>
-        )
-      },
-      {
-        slideNum: 3,
-        title: "Arakawa Grid Staggering & CFL Condition",
-        badge: "Slide 3 • Discrete Numerical Meshes",
-        render: (
-          <div className="h-full flex flex-col justify-between p-6 sm:p-10 text-slate-900 bg-white border border-slate-200 rounded-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-[#0a2558]">2. Arakawa-C Staggering & CFL Stability</h3>
-              <span className="text-xs font-bold text-slate-400">{subjName}</span>
-            </div>
-            <div className="space-y-4 my-auto py-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200">
-                  <h5 className="font-bold text-amber-900">Arakawa A-Grid</h5>
-                  <p className="text-[11px] text-slate-600">All variables co-located at cell centers.</p>
-                </div>
-                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 ring-2 ring-emerald-400/40">
-                  <h5 className="font-bold text-emerald-900">Arakawa C-Grid (WRF Standard)</h5>
-                  <p className="text-[11px] text-slate-600">Velocities staggered on faces; scalars at center.</p>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-xl border border-blue-200">
-                  <h5 className="font-bold text-blue-900">Arakawa B-Grid (GFS Standard)</h5>
-                  <p className="text-[11px] text-slate-600">Velocity vectors staggered at corners.</p>
-                </div>
-              </div>
-              <div className="p-3 bg-slate-900 text-white rounded-xl font-mono text-xs space-y-1">
-                <span className="text-amber-300 font-bold">CFL Stability Limit:</span>
-                <span className="text-emerald-300 ml-2">Δt ≤ Δx / (√2 · c_max) ≈ 6 × Δx (in km)</span>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Topic: {topic}</span>
-              <span>Slide 3 of 5</span>
-            </div>
-          </div>
-        )
-      },
-      {
-        slideNum: 4,
-        title: "Sub-Grid Scale Physical Parameterizations",
-        badge: "Slide 4 • Physics Parameterization",
-        render: (
-          <div className="h-full flex flex-col justify-between p-6 sm:p-10 text-slate-900 bg-white border border-slate-200 rounded-2xl">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-[#0a2558]">3. Boundary Layer & Microphysics Closures</h3>
-              <span className="text-xs font-bold text-slate-400">{subjName}</span>
-            </div>
-            <div className="space-y-3 my-auto py-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 bg-purple-50 rounded-xl border border-purple-200">
-                  <h5 className="font-bold text-purple-900">PBL Closures</h5>
-                  <p className="text-[11px] text-slate-600">YSU Non-local-K, MYJ 1.5-order TKE, and ACM2 convective schemes.</p>
-                </div>
-                <div className="p-3.5 bg-blue-50 rounded-xl border border-blue-200">
-                  <h5 className="font-bold text-blue-900">Microphysics Schemes</h5>
-                  <p className="text-[11px] text-slate-600">WSM6 6-class hydrometeors & Thompson 2-moment ice predictive scheme.</p>
-                </div>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Topic: {topic}</span>
-              <span>Slide 4 of 5</span>
-            </div>
-          </div>
-        )
-      },
-      {
-        slideNum: 5,
-        title: "Operational Checklist & Skill Verification",
-        badge: "Slide 5 • Protocol & Takeaways",
-        render: (
-          <div className="h-full flex flex-col justify-between p-6 sm:p-10 text-slate-900 bg-gradient-to-br from-slate-50 to-blue-50/50 border border-slate-200 rounded-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="font-extrabold text-base text-[#0a2558]">4. Operational Forecast Verification Takeaways</h3>
-              <span className="text-xs font-bold text-slate-500">{subjName}</span>
-            </div>
-            <div className="space-y-3 my-auto py-4 text-xs">
-              <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1.5 text-[11px] text-slate-700">
-                <p>✅ Enforce non-hydrostatic primitives for tropical severe convective weather.</p>
-                <p>✅ Check Arakawa-C staggered grid coupling to prevent 2Δx pressure checkerboarding.</p>
-                <p>✅ Validate numerical predictions against Doppler Radar PACP & AWS observations with ETS & RMSE.</p>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Authorized by: {author}</span>
-              <span>Slide 5 of 5</span>
-            </div>
-          </div>
-        )
-      }
-    ];
+    const defaultTitle = videoItem 
+      ? `Video Quiz: ${videoItem.title.replace(/^Video \d+:\s*/i, "").substring(0, 35)} Check`
+      : `Module Assessment Quiz: ${moduleItem.title.substring(0, 35)}`;
+    
+    setQuizTitle(defaultTitle);
+    setAiQuizTopic(videoItem?.title || moduleItem.title);
+    setStagedQuestions([]);
+    setSelectedBankQuestionIds([]);
+    setQuizCreationMode("ai");
+    setIsQuizModalOpen(true);
   };
 
-  const getPdfPages = (item) => {
-    const subjName = cleanSubject(currentSubject?.name || "Atmospheric Dynamics & Modeling");
-    const topic = cleanTopic(item.topic || item.title || "Standard Operational Technical Guide");
-    const author = item.uploadedBy || currentUser?.name || "Dr. Amit Sengupta";
-
-    return [
-      {
-        pageNum: 1,
-        title: "Executive Summary & Metadata",
-        render: (
-          <div className="bg-white p-8 sm:p-12 shadow-sm rounded-xl border border-slate-200 space-y-6 text-slate-800 text-xs min-h-[560px] font-sans">
-            <div className="flex items-center justify-between border-b-2 border-[#0a2558] pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#0a2558] text-white font-black flex items-center justify-center text-sm">
-                  IMD
-                </div>
-                <div>
-                  <h2 className="text-xs font-black uppercase text-[#0a2558]">Ministry of Earth Sciences • Govt. of India</h2>
-                  <p className="text-[10px] text-slate-500 font-semibold">India Meteorological Department • Training Directorate</p>
-                </div>
-              </div>
-              <div className="text-right text-[10px] text-slate-500 font-mono">
-                <p>DOC ID: <b className="text-slate-800">MOES-CURRICULUM-2026</b></p>
-                <p>SUBJECT: <b className="text-blue-900">{subjName}</b></p>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-2">
-              <h1 className="text-xl font-black text-slate-900 leading-tight">
-                {item.title}
-              </h1>
-              <p className="text-xs font-bold text-slate-600">
-                Curriculum Topic: <span className="text-[#0a2558]">{topic}</span>
-              </p>
-            </div>
-
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1 text-[11px] leading-relaxed">
-              <h4 className="font-black text-slate-900 uppercase">Operational Overview:</h4>
-              <p className="text-slate-700">
-                This study guide covers standard technical protocols, prognostic modeling formulations, and practical evaluation metrics designed for meteorological officers.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100 text-[11px]">
-              <div><p className="text-slate-400 font-bold">Author</p><p className="font-bold text-slate-800">{author}</p></div>
-              <div><p className="text-slate-400 font-bold">Format</p><p className="font-bold text-slate-800">{item.type?.toUpperCase() || "PDF"}</p></div>
-              <div><p className="text-slate-400 font-bold">Size</p><p className="font-bold text-slate-800">{item.size || "3.2 MB"}</p></div>
-              <div><p className="text-slate-400 font-bold">Pages</p><p className="font-bold text-slate-800">{item.pages || "4 Pgs"}</p></div>
-            </div>
-          </div>
-        )
-      },
-      {
-        pageNum: 2,
-        title: "Mathematical Formulations & Equations",
-        render: (
-          <div className="bg-white p-8 sm:p-12 shadow-sm rounded-xl border border-slate-200 space-y-5 text-slate-800 text-xs min-h-[560px] font-sans">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="font-black text-xs text-[#0a2558] uppercase">Section 2: Analytical Governing Physics</h3>
-              <span className="text-[10px] text-slate-400 font-mono">Page 2 of 4</span>
-            </div>
-            <div className="space-y-3 text-[11px] text-slate-700 leading-relaxed">
-              <p>Continuous Navier-Stokes momentum balance in Cartesian coordinates:</p>
-              <div className="p-3 bg-slate-900 text-emerald-300 font-mono rounded-xl text-xs">
-                ∂u/∂t + (u·∇)u + 2(Ω × u) = -(1/ρ)∇p + g + ν∇²u
-              </div>
-              <p>Thermodynamic moisture advection and diabatic heating equation:</p>
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs text-slate-800 font-bold">
-                dθ/dt = (θ/T)(Q/c_p) + ∇·(K_h ∇θ)
-              </div>
-            </div>
-          </div>
-        )
-      },
-      {
-        pageNum: 3,
-        title: "Supercomputer HPC Execution",
-        render: (
-          <div className="bg-white p-8 sm:p-12 shadow-sm rounded-xl border border-slate-200 space-y-5 text-slate-800 text-xs min-h-[560px] font-sans">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="font-black text-xs text-[#0a2558] uppercase">Section 3: HPC Terminal Execution Commands</h3>
-              <span className="text-[10px] text-slate-400 font-mono">Page 3 of 4</span>
-            </div>
-            <div className="p-4 bg-slate-950 text-slate-100 font-mono text-xs rounded-xl space-y-2 border border-slate-800 shadow-inner">
-              <p className="text-slate-400"># Step 1: Execute Geogrid</p>
-              <p className="text-emerald-400">$ ./geogrid.exe &gt;&gt; geogrid.log 2&gt;&amp;1</p>
-              <p className="text-slate-400 pt-1"># Step 2: Unpack GFS GRIB2 files</p>
-              <p className="text-emerald-400">$ ./ungrib.exe &amp;&amp; ./metgrid.exe</p>
-              <p className="text-slate-400 pt-1"># Step 3: Run MPI Integration</p>
-              <p className="text-amber-400">$ mpirun -np 64 ./wrf.exe</p>
-            </div>
-          </div>
-        )
-      },
-      {
-        pageNum: 4,
-        title: "Quality Verification & Statistical Indices",
-        render: (
-          <div className="bg-white p-8 sm:p-12 shadow-sm rounded-xl border border-slate-200 space-y-5 text-slate-800 text-xs min-h-[560px] font-sans">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="font-black text-xs text-[#0a2558] uppercase">Section 4: Skill Score Verification</h3>
-              <span className="text-[10px] text-slate-400 font-mono">Page 4 of 4</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <h5 className="font-bold text-slate-900">RMSE</h5>
-                <p className="font-mono text-xs font-bold text-[#0a2558]">RMSE = √[ (1/N) Σ (F_i - O_i)² ]</p>
-              </div>
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <h5 className="font-bold text-slate-900">Equitable Threat Score</h5>
-                <p className="font-mono text-xs font-bold text-[#0a2558]">ETS = (Hits - Hits_rnd) / (Hits + FA + Miss - Hits_rnd)</p>
-              </div>
-            </div>
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500 font-bold">
-              <span>Author: {author}</span>
-              <span>MoES IMD Directorate • New Delhi</span>
-            </div>
-          </div>
-        )
+  // ─── GENERATE QUIZ QUESTIONS WITH GEMINI AI ───
+  const handleGenerateAiQuizQuestions = async () => {
+    if (generatingAiQuestions) return;
+    setGeneratingAiQuestions(true);
+    try {
+      const payload = {
+        topic: aiQuizTopic || currentSubject.name,
+        difficulty: aiQuizDifficulty,
+        count: aiQuizCount,
+        courseName: currentCourse.title
+      };
+      const res = await api.generateAiQuestions(payload);
+      if (res.success && res.generatedQuestions) {
+        const mapped = res.generatedQuestions.map((q, idx) => ({
+          id: `ai_q_${Date.now()}_${idx}`,
+          question: q.question,
+          options: q.options || ["Option A", "Option B", "Option C", "Option D"],
+          correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+          marks: Number(aiQuizMarksPerQuestion) || 5,
+          explanation: q.explanation || "Scientifically verified operational response."
+        }));
+        setStagedQuestions(mapped);
+        showToast(`✨ Generated ${mapped.length} technical MCQs with Gemini AI!`);
+      } else {
+        showToast(res.message || "Failed to generate AI questions", "error");
       }
-    ];
+    } catch (err) {
+      showToast("AI Generation error: " + err.message, "error");
+    } finally {
+      setGeneratingAiQuestions(false);
+    }
   };
 
-  const pptSlides = previewItem ? getPptSlides(previewItem) : [];
-  const pdfPages = previewItem ? getPdfPages(previewItem) : [];
+  // ─── FETCH QUESTION BANK QUESTIONS ───
+  const handleFetchBankQuestions = async () => {
+    if (bankQuestions.length > 0) return;
+    setLoadingBankQuestions(true);
+    try {
+      const res = await api.getQuestions();
+      if (res.success && res.questions) {
+        setBankQuestions(res.questions);
+      }
+    } catch (err) {
+      console.error("Error loading bank questions:", err);
+    } finally {
+      setLoadingBankQuestions(false);
+    }
+  };
 
+  // ─── TOGGLE BANK QUESTION SELECTION ───
+  const handleToggleBankQuestion = (q) => {
+    const isSelected = selectedBankQuestionIds.includes(q.id);
+    if (isSelected) {
+      setSelectedBankQuestionIds(prev => prev.filter(id => id !== q.id));
+      setStagedQuestions(prev => prev.filter(item => item.id !== q.id));
+    } else {
+      setSelectedBankQuestionIds(prev => [...prev, q.id]);
+      setStagedQuestions(prev => [
+        ...prev,
+        {
+          id: q.id,
+          question: q.question || q.text,
+          options: q.options || ["A", "B", "C", "D"],
+          correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+          marks: Number(q.marks) || 5,
+          explanation: q.explanation || ""
+        }
+      ]);
+    }
+  };
+
+  // ─── SAVE & ATTACH QUIZ TO CURRICULUM BELOW VIDEO ───
+  const handleSaveQuizToCurriculum = async (e) => {
+    e.preventDefault();
+    if (!quizTitle.trim()) {
+      showToast("Please enter a title for the quiz", "error");
+      return;
+    }
+
+    if (stagedQuestions.length === 0) {
+      showToast("Please generate or select at least 1 question for the quiz", "error");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const totalMarks = stagedQuestions.reduce((acc, q) => acc + (Number(q.marks) || 5), 0);
+      const newQuizId = `mat_quiz_${Date.now()}`;
+
+      // Build Prerequisite Config
+      let prereqConfig = {
+        enabled: false,
+        condition: "ALL",
+        requiredWatchThreshold: 80,
+        prerequisites: []
+      };
+
+      if (enforcePrecedingVideoPrereq && quizTargetVideo) {
+        prereqConfig = {
+          enabled: true,
+          condition: "ALL",
+          requiredWatchThreshold: 80,
+          prerequisites: [
+            {
+              id: quizTargetVideo.id,
+              title: quizTargetVideo.title,
+              type: "video",
+              requiredWatchPct: 80
+            }
+          ]
+        };
+      }
+
+      const quizPayload = {
+        id: newQuizId,
+        title: quizTitle.trim(),
+        type: "quiz",
+        duration: quizDuration,
+        durationSeconds: 900,
+        allowDownload: false,
+        uploadedBy: currentUser?.name ? `${currentUser.name} (Trainer)` : "Dr. Amit Sengupta",
+        uploadedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        totalMarks,
+        passPercentage: Number(quizPassPercentage) || 50,
+        prerequisiteConfig: prereqConfig,
+        questions: stagedQuestions
+      };
+
+      // Insert immediately after quizTargetVideo in module materials:
+      const updatedSubjects = currentCourse.subjects.map(sub => {
+        if (sub.id !== currentSubject.id) return sub;
+        return {
+          ...sub,
+          modules: (sub.modules || []).map(mod => {
+            if (mod.id !== quizTargetModule.id) return mod;
+            const currentMats = mod.materials || [];
+            const insertIdx = quizTargetVideo ? currentMats.findIndex(m => m.id === quizTargetVideo.id) : currentMats.length - 1;
+            
+            let nextMats = [];
+            if (insertIdx === -1) {
+              nextMats = [...currentMats, quizPayload];
+            } else {
+              nextMats = [
+                ...currentMats.slice(0, insertIdx + 1),
+                quizPayload,
+                ...currentMats.slice(insertIdx + 1)
+              ];
+
+              // If enforceDownstreamLockPrereq is on, chain subsequent material to require this quiz
+              if (enforceDownstreamLockPrereq && insertIdx + 1 < currentMats.length) {
+                const downstreamMat = nextMats[insertIdx + 2];
+                if (downstreamMat) {
+                  const existingPrereqs = downstreamMat.prerequisiteConfig?.prerequisites || [];
+                  nextMats[insertIdx + 2] = {
+                    ...downstreamMat,
+                    prerequisiteConfig: {
+                      enabled: true,
+                      condition: downstreamMat.prerequisiteConfig?.condition || "ALL",
+                      requiredWatchThreshold: 80,
+                      prerequisites: [
+                        ...existingPrereqs.filter(p => p.id !== quizTargetVideo?.id),
+                        {
+                          id: quizPayload.id,
+                          title: quizPayload.title,
+                          type: "quiz",
+                          requiredPassScore: quizPayload.passPercentage
+                        }
+                      ]
+                    }
+                  };
+                }
+              }
+            }
+
+            return {
+              ...mod,
+              materials: nextMats
+            };
+          })
+        };
+      });
+
+      await api.updateCourse(currentCourse.id, { subjects: updatedSubjects });
+      await fetchFreshCourseData();
+      setIsQuizModalOpen(false);
+      showToast(`✓ Video Quiz "${quizPayload.title}" successfully added below "${quizTargetVideo?.title || "Module"}" with ${stagedQuestions.length} questions!`);
+
+    } catch (err) {
+      showToast("Failed attaching quiz: " + err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper Icon getter
   const getItemIcon = (type) => {
     const t = (type || "").toLowerCase();
+    if (t === "quiz") {
+      return <HelpCircle className="w-4 h-4 text-indigo-600" />;
+    }
     if (t.includes("video") || t.includes("lecture") || t.includes("mp4")) {
       return <Video className="w-4 h-4 text-blue-600" />;
     }
     if (t.includes("ppt") || t.includes("presentation")) {
-      return <Presentation className="w-4 h-4 text-purple-600" />;
+      return <Presentation className="w-4 h-4 text-amber-600" />;
     }
     if (t.includes("manual") || t.includes("lab")) {
-      return <FileCode className="w-4 h-4 text-amber-600" />;
+      return <FileCode className="w-4 h-4 text-emerald-600" />;
     }
     return <FileText className="w-4 h-4 text-rose-600" />;
   };
@@ -514,7 +499,7 @@ export const TrainerCurriculumStudio = ({
         </div>
       )}
 
-      {/* ═════════ 1. HERO BAR & BACK TO DASHBOARD ═════════ */}
+      {/* ═════════ 1. HERO BAR: COURSE METADATA & CONTROLLED PATH MASTER ON/OFF ═════════ */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         
         <div className="flex items-center gap-3.5">
@@ -540,8 +525,34 @@ export const TrainerCurriculumStudio = ({
           </div>
         </div>
 
-        {/* Global Action Strip */}
+        {/* Global Action Strip + Controlled Path Master ON/OFF Switch */}
         <div className="flex items-center gap-2 flex-wrap ml-auto">
+          
+          {/* 🔒 MASTER CONTROLLED PATH ON/OFF SWITCH */}
+          <button
+            onClick={handleToggleControlledPath}
+            title="Trainer Rule: Toggle strict video watch threshold & quiz unlock constraints on/off"
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold shadow-sm transition-all ${
+              isLockPathEnabled 
+                ? "bg-indigo-600 hover:bg-indigo-700 text-white" 
+                : "bg-amber-500 hover:bg-amber-600 text-white"
+            }`}
+          >
+            {isLockPathEnabled ? (
+              <>
+                <Lock className="w-3.5 h-3.5 text-white" />
+                <span>Controlled Path:</span>
+                <span className="bg-indigo-800/80 px-1.5 py-0.5 rounded text-[10px] uppercase">ON (Strict)</span>
+              </>
+            ) : (
+              <>
+                <Unlock className="w-3.5 h-3.5 text-white" />
+                <span>Controlled Path:</span>
+                <span className="bg-amber-700/80 px-1.5 py-0.5 rounded text-[10px] uppercase">OFF (Open)</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={() => onOpenContentLibrary && onOpenContentLibrary(currentSubject?.id)}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-200 font-extrabold rounded-xl text-xs transition-colors shadow-2xs"
@@ -598,6 +609,11 @@ export const TrainerCurriculumStudio = ({
             <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-900 rounded-xl text-xs font-extrabold border border-blue-200">
               <Video className="w-3.5 h-3.5 text-blue-600" />
               <span>{totalVideos} Videos</span>
+            </span>
+
+            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-900 rounded-xl text-xs font-extrabold border border-indigo-200">
+              <HelpCircle className="w-3.5 h-3.5 text-indigo-600" />
+              <span>{totalQuizzes} Quizzes</span>
             </span>
 
             <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-900 rounded-xl text-xs font-extrabold border border-amber-200">
@@ -660,7 +676,7 @@ export const TrainerCurriculumStudio = ({
                   )}
                 </div>
 
-                {/* Materials List */}
+                {/* Materials List (With dedicated "+ Upload Quiz Below Video" buttons) */}
                 <div className="space-y-2 flex-1">
                   {materials.length === 0 ? (
                     <div className="p-4 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-1">
@@ -668,69 +684,117 @@ export const TrainerCurriculumStudio = ({
                       <p className="text-[10px] text-slate-400">Click below to upload from your Content Library</p>
                     </div>
                   ) : (
-                    materials.map((mat, matIdx) => (
-                      <div
-                        key={mat.id || matIdx}
-                        className="p-3 bg-slate-50/70 hover:bg-blue-50/50 rounded-2xl border border-slate-200/80 flex items-center justify-between gap-3 text-xs transition-colors group"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="p-1.5 rounded-lg bg-white border border-slate-200 shrink-0">
-                            {getItemIcon(mat.type)}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-bold text-slate-900 truncate text-xs">
-                              {mat.title}
-                            </p>
-                            <span className="text-[10px] text-slate-400 font-medium">
-                              {mat.duration || mat.pages ? `${mat.duration || `${mat.pages} Pgs`} • ` : ""}{mat.size || "3.5 MB"}
-                            </span>
-                          </div>
-                        </div>
+                    materials.map((mat, matIdx) => {
+                      const isVideo = (mat.type || "").toLowerCase().includes("video") || (mat.type || "").toLowerCase().includes("lecture");
+                      const isQuiz = (mat.type || "").toLowerCase() === "quiz";
 
-                        {/* Action buttons on item */}
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            onClick={() => {
-                              setPreviewItem({
-                                ...mat,
-                                subject: currentSubject.name,
-                                topic: moduleItem.title
-                              });
-                              setCurrentSlideIndex(0);
-                              setCurrentPageIndex(0);
-                            }}
-                            className="p-1.5 bg-white hover:bg-[#0a2558] text-slate-600 hover:text-white border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
-                            title="Preview Full Material"
+                      return (
+                        <div key={mat.id || matIdx} className="space-y-1.5">
+                          <div
+                            className={`p-3 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-colors group ${
+                              isQuiz 
+                                ? "bg-indigo-50/70 border-indigo-200 hover:bg-indigo-100/70" 
+                                : "bg-slate-50/70 hover:bg-blue-50/50 border-slate-200/80"
+                            }`}
                           >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className={`p-1.5 rounded-lg border shrink-0 ${isQuiz ? "bg-indigo-100 border-indigo-300" : "bg-white border-slate-200"}`}>
+                                {getItemIcon(mat.type)}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  {isQuiz && (
+                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-indigo-200 text-indigo-900 uppercase">
+                                      QUIZ GATE
+                                    </span>
+                                  )}
+                                  <p className="font-bold text-slate-900 truncate text-xs">
+                                    {mat.title}
+                                  </p>
+                                </div>
 
-                          <button
-                            onClick={() => handleRemoveMaterial(moduleItem.id, mat.id, mat.title)}
-                            className="p-1.5 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs opacity-0 group-hover:opacity-100"
-                            title="Remove from Module"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                                <span className="text-[10px] text-slate-500 font-medium">
+                                  {isQuiz 
+                                    ? `${mat.questions?.length || 2} Questions • ${mat.totalMarks || 10} Marks • Min Pass ${mat.passPercentage || 50}%`
+                                    : `${mat.duration || mat.pages ? `${mat.duration || `${mat.pages} Pgs`} • ` : ""}${mat.size || "3.5 MB"}`}
+                                  {mat.prerequisiteConfig?.enabled && (
+                                    <span className="text-amber-700 font-bold ml-1">
+                                      • 🔒 Prerequisite Linked
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Action buttons on item */}
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                onClick={() => {
+                                  setPreviewItem({
+                                    ...mat,
+                                    subject: currentSubject.name,
+                                    topic: moduleItem.title
+                                  });
+                                  setCurrentSlideIndex(0);
+                                  setCurrentPageIndex(0);
+                                }}
+                                className="p-1.5 bg-white hover:bg-[#0a2558] text-slate-600 hover:text-white border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
+                                title="Preview Full Material"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+
+                              <button
+                                onClick={() => handleRemoveMaterial(moduleItem.id, mat.id, mat.title)}
+                                className="p-1.5 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs opacity-0 group-hover:opacity-100"
+                                title="Remove from Module"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* 🎬 DEDICATED BUTTON TO UPLOAD QUIZ BELOW THIS VIDEO */}
+                          {isVideo && (
+                            <div className="flex items-center justify-end px-2 pt-0.5">
+                              <button
+                                onClick={() => handleOpenQuizModal(moduleItem, mat)}
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-black transition-all hover:scale-105 shadow-xs"
+                              >
+                                <PlusCircle className="w-3 h-3 text-indigo-600" />
+                                <span>+ Upload Quiz Below This Video</span>
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
 
-                {/* Module Footer & "+ Upload Learning Material" Button */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                {/* Module Footer & Upload Buttons */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                   <span className="text-[10px] font-semibold text-slate-400">
                     Uploaded by: <b className="text-slate-700">{currentUser?.name || "Dr. Amit Sengupta"}</b>
                   </span>
 
-                  <button
-                    onClick={() => setGalleryPickerModule(moduleItem)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-xl text-xs shadow-xs transition-all hover:scale-105"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Upload Learning Material</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenQuizModal(moduleItem, null)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200 font-extrabold rounded-xl text-xs shadow-2xs transition-all hover:scale-105"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>+ Add Video Quiz</span>
+                    </button>
+
+                    <button
+                      onClick={() => setGalleryPickerModule(moduleItem)}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-xl text-xs shadow-xs transition-all hover:scale-105"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Upload Material</span>
+                    </button>
+                  </div>
                 </div>
 
               </div>
@@ -758,6 +822,369 @@ export const TrainerCurriculumStudio = ({
         </div>
 
       </div>
+
+      {/* ═════════ MODAL: CREATE / UPLOAD VIDEO QUIZ (AI / QUESTION BANK / MANUAL) ═════════ */}
+      {isQuizModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden text-slate-800 my-auto max-h-[92vh] flex flex-col">
+            
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 bg-gradient-to-r from-indigo-900 via-indigo-800 to-blue-900 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 font-bold">
+                  <HelpCircle className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-black bg-amber-400 text-slate-950 uppercase tracking-wider">
+                    TRAINER VIDEO QUIZ AUTHORING
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black tracking-tight text-white mt-0.5">
+                    {quizTargetVideo ? `Upload Quiz Below: "${quizTargetVideo.title?.substring(0, 32)}..."` : "Create In-Module Assessment Quiz"}
+                  </h3>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsQuizModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSaveQuizToCurriculum} className="p-6 space-y-5 text-xs overflow-y-auto flex-1">
+              
+              {/* Quiz Title & Pass Score */}
+              <div className="space-y-3">
+                <div>
+                  <label className="block font-bold text-slate-800 mb-1">Quiz Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={quizTitle}
+                    onChange={(e) => setQuizTitle(e.target.value)}
+                    placeholder="e.g. Video Quiz: Primitive Equations & Geostrophic Advection Check"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-600"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Estimated Duration</label>
+                    <input
+                      type="text"
+                      value={quizDuration}
+                      onChange={(e) => setQuizDuration(e.target.value)}
+                      className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Passing Grade Requirement</label>
+                    <select
+                      value={quizPassPercentage}
+                      onChange={(e) => setQuizPassPercentage(Number(e.target.value))}
+                      className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+                    >
+                      <option value={50}>50% Passing Score (Standard)</option>
+                      <option value={70}>70% Passing Score (Rigor)</option>
+                      <option value={80}>80% Passing Score (Mastery)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 QUESTION SOURCE MODES (AI / QUESTION BANK / MANUAL) */}
+              <div className="space-y-3">
+                <label className="block font-extrabold text-slate-800 uppercase tracking-wider text-[10px]">
+                  Choose How to Build Quiz Questions:
+                </label>
+                
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setQuizCreationMode("ai")}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 transition-all ${
+                      quizCreationMode === "ai"
+                        ? "bg-indigo-50 border-indigo-600 text-indigo-950 ring-2 ring-indigo-400 shadow-xs"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4 text-indigo-600" />
+                    <span className="text-[10px]">1. Generate with AI ✨</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuizCreationMode("bank");
+                      handleFetchBankQuestions();
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 transition-all ${
+                      quizCreationMode === "bank"
+                        ? "bg-indigo-50 border-indigo-600 text-indigo-950 ring-2 ring-indigo-400 shadow-xs"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Database className="w-4 h-4 text-blue-600" />
+                    <span className="text-[10px]">2. Select from Bank 📚</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuizCreationMode("manual");
+                      if (stagedQuestions.length === 0) {
+                        setStagedQuestions([
+                          {
+                            id: `manual_q_${Date.now()}`,
+                            question: "In operational NWP, what does the CFL stability condition ensure?",
+                            options: ["Courant number ≤ 1.0", "Infinite time step", "Zero geopotential slope", "Non-hydrostatic divergence"],
+                            correctAnswer: 0,
+                            marks: 5,
+                            explanation: "The CFL condition ensures computational stability in explicit advection."
+                          }
+                        ]);
+                      }
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold flex flex-col items-center gap-1 transition-all ${
+                      quizCreationMode === "manual"
+                        ? "bg-indigo-50 border-indigo-600 text-indigo-950 ring-2 ring-indigo-400 shadow-xs"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    <FileText className="w-4 h-4 text-emerald-600" />
+                    <span className="text-[10px]">3. Custom MCQs ✍️</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* MODE 1: GEMINI AI GENERATOR */}
+              {quizCreationMode === "ai" && (
+                <div className="p-4 bg-indigo-50/70 rounded-2xl border border-indigo-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-indigo-950 text-xs flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-indigo-600" />
+                      <span>Gemini 1.5 Flash MCQ Synthesizer</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-indigo-700 font-bold bg-white px-2 py-0.5 rounded border border-indigo-200">
+                      SOP Validated
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-indigo-900 uppercase mb-1">Topic Name</label>
+                    <input
+                      type="text"
+                      value={aiQuizTopic}
+                      onChange={(e) => setAiQuizTopic(e.target.value)}
+                      placeholder="e.g. Navier-Stokes equations, sigma vertical coordinate, PBL closures"
+                      className="w-full p-2 bg-white border border-indigo-200 rounded-xl text-xs font-semibold"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-indigo-900 uppercase mb-1">Question Count</label>
+                      <select
+                        value={aiQuizCount}
+                        onChange={(e) => setAiQuizCount(Number(e.target.value))}
+                        className="w-full p-2 bg-white border border-indigo-200 rounded-xl text-xs font-bold"
+                      >
+                        <option value={1}>1 MCQ</option>
+                        <option value={2}>2 MCQs</option>
+                        <option value={3}>3 MCQs</option>
+                        <option value={5}>5 MCQs</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-indigo-900 uppercase mb-1">Marks Each</label>
+                      <select
+                        value={aiQuizMarksPerQuestion}
+                        onChange={(e) => setAiQuizMarksPerQuestion(Number(e.target.value))}
+                        className="w-full p-2 bg-white border border-indigo-200 rounded-xl text-xs font-bold"
+                      >
+                        <option value={2}>2 Marks</option>
+                        <option value={5}>5 Marks</option>
+                        <option value={10}>10 Marks</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-indigo-900 uppercase mb-1">Difficulty</label>
+                      <select
+                        value={aiQuizDifficulty}
+                        onChange={(e) => setAiQuizDifficulty(e.target.value)}
+                        className="w-full p-2 bg-white border border-indigo-200 rounded-xl text-xs font-bold"
+                      >
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleGenerateAiQuizQuestions}
+                    disabled={generatingAiQuestions}
+                    className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-sm flex items-center justify-center gap-2 transition-transform hover:scale-[1.01]"
+                  >
+                    <Sparkles className={`w-4 h-4 ${generatingAiQuestions ? "animate-spin" : ""}`} />
+                    <span>{generatingAiQuestions ? "Gemini is Synthesizing Questions..." : "✨ Synthesize Questions with AI"}</span>
+                  </button>
+                </div>
+              )}
+
+              {/* MODE 2: SELECT FROM QUESTION BANK */}
+              {quizCreationMode === "bank" && (
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-slate-800 text-xs flex items-center gap-1.5">
+                      <Database className="w-4 h-4 text-blue-600" />
+                      <span>Pick Questions from Question Bank</span>
+                    </span>
+                    <span className="text-[10px] text-blue-700 font-bold">
+                      {selectedBankQuestionIds.length} Selected
+                    </span>
+                  </div>
+
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                    <input
+                      type="text"
+                      value={bankSearchQuery}
+                      onChange={(e) => setBankSearchQuery(e.target.value)}
+                      placeholder="Filter by question keyword or topic..."
+                      className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs"
+                    />
+                  </div>
+
+                  {loadingBankQuestions ? (
+                    <div className="p-6 text-center text-xs text-slate-500 font-mono">
+                      Loading Question Bank repository...
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {bankQuestions
+                        .filter(q => !bankSearchQuery || (q.question || q.text || "").toLowerCase().includes(bankSearchQuery.toLowerCase()))
+                        .map(q => {
+                          const isSelected = selectedBankQuestionIds.includes(q.id);
+                          return (
+                            <div
+                              key={q.id}
+                              onClick={() => handleToggleBankQuestion(q)}
+                              className={`p-3 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-2.5 ${
+                                isSelected ? "bg-indigo-50 border-indigo-400 ring-1 ring-indigo-400" : "bg-white border-slate-200 hover:bg-slate-100"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => {}}
+                                className="mt-0.5 accent-indigo-600 shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-slate-900 text-xs line-clamp-2">
+                                  {q.question || q.text}
+                                </p>
+                                <span className="text-[10px] text-slate-500">
+                                  {q.topic || "Dynamics"} • {q.marks || 5} Marks • {q.difficulty || "Medium"}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* STAGED QUESTIONS PREVIEW LIST */}
+              {stagedQuestions.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-xs text-slate-900">
+                      Quiz Questions Preview ({stagedQuestions.length} Items • {stagedQuestions.reduce((acc, q) => acc + (Number(q.marks) || 5), 0)} Marks Total):
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {stagedQuestions.map((q, qIdx) => (
+                      <div key={q.id || qIdx} className="p-3 bg-white rounded-xl border border-slate-200 space-y-1 text-xs">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="font-bold text-slate-900 leading-tight">
+                            {qIdx + 1}. {q.question}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-800 font-mono text-[10px] font-black shrink-0 border border-indigo-200">
+                            {q.marks || 5} Marks
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500">
+                          Options: {q.options?.join(" | ")}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* AUTOMATED CONTROLLED PROGRESSION RULE WIRING */}
+              <div className="p-3.5 bg-indigo-50/90 border border-indigo-200 rounded-2xl space-y-2 text-indigo-950">
+                <span className="font-extrabold text-xs block text-indigo-900">
+                  🔒 Automated Learning Path Progression Rule:
+                </span>
+                
+                <label className="flex items-start gap-2 cursor-pointer text-[11px]">
+                  <input
+                    type="checkbox"
+                    checked={enforcePrecedingVideoPrereq}
+                    onChange={(e) => setEnforcePrecedingVideoPrereq(e.target.checked)}
+                    className="mt-0.5 accent-indigo-600"
+                  />
+                  <span>
+                    Require preceding video <b>(≥ 80% watch threshold)</b> before trainee can unlock and attempt this quiz.
+                  </span>
+                </label>
+
+                <label className="flex items-start gap-2 cursor-pointer text-[11px]">
+                  <input
+                    type="checkbox"
+                    checked={enforceDownstreamLockPrereq}
+                    onChange={(e) => setEnforceDownstreamLockPrereq(e.target.checked)}
+                    className="mt-0.5 accent-indigo-600"
+                  />
+                  <span>
+                    Require trainee to <b>pass this quiz (≥ {quizPassPercentage}%)</b> before downstream materials become unlocked.
+                  </span>
+                </label>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="pt-2 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsQuizModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={loading || stagedQuestions.length === 0}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Attach Quiz to Curriculum ({stagedQuestions.length} Questions)</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ═════════ MODAL: CREATE NEW MODULE ═════════ */}
       {isCreateModuleModalOpen && (
@@ -798,279 +1225,68 @@ export const TrainerCurriculumStudio = ({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">
-                    Estimated Duration
-                  </label>
-                  <select
-                    value={moduleForm.duration}
-                    onChange={(e) => setModuleForm({ ...moduleForm, duration: e.target.value })}
-                    className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white font-medium"
-                  >
-                    <option value="2 Hours">2 Hours</option>
-                    <option value="4 Hours">4 Hours</option>
-                    <option value="6 Hours">6 Hours</option>
-                    <option value="8 Hours">8 Hours</option>
-                    <option value="12 Hours">12 Hours</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">
-                    Assigned Subject
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    value={cleanSubject(currentSubject?.name)}
-                    className="w-full p-3 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 font-medium"
-                  />
-                </div>
+              <div className="space-y-1.5">
+                <label className="font-extrabold text-slate-800">Allocated Instructional Hours</label>
+                <select
+                  value={moduleForm.duration}
+                  onChange={(e) => setModuleForm({ ...moduleForm, duration: e.target.value })}
+                  className="w-full p-3 rounded-xl border border-slate-200 font-medium"
+                >
+                  <option value="2 Hours">2 Instructional Hours</option>
+                  <option value="4 Hours">4 Instructional Hours (Standard)</option>
+                  <option value="6 Hours">6 Instructional Hours</option>
+                  <option value="8 Hours">8 Instructional Hours (In-depth)</option>
+                </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-extrabold text-slate-800">
-                  Learning Objectives / Syllabus Summary
-                </label>
+                <label className="font-extrabold text-slate-800">Pedagogical Description</label>
                 <textarea
                   rows={3}
-                  placeholder="Briefly describe what meteorological concepts or hands-on procedures this module covers..."
+                  placeholder="Brief summary of learning objectives, mathematical derivations, or forecasting radar operations..."
                   value={moduleForm.description}
                   onChange={(e) => setModuleForm({ ...moduleForm, description: e.target.value })}
-                  className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium"
+                  className="w-full p-3 rounded-xl border border-slate-200 font-medium"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-2 flex items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setIsCreateModuleModalOpen(false)}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-xl text-xs shadow-md transition-transform hover:scale-105"
+                  className="flex-1 py-3 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold rounded-xl text-xs shadow-md flex items-center justify-center gap-2"
                 >
-                  {loading ? "Creating..." : "Create Module & Select Materials"}
+                  <Plus className="w-4 h-4 text-white" />
+                  <span>{loading ? "Creating Module..." : "Create Module & Add Materials"}</span>
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}
 
-      {/* ═════════ 4. CONTENT GALLERY PICKER MODAL ═════════ */}
+      {/* ═════════ MODAL: CONTENT GALLERY PICKER (ATTACH FROM LIBRARY) ═════════ */}
       {galleryPickerModule && (
         <ContentGalleryPickerModal
           isOpen={!!galleryPickerModule}
           onClose={() => setGalleryPickerModule(null)}
           course={currentCourse}
           subject={currentSubject}
-          targetModule={galleryPickerModule}
+          moduleItem={galleryPickerModule}
           currentUser={currentUser}
-          onAttachedSuccess={handleMaterialAttachedSuccess}
-          onOpenPreview={(item) => {
-            setPreviewItem({
-              ...item,
-              subject: currentSubject.name,
-              topic: galleryPickerModule.title
-            });
-            setCurrentSlideIndex(0);
-            setCurrentPageIndex(0);
+          onAttachedSuccess={(items) => {
+            handleMaterialAttachedSuccess(galleryPickerModule.id, items);
+            setGalleryPickerModule(null);
           }}
         />
-      )}
-
-      {/* ═════════ 5. FULL PREVIEW MODAL (PPT / PDF / VIDEO + FULLSCREEN) ═════════ */}
-      {previewItem && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 animate-in fade-in">
-          <div className={`bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col transition-all duration-200 ${
-            isFullscreenPreview 
-              ? "w-screen h-screen rounded-none max-w-none max-h-none" 
-              : "max-w-5xl w-full max-h-[92vh]"
-          }`}>
-            
-            {/* Top Bar */}
-            <div className="bg-[#0a2558] p-4 sm:p-5 text-white flex items-center justify-between shrink-0 shadow-md">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-                  {getItemIcon(previewItem.type)}
-                </div>
-                <div>
-                  <h3 className="text-sm sm:text-base font-extrabold truncate max-w-lg">{previewItem.title}</h3>
-                  <p className="text-[11px] text-blue-200">
-                    Subject: <b>{cleanSubject(previewItem.subject)}</b> • Topic: <b>{cleanTopic(previewItem.topic)}</b>
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setIsFullscreenPreview(!isFullscreenPreview)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/20 transition-colors"
-                  title={isFullscreenPreview ? "Exit Fullscreen" : "Open Full Screen View"}
-                >
-                  {isFullscreenPreview ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                  <span className="hidden sm:inline">{isFullscreenPreview ? "Exit Fullscreen" : "Full Screen View"}</span>
-                </button>
-
-                <button 
-                  onClick={() => { setPreviewItem(null); setIsFullscreenPreview(false); }}
-                  className="text-white/70 hover:text-white p-1.5 rounded-xl hover:bg-white/10"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Viewer Stage */}
-            <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 text-xs bg-slate-100/70">
-              {previewItem.type === "ppt" || previewItem.type === "presentation" ? (
-                <div className="space-y-3">
-                  <div className="aspect-video max-h-[540px] w-full mx-auto shadow-2xl rounded-2xl overflow-hidden">
-                    {pptSlides[currentSlideIndex]?.render || (
-                      <div className="h-full bg-slate-900 text-white flex items-center justify-center font-bold">
-                        Slide {currentSlideIndex + 1}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Slide controls */}
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setCurrentSlideIndex(Math.max(0, currentSlideIndex - 1))}
-                        disabled={currentSlideIndex === 0}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#0a2558] text-white rounded-xl text-xs font-bold hover:bg-[#071c42] disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span>Previous Slide</span>
-                      </button>
-
-                      <button
-                        onClick={() => setCurrentSlideIndex(Math.min(pptSlides.length - 1, currentSlideIndex + 1))}
-                        disabled={currentSlideIndex === pptSlides.length - 1}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#0a2558] text-white rounded-xl text-xs font-bold hover:bg-[#071c42] disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all"
-                      >
-                        <span>Next Slide</span>
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-700">
-                        Slide <b className="text-blue-900">{currentSlideIndex + 1}</b> of {pptSlides.length}
-                      </span>
-                      <div className="hidden sm:flex items-center gap-1 ml-3">
-                        {pptSlides.map((s, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setCurrentSlideIndex(idx)}
-                            className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                              currentSlideIndex === idx
-                                ? "bg-[#0a2558] text-white shadow-md scale-105"
-                                : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                            }`}
-                          >
-                            {idx + 1}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] text-slate-500 font-semibold hidden md:block">
-                      {pptSlides[currentSlideIndex]?.title}
-                    </div>
-                  </div>
-                </div>
-              ) : previewItem.type === "video" ? (
-                <div className="space-y-3">
-                  <div className="aspect-video max-h-[540px] w-full mx-auto bg-black rounded-2xl overflow-hidden shadow-2xl">
-                    <iframe
-                      src={previewItem.url || "https://www.youtube.com/embed/dQw4w9WgXcQ"}
-                      title={previewItem.title}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {/* Page controls */}
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setCurrentPageIndex(Math.max(0, currentPageIndex - 1))}
-                        disabled={currentPageIndex === 0}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#0a2558] text-white rounded-xl text-xs font-bold hover:bg-[#071c42] disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span>Previous Page</span>
-                      </button>
-
-                      <button
-                        onClick={() => setCurrentPageIndex(Math.min(pdfPages.length - 1, currentPageIndex + 1))}
-                        disabled={currentPageIndex === pdfPages.length - 1}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#0a2558] text-white rounded-xl text-xs font-bold hover:bg-[#071c42] disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all"
-                      >
-                        <span>Next Page</span>
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-700">
-                        Page <b className="text-blue-900">{currentPageIndex + 1}</b> of {pdfPages.length}
-                      </span>
-                      <div className="hidden sm:flex items-center gap-1 ml-3">
-                        {pdfPages.map((p, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setCurrentPageIndex(idx)}
-                            className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
-                              currentPageIndex === idx
-                                ? "bg-[#0a2558] text-white shadow-md scale-105"
-                                : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                            }`}
-                          >
-                            {idx + 1}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] text-slate-500 font-semibold hidden md:block">
-                      {pdfPages[currentPageIndex]?.title}
-                    </div>
-                  </div>
-
-                  <div className="w-full max-w-4xl mx-auto shadow-2xl rounded-2xl overflow-hidden">
-                    {pdfPages[currentPageIndex]?.render}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 bg-white border-t border-slate-200 flex items-center justify-between shrink-0">
-              <span className="text-xs text-slate-500">
-                Author: <b className="text-slate-800">{previewItem.uploadedBy || "Dr. Amit Sengupta"}</b>
-              </span>
-              <button
-                onClick={() => { setPreviewItem(null); setIsFullscreenPreview(false); }}
-                className="px-6 py-2 bg-[#0a2558] hover:bg-[#071739] text-white font-bold rounded-xl text-xs shadow-md transition-all"
-              >
-                Close Preview
-              </button>
-            </div>
-          </div>
-        </div>
       )}
 
     </div>
