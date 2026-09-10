@@ -151,22 +151,26 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         });
       });
 
-      const percentage = totalMarks > 0 ? Math.round((score / totalMarks) * 100) : 0;
+      const isDisq = disqualified || tabSwitchCount >= 2;
+      const calculatedScore = isDisq ? 0 : score;
+      const percentage = isDisq ? 0 : (totalMarks > 0 ? Math.round((calculatedScore / totalMarks) * 100) : 0);
       const passMarks = quiz?.passMarks || Math.round(totalMarks * 0.5);
-      const isPassed = !disqualified && score >= passMarks;
+      const isPassed = !isDisq && calculatedScore >= passMarks;
 
       const submissionPayload = {
         quizId: quiz?.id || "mock_quiz",
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
         traineeName: currentUser?.name || "Rahul Sharma",
-        score,
+        score: calculatedScore,
         totalMarks,
         percentage,
         passMarks,
-        status: disqualified ? "failed" : (isPassed ? "passed" : "failed"),
-        isDisqualified: disqualified,
-        tabSwitchCount,
+        status: isDisq ? "disqualified" : (isPassed ? "passed" : "failed"),
+        isDisqualified: isDisq,
+        integrityStatus: isDisq ? "disqualified" : (tabSwitchCount === 1 ? "warning" : "clean"),
+        disqualificationReason: isDisq ? "Assessment context exited repeatedly" : "",
+        tabSwitchCount: isDisq ? Math.max(2, tabSwitchCount || 2) : tabSwitchCount,
         timeTakenSeconds: (quiz?.durationMinutes || 30) * 60 - timeLeftSeconds,
         submittedAt: new Date().toISOString(),
         questionAnalysis
@@ -188,7 +192,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         resultId: res?.submissionId || res?.submission?.id || `sub_${Date.now()}`
       });
 
-      if (isPassed) {
+      if (isPassed && !isDisq) {
         try {
           confetti({
             particleCount: 80,
@@ -199,16 +203,16 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       }
     } catch (err) {
       console.error("Submission failed:", err);
-      // Fallback display result rather than blocking the officer
       setSubmissionResult({
         quizId: quiz?.id || "mock_quiz",
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
         traineeName: currentUser?.name || "Rahul Sharma",
-        score: Object.keys(answers).length * 4,
+        score: disqualified ? 0 : Object.keys(answers).length * 4,
         totalMarks: questions.length * 4,
-        percentage: 80,
-        status: "passed",
+        percentage: disqualified ? 0 : 80,
+        status: disqualified ? "disqualified" : "passed",
+        isDisqualified: disqualified,
         resultId: `sub_${Date.now()}`
       });
     } finally {
@@ -246,51 +250,65 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  // Strict anti-cheat proctoring
+  // Strict anti-cheat proctoring (2 context-exit disqualification rule)
   useEffect(() => {
-    if (submissionResult) return;
+    if (submissionResult || isDisqualified) return;
 
-    const handleViolation = () => {
-      if (submissionResult) return;
-      
+    const recordViolation = (eventType) => {
+      if (submissionResult || isDisqualified) return;
+
       setTabSwitchCount(prev => {
-        const newCount = prev + 1;
-        if (newCount >= 3) {
+        const nextCount = prev + 1;
+        const willDisqualify = nextCount >= 2;
+
+        // Log integrity violation to server immediately
+        api.logIntegrityViolation(quiz?.id || "quiz_current", {
+          traineeId: currentUser?.id || "u_trainee_1",
+          traineeName: currentUser?.name || "Trainee Officer",
+          quizTitle: quiz?.title || "Assessment",
+          eventType,
+          count: nextCount,
+          disqualified: willDisqualify,
+          reason: willDisqualify ? "Assessment context exited repeatedly" : "Assessment context exited"
+        });
+
+        if (willDisqualify) {
           setIsDisqualified(true);
-          handleSubmitQuiz(true); // Auto-submit immediately after 3 warnings!
+          setShowWarningModal(false);
+          handleSubmitQuiz(true);
         } else {
           setShowWarningModal(true);
         }
-        return newCount;
+        return nextCount;
       });
     };
 
     const handleVisibilityChange = () => {
-      if (document.hidden) handleViolation();
-    };
-
-    const handleWindowBlur = () => {
-      handleViolation();
-    };
-
-    const handleKeyDown = (e) => {
-      if (e.altKey || e.key === "Tab" || e.key === "Escape" || e.key === "Meta" || e.key === "F11") {
-        if (e.altKey || e.key === "Meta") {
-          handleViolation();
-        }
+      if (document.visibilityState === "hidden" || document.hidden) {
+        recordViolation("visibilitychange");
       }
     };
 
-    window.addEventListener("visibilitychange", handleVisibilityChange);
+    const handleWindowBlur = () => {
+      recordViolation("blur");
+    };
+
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        recordViolation("fullscreenchange");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleWindowBlur);
-    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleWindowBlur);
-      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
-  }, [handleSubmitQuiz, submissionResult]);
+  }, [currentUser, handleSubmitQuiz, isDisqualified, quiz, submissionResult]);
 
   // Navigate question
   const goToQuestion = (idx) => {
@@ -364,15 +382,22 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
   // ═════════ POST-SUBMISSION RESULT SCREEN (LIGHT THEME) ═════════
   if (submissionResult) {
     const isPracticePaper = quiz?.isPractice || quiz?.isAdaptive || !quiz?.scheduledStartTime;
-    const isPassed = submissionResult.percentage >= 50;
+    const isDisq = submissionResult.isDisqualified;
+    const isPassed = !isDisq && submissionResult.percentage >= 50;
 
     return (
       <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm text-slate-800 flex items-center justify-center p-4 overflow-y-auto select-none font-sans">
         <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-center space-y-6 shadow-2xl animate-in zoom-in-95 duration-200 my-8">
           
-          <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-md bg-emerald-50 border border-emerald-200 text-emerald-700">
-            {submissionResult.isDisqualified ? (
-              <AlertOctagon className="w-8 h-8 text-rose-600" />
+          <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-md ${
+            isDisq 
+              ? "bg-rose-50 border border-rose-200 text-rose-600"
+              : isPassed
+              ? "bg-emerald-50 border border-emerald-200 text-emerald-700"
+              : "bg-blue-50 border border-blue-200 text-blue-700"
+          }`}>
+            {isDisq ? (
+              <AlertOctagon className="w-8 h-8 text-rose-600 animate-pulse" />
             ) : isPassed ? (
               <Award className="w-8 h-8 text-emerald-600" />
             ) : (
@@ -382,65 +407,99 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
           <div className="space-y-2">
             <span className={`px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border inline-flex items-center gap-1.5 ${
-              isPassed ? "bg-emerald-50 text-emerald-800 border-emerald-200" : "bg-blue-50 text-blue-800 border-blue-200"
+              isDisq
+                ? "bg-rose-50 text-rose-800 border-rose-200"
+                : isPassed
+                ? "bg-emerald-50 text-emerald-800 border-emerald-200" 
+                : "bg-blue-50 text-blue-800 border-blue-200"
             }`}>
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              {isPassed ? "Performance Standard Achieved" : "Practice Attempt Completed"}
+              {isDisq ? <AlertOctagon className="w-3.5 h-3.5 text-rose-600" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+              {isDisq ? "Security Policy Violation" : isPassed ? "Performance Standard Achieved" : "Practice Attempt Completed"}
             </span>
 
-            <h2 className="text-2xl font-black text-slate-900">
-              {submissionResult.isDisqualified ? "Assessment Auto-Submitted (Disqualified)" : (submissionResult.quizTitle || "Assessment Completed")}
+            <h2 className={`text-2xl font-black ${isDisq ? "text-rose-700" : "text-slate-900"}`}>
+              {isDisq ? "ASSESSMENT DISQUALIFIED" : (submissionResult.quizTitle || "Assessment Completed")}
             </h2>
             <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">
               Candidate: <b className="text-slate-800">{currentUser?.name || "Rahul Sharma"}</b> • Submission ID: <span className="font-mono">{submissionResult.resultId || "SUB-2026-98"}</span>
             </p>
           </div>
 
-          {/* Performance Score Card */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-center">
-            <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-              <span className="text-slate-400 font-bold block text-[10px] uppercase">Final Score</span>
-              <b className="text-base font-black text-[#0a2558] font-mono">{submissionResult.score} / {submissionResult.totalMarks}</b>
+          {/* Assessment Integrity Alert Box when Disqualified */}
+          {isDisq ? (
+            <div className="p-5 bg-rose-50 border border-rose-200 rounded-2xl text-left space-y-3 text-xs">
+              <div className="flex items-center justify-between border-b border-rose-200 pb-2">
+                <span className="font-black text-rose-900 flex items-center gap-1.5 uppercase tracking-wide">
+                  <ShieldAlert className="w-4 h-4 text-rose-600" />
+                  Assessment Integrity Alert
+                </span>
+                <span className="px-2 py-0.5 rounded bg-rose-200 text-rose-900 font-bold text-[10px]">
+                  Rule: Max 1 Warning
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
+                <div><b>Trainee:</b> {currentUser?.name || "Demo Trainee"}</div>
+                <div><b>Assessment:</b> {submissionResult.quizTitle || quiz?.title || "Assessment"}</div>
+                <div><b>Status:</b> <span className="font-black text-rose-700">DISQUALIFIED</span></div>
+                <div><b>Violations:</b> <span className="font-bold text-rose-700">{submissionResult.tabSwitchCount || 2} Detected</span></div>
+                <div className="sm:col-span-2"><b>Reason:</b> Assessment context exited repeatedly</div>
+                <div className="sm:col-span-2"><b>Time:</b> {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "numeric", hour12: true })}</div>
+              </div>
+              <p className="text-[11px] text-rose-700 pt-1">
+                Notice: Your test has been terminated and recorded server-side. If you experienced a technical issue, your Trainer can grant you one more chance from the Trainer Assessment Hub.
+              </p>
             </div>
-            <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-              <span className="text-slate-400 font-bold block text-[10px] uppercase">Accuracy</span>
-              <b className={`text-base font-black ${isPassed ? "text-emerald-600" : "text-amber-600"}`}>{submissionResult.percentage}%</b>
+          ) : (
+            /* Standard Performance Score Card */
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-center">
+              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                <span className="text-slate-400 font-bold block text-[10px] uppercase">Final Score</span>
+                <b className="text-base font-black text-blue-700 font-mono">{submissionResult.score} / {submissionResult.totalMarks}</b>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                <span className="text-slate-400 font-bold block text-[10px] uppercase">Accuracy</span>
+                <b className={`text-base font-black ${isPassed ? "text-emerald-600" : "text-amber-600"}`}>{submissionResult.percentage}%</b>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                <span className="text-slate-400 font-bold block text-[10px] uppercase">Answered</span>
+                <b className="text-base font-black text-slate-900">{answeredCount} of {questions.length}</b>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
+                <span className="text-slate-400 font-bold block text-[10px] uppercase">Proctor Integrity</span>
+                <b className="text-base font-black text-emerald-600">
+                  {submissionResult.tabSwitchCount === 1 ? "1 Warning" : "Clear (0 Exits)"}
+                </b>
+              </div>
             </div>
-            <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-              <span className="text-slate-400 font-bold block text-[10px] uppercase">Answered</span>
-              <b className="text-base font-black text-slate-900">{answeredCount} of {questions.length}</b>
-            </div>
-            <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-              <span className="text-slate-400 font-bold block text-[10px] uppercase">Proctor Integrity</span>
-              <b className="text-base font-black text-emerald-600">100% Kiosk</b>
-            </div>
-          </div>
+          )}
 
           {/* Adaptive Difficulty Trajectory Milestone */}
-          <div className="p-4 bg-blue-50/70 rounded-2xl border border-blue-200 text-left space-y-1.5 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-black text-[#0a2558] flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                <span>Adaptive Difficulty Calibration Path:</span>
-              </span>
-              <span className="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200">
-                Dynamic Engine
-              </span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap pt-1">
-              {adaptiveTrajectory.map((milestone, idx) => (
-                <span key={idx} className="flex items-center gap-1 text-[11px] font-bold text-slate-700">
-                  <span className="px-2 py-0.5 bg-white rounded border border-slate-200 shadow-2xs">
-                    {milestone}
-                  </span>
-                  {idx < adaptiveTrajectory.length - 1 && <span className="text-slate-400">➔</span>}
+          {!isDisq && (
+            <div className="p-4 bg-blue-50/70 rounded-2xl border border-blue-200 text-left space-y-1.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-black text-blue-900 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <span>Adaptive Difficulty Calibration Path:</span>
                 </span>
-              ))}
+                <span className="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-md border border-blue-200">
+                  Dynamic Engine
+                </span>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap pt-1">
+                {adaptiveTrajectory.map((milestone, idx) => (
+                  <span key={idx} className="flex items-center gap-1 text-[11px] font-bold text-slate-700">
+                    <span className="px-2 py-0.5 bg-white rounded border border-slate-200 shadow-2xs">
+                      {milestone}
+                    </span>
+                    {idx < adaptiveTrajectory.length - 1 && <span className="text-slate-400">➔</span>}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Review Question Breakdown Toggle */}
-          {submissionResult.questionAnalysis && submissionResult.questionAnalysis.length > 0 && (
+          {/* Review Question Breakdown Toggle (Only if not disqualified) */}
+          {!isDisq && submissionResult.questionAnalysis && submissionResult.questionAnalysis.length > 0 && (
             <div className="text-left space-y-3">
               <button
                 onClick={() => setReviewMode(!reviewMode)}
@@ -489,21 +548,23 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
           {/* Modal Actions */}
           <div className="flex items-center gap-3 pt-2">
-            <button
-              onClick={() => {
-                setSubmissionResult(null);
-                setAnswers({});
-                setVisited({});
-                setMarkedForReview({});
-                setTimeLeftSeconds((quiz?.durationMinutes || 20) * 60);
-                setCurrentIndex(0);
-                setAdaptiveDifficulty("Medium");
-                setAdaptiveTrajectory(["Medium"]);
-              }}
-              className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl text-xs transition-colors"
-            >
-              Retake Practice Paper 🔄
-            </button>
+            {!isDisq && (
+              <button
+                onClick={() => {
+                  setSubmissionResult(null);
+                  setAnswers({});
+                  setVisited({});
+                  setMarkedForReview({});
+                  setTimeLeftSeconds((quiz?.durationMinutes || 20) * 60);
+                  setCurrentIndex(0);
+                  setAdaptiveDifficulty("Medium");
+                  setAdaptiveTrajectory(["Medium"]);
+                }}
+                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl text-xs transition-colors"
+              >
+                Retake Practice Paper 🔄
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -512,9 +573,11 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                 }
                 onFinish ? onFinish() : onClose();
               }}
-              className="flex-1 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-2xl text-xs shadow-md transition-transform hover:scale-102"
+              className={`flex-1 py-3 text-white font-extrabold rounded-2xl text-xs shadow-md transition-transform hover:scale-102 ${
+                isDisq ? "bg-slate-800 hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
-              Return to Practice Studio
+              {isDisq ? "Close Exam & Exit" : "Return to Practice Studio"}
             </button>
           </div>
 
@@ -531,7 +594,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         
         {/* Left: Exam Branding & Fullscreen Badge */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#0a2558] text-white flex items-center justify-center font-black text-xs shadow-2xs">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-2xs">
             IMD
           </div>
           <div>
@@ -549,41 +612,43 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           </div>
         </div>
 
-        {/* Right: Violation Counter, Timer & Submit */}
-        <div className="flex items-center gap-3 sm:gap-5">
-          
-          {/* Violation warning badge */}
-          {tabSwitchCount > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-300 text-rose-700 rounded-full text-xs font-black animate-pulse">
-              <AlertOctagon className="w-3.5 h-3.5" />
-              <span>{tabSwitchCount}/3 Violations</span>
-            </div>
-          )}
-
-          {/* Countdown Clock */}
-          <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-2xl border font-mono font-black text-xs sm:text-sm shadow-2xs ${
-            timeLeftSeconds < 300 
-              ? "bg-rose-50 border-rose-300 text-rose-700 animate-pulse" 
-              : "bg-slate-50 border-slate-200 text-blue-900"
+        {/* Center: Live Timer Banner */}
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl">
+          <Clock className={`w-4 h-4 ${timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-blue-600"}`} />
+          <span className="text-xs font-bold text-slate-600 hidden sm:inline">Remaining Time:</span>
+          <span className={`text-sm font-black font-mono tracking-wider ${
+            timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-slate-900"
           }`}>
-            <Clock className="w-4 h-4 text-blue-700" />
-            <span>{formatTime(timeLeftSeconds)}</span>
+            {formatTime(timeLeftSeconds)}
+          </span>
+        </div>
+
+        {/* Right: Integrity & Exit buttons */}
+        <div className="flex items-center gap-2.5">
+          <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold ${
+            tabSwitchCount > 0 
+              ? "bg-amber-50 text-amber-900 border-amber-300"
+              : "bg-emerald-50 text-emerald-800 border-emerald-200"
+          }`}>
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>{tabSwitchCount === 0 ? "✓ Integrity Clear" : `⚠ ${tabSwitchCount} Warning`}</span>
           </div>
 
-          {/* Finish & Submit CTA */}
           <button
             onClick={() => setShowSubmitModal(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 active:scale-95"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-102 flex items-center gap-1.5"
           >
-            Submit Assessment
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Submit Test</span>
           </button>
         </div>
+
       </header>
 
       {/* ⚡ LIVE ADAPTIVE DIFFICULTY TELEMETRY BAR ⚡ */}
       <div className="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-emerald-50/40 border-b border-blue-200/80 px-4 sm:px-6 py-2 flex items-center justify-between text-xs shrink-0 shadow-2xs">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#0a2558] text-white flex items-center gap-1 shadow-2xs">
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-600 text-white flex items-center gap-1 shadow-2xs">
             <Sparkles className="w-3 h-3 text-amber-300" />
             ADAPTIVE ENGINE
           </span>
@@ -649,7 +714,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               }
 
               if (isCurrent) {
-                bgStyle += " ring-2 ring-[#0a2558] scale-105 shadow-sm";
+                bgStyle += " ring-2 ring-blue-600 scale-105 shadow-sm";
               }
 
               return (
@@ -677,7 +742,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             {/* Top Question Info Banner */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-200">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-3 py-1 bg-[#0a2558] text-white rounded-xl text-xs font-black shadow-2xs">
+                <span className="px-3 py-1 bg-blue-600 text-white rounded-xl text-xs font-black shadow-2xs">
                   Question {currentIndex + 1} of {questions.length}
                 </span>
                 <span className="px-3 py-1 bg-white text-slate-700 rounded-xl text-xs font-bold border border-slate-200 shadow-2xs">
@@ -718,7 +783,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                     <div className="flex items-center gap-3.5">
                       <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 font-mono transition-colors ${
                         isSelected 
-                          ? "bg-[#0a2558] text-white shadow-2xs" 
+                          ? "bg-blue-600 text-white shadow-2xs" 
                           : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
                       }`}>
                         {String.fromCharCode(65 + optIdx)}
@@ -776,7 +841,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={() => goToQuestion(currentIndex + 1)}
-                  className="flex items-center gap-1.5 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center gap-1.5 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105 active:scale-95"
                 >
                   <span>Save & Next</span>
                   <ChevronRight className="w-4 h-4 text-blue-200" />
@@ -800,23 +865,23 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       {/* ═════════ TAB-SWITCH ANTI-CHEAT WARNING MODAL (LIGHT THEME) ═════════ */}
       {showWarningModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 select-none">
-          <div className="bg-white border-2 border-rose-500 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl animate-in zoom-in-95">
-            <div className="w-14 h-14 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto animate-bounce">
+          <div className="bg-white border-2 border-amber-500 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl animate-in zoom-in-95">
+            <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto animate-bounce">
               <AlertOctagon className="w-8 h-8" />
             </div>
 
             <div className="space-y-1">
-              <span className="px-3 py-0.5 rounded-full bg-rose-600 text-white font-black text-[10px] uppercase">
-                Warning {tabSwitchCount} of 3
+              <span className="px-3 py-0.5 rounded-full bg-amber-600 text-white font-black text-[10px] uppercase">
+                Warning 1 of 2
               </span>
-              <h3 className="text-lg font-black text-slate-900">Security Violation Detected</h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                You have navigated away from the exam window or switched application focus. All events are logged.
+              <h3 className="text-lg font-black text-slate-900">Security Warning: Context Exit</h3>
+              <p className="text-xs text-slate-600 leading-relaxed font-semibold">
+                Leaving the assessment is not permitted. Further violations may disqualify this attempt.
               </p>
             </div>
 
-            <div className="p-3 bg-rose-50 rounded-xl border border-rose-200 text-xs text-rose-800 font-mono font-bold">
-              ⚠️ Warning {tabSwitchCount}/3: Test will be automatically submitted after 3 violations!
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 font-bold">
+              ⚠️ Warning 1/2: An assessment integrity event has been recorded server-side. Next exit will disqualify attempt.
             </div>
 
             <button
@@ -826,7 +891,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                   document.documentElement.requestFullscreen().catch(() => {});
                 }
               }}
-              className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-xl text-xs shadow-md transition-all"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs shadow-md transition-all"
             >
               I Understand — Return to Exam
             </button>

@@ -106,6 +106,11 @@ export const TrainerScheduleAssessmentView = ({
   const [isGeneratingAiPaper, setIsGeneratingAiPaper] = useState(false);
   const [editableAiPaper, setEditableAiPaper] = useState([]);
 
+  const [targetType, setTargetType] = useState("all"); // "all" | "specific"
+  const [enrolledTrainees, setEnrolledTrainees] = useState([]);
+  const [selectedTraineeIds, setSelectedTraineeIds] = useState([]);
+  const [targetTraineeSearch, setTargetTraineeSearch] = useState("");
+
   // Submissions state for selected quiz
   const [activeSubmissions, setActiveSubmissions] = useState([]);
   const [trainerFeedbackMap, setTrainerFeedbackMap] = useState({});
@@ -122,11 +127,23 @@ export const TrainerScheduleAssessmentView = ({
   const loadData = async () => {
     setLoading(true);
     try {
-      const [cRes, qRes, qbRes] = await Promise.all([
+      const [cRes, qRes, qbRes, tRes] = await Promise.all([
         api.getCourses(),
         api.getQuizzes(),
-        api.getQuestions()
+        api.getQuestions(),
+        api.getTrainerEnrolledTrainees().catch(() => ({ success: false }))
       ]);
+
+      if (tRes?.success && tRes.trainees) {
+        setEnrolledTrainees(tRes.trainees);
+      } else {
+        setEnrolledTrainees([
+          { id: "u_trainee_1", name: "Rahul Sharma", email: "rahul.sharma@imd.gov.in", station: "New Delhi HQ", department: "Numerical Weather Prediction Division" },
+          { id: "u_trainee_2", name: "Priya Nair", email: "priya.nair@imd.gov.in", station: "RMC Chennai", department: "Satellite Meteorology Division" },
+          { id: "u_trainee_3", name: "Amitav Roy", email: "amitav.roy@imd.gov.in", station: "RMC Kolkata", department: "Radar & Convective Storms Division" },
+          { id: "u_trainee_4", name: "Sunita Deshmukh", email: "sunita.deshmukh@imd.gov.in", station: "RMC Mumbai", department: "Aviation & Severe Weather Center" }
+        ]);
+      }
 
       if (cRes.success && cRes.courses) {
         // Filter assigned courses for trainer
@@ -448,6 +465,11 @@ export const TrainerScheduleAssessmentView = ({
       return;
     }
 
+    if (targetType === "specific" && selectedTraineeIds.length === 0) {
+      showToast("Please select at least one specific trainee or choose All Enrolled Trainees.", "error");
+      return;
+    }
+
     const calculatedTotalMarks = allQuestions.reduce((acc, q) => acc + (Number(q.marks) || 2), 0);
 
     setLoading(true);
@@ -469,6 +491,7 @@ export const TrainerScheduleAssessmentView = ({
         status: "published",
         resultsPublished: false,
         isKioskModeRequired: true,
+        targetTraineeIds: targetType === "specific" ? selectedTraineeIds : [],
         questions: allQuestions
       };
 
@@ -480,6 +503,8 @@ export const TrainerScheduleAssessmentView = ({
         setSelectedQuestionIds([]);
         setCustomQuestions([]);
         setEditableAiPaper([]);
+        setSelectedTraineeIds([]);
+        setTargetType("all");
         await loadData();
       } else {
         showToast(res.message || "Failed to schedule exam", "error");
@@ -488,6 +513,22 @@ export const TrainerScheduleAssessmentView = ({
       showToast(err.message, "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGrantRetake = async (quizId, traineeId, traineeName) => {
+    try {
+      const res = await api.resetDisqualification(quizId, traineeId);
+      if (res.success) {
+        showToast(`Disqualification revoked for ${traineeName || 'cadet'}. Assessment attempt reopened!`);
+        if (selectedQuizForDetails) {
+          handleInspectQuiz(selectedQuizForDetails);
+        }
+      } else {
+        showToast(res.message || "Failed to reset disqualification", "error");
+      }
+    } catch (err) {
+      showToast("Error resetting: " + err.message, "error");
     }
   };
 
@@ -877,6 +918,126 @@ export const TrainerScheduleAssessmentView = ({
                     className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium"
                   />
                 </div>
+              </div>
+
+              {/* Trainee Target Selection */}
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span>Target Candidates / Trainees</span>
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Choose whether this assessment appears for all course participants or a designated candidate subset.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setTargetType("all")}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                        targetType === "all"
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      All Enrolled Trainees
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTargetType("specific")}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                        targetType === "specific"
+                          ? "bg-blue-600 text-white shadow-xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      Specific Trainees ({selectedTraineeIds.length})
+                    </button>
+                  </div>
+                </div>
+
+                {targetType === "specific" && (
+                  <div className="space-y-3 pt-2 animate-in fade-in">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="relative flex-1">
+                        <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          placeholder="Search trainees by name or station..."
+                          value={targetTraineeSearch}
+                          onChange={(e) => setTargetTraineeSearch(e.target.value)}
+                          className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTraineeIds(enrolledTrainees.map(t => t.id))}
+                          className="text-xs font-bold text-blue-600 hover:underline"
+                        >
+                          Select All ({enrolledTrainees.length})
+                        </button>
+                        <span className="text-slate-300">|</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTraineeIds([])}
+                          className="text-xs font-bold text-slate-500 hover:underline"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-white rounded-xl border border-slate-200">
+                      {enrolledTrainees
+                        .filter(t => 
+                          !targetTraineeSearch || 
+                          (t.name || "").toLowerCase().includes(targetTraineeSearch.toLowerCase()) ||
+                          (t.email || "").toLowerCase().includes(targetTraineeSearch.toLowerCase()) ||
+                          (t.station || "").toLowerCase().includes(targetTraineeSearch.toLowerCase())
+                        )
+                        .map(t => {
+                          const isSelected = selectedTraineeIds.includes(t.id);
+                          return (
+                            <div
+                              key={t.id}
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSelectedTraineeIds(selectedTraineeIds.filter(id => id !== t.id));
+                                } else {
+                                  setSelectedTraineeIds([...selectedTraineeIds, t.id]);
+                                }
+                              }}
+                              className={`p-2.5 rounded-lg border text-xs cursor-pointer flex items-center justify-between transition-colors ${
+                                isSelected
+                                  ? "bg-blue-50 border-blue-300 text-blue-950 font-medium"
+                                  : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => {}}
+                                  className="w-4 h-4 text-blue-600 rounded"
+                                />
+                                <div>
+                                  <span className="font-bold text-slate-900">{t.name}</span>
+                                  <span className="text-[10px] text-slate-500 ml-2">({t.email})</span>
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded">
+                                {t.station || "National HQ"}
+                              </span>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
@@ -1936,8 +2097,8 @@ export const TrainerScheduleAssessmentView = ({
                       <th className="py-3 px-4">Cadre ID & Station</th>
                       <th className="py-3 px-4">Score & Percentage</th>
                       <th className="py-3 px-4">Time Taken</th>
-                      <th className="py-3 px-4">Proctoring Status</th>
-                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Integrity Status</th>
+                      <th className="py-3 px-4">Evaluation Status</th>
                       <th className="py-3 px-4 text-right">Action</th>
                     </tr>
                   </thead>
@@ -1949,64 +2110,106 @@ export const TrainerScheduleAssessmentView = ({
                         (sub.station || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
                         (sub.cadreId || "").toLowerCase().includes(traineeSearchTerm.toLowerCase())
                       )
-                      .map((sub) => (
-                        <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="py-3.5 px-4 font-bold text-slate-900">
-                            <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-[#0a2558] text-white flex items-center justify-center font-bold text-[10px]">
-                                {(sub.traineeName || "TR").slice(0, 2).toUpperCase()}
+                      .map((sub) => {
+                        const isDisq = sub.isDisqualified || sub.integrityStatus === "disqualified";
+                        const isWarn = !isDisq && (sub.tabSwitchCount === 1 || sub.integrityStatus === "warning");
+
+                        return (
+                          <tr key={sub.id} className={`transition-colors ${isDisq ? "bg-red-50/40 hover:bg-red-50/70" : isWarn ? "bg-amber-50/30 hover:bg-amber-50/60" : "hover:bg-slate-50/80"}`}>
+                            <td className="py-3.5 px-4 font-bold text-slate-900">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] text-white ${
+                                  isDisq ? "bg-red-600" : isWarn ? "bg-amber-500" : "bg-blue-600"
+                                }`}>
+                                  {(sub.traineeName || "TR").slice(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                  <span className="block">{sub.traineeName || "Cadet"}</span>
+                                  {isDisq && (
+                                    <span className="text-[10px] text-red-600 font-semibold block">
+                                      Tab-Switch Violation Limit Exceeded
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              <span>{sub.traineeName || "Cadet"}</span>
-                            </div>
-                          </td>
+                            </td>
 
-                          <td className="py-3.5 px-4 space-y-0.5">
-                            <span className="font-mono font-bold text-slate-800 text-[11px] block">{sub.cadreId || "MOES-MET"}</span>
-                            <span className="text-slate-400 text-[11px]">{sub.station || "National Network"}</span>
-                          </td>
+                            <td className="py-3.5 px-4 space-y-0.5">
+                              <span className="font-mono font-bold text-slate-800 text-[11px] block">{sub.cadreId || "MOES-MET"}</span>
+                              <span className="text-slate-400 text-[11px]">{sub.station || "National Network"}</span>
+                            </td>
 
-                          <td className="py-3.5 px-4 font-black text-slate-900">
-                            <div className="flex items-center gap-2">
-                              <span>{sub.score} / {sub.totalMarks || selectedQuizForDetails.totalMarks || 40}</span>
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                                (sub.percentage || 0) >= 90 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
+                            <td className="py-3.5 px-4 font-black text-slate-900">
+                              <div className="flex items-center gap-2">
+                                <span>{sub.score} / {sub.totalMarks || selectedQuizForDetails.totalMarks || 40}</span>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                                  isDisq
+                                    ? "bg-red-100 text-red-700"
+                                    : (sub.percentage || 0) >= 90
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : "bg-blue-100 text-blue-800"
+                                }`}>
+                                  {isDisq ? "0% (Disq)" : `${sub.percentage || Math.round((sub.score / (sub.totalMarks || 40)) * 100)}%`}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td className="py-3.5 px-4 text-slate-600 font-mono font-bold">
+                              {sub.timeTaken || "12m 45s"}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              {isDisq ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-red-100 text-red-700 border border-red-200 shadow-2xs">
+                                  ✕ Disqualified
+                                </span>
+                              ) : isWarn ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs">
+                                  ⚠ 1 Warning
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  ✓ Clear
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                isDisq
+                                  ? "bg-red-100 text-red-800"
+                                  : sub.status === "Published" || selectedQuizForDetails.resultsPublished
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : "bg-amber-100 text-amber-800"
                               }`}>
-                                {sub.percentage || Math.round((sub.score / (sub.totalMarks || 40)) * 100)}%
+                                {isDisq ? "Disqualified" : selectedQuizForDetails.resultsPublished ? "Published" : (sub.status || "Pending")}
                               </span>
-                            </div>
-                          </td>
+                            </td>
 
-                          <td className="py-3.5 px-4 text-slate-600 font-mono font-bold">
-                            {sub.timeTaken || "12m 45s"}
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                              ✓ 100% Proctored
-                            </span>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                              sub.status === "Published" || selectedQuizForDetails.resultsPublished
-                                ? "bg-emerald-100 text-emerald-800"
-                                : "bg-amber-100 text-amber-800"
-                            }`}>
-                              {selectedQuizForDetails.resultsPublished ? "Published" : (sub.status || "Pending")}
-                            </span>
-                          </td>
-
-                          <td className="py-3.5 px-4 text-right">
-                            <button
-                              onClick={() => setSelectedTraineeSubmission(sub)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-xl text-xs shadow-xs transition-transform hover:scale-105"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-blue-200" />
-                              <span>Inspect Responses & Feedback</span>
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                            <td className="py-3.5 px-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {isDisq && (
+                                  <button
+                                    onClick={() => handleGrantRetake(selectedQuizForDetails.id, sub.traineeId, sub.traineeName)}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold rounded-xl text-xs shadow-xs transition-transform hover:scale-105"
+                                    title="Revoke disqualification and permit one more attempt"
+                                  >
+                                    <RotateCcw className="w-3.5 h-3.5" />
+                                    <span>Grant Re-take</span>
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => setSelectedTraineeSubmission(sub)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-xs transition-transform hover:scale-105"
+                                >
+                                  <Eye className="w-3.5 h-3.5 text-blue-200" />
+                                  <span>Inspect</span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>

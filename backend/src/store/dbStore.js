@@ -30,6 +30,7 @@ class DatabaseStore {
         this.feedbacks = saved.feedbacks || [...initialData.feedbacks];
         this.moduleProgress = saved.moduleProgress || {};
         this.contentLibrary = this._sanitizeContentLibrary(saved.contentLibrary || this._generateInitialContentLibrary());
+        this.integrityAlerts = saved.integrityAlerts || [];
         this._persist();
         console.log("✅ Database loaded from db.json");
         return;
@@ -48,6 +49,7 @@ class DatabaseStore {
     this.feedbacks = [...initialData.feedbacks];
     this.moduleProgress = {};
     this.contentLibrary = this._generateInitialContentLibrary();
+    this.integrityAlerts = [];
   }
 
   // --- Persist current state to db.json ---
@@ -63,7 +65,8 @@ class DatabaseStore {
         announcements: this.announcements,
         feedbacks: this.feedbacks,
         moduleProgress: this.moduleProgress,
-        contentLibrary: this.contentLibrary
+        contentLibrary: this.contentLibrary,
+        integrityAlerts: this.integrityAlerts || []
       };
       fs.writeFileSync(DB_FILE, JSON.stringify(state, null, 2), "utf-8");
     } catch (err) {
@@ -638,6 +641,10 @@ class DatabaseStore {
       title: quizData.title,
       courseId: quizData.courseId,
       courseName: quizData.courseName,
+      subjectId: quizData.subjectId || "all",
+      subjectName: quizData.subjectName || "",
+      topicName: quizData.topicName || "",
+      conceptName: quizData.conceptName || "",
       trainerId: quizData.trainerId,
       trainerName: quizData.trainerName,
       department: quizData.department || "India Meteorological Department",
@@ -648,6 +655,7 @@ class DatabaseStore {
       deadlineTime: quizData.deadlineTime || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       status: quizData.status || "published",
       isKioskModeRequired: true,
+      targetTraineeIds: Array.isArray(quizData.targetTraineeIds) ? quizData.targetTraineeIds : [],
       questions: quizData.questions || []
     };
     this.quizzes.unshift(newQuiz);
@@ -655,24 +663,32 @@ class DatabaseStore {
     return newQuiz;
   }
 
-  // --- Submissions & Auto-Grading ---
+  // --- Submissions & Auto-Grading & Integrity Enforcement ---
   submitQuiz(submissionData) {
     const quiz = this.getQuizById(submissionData.quizId);
     if (!quiz) throw new Error("Quiz not found");
 
+    const rawTabSwitches = Number(submissionData.tabSwitchCount) || 0;
+    const isDisqualified = !!submissionData.isDisqualified || rawTabSwitches >= 2;
+    const tabSwitchCount = isDisqualified ? Math.max(2, rawTabSwitches) : rawTabSwitches;
+    const integrityStatus = isDisqualified ? "disqualified" : (tabSwitchCount === 1 ? "warning" : "clean");
+
     let totalScore = 0;
     const answers = submissionData.answers || {};
 
-    quiz.questions.forEach(q => {
-      const selected = answers[q.id];
-      if (selected !== undefined && selected === q.correctAnswer) {
-        totalScore += q.marks || 2;
-      }
-    });
+    // Auto-grade only if not disqualified
+    if (!isDisqualified) {
+      quiz.questions.forEach(q => {
+        const selected = answers[q.id];
+        if (selected !== undefined && selected === q.correctAnswer) {
+          totalScore += q.marks || 2;
+        }
+      });
+    }
 
     const totalMarks = quiz.totalMarks || quiz.questions.reduce((acc, q) => acc + (q.marks || 2), 0);
-    const percentage = Math.round((totalScore / (totalMarks || 1)) * 100);
-    const passed = totalScore >= (quiz.passMarks || (totalMarks * 0.5));
+    const percentage = isDisqualified ? 0 : Math.round((totalScore / (totalMarks || 1)) * 100);
+    const passed = isDisqualified ? false : totalScore >= (quiz.passMarks || (totalMarks * 0.5));
 
     const submission = {
       id: `subm_${uuidv4().substring(0, 8)}`,
@@ -687,20 +703,112 @@ class DatabaseStore {
       totalMarks,
       percentage,
       passed,
+      isDisqualified,
+      integrityStatus,
+      disqualificationReason: isDisqualified ? (submissionData.disqualificationReason || "Assessment context exited repeatedly") : "",
       timeTakenSeconds: submissionData.timeTakenSeconds || 600,
-      tabSwitchCount: submissionData.tabSwitchCount || 0,
+      tabSwitchCount,
       submittedAt: new Date().toISOString(),
       gradedBy: "auto",
       resultsPublished: !!submissionData.resultsPublished || false,
-      evaluationStatus: submissionData.resultsPublished ? "published" : "pending_publish",
-      trainerFeedback: "",
+      evaluationStatus: isDisqualified ? "disqualified" : (submissionData.resultsPublished ? "published" : "pending_publish"),
+      trainerFeedback: isDisqualified ? "Attempt Disqualified due to repeated context exit violations (Security Rule)." : "",
       certificateGenerated: passed,
-      certificateId: passed ? `MOES-IMD-CERT-2025-${Math.floor(1000 + Math.random() * 9000)}` : null
+      certificateId: passed ? `MOES-IMD-CERT-2025-${Math.floor(1000 + Math.random() * 9000)}` : null,
+      questionAnalysis: submissionData.questionAnalysis || []
     };
 
-    this.quizSubmissions.unshift(submission);
+    // Replace existing submission for this quiz + trainee if present
+    const existingIdx = this.quizSubmissions.findIndex(s => s.quizId === quiz.id && s.traineeId === submissionData.traineeId);
+    if (existingIdx !== -1) {
+      this.quizSubmissions[existingIdx] = submission;
+    } else {
+      this.quizSubmissions.unshift(submission);
+    }
+
+    // Auto log alert if violation or disqualification occurred
+    if (tabSwitchCount > 0 || isDisqualified) {
+      this.logIntegrityViolation({
+        quizId: quiz.id,
+        quizTitle: quiz.title,
+        traineeId: submissionData.traineeId,
+        traineeName: submissionData.traineeName,
+        eventType: "context_switch",
+        count: tabSwitchCount,
+        disqualified: isDisqualified,
+        reason: isDisqualified ? "Assessment context exited repeatedly" : "Assessment context exited"
+      });
+    }
+
     this._persist();
     return submission;
+  }
+
+  // --- Integrity Violations & Disqualification Management ---
+  logIntegrityViolation(violationData) {
+    const { 
+      quizId, 
+      quizTitle, 
+      traineeId, 
+      traineeName, 
+      eventType = "visibilitychange", 
+      count = 1, 
+      disqualified = false, 
+      reason 
+    } = violationData;
+    
+    const isDisq = disqualified || count >= 2;
+    const alert = {
+      id: `alert_${uuidv4().substring(0, 8)}`,
+      quizId,
+      quizTitle: quizTitle || "Assessment",
+      traineeId,
+      traineeName: traineeName || "Trainee Officer",
+      status: isDisq ? "DISQUALIFIED" : "WARNING",
+      violations: count,
+      eventType,
+      reason: reason || (isDisq ? "Assessment context exited repeatedly" : "Assessment context exited (Warning)"),
+      timestamp: new Date().toISOString(),
+      formattedTime: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "numeric", hour12: true })
+    };
+
+    if (!this.integrityAlerts) this.integrityAlerts = [];
+    // Remove older alert for same trainee & quiz
+    this.integrityAlerts = this.integrityAlerts.filter(a => !(a.quizId === quizId && a.traineeId === traineeId));
+    this.integrityAlerts.unshift(alert);
+
+    this._persist();
+    return alert;
+  }
+
+  getIntegrityAlerts(filter = {}) {
+    if (!this.integrityAlerts) this.integrityAlerts = [];
+    let alerts = [...this.integrityAlerts];
+    if (filter.quizId) {
+      alerts = alerts.filter(a => a.quizId === filter.quizId);
+    }
+    if (filter.traineeId) {
+      alerts = alerts.filter(a => a.traineeId === filter.traineeId);
+    }
+    return alerts;
+  }
+
+  resetDisqualification(quizId, traineeId) {
+    // 1. Remove any disqualified submission for this quiz + trainee so they can re-take the exam cleanly
+    this.quizSubmissions = this.quizSubmissions.filter(s => !(s.quizId === quizId && s.traineeId === traineeId));
+    
+    // 2. Remove or resolve integrity alerts for this quiz & trainee
+    if (this.integrityAlerts) {
+      this.integrityAlerts = this.integrityAlerts.filter(a => !(a.quizId === quizId && a.traineeId === traineeId));
+    }
+
+    this._persist();
+    return {
+      success: true,
+      quizId,
+      traineeId,
+      message: "Disqualification removed successfully. Trainee has been granted one more chance and can now re-take the assessment."
+    };
   }
 
   getSubmissionsForQuiz(quizId) {

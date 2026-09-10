@@ -49,7 +49,7 @@ export const deleteQuestion = (req, res) => {
 // --- Quiz Scheduling & Management ---
 export const getQuizzes = (req, res) => {
   try {
-    const { courseId, trainerId, subjectId, subjectName } = req.query;
+    const { courseId, trainerId, subjectId, subjectName, traineeId } = req.query;
     let quizzes = db.getQuizzes();
     if (courseId) {
       quizzes = quizzes.filter(q => q.courseId === courseId);
@@ -64,6 +64,13 @@ export const getQuizzes = (req, res) => {
       quizzes = quizzes.filter(q => 
         (q.subjectName && q.subjectName.toLowerCase().includes(subjectName.toLowerCase())) ||
         (q.title && q.title.toLowerCase().includes(subjectName.toLowerCase()))
+      );
+    }
+    if (traineeId) {
+      quizzes = quizzes.filter(q => 
+        !q.targetTraineeIds || 
+        q.targetTraineeIds.length === 0 || 
+        q.targetTraineeIds.includes(traineeId)
       );
     }
     return res.json({ success: true, count: quizzes.length, quizzes });
@@ -104,7 +111,9 @@ export const submitQuiz = (req, res) => {
     const submission = db.submitQuiz(req.body);
     return res.status(201).json({
       success: true,
-      message: submission.passed ? "Assessment submitted! Congratulations, you passed!" : "Assessment submitted.",
+      message: submission.isDisqualified 
+        ? "Assessment terminated: Disqualified due to repeated window/tab context exits." 
+        : (submission.passed ? "Assessment submitted! Congratulations, you passed!" : "Assessment submitted."),
       submission
     });
   } catch (err) {
@@ -122,13 +131,17 @@ export const getQuizSubmissions = (req, res) => {
     }
     const submissions = db.getSubmissionsForQuiz(id).map(s => {
       const user = db.findUserById(s.traineeId) || {};
+      const isDisq = s.isDisqualified || (s.tabSwitchCount && s.tabSwitchCount >= 2);
       return {
         ...s,
         cadreId: user.cadreId || s.cadreId || `MOES-MET-2026-${Math.floor(1000 + Math.random() * 9000)}`,
         station: user.station || user.department || s.station || "National Meteorological Centre",
         department: user.department || s.department || "Meteorology Division",
         designation: user.designation || s.designation || "Scientist 'B'",
-        avatar: user.avatar || s.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"
+        avatar: user.avatar || s.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+        isDisqualified: isDisq,
+        integrityStatus: isDisq ? "disqualified" : (s.tabSwitchCount === 1 ? "warning" : "clean"),
+        disqualificationReason: s.disqualificationReason || (isDisq ? "Assessment context exited repeatedly" : "")
       };
     });
     return res.json({ success: true, count: submissions.length, submissions, quiz });
@@ -247,6 +260,7 @@ export const getQuizAnalytics = (req, res) => {
       .sort((a, b) => (b.score || 0) - (a.score || 0) || (a.timeTakenSeconds || 0) - (b.timeTakenSeconds || 0))
       .map((s, idx) => {
         const user = db.findUserById(s.traineeId) || {};
+        const isDisq = s.isDisqualified || (s.tabSwitchCount && s.tabSwitchCount >= 2);
         return {
           rank: idx + 1,
           id: s.id,
@@ -262,13 +276,16 @@ export const getQuizAnalytics = (req, res) => {
           totalMarks: s.totalMarks || quiz.totalMarks || 20,
           percentage: s.percentage || 0,
           passed: s.passed,
+          isDisqualified: isDisq,
+          integrityStatus: isDisq ? "disqualified" : (s.tabSwitchCount === 1 ? "warning" : "clean"),
+          disqualificationReason: s.disqualificationReason || (isDisq ? "Assessment context exited repeatedly" : ""),
           timeTakenSeconds: s.timeTakenSeconds || 600,
           timeTakenMinutes: Math.round((s.timeTakenSeconds || 600) / 60),
           timeTakenText: `${Math.floor((s.timeTakenSeconds || 600) / 60)}m ${(s.timeTakenSeconds || 600) % 60}s`,
           tabSwitchCount: s.tabSwitchCount || 0,
           certificateId: s.certificateId,
           trainerFeedback: s.trainerFeedback || "",
-          evaluationStatus: s.resultsPublished ? "published" : (s.evaluationStatus || "pending_publish"),
+          evaluationStatus: isDisq ? "disqualified" : (s.resultsPublished ? "published" : (s.evaluationStatus || "pending_publish")),
           submittedAt: s.submittedAt || new Date().toISOString(),
           answers: s.answers || {}
         };
@@ -366,6 +383,51 @@ export const evaluateSubmission = (req, res) => {
       message: "Cadet evaluation updated successfully!",
       submission: evaluated
     });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// --- Integrity Monitoring & Disqualification Control ---
+export const logIntegrityViolation = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { traineeId, traineeName, eventType, count, disqualified, reason, quizTitle } = req.body;
+    const alert = db.logIntegrityViolation({
+      quizId: id,
+      quizTitle,
+      traineeId,
+      traineeName,
+      eventType,
+      count,
+      disqualified,
+      reason
+    });
+    return res.json({ success: true, alert });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getIntegrityAlerts = (req, res) => {
+  try {
+    const { quizId, traineeId } = req.query;
+    const alerts = db.getIntegrityAlerts({ quizId, traineeId });
+    return res.json({ success: true, count: alerts.length, alerts });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const resetDisqualification = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { traineeId } = req.body;
+    if (!traineeId) {
+      return res.status(400).json({ success: false, message: "Please specify traineeId to reset disqualification." });
+    }
+    const result = db.resetDisqualification(id, traineeId);
+    return res.json(result);
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

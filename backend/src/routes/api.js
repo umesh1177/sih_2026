@@ -64,10 +64,13 @@ router.post("/ai/generate-summary", requireAuth, aiController.generateMaterialSu
 router.post("/ai/synthesize-paper", requireAuth, aiController.synthesizeAssessmentPaperWithAI);
 
 router.get("/quizzes", requireAuth, quizController.getQuizzes);
+router.get("/quizzes/integrity-alerts", requireAuth, quizController.getIntegrityAlerts);
 router.get("/quizzes/:id", requireAuth, quizController.getQuizById);
 router.get("/quizzes/:id/submissions", requireAuth, quizController.getQuizSubmissions);
 router.post("/quizzes", requireAuth, quizController.createQuiz);
 router.post("/quizzes/submit", requireAuth, quizController.submitQuiz);
+router.post("/quizzes/:id/integrity-violation", requireAuth, quizController.logIntegrityViolation);
+router.post("/quizzes/:id/reset-disqualification", requireAuth, requireRole("trainer", "admin"), quizController.resetDisqualification);
 router.post("/quizzes/:id/publish-results", requireAuth, requireRole("trainer", "admin"), quizController.publishQuizResults);
 router.put("/quizzes/submissions/:id/evaluate", requireAuth, requireRole("trainer", "admin"), quizController.evaluateSubmission);
 router.get("/quizzes/:id/analytics", requireAuth, quizController.getQuizAnalytics);

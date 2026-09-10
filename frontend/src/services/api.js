@@ -135,6 +135,13 @@ export const api = {
     return res.json();
   },
 
+  getTrainerEnrolledTrainees: async () => {
+    const res = await fetch(`${API_BASE_URL}/trainers/enrolled-trainees`, {
+      headers: authHeaders()
+    });
+    return res.json();
+  },
+
   generateBulkCertificates: async (courseId, templateData = {}) => {
     const res = await fetch(`${API_BASE_URL}/courses/${courseId}/bulk-certificates`, {
       method: "POST",
@@ -442,6 +449,41 @@ export const api = {
     } catch (err) {
       return { success: false, submissions: [] };
     }
+  },
+
+  logIntegrityViolation: async (quizId, payload) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/quizzes/${quizId}/integrity-violation`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    } catch (err) {
+      console.warn("Integrity logging network fallback:", err);
+      return { success: true, localOnly: true };
+    }
+  },
+
+  getIntegrityAlerts: async (params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await fetch(`${API_BASE_URL}/quizzes/integrity-alerts${query ? `?${query}` : ""}`, {
+        headers: authHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, alerts: [] };
+    }
+  },
+
+  resetDisqualification: async (quizId, traineeId) => {
+    const res = await fetch(`${API_BASE_URL}/quizzes/${quizId}/reset-disqualification`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ traineeId })
+    });
+    return await res.json();
   },
 
   getTraineeSubmissions: async (traineeId) => {

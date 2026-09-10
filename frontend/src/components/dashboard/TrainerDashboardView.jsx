@@ -20,7 +20,10 @@ import {
   SlidersHorizontal,
   Building2,
   Filter,
-  Check
+  Check,
+  ShieldAlert,
+  ShieldCheck,
+  RotateCcw
 } from "lucide-react";
 import { api } from "../../services/api";
 
@@ -32,43 +35,71 @@ export const TrainerDashboardView = ({
   onOpenQuestionBank
 }) => {
   const [courses, setCourses] = useState([]);
+  const [integrityAlerts, setIntegrityAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [subjectSearch, setSubjectSearch] = useState("");
   const [selectedCourseFilter, setSelectedCourseFilter] = useState("all");
-  const [expandedSubjectId, setExpandedSubjectId] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const loadTrainerData = async () => {
+    setLoading(true);
+    try {
+      const [cRes, alertRes] = await Promise.all([
+        api.getCourses(),
+        api.getIntegrityAlerts().catch(() => ({ success: false, alerts: [] }))
+      ]);
+
+      if (cRes.success) {
+        // Filter courses assigned to this trainer
+        const assignedOnly = cRes.courses.filter(c => {
+          if (currentUser?.name && c.leadTrainerName) {
+            const cName = c.leadTrainerName.toLowerCase();
+            const uName = currentUser.name.toLowerCase();
+            if (cName.includes(uName) || uName.includes(cName)) return true;
+            if (uName.includes("sengupta") && cName.includes("sengupta")) return true;
+            if (uName.includes("kulkarni") && cName.includes("kulkarni")) return true;
+            if (uName.includes("roy") && cName.includes("roy")) return true;
+          }
+          if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
+          return false;
+        });
+        
+        const finalCourses = assignedOnly.length > 0 ? assignedOnly : (currentUser?.role === "admin" ? cRes.courses : assignedOnly);
+        setCourses(finalCourses);
+      }
+
+      if (alertRes?.success && Array.isArray(alertRes.alerts)) {
+        setIntegrityAlerts(alertRes.alerts);
+      }
+    } catch (err) {
+      console.error("Trainer dashboard load error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadTrainerData = async () => {
-      setLoading(true);
-      try {
-        const cRes = await api.getCourses();
-        if (cRes.success) {
-          // Filter courses assigned to this trainer
-          const assignedOnly = cRes.courses.filter(c => {
-            if (currentUser?.name && c.leadTrainerName) {
-              const cName = c.leadTrainerName.toLowerCase();
-              const uName = currentUser.name.toLowerCase();
-              if (cName.includes(uName) || uName.includes(cName)) return true;
-              if (uName.includes("sengupta") && cName.includes("sengupta")) return true;
-              if (uName.includes("kulkarni") && cName.includes("kulkarni")) return true;
-              if (uName.includes("roy") && cName.includes("roy")) return true;
-            }
-            if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
-            return false;
-          });
-          
-          const finalCourses = assignedOnly;
-          setCourses(finalCourses);
-        }
-      } catch (err) {
-        console.error("Trainer dashboard load error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadTrainerData();
   }, [currentUser]);
+
+  const handleGrantRetake = async (quizId, traineeId, traineeName) => {
+    try {
+      const res = await api.resetDisqualification(quizId, traineeId);
+      if (res.success) {
+        showToast(`Disqualification revoked for ${traineeName || 'cadet'}. Assessment attempt reopened!`);
+        setIntegrityAlerts(prev => prev.filter(a => !(a.quizId === quizId && a.traineeId === traineeId)));
+      } else {
+        showToast(res.message || "Failed to reset disqualification");
+      }
+    } catch (err) {
+      showToast("Error: " + err.message);
+    }
+  };
 
   // Extract all assigned subjects from the trainer's assigned courses
   const assignedSubjects = [];
@@ -120,6 +151,14 @@ export const TrainerDashboardView = ({
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900 text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+          <span className="text-xs font-bold">{toastMessage}</span>
+        </div>
+      )}
+
       {/* ─── 1. HERO BAR & INSTRUCTOR PROFILE (CLEAN LIGHT THEME) ─── */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
         {/* Subtle decorative glow */}
@@ -127,7 +166,7 @@ export const TrainerDashboardView = ({
 
         <div className="space-y-2.5 z-10 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0a2558] text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+            <span className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
               <GraduationCap className="w-3.5 h-3.5 text-blue-700" />
               Assigned Faculty & Lead Scientist
             </span>
@@ -147,22 +186,89 @@ export const TrainerDashboardView = ({
           {onOpenQuestionBank && (
             <button
               onClick={onOpenQuestionBank}
-              className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-[#0a2558] font-bold rounded-2xl text-xs shadow-sm transition-all transform hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-blue-700 font-bold rounded-2xl text-xs shadow-sm transition-all transform hover:scale-105 active:scale-95"
             >
-              <Layers className="w-4 h-4 text-[#0a2558]" />
+              <Layers className="w-4 h-4 text-blue-700" />
               <span>Question Bank</span>
             </button>
           )}
 
           <button
             onClick={onOpenContentLibrary}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"
+            className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"
           >
             <FolderKanban className="w-4 h-4 text-blue-200" />
             <span>Open Content Library</span>
           </button>
         </div>
       </div>
+
+      {/* ─── ASSESSMENT INTEGRITY ALERTS CARD (IF ANY DISQUALIFICATIONS / WARNINGS) ─── */}
+      {integrityAlerts.length > 0 && (
+        <div className="bg-red-50/70 border border-red-200 rounded-3xl p-6 shadow-xs space-y-4 animate-in fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold shadow-xs">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-red-950">
+                  Assessment Integrity Alerts ({integrityAlerts.length})
+                </h3>
+                <p className="text-[11px] text-red-700">
+                  Real-time proctoring alerts detected during assessment runs. Review and grant re-take permissions where justified.
+                </p>
+              </div>
+            </div>
+
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-200 text-red-900 uppercase">
+              Action Required
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            {integrityAlerts.map((alert, idx) => (
+              <div
+                key={idx}
+                className="p-4 bg-white rounded-2xl border border-red-200 shadow-2xs space-y-2.5 flex flex-col justify-between"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-slate-900 text-xs">{alert.traineeName}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                      alert.status === "DISQUALIFIED" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-800"
+                    }`}>
+                      {alert.status || "DISQUALIFIED"}
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-slate-600 font-medium">
+                    Assessment: <b className="text-slate-900">{alert.quizTitle}</b>
+                  </p>
+
+                  <div className="flex items-center gap-3 text-[10px] text-slate-500 pt-0.5">
+                    <span>Violations: <b className="text-red-700">{alert.violations}</b></span>
+                    <span>•</span>
+                    <span>Reason: {alert.reason}</span>
+                    <span>•</span>
+                    <span className="font-mono">{alert.formattedTime || "Recently"}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => handleGrantRetake(alert.quizId, alert.traineeId, alert.traineeName)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-xl text-xs shadow-xs transition-transform hover:scale-105"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Grant Re-take</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ─── 2. KPI METRICS CARDS (LIGHT, AIRY & MODERN) ─── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -259,7 +365,7 @@ export const TrainerDashboardView = ({
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0a2558] text-white shadow-2xs">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white shadow-2xs">
                     {subject.courseCode || "NWP-201"}
                   </span>
                   <span className="text-xs text-slate-400 font-medium">
@@ -295,7 +401,7 @@ export const TrainerDashboardView = ({
 
                 <button
                   onClick={() => onOpenCourse(subject.parentCourse)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-sm transition-all transform hover:scale-105"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all transform hover:scale-105"
                 >
                   <span>Open Course Overview</span>
                   <ChevronRight className="w-3.5 h-3.5 text-blue-200" />
