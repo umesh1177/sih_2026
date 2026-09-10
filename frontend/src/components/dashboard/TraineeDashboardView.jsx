@@ -21,7 +21,10 @@ import {
   CheckCircle,
   ExternalLink,
   Target,
-  GraduationCap
+  GraduationCap,
+  ShieldAlert,
+  BrainCircuit,
+  Zap
 } from "lucide-react";
 import { 
   Radar, 
@@ -227,6 +230,39 @@ export const TraineeDashboardView = ({
           </div>
         </div>
 
+      </div>
+
+      {/* ─── 2.4 AUTOMATED LEARNING GAP DETECTION ALERT (RULE 10) ─── */}
+      <div className="bg-gradient-to-r from-rose-50 via-amber-50/70 to-indigo-50/70 rounded-3xl p-6 border border-rose-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+        <div className="space-y-2 max-w-2xl z-10">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+              <ShieldAlert className="w-3 h-3 text-white" />
+              Learning Gap Detected
+            </span>
+            <span className="text-xs font-bold text-rose-800">
+              Radar Interpretation — Accuracy: 46% (Below 60% Cutoff)
+            </span>
+          </div>
+
+          <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+            Cognitive Weakness Isolated in Dual-Pol Radar & Velocity De-aliasing
+          </h3>
+
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            The adaptive engine has detected recurring errors on <b>Radar Interpretation</b>. System has generated targeted <b>AI Concept Summary</b>, assigned <b>Curriculum Lecture Materials</b>, and compiled an <b>Adaptive Practice Quiz</b> to close this gap.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 z-10 flex-wrap sm:flex-nowrap">
+          <button
+            onClick={() => onNavigateTab("learning-gaps")}
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-black rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"
+          >
+            <BrainCircuit className="w-4 h-4 text-amber-200" />
+            <span>Open Gap Remediation Hub →</span>
+          </button>
+        </div>
       </div>
 
       {/* ─── 2.5 AI PRACTICE PAPERS & QUESTION BANK LAUNCHER BANNER ─── */}

@@ -15,7 +15,8 @@ import {
   Building2,
   FolderKanban,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  ShieldAlert
 } from "lucide-react";
 
 export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage, onOpenAiAdvisor }) => {
@@ -32,6 +33,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
       return [
         ...baseItems,
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
+        { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
         { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
         { id: "questions", label: "Question Bank", icon: Layers },
         { id: "content-library", label: "Content Library", icon: FolderKanban },
@@ -44,6 +46,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
       return [
         ...baseItems,
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
+        { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
         { id: "approvals", label: "Officer Approvals", icon: UserCheck },
         { id: "announcements", label: "National Broadcasts", icon: BellRing },
         { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
@@ -53,6 +56,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
     // Trainee view
     return [
       ...baseItems,
+      { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
       { id: "ai-course-advisor", label: "AI Course Advisor", icon: Sparkles, isModalTrigger: true },
       { id: "my-learning", label: "My Enrolled Courses", icon: GraduationCap },
       { id: "trainee-quizzes", label: "Scheduled Assessments", icon: ClipboardList },

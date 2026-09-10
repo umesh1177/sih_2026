@@ -31,6 +31,7 @@ import { ContentLibraryView } from "./components/trainer/ContentLibraryView";
 import { TrainerCurriculumStudio } from "./components/trainer/TrainerCurriculumStudio";
 import { TrainerScheduleAssessmentView } from "./components/trainer/TrainerScheduleAssessmentView";
 import { TraineePerformanceCategoryView } from "./components/analytics/TraineePerformanceCategoryView";
+import { LearningGapDetectionHub } from "./components/analytics/LearningGapDetectionHub";
 import { PublicHomePage } from "./pages/PublicHomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { api } from "./services/api";
@@ -485,6 +486,22 @@ const MainApp = () => {
               onOpenCourse={(course) => {
                 setSelectedOverviewCourse(course);
               }}
+            />
+          )}
+
+          {/* 6.6. AUTOMATED LEARNING GAP DETECTION & REMEDIATION HUB */}
+          {activeTab === "learning-gaps" && (
+            <LearningGapDetectionHub
+              currentUser={currentUser}
+              onStartExam={(quiz) => setActiveExamQuiz(quiz)}
+              onOpenStudio={(course) => {
+                setSelectedOverviewCourse(null);
+                setActiveStudioCourse(course);
+              }}
+              onOpenCourse={(course) => {
+                setSelectedOverviewCourse(course);
+              }}
+              onNavigateTab={(tab) => setActiveTab(tab)}
             />
           )}
 
