@@ -1,82 +1,91 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Bell, AlertTriangle, CheckCircle2, Sparkles, Building2 } from "lucide-react";
+import { Bell, AlertTriangle, CheckCircle2, Building2, ChevronRight, UserCircle } from "lucide-react";
 
 export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator }) => {
   const { currentUser } = useAuth();
 
   const getBreadcrumbTitle = () => {
     switch (activeTab) {
-      case "dashboard": return "Executive Dashboard";
-      case "courses": return "Course Catalog & Curricula";
-      case "my-learning": return "Enrolled Programs";
-      case "content-library": return "Trainer Content Library";
+      case "dashboard": return "Dashboard";
+      case "courses": return "Course Catalog";
+      case "my-learning": return "My Learning";
+      case "content-library": return "Trainer Library";
       case "schedule-assessment": return "Schedule Assessments";
-      case "questions": return "Question Bank Management";
+      case "questions": return "Question Bank";
       case "quizzes": return "Assessments Engine";
-      case "trainee-quizzes": return "My Scheduled Assessments";
-      case "certificates": return "Certified Credentials";
-      case "profile": return "Professional Officer Profile";
-      case "approvals": return "Officer Approvals Queue";
-      case "credential-verification": return "Trainer Credential Verification";
-      case "org-structure": return "Organization Hierarchy & Scope";
-      case "competency": return "Competency Mapping Matrix";
-      case "announcements": return "National Directives & Circulars";
-      case "analytics": return "Platform Analytics & Radar";
-      case "audit-logs": return "Governance & Security Audit Logs";
+      case "trainee-quizzes": return "Assessments";
+      case "certificates": return "Certificates";
+      case "profile": return "Professional Profile";
+      case "approvals": return "Users & Approvals";
+      case "credential-verification": return "Credential Verification";
+      case "org-structure": return "Organization Structure";
+      case "competency": return "Competency Matrix";
+      case "announcements": return "Announcements";
+      case "audit-logs": return "Audit Logs";
       default: return "Portal";
     }
   };
 
   return (
-    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 flex items-center justify-between z-20 shrink-0 shadow-sm">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2.5 text-xs">
-        <div className="flex items-center gap-1.5 text-slate-400">
-          <Building2 className="w-4 h-4 text-[#0a2558]" />
-          <span className="font-semibold text-slate-500">MoES / IMD</span>
-          <span>/</span>
+    <header className="h-14 bg-white border-b border-[#D9E2EC] px-6 flex items-center justify-between z-20 shrink-0">
+      {/* Breadcrumb Hierarchy */}
+      <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-1.5 text-[#64748B]">
+          <Building2 className="w-3.5 h-3.5 text-[#164E63]" />
+          <span className="font-semibold text-[#164E63]">MoES / IMD</span>
         </div>
-        <span className="font-extrabold text-slate-800 tracking-tight text-sm">{getBreadcrumbTitle()}</span>
+        <ChevronRight className="w-3.5 h-3.5 text-[#94A3B8]" />
+        <span className="font-semibold text-[#1E293B] text-xs md:text-sm">
+          {getBreadcrumbTitle()}
+        </span>
       </div>
 
-      {/* Right Controls */}
-      <div className="flex items-center gap-3.5">
+      {/* Right Controls & Profile Info */}
+      <div className="flex items-center gap-3">
         {/* Verification Status Pill */}
         {currentUser?.status === "pending" && (
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-[11px] font-bold animate-pulse shadow-sm">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded text-xs font-medium">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-            <span>Registration In Review</span>
+            <span>Under Review</span>
           </div>
         )}
 
         {currentUser?.status === "approved" && (
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-[11px] font-bold shadow-sm">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-xs font-medium">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Verified Officer ({currentUser.role.toUpperCase()})</span>
+            <span className="capitalize">{currentUser.role} Account</span>
           </div>
         )}
 
-        {/* AI Generator Shortcut Button */}
+        {/* AI Generator Draft Tool */}
         {(currentUser?.role === "trainer" || currentUser?.role === "admin") && onOpenAiGenerator && (
           <button
             onClick={onOpenAiGenerator}
-            className="flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-800 hover:from-blue-800 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md transition-all transform hover:scale-105"
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-slate-50 text-[#164E63] border border-[#D9E2EC] rounded text-xs font-medium transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-            <span>AI Question Drafter</span>
+            <span>Draft Questions</span>
           </button>
         )}
 
-        {/* Announcements Trigger */}
+        {/* Announcements / Notifications Trigger */}
         <button
           onClick={onOpenAnnouncements}
-          title="MoES Directives & Circulars"
-          className="p-2 rounded-xl text-slate-500 hover:text-[#0a2558] hover:bg-slate-100 transition-colors relative border border-slate-200 shadow-sm"
+          title="Announcements & Circulars"
+          className="p-1.5 rounded text-[#64748B] hover:text-[#1E293B] hover:bg-slate-100 transition-colors relative border border-[#D9E2EC]"
         >
           <Bell className="w-4 h-4" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+          <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#1D4ED8] rounded-full"></span>
         </button>
+
+        {/* User Identity Display */}
+        <div className="hidden md:flex items-center gap-2 pl-2 border-l border-[#D9E2EC] text-xs">
+          <UserCircle className="w-5 h-5 text-[#64748B]" />
+          <div className="text-left leading-tight">
+            <p className="font-semibold text-[#1E293B] text-xs">{currentUser?.name || "Officer"}</p>
+            <p className="text-[11px] text-[#64748B] capitalize">{currentUser?.role || "Trainee"}</p>
+          </div>
+        </div>
       </div>
     </header>
   );

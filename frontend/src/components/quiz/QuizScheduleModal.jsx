@@ -15,7 +15,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
     durationMinutes: 30,
     totalMarks: 20,
     passMarks: 12,
-    scheduledStartTime: new Date().toISOString().slice(0, 16), // datetime-local format
+    scheduledStartTime: new Date().toISOString().slice(0, 16),
     deadlineTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
   });
 
@@ -37,7 +37,6 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
       api.getQuestions().then(res => {
         if (res.success && res.questions) {
           setQuestionBank(res.questions);
-          // Auto select first 4 questions by default
           setSelectedQuestions(res.questions.slice(0, 4).map(q => q.id));
         }
       });
@@ -96,23 +95,23 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-white rounded-xl max-w-2xl w-full p-6 shadow-xl border border-[#D9E2EC] my-8">
+        <div className="flex items-center justify-between pb-3.5 border-b border-[#D9E2EC]">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
+            <h2 className="text-sm font-bold text-slate-900">
               Schedule New Capacity Assessment Quiz
             </h2>
             <p className="text-[11px] text-slate-500">
-              Configure quiz card appearance time, proctored kiosk duration, and questions
+              Configure assessment window, proctored kiosk duration, and curated questions
             </p>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="p-1 rounded-md text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="py-4 space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="py-4 space-y-3.5 text-xs">
           <div>
             <label className="block font-semibold text-slate-700 mb-1">Assessment Title *</label>
             <input
@@ -121,11 +120,11 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g. Mid-Term Evaluation: Doppler Radar & Convective Nowcasting"
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+              className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">Associated Course</label>
               <select
@@ -138,7 +137,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     courseName: c ? c.title : ""
                   });
                 }}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none text-slate-800"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none text-slate-800"
               >
                 {courses.map(c => (
                   <option key={c.id} value={c.id}>{c.title}</option>
@@ -154,44 +153,44 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                 max={180}
                 value={form.durationMinutes}
                 onChange={(e) => setForm({ ...form, durationMinutes: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                📅 Card Visible / Start Time (Trainee Dashboard)
+                Start Time (Go-Live)
               </label>
               <input
                 type="datetime-local"
                 required
                 value={form.scheduledStartTime}
                 onChange={(e) => setForm({ ...form, scheduledStartTime: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium text-slate-800"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none font-medium text-slate-800"
               />
             </div>
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                ⏳ Final Assessment Deadline
+                Final Submission Deadline
               </label>
               <input
                 type="datetime-local"
                 required
                 value={form.deadlineTime}
                 onChange={(e) => setForm({ ...form, deadlineTime: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium text-slate-800"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none font-medium text-slate-800"
               />
             </div>
           </div>
 
           {/* Select Questions from Bank */}
           <div className="pt-2">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1.5">
               <label className="font-semibold text-slate-700">
-                Select Questions from Question Bank ({selectedQuestions.length} selected)
+                Select Questions from Bank ({selectedQuestions.length} selected)
               </label>
               <button
                 type="button"
@@ -202,20 +201,20 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     setSelectedQuestions(questionBank.map(q => q.id));
                   }
                 }}
-                className="text-blue-700 font-bold hover:underline"
+                className="text-[#1D4ED8] font-semibold hover:underline"
               >
                 {selectedQuestions.length === questionBank.length ? "Deselect All" : "Select All"}
               </button>
             </div>
 
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1 border border-slate-200 rounded-xl p-3 bg-slate-50">
+            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 border border-[#D9E2EC] rounded-md p-2 bg-slate-50">
               {questionBank.map(q => {
                 const isSelected = selectedQuestions.includes(q.id);
                 return (
                   <div
                     key={q.id}
                     onClick={() => handleToggleQuestion(q.id)}
-                    className={`p-3 rounded-lg border text-xs cursor-pointer flex items-center gap-3 transition-colors ${
+                    className={`p-2.5 rounded border text-xs cursor-pointer flex items-center gap-2.5 transition-colors ${
                       isSelected
                         ? "bg-blue-50 border-blue-300 text-blue-950 font-medium"
                         : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
@@ -224,12 +223,12 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => {}} // Handled by parent div
-                      className="w-4 h-4 text-[#0a2558] rounded"
+                      onChange={() => {}}
+                      className="w-3.5 h-3.5 text-[#1D4ED8] rounded"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className="line-clamp-1">{q.question}</p>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500">
+                      <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-500">
                         <span>{q.marks} Marks</span>
                         <span>•</span>
                         <span>{q.difficulty}</span>
@@ -243,18 +242,18 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-3.5 border-t border-[#D9E2EC] flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold"
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md transition-all transform hover:scale-105"
+              className="px-5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white rounded-md font-semibold shadow-xs transition-colors"
             >
               {loading ? "Publishing Assessment..." : "Schedule & Publish Assessment"}
             </button>

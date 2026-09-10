@@ -72,42 +72,42 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-white rounded-xl max-w-2xl w-full p-6 shadow-xl border border-[#D9E2EC] my-8">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-3.5 border-b border-[#D9E2EC]">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
-              <Sparkles className="w-5 h-5 text-yellow-300" />
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1D4ED8] flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">
-                IMD Meteorological AI Question Generator
+              <h2 className="text-sm font-bold text-slate-900">
+                AI Meteorological Question Generator
               </h2>
               <p className="text-[11px] text-slate-500">
-                Auto-generate high-quality domain assessment questions with formulas and physics options
+                Generate domain questions with technical options and explanations
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-600"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Input Parameters Form */}
-        <form onSubmit={handleGenerate} className="py-4 space-y-4 text-xs">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleGenerate} className="py-4 space-y-3.5 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                Meteorological Domain / Topic Prompt *
+                Meteorological Domain / Topic *
               </label>
               <select
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium text-slate-800"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none text-slate-800"
               >
                 <option value="Numerical Weather Prediction (NWP) Dynamics">Numerical Weather Prediction (NWP) & WRF Physics</option>
                 <option value="Doppler Weather Radar (DWR) Dual-Polarization & Microbursts">Doppler Weather Radar (DWR) & Dual-Pol Moments</option>
@@ -123,7 +123,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
               <select
                 value={subjectName}
                 onChange={(e) => setSubjectName(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none text-slate-800"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none text-slate-800"
               >
                 <option value="Subject 1: Governing Equations & Atmospheric Dynamics">Subject 1: Governing Equations & Atmospheric Dynamics</option>
                 <option value="Subject 2: Radar Hardware & Base Products">Subject 2: Radar Hardware & Base Products</option>
@@ -132,7 +132,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
                 Target Difficulty
@@ -140,7 +140,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
               <select
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
               >
                 <option value="Easy">Easy (Conceptual / 2 Marks)</option>
                 <option value="Medium">Medium (Analytical / 3 Marks)</option>
@@ -158,7 +158,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                 max={6}
                 value={count}
                 onChange={(e) => setCount(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -171,7 +171,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                 value={module}
                 onChange={(e) => setModule(e.target.value)}
                 placeholder="e.g. Module 1"
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
               />
             </div>
           </div>
@@ -180,26 +180,26 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
             <button
               type="submit"
               disabled={generating}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md transition-all transform hover:scale-105"
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white rounded-md font-semibold shadow-xs transition-colors"
             >
               {generating ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Synthesizing Questions with AI...</span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Synthesizing Questions...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-yellow-300" />
-                  <span>Generate Questions Now</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Generate Questions</span>
                 </>
               )}
             </button>
           </div>
         </form>
 
-        {/* AI Results Preview List */}
+        {/* Results Preview */}
         {generatedList.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+          <div className="mt-3 pt-3.5 border-t border-[#D9E2EC] space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
                 Generated Questions Preview ({generatedList.length})
@@ -209,48 +209,48 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
               </span>
             </div>
 
-            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
               {generatedList.map((q, idx) => (
                 <div
                   key={q.id || idx}
-                  className={`p-4 rounded-xl border text-xs transition-colors ${
+                  className={`p-3 rounded-lg border text-xs transition-colors ${
                     selectedToAdd[q.id]
                       ? "bg-blue-50/50 border-blue-200"
                       : "bg-slate-50 border-slate-200 opacity-60"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-2.5">
                     <input
                       type="checkbox"
                       checked={!!selectedToAdd[q.id]}
                       onChange={() =>
                         setSelectedToAdd(prev => ({ ...prev, [q.id]: !prev[q.id] }))
                       }
-                      className="mt-1 w-4 h-4 text-[#0a2558] rounded focus:ring-[#0a2558]"
+                      className="mt-0.5 w-3.5 h-3.5 text-[#1D4ED8] rounded"
                     />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0a2558] text-white">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-900">
                           {q.type}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-teal-100 text-teal-800">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-800">
                           {q.difficulty}
                         </span>
-                        <span className="text-[11px] font-semibold text-slate-500">
+                        <span className="text-[10px] text-slate-500 font-medium">
                           {q.marks} Marks
                         </span>
                       </div>
 
-                      <p className="font-semibold text-slate-800 mb-2">{q.question}</p>
+                      <p className="font-semibold text-slate-800 mb-1.5">{q.question}</p>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 pl-2 text-slate-600">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1 pl-1 text-slate-600">
                         {q.options.map((opt, optIdx) => (
                           <div
                             key={optIdx}
-                            className={`p-1.5 rounded-md ${
+                            className={`p-1 rounded text-[11px] ${
                               q.correctAnswer === optIdx
-                                ? "bg-emerald-100/70 text-emerald-900 font-bold border border-emerald-300"
-                                : "bg-white/80 border border-slate-200"
+                                ? "bg-emerald-100 text-emerald-900 font-semibold border border-emerald-300"
+                                : "bg-white border border-slate-200"
                             }`}
                           >
                             {String.fromCharCode(65 + optIdx)}. {opt}
@@ -259,8 +259,8 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                       </div>
 
                       {q.explanation && (
-                        <p className="mt-2 text-[11px] text-blue-800 bg-white p-2 rounded-lg border border-blue-100">
-                          💡 <b>Key Concept:</b> {q.explanation}
+                        <p className="mt-1.5 text-[10px] text-blue-800 bg-white p-1.5 rounded border border-blue-100">
+                          <b>Concept:</b> {q.explanation}
                         </p>
                       )}
                     </div>
@@ -269,15 +269,15 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
               ))}
             </div>
 
-            <div className="pt-3 flex items-center justify-between">
+            <div className="pt-2 flex items-center justify-between">
               <span className="text-xs text-slate-500">
                 {Object.values(selectedToAdd).filter(Boolean).length} selected
               </span>
               <button
                 onClick={handleAddSelectedToBank}
-                className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md transition-transform hover:scale-105"
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#15803D] hover:bg-green-800 text-white rounded-md text-xs font-semibold shadow-xs transition-colors"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Import to Question Bank</span>
               </button>
             </div>

@@ -9,7 +9,6 @@ import {
   Printer, 
   CheckCircle2, 
   XCircle, 
-  HelpCircle, 
   BarChart3, 
   TrendingUp, 
   Layers, 
@@ -18,20 +17,17 @@ import {
   Check, 
   Hourglass, 
   Gauge, 
-  Users, 
   Medal,
-  Building2,
   FileText
 } from "lucide-react";
 
 export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
-  const [activeTab, setActiveTab] = useState("overview"); // "overview" | "responses" | "leaderboard"
+  const [activeTab, setActiveTab] = useState("overview");
   const [responseSearch, setResponseSearch] = useState("");
-  const [responseFilter, setResponseFilter] = useState("all"); // "all" | "correct" | "incorrect"
-  const [activeAnalysisFilter, setActiveAnalysisFilter] = useState("subjects"); // "subjects" | "labels" | "types"
+  const [responseFilter, setResponseFilter] = useState("all");
+  const [activeAnalysisFilter, setActiveAnalysisFilter] = useState("subjects");
   const [copiedShare, setCopiedShare] = useState(false);
 
-  // Derived or default statistics matching Photo 3 & 4
   const stats = exam?.stats || {
     score: exam?.score || 29,
     totalMarks: exam?.totalMarks || 40,
@@ -44,7 +40,6 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
     allottedTime: exam?.durationMinutes ? `${exam.durationMinutes} min` : "30 min"
   };
 
-  // Performance vs Time Breakdown by Subject matching Photo 4 (dynamically built from selected exam)
   const subjectPerformanceData = exam?.subjectPerformance || (exam?.subjects && exam.subjects.length > 0 ? (
     exam.subjects.filter(s => !s.includes("+")).map((subj, idx) => {
       const perfValues = [90, 85, 75, 65, 80, 70];
@@ -100,7 +95,6 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
     }
   ]);
 
-  // Default rich mock responses matching Photo 5
   const mockResponses = exam?.questions && exam.questions.length > 0 ? exam.questions.map((q, idx) => ({
     id: q.id || `q_${idx + 1}`,
     questionNumber: idx + 1,
@@ -112,10 +106,10 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
     marks: "1/1",
     question: q.question,
     options: q.options || ["Option A", "Option B", "Option C", "Option D"],
-    userAnswer: idx % 4 === 3 ? (q.correctAnswer + 1) % 4 : q.correctAnswer, // mostly correct, some wrong
+    userAnswer: idx % 4 === 3 ? (q.correctAnswer + 1) % 4 : q.correctAnswer,
     correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 1,
     isCorrect: idx % 4 !== 3,
-    explanation: q.explanation || "This option directly satisfies the atmospheric boundary condition equations formulated in operational NWP."
+    explanation: q.explanation || "This option directly satisfies atmospheric boundary condition equations formulated in operational NWP."
   })) : [
     {
       id: "q_1",
@@ -203,7 +197,6 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
     }
   ];
 
-  // Leaderboard data
   const leaderboardData = [
     { rank: 1, name: "Dr. Sunita Kulkarni", station: "IMD Pune (NWP Division)", score: "38/40", accuracy: "95%", time: "11m 45s", percentile: "99.8%" },
     { rank: 2, name: "Rahul Sharma (You)", station: "IMD HQ New Delhi (Satellite Division)", score: "29/40", accuracy: "72.5%", time: "13m 16s", percentile: "88.4%" },
@@ -213,7 +206,7 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
   ];
 
   const handleShareScore = () => {
-    const text = `🎖️ CAPACITY CONNECT — Assessment Score\nExam: ${exam?.title || "#30 Mock Technical Aptitude"}\nScore: ${stats.score}/${stats.totalMarks} (${stats.percentage}%)\nAccuracy: ${stats.accuracy}%\nTime Spent: ${stats.timeSpent}\nOfficer: ${currentUser?.name || "Rahul Sharma"}`;
+    const text = `CAPACITY CONNECT — Assessment Score\nExam: ${exam?.title || "#30 Mock Technical Aptitude"}\nScore: ${stats.score}/${stats.totalMarks} (${stats.percentage}%)\nAccuracy: ${stats.accuracy}%\nTime Spent: ${stats.timeSpent}\nOfficer: ${currentUser?.name || "Rahul Sharma"}`;
     navigator.clipboard.writeText(text);
     setCopiedShare(true);
     setTimeout(() => setCopiedShare(false), 2000);
@@ -227,371 +220,222 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 font-sans">
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl border border-[#D9E2EC] w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 font-sans">
         
-        {/* ═════════ TOP HEADER BAR & BREADCRUMBS (MATCHES PHOTO 3) ═════════ */}
-        <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-3 shrink-0">
+        {/* Header */}
+        <div className="p-5 border-b border-[#D9E2EC] bg-white flex flex-col gap-3 shrink-0">
           
-          {/* Breadcrumb & Close */}
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-400">History</span>
+              <span className="text-slate-400">Assessments</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-              <span className="font-bold text-slate-800 truncate max-w-md">{exam?.title || "#30 Mock Technical Aptitude"}</span>
+              <span className="font-semibold text-slate-800 truncate max-w-md">{exam?.title || "#30 Technical Assessment"}</span>
             </div>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors"
+              className="p-1 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Exam Title & Meta Chips */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Exam Title & Meta */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                {exam?.title || "#30 Mock Technical Aptitude"}
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                {exam?.title || "#30 Technical Assessment"}
               </h1>
               
-              <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
-                  <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">
+                  <Clock className="w-3 h-3 text-slate-500" />
                   <span>{stats.allottedTime}</span>
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
-                  <Layers className="w-3.5 h-3.5 text-slate-500" />
+                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">
+                  <Layers className="w-3 h-3 text-slate-500" />
                   <span>{stats.totalQuestions} questions</span>
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
-                  <Award className="w-3.5 h-3.5 text-slate-500" />
+                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-100">
+                  <Award className="w-3 h-3 text-blue-600" />
                   <span>{stats.totalMarks} marks</span>
                 </span>
               </div>
             </div>
 
-            {/* Share score action */}
+            {/* Share action */}
             <button
               onClick={handleShareScore}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0a2558] hover:bg-[#071c42] text-white text-xs font-bold shadow-md transition-transform hover:scale-105 shrink-0 self-start sm:self-center"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#1D4ED8] hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors shrink-0 self-start sm:self-center"
             >
-              {copiedShare ? <Check className="w-4 h-4 text-emerald-300" /> : <Share2 className="w-4 h-4" />}
-              <span>{copiedShare ? "Score Copied!" : "Share score"}</span>
+              {copiedShare ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+              <span>{copiedShare ? "Copied" : "Share Score"}</span>
             </button>
           </div>
 
-          {/* Main Navigation Tabs: Overview | Responses | Leaderboard */}
-          <div className="flex items-center gap-6 border-b border-slate-200 mt-2 text-xs font-bold">
+          {/* Tabs */}
+          <div className="flex items-center gap-4 border-b border-[#D9E2EC] -mb-5 pt-1 text-xs font-semibold">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`flex items-center gap-2 pb-3 border-b-2 transition-all ${
+              className={`flex items-center gap-1.5 pb-2.5 border-b-2 transition-colors ${
                 activeTab === "overview"
-                  ? "border-[#0a2558] text-[#0a2558]"
+                  ? "border-[#1D4ED8] text-[#1D4ED8]"
                   : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >
-              <BarChart3 className="w-4 h-4" />
+              <BarChart3 className="w-3.5 h-3.5" />
               <span>Overview</span>
             </button>
 
             <button
               onClick={() => setActiveTab("responses")}
-              className={`flex items-center gap-2 pb-3 border-b-2 transition-all ${
+              className={`flex items-center gap-1.5 pb-2.5 border-b-2 transition-colors ${
                 activeTab === "responses"
-                  ? "border-[#0a2558] text-[#0a2558]"
+                  ? "border-[#1D4ED8] text-[#1D4ED8]"
                   : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-3.5 h-3.5" />
               <span>Responses</span>
             </button>
 
             <button
               onClick={() => setActiveTab("leaderboard")}
-              className={`flex items-center gap-2 pb-3 border-b-2 transition-all ${
+              className={`flex items-center gap-1.5 pb-2.5 border-b-2 transition-colors ${
                 activeTab === "leaderboard"
-                  ? "border-[#0a2558] text-[#0a2558]"
+                  ? "border-[#1D4ED8] text-[#1D4ED8]"
                   : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >
-              <Medal className="w-4 h-4 text-amber-500" />
+              <Medal className="w-3.5 h-3.5 text-amber-600" />
               <span>Leaderboard</span>
             </button>
           </div>
 
         </div>
 
-        {/* ═════════ MODAL BODY CONTENT ═════════ */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-8 bg-[#fbfcfe]">
+        {/* Body Content */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 bg-[#F6F8FA]">
           
-          {/* ────────────────── 1. TAB: OVERVIEW (PHOTOS 3 & 4) ────────────────── */}
+          {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="space-y-8 animate-in fade-in duration-150">
+            <div className="space-y-6">
               
-              {/* 4 Stat Score Cards (Matches Photo 3) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                {/* 1. Score Card (Yellow / Cream Border) */}
-                <div className="p-5 rounded-2xl bg-[#fffef5] border border-amber-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-xs font-bold text-slate-500 block mb-1">Score</span>
-                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                        {stats.score} ({stats.percentage}%)
-                      </h3>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                      <Gauge className="w-4 h-4" />
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-3 font-medium">Score with percentage</p>
+              {/* Stat Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="p-4 rounded-lg bg-white border border-[#D9E2EC] shadow-xs">
+                  <span className="text-[11px] font-semibold text-slate-500 block mb-1">Score</span>
+                  <h3 className="text-xl font-bold text-slate-900">
+                    {stats.score} ({stats.percentage}%)
+                  </h3>
+                  <p className="text-[10px] text-slate-400 mt-1">Score with percentage</p>
                 </div>
 
-                {/* 2. Attempted Card (Light Blue Border) */}
-                <div className="p-5 rounded-2xl bg-[#f8fbff] border border-blue-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-xs font-bold text-slate-500 block mb-1">Attempted</span>
-                      <h3 className="text-2xl font-black text-blue-900 tracking-tight">
-                        {stats.attempted} / {stats.totalQuestions}
-                      </h3>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                      <Layers className="w-4 h-4" />
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-3 font-medium">Questions attempted with total</p>
+                <div className="p-4 rounded-lg bg-white border border-[#D9E2EC] shadow-xs">
+                  <span className="text-[11px] font-semibold text-slate-500 block mb-1">Attempted</span>
+                  <h3 className="text-xl font-bold text-[#1D4ED8]">
+                    {stats.attempted} / {stats.totalQuestions}
+                  </h3>
+                  <p className="text-[10px] text-slate-400 mt-1">Questions answered</p>
                 </div>
 
-                {/* 3. Accuracy Card (Amber / Cream Border) */}
-                <div className="p-5 rounded-2xl bg-[#fffef5] border border-amber-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-xs font-bold text-slate-500 block mb-1">Accuracy</span>
-                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                        {stats.accuracy}%
-                      </h3>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                      <Target className="w-4 h-4" />
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-3 font-medium">
+                <div className="p-4 rounded-lg bg-white border border-[#D9E2EC] shadow-xs">
+                  <span className="text-[11px] font-semibold text-slate-500 block mb-1">Accuracy</span>
+                  <h3 className="text-xl font-bold text-emerald-700">
+                    {stats.accuracy}%
+                  </h3>
+                  <p className="text-[10px] text-slate-400 mt-1">
                     {stats.correctCount} correct of {stats.attempted} attempted
                   </p>
                 </div>
 
-                {/* 4. Time Spent Card (Blue Border) */}
-                <div className="p-5 rounded-2xl bg-[#f8fbff] border border-blue-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-xs font-bold text-slate-500 block mb-1">Time Spent</span>
-                      <h3 className="text-2xl font-black text-blue-900 tracking-tight">
-                        {stats.timeSpent}
-                      </h3>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                      <Hourglass className="w-4 h-4" />
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-3 font-medium">Total time on this attempt</p>
+                <div className="p-4 rounded-lg bg-white border border-[#D9E2EC] shadow-xs">
+                  <span className="text-[11px] font-semibold text-slate-500 block mb-1">Time Spent</span>
+                  <h3 className="text-xl font-bold text-slate-900 font-mono">
+                    {stats.timeSpent}
+                  </h3>
+                  <p className="text-[10px] text-slate-400 mt-1">Total exam session time</p>
                 </div>
-
               </div>
 
-              {/* Performance Analysis Section (Matches Photo 3 & 4) */}
-              <div className="space-y-6">
+              {/* Performance Analysis Section */}
+              <div className="space-y-4">
                 <div>
-                  <h2 className="text-base font-extrabold text-slate-900">Performance Analysis</h2>
+                  <h2 className="text-sm font-bold text-slate-900">Performance vs Time Breakdown</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Review your accuracy and time usage across subjects, labels, and question types.
+                    Accuracy and time utilization across meteorological domain subjects.
                   </p>
                 </div>
 
-                {/* Filter Pills */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setActiveAnalysisFilter("subjects")}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      activeAnalysisFilter === "subjects"
-                        ? "bg-slate-900 text-white shadow-sm"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
-                  >
-                    Subjects
-                  </button>
-                  <button
-                    onClick={() => setActiveAnalysisFilter("labels")}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      activeAnalysisFilter === "labels"
-                        ? "bg-slate-900 text-white shadow-sm"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
-                  >
-                    Labels
-                  </button>
-                  <button
-                    onClick={() => setActiveAnalysisFilter("types")}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      activeAnalysisFilter === "types"
-                        ? "bg-slate-900 text-white shadow-sm"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
-                  >
-                    Question Types
-                  </button>
-                </div>
-
-                {/* ─── 1. PERFORMANCE VS TIME BY SUBJECT (DUAL COMPARISON BARS - PHOTO 4) ─── */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                      <h3 className="font-extrabold text-slate-900 text-sm">Performance vs Time by Subject</h3>
-                      <p className="text-[11px] text-slate-500">
-                        How accurately you scored in each subject compared with the share of time you spent there.
-                      </p>
-                    </div>
-
-                    {/* Legend */}
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-600">
+                <div className="bg-white rounded-xl p-5 border border-[#D9E2EC] shadow-xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <h3 className="font-semibold text-slate-900 text-xs">Domain Accuracy Breakdown</h3>
+                    <div className="flex items-center gap-3 text-xs font-medium text-slate-600">
                       <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#0a2558]"></span>
+                        <span className="w-2.5 h-2.5 rounded bg-[#155E75]"></span>
                         <span>Performance</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#2563eb]"></span>
+                        <span className="w-2.5 h-2.5 rounded bg-[#1D4ED8]"></span>
                         <span>Time Utilization</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Dual Bar Chart Rows */}
-                  <div className="space-y-6 pt-2">
+                  <div className="space-y-4 pt-1">
                     {subjectPerformanceData.map((item, idx) => (
-                      <div key={idx} className="space-y-2 group">
-                        <div className="flex items-center justify-between text-xs font-bold">
+                      <div key={idx} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs font-semibold">
                           <span className="text-slate-800">{item.subject}</span>
                           <span className="text-slate-500 font-mono text-[11px]">
                             {item.correct}/{item.totalQuestions} Correct
                           </span>
                         </div>
 
-                        {/* Comparative Dual Bars */}
-                        <div className="space-y-1.5 relative">
-                          {/* Performance Bar (Navy) */}
-                          <div className="w-full bg-slate-100 h-4 rounded-full overflow-hidden relative">
+                        <div className="space-y-1">
+                          <div className="w-full bg-slate-100 h-3 rounded overflow-hidden">
                             <div
-                              className="h-full bg-[#0a2558] rounded-full transition-all duration-500 flex items-center justify-end pr-2 text-[10px] text-white font-extrabold"
+                              className="h-full bg-[#155E75] rounded transition-all duration-300"
                               style={{ width: `${item.performance}%` }}
-                            >
-                              {item.performance}%
-                            </div>
+                            ></div>
                           </div>
-
-                          {/* Time Utilization Bar (Blue) */}
-                          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden relative">
+                          <div className="w-full bg-slate-100 h-2 rounded overflow-hidden">
                             <div
-                              className="h-full bg-[#2563eb] rounded-full transition-all duration-500 flex items-center justify-end pr-2 text-[9px] text-white font-bold"
+                              className="h-full bg-[#1D4ED8] rounded transition-all duration-300"
                               style={{ width: `${Math.min(100, item.timeUtilization * 1.2)}%` }}
-                            >
-                              {item.timeUtilization}%
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Axis scale marks */}
-                  <div className="flex justify-between text-[10px] font-bold text-slate-400 border-t border-slate-100 pt-2 font-mono">
-                    <span>0%</span>
-                    <span>25%</span>
-                    <span>50%</span>
-                    <span>75%</span>
-                    <span>100%</span>
-                  </div>
-                </div>
-
-                {/* ─── 2. TIME SPENT BY SUBJECT (PHOTO 4 BOTTOM) ─── */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <div>
-                      <h3 className="font-extrabold text-slate-900 text-sm">Time Spent by Subject</h3>
-                      <p className="text-[11px] text-slate-500">
-                        Average time per question in each subject versus the time typically required.
-                      </p>
-                    </div>
-
-                    {/* Legend */}
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#0a2558]"></span>
-                        <span>Time Spent</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full bg-[#3b82f6]"></span>
-                        <span>Time Required</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 pt-2">
-                    {subjectPerformanceData.map((item, idx) => (
-                      <div key={idx} className="space-y-1.5 text-xs">
-                        <div className="flex items-center justify-between font-bold text-slate-700">
-                          <span>{item.subject}</span>
-                          <span className="font-mono text-slate-500 text-[11px]">
-                            {item.timeSpent} / {item.timeRequired}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 text-[10px] font-bold text-slate-500">Spent: {item.timeSpent}</div>
-                          <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                            <div className="bg-[#0a2558] h-full rounded-full" style={{ width: `${Math.min(100, item.timeUtilization * 1.1)}%` }}></div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 text-[10px] font-bold text-slate-400">Target: {item.timeRequired}</div>
-                          <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                            <div className="bg-[#3b82f6] h-full rounded-full" style={{ width: `75%` }}></div>
+                            ></div>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-
               </div>
 
             </div>
           )}
 
-          {/* ────────────────── 2. TAB: RESPONSES (PHOTO 5) ────────────────── */}
+          {/* TAB 2: RESPONSES */}
           {activeTab === "responses" && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              
-              {/* Filter Controls Bar */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200">
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 bg-white p-3 rounded-lg border border-[#D9E2EC]">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <div className="relative w-full sm:w-64">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <div className="relative w-full sm:w-60">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       placeholder="Search questions..."
                       value={responseSearch}
                       onChange={(e) => setResponseSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-blue-600 focus:outline-none"
+                      className="w-full pl-8 pr-3 py-1.5 rounded-md border border-[#D9E2EC] text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"
                     />
                   </div>
 
                   <select
                     value={responseFilter}
                     onChange={(e) => setResponseFilter(e.target.value)}
-                    className="p-1.5 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700"
+                    className="p-1.5 rounded-md border border-[#D9E2EC] text-xs font-semibold bg-white text-slate-700"
                   >
                     <option value="all">All Status</option>
                     <option value="correct">Correct Only</option>
@@ -601,80 +445,68 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
 
                 <button
                   onClick={() => window.print()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0a2558] hover:bg-[#071c42] text-white text-xs font-bold shadow transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#1D4ED8] hover:bg-blue-700 text-white text-xs font-semibold transition-colors"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Print PDF</span>
                 </button>
               </div>
 
-              {/* Question Cards List (Matching Photo 5) */}
-              <div className="space-y-6">
+              <div className="space-y-3.5">
                 {filteredResponses.map((q) => (
-                  <div key={q.id} className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-                    
-                    {/* Top Question Badges Row */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                  <div key={q.id} className="bg-white rounded-lg p-5 border border-[#D9E2EC] shadow-xs space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-extrabold text-sm text-slate-900">Q{q.questionNumber}</span>
-                        <span className="px-2 py-0.5 rounded bg-blue-900 text-white font-black text-[10px] uppercase">
-                          MCQ
+                        <span className="font-bold text-xs text-slate-900">Question {q.questionNumber}</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-800 text-[10px] font-semibold border border-blue-200">
+                          {q.topic}
                         </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">
-                          Topic: {q.topic}
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold">
-                          Difficulty: {q.difficulty}
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-cyan-50 text-cyan-800 text-xs font-semibold">
-                          Solve Approach: {q.solveApproach}
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-medium">
+                          {q.difficulty}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs font-mono font-bold text-slate-500">
-                        <span>⏱️ {q.timeSpent} / {q.allottedTime}</span>
-                        <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px]">
-                          🏅 {q.marks}
+                      <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
+                        <span>{q.timeSpent} / {q.allottedTime}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-semibold border border-emerald-200">
+                          {q.marks}
                         </span>
                       </div>
                     </div>
 
-                    {/* Question Statement */}
-                    <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-100 text-xs sm:text-sm font-semibold text-slate-900 leading-relaxed">
+                    <p className="text-xs font-semibold text-slate-900 leading-relaxed">
                       {q.question}
-                    </div>
+                    </p>
 
-                    {/* Options List */}
-                    <div className="space-y-2">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Answer Choices:</span>
+                    <div className="space-y-1.5">
                       {q.options.map((opt, optIdx) => {
                         const isChosen = q.userAnswer === optIdx;
                         const isCorrect = q.correctAnswer === optIdx;
 
-                        let style = "bg-white border-slate-200 text-slate-700";
+                        let style = "bg-white border-[#D9E2EC] text-slate-700";
                         if (isCorrect) {
-                          style = "bg-emerald-50 border-emerald-500 text-emerald-900 font-bold ring-1 ring-emerald-400";
+                          style = "bg-emerald-50 border-emerald-400 text-emerald-900 font-semibold";
                         } else if (isChosen && !isCorrect) {
-                          style = "bg-rose-50 border-rose-400 text-rose-800 font-semibold";
+                          style = "bg-red-50 border-red-300 text-red-800";
                         }
 
                         return (
                           <div
                             key={optIdx}
-                            className={`p-3 rounded-xl border text-xs flex items-center justify-between transition-all ${style}`}
+                            className={`p-2.5 rounded-md border text-xs flex items-center justify-between ${style}`}
                           >
                             <span>{opt}</span>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                               {isChosen && (
-                                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
+                                <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-black/5">
                                   Your Choice
                                 </span>
                               )}
                               {isCorrect && (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               )}
                               {isChosen && !isCorrect && (
-                                <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                                <XCircle className="w-3.5 h-3.5 text-red-600" />
                               )}
                             </div>
                           </div>
@@ -682,63 +514,60 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
                       })}
                     </div>
 
-                    {/* Explanation */}
                     {q.explanation && (
-                      <div className="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-100 text-xs text-blue-900 space-y-1">
-                        <span className="font-extrabold text-[#0a2558] block">Scientific Explanation:</span>
+                      <div className="p-2.5 rounded-md bg-blue-50/70 border border-blue-100 text-xs text-blue-900 space-y-0.5">
+                        <span className="font-semibold text-blue-950 block text-[11px]">Explanation:</span>
                         <p className="leading-relaxed text-[11px]">{q.explanation}</p>
                       </div>
                     )}
-
                   </div>
                 ))}
               </div>
-
             </div>
           )}
 
-          {/* ────────────────── 3. TAB: LEADERBOARD ────────────────── */}
+          {/* TAB 3: LEADERBOARD */}
           {activeTab === "leaderboard" && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-5 bg-gradient-to-r from-[#0a2558] to-[#1967d2] text-white flex items-center justify-between">
+            <div className="space-y-4">
+              <div className="bg-white rounded-xl border border-[#D9E2EC] shadow-xs overflow-hidden">
+                <div className="p-4 bg-white border-b border-[#D9E2EC] flex items-center justify-between">
                   <div>
-                    <h3 className="font-extrabold text-base">National Meteorological Assessment Leaderboard</h3>
-                    <p className="text-xs text-blue-100">MoES Central Competency Ranking</p>
+                    <h3 className="font-bold text-sm text-slate-900">National Assessment Standings</h3>
+                    <p className="text-xs text-slate-500">MoES Central Competency Ranking</p>
                   </div>
-                  <Medal className="w-8 h-8 text-amber-300" />
+                  <Medal className="w-6 h-6 text-amber-500" />
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-black tracking-wider border-b border-slate-100">
+                    <thead className="bg-slate-50 text-slate-600 font-semibold uppercase text-[10px] border-b border-[#D9E2EC]">
                       <tr>
-                        <th className="p-4">Rank</th>
-                        <th className="p-4">Officer Trainee</th>
-                        <th className="p-4">Station / Centre</th>
-                        <th className="p-4">Score</th>
-                        <th className="p-4">Accuracy</th>
-                        <th className="p-4">Time Taken</th>
-                        <th className="p-4 text-right">Percentile</th>
+                        <th className="p-3">Rank</th>
+                        <th className="p-3">Officer Trainee</th>
+                        <th className="p-3">Station / Centre</th>
+                        <th className="p-3">Score</th>
+                        <th className="p-3">Accuracy</th>
+                        <th className="p-3">Time</th>
+                        <th className="p-3 text-right">Percentile</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {leaderboardData.map((row) => (
                         <tr
                           key={row.rank}
-                          className={`hover:bg-slate-50/80 transition-colors ${
-                            row.name.includes("You") ? "bg-blue-50/60 font-bold" : ""
+                          className={`hover:bg-slate-50 transition-colors ${
+                            row.name.includes("You") ? "bg-blue-50/60 font-semibold" : ""
                           }`}
                         >
-                          <td className="p-4 font-black">
-                            {row.rank === 1 ? "🥇 #1" : row.rank === 2 ? "🥈 #2" : row.rank === 3 ? "🥉 #3" : `#${row.rank}`}
+                          <td className="p-3 font-bold">
+                            #{row.rank}
                           </td>
-                          <td className="p-4 font-bold text-slate-900">{row.name}</td>
-                          <td className="p-4 text-slate-600">{row.station}</td>
-                          <td className="p-4 font-bold text-[#0a2558]">{row.score}</td>
-                          <td className="p-4 text-emerald-700 font-semibold">{row.accuracy}</td>
-                          <td className="p-4 text-slate-600 font-mono">{row.time}</td>
-                          <td className="p-4 text-right font-black text-blue-700">{row.percentile}</td>
+                          <td className="p-3 font-semibold text-slate-900">{row.name}</td>
+                          <td className="p-3 text-slate-500">{row.station}</td>
+                          <td className="p-3 font-bold text-slate-900">{row.score}</td>
+                          <td className="p-3 text-emerald-700 font-semibold">{row.accuracy}</td>
+                          <td className="p-3 text-slate-600 font-mono">{row.time}</td>
+                          <td className="p-3 text-right font-bold text-[#1D4ED8]">{row.percentile}</td>
                         </tr>
                       ))}
                     </tbody>

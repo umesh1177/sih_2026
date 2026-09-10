@@ -167,23 +167,23 @@ export const ContentGalleryPickerModal = ({
       <div className="bg-white rounded-3xl max-w-4xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] p-5 sm:p-6 text-white flex items-center justify-between shrink-0">
+        <div className="bg-white border-b border-slate-200 p-5 sm:p-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-400 text-slate-900 flex items-center justify-center font-black">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-[#1D4ED8] flex items-center justify-center font-bold">
               <FolderKanban className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold tracking-tight">
+              <h3 className="text-base font-bold tracking-tight text-slate-900">
                 Select Materials from Content Library
               </h3>
-              <p className="text-xs text-blue-200">
-                Attaching to: <b>{subject?.name || "Assigned Subject"}</b> &rsaquo; <span className="text-amber-300 font-bold">{targetModule?.title || "Target Module"}</span>
+              <p className="text-xs text-slate-500">
+                Attaching to: <b className="text-slate-800">{subject?.name || "Assigned Subject"}</b> &rsaquo; <span className="text-[#1D4ED8] font-bold">{targetModule?.title || "Target Module"}</span>
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="text-white/70 hover:text-white p-1 rounded-xl hover:bg-white/10"
+            className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

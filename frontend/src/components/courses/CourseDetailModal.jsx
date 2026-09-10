@@ -125,43 +125,43 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
               <button
                 onClick={handleEnroll}
                 disabled={isEnrolling}
-                className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl text-xs font-bold shadow-md transition-all transform hover:scale-105"
+                className="px-4 py-2 bg-[#1D4ED8] hover:bg-[#1E40AF] text-white rounded-lg text-xs font-semibold shadow-sm transition-colors"
               >
                 {isEnrolling ? "Enrolling..." : "Enroll in Course"}
               </button>
             )}
-            <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
-              <X className="w-5 h-5" />
+            <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors">
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-slate-100 my-4 text-xs font-semibold">
+        <div className="flex border-b border-slate-200 my-4 text-xs font-semibold gap-2">
           <button
             onClick={() => setActiveTab("curriculum")}
-            className={`pb-2 px-4 border-b-2 transition-colors ${
-              activeTab === "curriculum" ? "border-[#0a2558] text-[#0a2558]" : "border-transparent text-slate-400"
+            className={`pb-2.5 px-3 border-b-2 transition-colors ${
+              activeTab === "curriculum" ? "border-[#1D4ED8] text-[#1D4ED8]" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
-            📚 Subjects & Learning Modules
+            Subjects & Learning Modules
           </button>
           <button
             onClick={() => setActiveTab("feedback")}
-            className={`pb-2 px-4 border-b-2 transition-colors ${
-              activeTab === "feedback" ? "border-[#0a2558] text-[#0a2558]" : "border-transparent text-slate-400"
+            className={`pb-2.5 px-3 border-b-2 transition-colors ${
+              activeTab === "feedback" ? "border-[#1D4ED8] text-[#1D4ED8]" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
-            ⭐ Course & Trainer Feedback
+            Course & Trainer Feedback
           </button>
           {(currentUser?.role === "trainer" || currentUser?.role === "admin") && (
             <button
               onClick={() => setActiveTab("upload")}
-              className={`pb-2 px-4 border-b-2 transition-colors ${
-                activeTab === "upload" ? "border-[#0a2558] text-[#0a2558]" : "border-transparent text-slate-400"
+              className={`pb-2.5 px-3 border-b-2 transition-colors ${
+                activeTab === "upload" ? "border-[#1D4ED8] text-[#1D4ED8]" : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >
-              📤 Upload Content (Trainer Library)
+              Upload Content (Trainer Library)
             </button>
           )}
         </div>
@@ -174,9 +174,9 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
             {/* Subjects and Modules List */}
             <div className="space-y-4 mt-3">
               {course.subjects && course.subjects.map(subject => (
-                <div key={subject.id} className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <h3 className="font-bold text-sm text-[#0a2558] mb-3 flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-blue-700" />
+                <div key={subject.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                  <h3 className="font-bold text-sm text-slate-900 mb-3 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-[#1D4ED8]" />
                     <span>{subject.name}</span>
                   </h3>
 

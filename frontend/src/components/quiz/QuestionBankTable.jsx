@@ -68,7 +68,6 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
     fetchQuestions();
   }, [selectedSubject, selectedType, selectedDifficulty]);
 
-  // Handle manual question creation
   const handleCreateQuestion = async (e) => {
     e.preventDefault();
     try {
@@ -94,7 +93,6 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
     }
   };
 
-  // Duplicate question
   const handleDuplicate = async (id) => {
     setActiveMenuId(null);
     try {
@@ -107,7 +105,6 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
     }
   };
 
-  // Delete question
   const handleDelete = async (id) => {
     setActiveMenuId(null);
     if (!window.confirm("Are you sure you want to delete this question from the Question Bank?")) return;
@@ -121,7 +118,6 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
     }
   };
 
-  // Filtered in-memory list if search text changes
   const displayedQuestions = questions.filter(q => {
     if (!searchQuery) return true;
     const qLower = searchQuery.toLowerCase();
@@ -129,22 +125,21 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
   });
 
   return (
-    <div className="p-6 bg-[#f8fafc] min-h-full">
-      {/* Top Header & Toolbar matching Screenshot 1 & 3 */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          {/* Left search & subject selector */}
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+    <div className="p-6 bg-[#F6F8FA] min-h-full">
+      {/* Top Header & Toolbar */}
+      <div className="bg-white rounded-xl border border-[#D9E2EC] shadow-xs p-4 mb-5">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
             {/* Search Box */}
-            <div className="relative min-w-[260px]">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative min-w-[240px]">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Search question bank..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchQuestions()}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0a2558] focus:bg-white text-slate-800"
+                className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-[#D9E2EC] rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white text-slate-800"
               />
             </div>
 
@@ -153,61 +148,58 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
               <select
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0a2558] cursor-pointer"
+                className="appearance-none pl-3 pr-7 py-2 bg-slate-50 border border-[#D9E2EC] rounded-md text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer"
               >
                 <option value="all">All Subjects</option>
-                <option value="sub_nwp_01">Subject 1: Governing Equations & Dynamics</option>
+                <option value="sub_nwp_01">Subject 1: Equations & Dynamics</option>
                 <option value="sub_nwp_02">Subject 2: Data Assimilation & Radiance</option>
                 <option value="sub_dwr_01">Subject 1: Radar Hardware & Base Products</option>
                 <option value="sub_dwr_02">Subject 2: Severe Storm Signatures</option>
-                <option value="sub_cyc_01">Subject 1: Cyclogenesis & Dvorak Technique</option>
+                <option value="sub_cyc_01">Subject 1: Cyclogenesis & Dvorak</option>
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
-          {/* Right Action Buttons matching Screenshot 1 & 3 */}
-          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-            {/* Filter Toggle */}
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-2 w-full md:w-auto justify-end">
             <button
               onClick={() => setShowFilterModal(!showFilterModal)}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 shadow-sm transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-[#D9E2EC] hover:bg-slate-50 rounded-md text-xs font-semibold text-slate-700 shadow-xs transition-colors"
             >
               <Filter className="w-3.5 h-3.5 text-slate-500" />
               <span>Filters</span>
             </button>
 
-            {/* AI Generate Button */}
             {onOpenAiGenerator && (
               <button
                 onClick={onOpenAiGenerator}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-all transform hover:scale-[1.02]"
+                className="flex items-center gap-1.5 px-3 py-2 bg-teal-50 border border-teal-200 text-teal-800 hover:bg-teal-100 rounded-md text-xs font-semibold shadow-xs transition-colors"
               >
-                <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                <Sparkles className="w-3.5 h-3.5 text-teal-600" />
                 <span>AI Generate</span>
               </button>
             )}
 
-            {/* + Create Question Button matching deep navy brand */}
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-lg text-xs font-bold shadow-md transition-all transform hover:scale-[1.02]"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white rounded-md text-xs font-semibold shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4 text-white" />
-              <span>+ Create Question</span>
+              <span>Create Question</span>
             </button>
           </div>
         </div>
 
-        {/* Filter Drawer if expanded */}
+        {/* Filter Drawer */}
         {showFilterModal && (
-          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs animate-in fade-in duration-150">
+          <div className="mt-3.5 pt-3.5 border-t border-[#D9E2EC] flex flex-wrap items-center gap-3 text-xs">
             <div>
-              <span className="text-slate-500 font-medium mr-2">Question Type:</span>
+              <span className="text-slate-500 font-medium mr-1.5">Type:</span>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-medium text-slate-700"
+                className="px-2.5 py-1 bg-slate-50 border border-[#D9E2EC] rounded-md font-medium text-slate-700 text-xs"
               >
                 <option value="all">All Types</option>
                 <option value="MCQ">MCQ</option>
@@ -217,11 +209,11 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
             </div>
 
             <div>
-              <span className="text-slate-500 font-medium mr-2">Difficulty:</span>
+              <span className="text-slate-500 font-medium mr-1.5">Difficulty:</span>
               <select
                 value={selectedDifficulty}
                 onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg font-medium text-slate-700"
+                className="px-2.5 py-1 bg-slate-50 border border-[#D9E2EC] rounded-md font-medium text-slate-700 text-xs"
               >
                 <option value="all">All Difficulties</option>
                 <option value="Easy">Easy</option>
@@ -237,7 +229,7 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                 setSelectedSubject("all");
                 setSearchQuery("");
               }}
-              className="text-blue-700 font-medium hover:underline ml-auto"
+              className="text-[#1D4ED8] font-medium hover:underline ml-auto text-xs"
             >
               Reset Filters
             </button>
@@ -245,27 +237,22 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
         )}
       </div>
 
-      {/* Questions Data Table strictly matching Screenshots 1 & 3 */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      {/* Questions Data Table */}
+      <div className="bg-white rounded-xl border border-[#D9E2EC] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-600 font-semibold select-none">
-                <th className="py-3.5 px-4 w-1/2">
+              <tr className="border-b border-[#D9E2EC] bg-slate-50 text-slate-600 font-semibold">
+                <th className="py-3 px-4 w-1/2">
                   <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-900">
                     <span>Question</span>
                     <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
-                <th className="py-3.5 px-4 w-20 text-center">
-                  <div className="flex items-center justify-center gap-1 cursor-pointer hover:text-slate-900">
-                    <span>Marks</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="py-3.5 px-4 w-28 text-center">Type</th>
-                <th className="py-3.5 px-4 w-44">Labels</th>
-                <th className="py-3.5 px-4 w-12 text-center"></th>
+                <th className="py-3 px-4 w-20 text-center">Marks</th>
+                <th className="py-3 px-4 w-28 text-center">Type</th>
+                <th className="py-3 px-4 w-44">Labels</th>
+                <th className="py-3 px-4 w-12 text-center"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -284,43 +271,38 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
               ) : (
                 displayedQuestions.map((q) => {
                   return (
-                    <tr key={q.id} className="hover:bg-slate-50/80 transition-colors group">
-                      {/* Question Text */}
-                      <td className="py-4 px-4 align-middle">
+                    <tr key={q.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3.5 px-4 align-middle">
                         <p className="font-normal text-slate-800 leading-relaxed max-w-2xl line-clamp-2">
                           {q.question}
                         </p>
                       </td>
 
-                      {/* Marks */}
-                      <td className="py-4 px-4 text-center font-semibold text-slate-700 align-middle">
+                      <td className="py-3.5 px-4 text-center font-semibold text-slate-700 align-middle">
                         {q.marks || 2}
                       </td>
 
-                      {/* Type Badge matching reference styling */}
-                      <td className="py-4 px-4 text-center align-middle">
+                      <td className="py-3.5 px-4 text-center align-middle">
                         <span
-                          className={`inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide ${
+                          className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-semibold ${
                             q.type === "MCQ"
-                              ? "bg-[#0a2558] text-white"
+                              ? "bg-blue-50 text-blue-900 border border-blue-200"
                               : q.type === "Descriptive"
-                              ? "bg-[#085287] text-white"
-                              : "bg-[#0f766e] text-white"
+                              ? "bg-slate-100 text-slate-800 border border-slate-200"
+                              : "bg-teal-50 text-teal-800 border border-teal-200"
                           }`}
                         >
                           {q.type === "MCQ" ? "MCQ" : q.type === "Descriptive" ? "Descriptive" : "One Word"}
                         </span>
                       </td>
 
-                      {/* Labels Column (Difficulty & Module badges) */}
-                      <td className="py-4 px-4 align-middle">
+                      <td className="py-3.5 px-4 align-middle">
                         <div className="flex flex-col gap-1">
-                          {/* Difficulty Pill */}
                           <div>
                             <span
-                              className={`inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold ${
+                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${
                                 q.difficulty === "Hard"
-                                  ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                  ? "bg-red-50 text-red-700 border border-red-200"
                                   : q.difficulty === "Medium"
                                   ? "bg-teal-50 text-teal-700 border border-teal-200"
                                   : "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -329,7 +311,6 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                               Difficulty: {q.difficulty || "Medium"}
                             </span>
                           </div>
-                          {/* Module Pill */}
                           <div>
                             <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
                               Module: {q.module || "Module 1"}
@@ -338,26 +319,24 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                         </div>
                       </td>
 
-                      {/* Actions Popover Button matching Screenshot 1 & 3 */}
-                      <td className="py-4 px-4 text-center align-middle relative">
+                      <td className="py-3.5 px-4 text-center align-middle relative">
                         <button
                           onClick={() => setActiveMenuId(activeMenuId === q.id ? null : q.id)}
-                          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+                          className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
 
-                        {/* Action Menu Popup matching screenshot exactly */}
                         {activeMenuId === q.id && (
-                          <div className="absolute right-6 top-8 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-40 text-left animate-in fade-in zoom-in-95 duration-100">
+                          <div className="absolute right-4 top-8 w-32 bg-white rounded-lg shadow-lg border border-[#D9E2EC] py-1 z-40 text-left">
                             <button
                               onClick={() => {
                                 setPreviewQuestion(q);
                                 setActiveMenuId(null);
                               }}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
                             >
-                              <Eye className="w-3.5 h-3.5 text-slate-500" />
+                              <Eye className="w-3.5 h-3.5 text-slate-400" />
                               <span>Preview</span>
                             </button>
 
@@ -367,17 +346,17 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                                 setIsCreateModalOpen(true);
                                 setActiveMenuId(null);
                               }}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
                             >
-                              <FileEdit className="w-3.5 h-3.5 text-slate-500" />
+                              <FileEdit className="w-3.5 h-3.5 text-slate-400" />
                               <span>Edit</span>
                             </button>
 
                             <button
                               onClick={() => handleDuplicate(q.id)}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
                             >
-                              <Copy className="w-3.5 h-3.5 text-slate-500" />
+                              <Copy className="w-3.5 h-3.5 text-slate-400" />
                               <span>Duplicate</span>
                             </button>
 
@@ -385,9 +364,9 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
 
                             <button
                               onClick={() => handleDelete(q.id)}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 transition-colors"
+                              className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors"
                             >
-                              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                              <Trash2 className="w-3.5 h-3.5 text-red-600" />
                               <span>Delete</span>
                             </button>
                           </div>
@@ -404,11 +383,11 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
 
       {/* Question Preview Modal */}
       {previewQuestion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-[#D9E2EC]">
+            <div className="flex items-center justify-between pb-3.5 border-b border-[#D9E2EC]">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0a2558] text-white">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200">
                   {previewQuestion.type}
                 </span>
                 <span className="text-xs font-semibold text-slate-500">
@@ -417,34 +396,34 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
               </div>
               <button
                 onClick={() => setPreviewQuestion(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="py-4 space-y-4">
-              <h3 className="text-base font-semibold text-slate-900 leading-snug">
+            <div className="py-4 space-y-3.5">
+              <h3 className="text-sm font-semibold text-slate-900 leading-relaxed">
                 {previewQuestion.question}
               </h3>
 
               {previewQuestion.options && previewQuestion.options.length > 0 && (
-                <div className="space-y-2 mt-3">
+                <div className="space-y-1.5 mt-2">
                   {previewQuestion.options.map((opt, i) => (
                     <div
                       key={i}
-                      className={`p-3 rounded-xl border text-xs flex items-center gap-3 ${
+                      className={`p-2.5 rounded-lg border text-xs flex items-center gap-2.5 ${
                         previewQuestion.correctAnswer === i
                           ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-medium"
                           : "bg-slate-50 border-slate-200 text-slate-700"
                       }`}
                     >
-                      <span className="w-6 h-6 rounded-full bg-white border border-slate-300 flex items-center justify-center font-bold shrink-0 text-slate-600">
+                      <span className="w-5 h-5 rounded bg-white border border-slate-300 flex items-center justify-center font-semibold shrink-0 text-slate-600 text-[11px]">
                         {String.fromCharCode(65 + i)}
                       </span>
                       <span>{opt}</span>
                       {previewQuestion.correctAnswer === i && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 ml-auto shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 ml-auto shrink-0" />
                       )}
                     </div>
                   ))}
@@ -452,17 +431,17 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
               )}
 
               {previewQuestion.explanation && (
-                <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl text-xs text-blue-900">
-                  <span className="font-bold block mb-1">Scientific Explanation:</span>
-                  <p>{previewQuestion.explanation}</p>
+                <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-lg text-xs text-blue-900">
+                  <span className="font-semibold block mb-0.5">Scientific Explanation:</span>
+                  <p className="leading-relaxed">{previewQuestion.explanation}</p>
                 </div>
               )}
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex justify-end">
+            <div className="pt-3 border-t border-[#D9E2EC] flex justify-end">
               <button
                 onClick={() => setPreviewQuestion(null)}
-                className="px-4 py-2 bg-[#0a2558] text-white rounded-lg text-xs font-bold"
+                className="px-4 py-2 bg-[#1D4ED8] text-white rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors"
               >
                 Close Preview
               </button>
@@ -473,21 +452,21 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
 
       {/* Create / Edit Question Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 my-8">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <h2 className="text-base font-bold text-slate-900">
-                {newQuestionForm.id ? "Edit Question" : "Create New Assessment Question"}
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-xl w-full p-6 shadow-xl border border-[#D9E2EC] my-8">
+            <div className="flex items-center justify-between pb-3.5 border-b border-[#D9E2EC]">
+              <h2 className="text-sm font-bold text-slate-900">
+                {newQuestionForm.id ? "Edit Question" : "Create Assessment Question"}
               </h2>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-md text-slate-400 hover:text-slate-600"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateQuestion} className="py-4 space-y-4 text-xs">
+            <form onSubmit={handleCreateQuestion} className="py-4 space-y-3.5 text-xs">
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">Question Prompt *</label>
                 <textarea
@@ -496,30 +475,30 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                   value={newQuestionForm.question}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, question: e.target.value })}
                   placeholder="Enter the meteorological problem or question here..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0a2558] focus:outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none leading-relaxed"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Question Type</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Type</label>
                   <select
                     value={newQuestionForm.type}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, type: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
                   >
                     <option value="MCQ">Multiple Choice (MCQ)</option>
                     <option value="Descriptive">Descriptive Question</option>
-                    <option value="One Word">One Word / Numerical</option>
+                    <option value="One Word">One Word</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Difficulty Level</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Difficulty</label>
                   <select
                     value={newQuestionForm.difficulty}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, difficulty: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
                   >
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
@@ -528,31 +507,31 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Marks Assigned</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Marks</label>
                   <input
                     type="number"
                     min={1}
                     max={20}
                     value={newQuestionForm.marks}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, marks: Number(e.target.value) })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Subject Association</label>
                   <select
                     value={newQuestionForm.subjectId}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, subjectId: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
                   >
-                    <option value="sub_nwp_01">Subject 1: Governing Equations & Dynamics</option>
+                    <option value="sub_nwp_01">Subject 1: Equations & Dynamics</option>
                     <option value="sub_nwp_02">Subject 2: Data Assimilation & Radiance</option>
                     <option value="sub_dwr_01">Subject 1: Radar Hardware & Base Products</option>
                     <option value="sub_dwr_02">Subject 2: Severe Storm Signatures</option>
-                    <option value="sub_cyc_01">Subject 1: Cyclogenesis & Dvorak Technique</option>
+                    <option value="sub_cyc_01">Subject 1: Cyclogenesis & Dvorak</option>
                   </select>
                 </div>
 
@@ -562,17 +541,17 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                     type="text"
                     value={newQuestionForm.module}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, module: e.target.value })}
-                    placeholder="e.g. Module 1, Module 2"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    placeholder="e.g. Module 1"
+                    className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* MCQ Options */}
               {newQuestionForm.type === "MCQ" && (
-                <div className="space-y-2 pt-2">
+                <div className="space-y-1.5 pt-1">
                   <label className="block font-semibold text-slate-700">
-                    Multiple Choice Options (Select radio for correct answer)
+                    Options (Select radio for correct answer)
                   </label>
                   {newQuestionForm.options.map((opt, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -581,9 +560,9 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                         name="correctAnswer"
                         checked={newQuestionForm.correctAnswer === i}
                         onChange={() => setNewQuestionForm({ ...newQuestionForm, correctAnswer: i })}
-                        className="w-4 h-4 text-[#0a2558] focus:ring-[#0a2558]"
+                        className="w-3.5 h-3.5 text-[#1D4ED8]"
                       />
-                      <span className="w-5 text-center font-bold text-slate-500">
+                      <span className="w-4 text-center font-bold text-slate-500 text-xs">
                         {String.fromCharCode(65 + i)}:
                       </span>
                       <input
@@ -596,7 +575,7 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
                           setNewQuestionForm({ ...newQuestionForm, options: updated });
                         }}
                         placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                        className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none"
+                        className="flex-1 p-1.5 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none text-xs"
                       />
                     </div>
                   ))}
@@ -604,27 +583,27 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
               )}
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Explanation / Solution Note</label>
+                <label className="block font-semibold text-slate-700 mb-1">Explanation Note</label>
                 <textarea
                   rows={2}
                   value={newQuestionForm.explanation}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, explanation: e.target.value })}
                   placeholder="Reference formulas, physics equations, or IMD SOP notes..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                  className="w-full p-2 bg-slate-50 border border-[#D9E2EC] rounded-md focus:bg-white focus:outline-none leading-relaxed text-xs"
                 />
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-[#D9E2EC] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold"
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-lg font-bold shadow-md"
+                  className="px-4 py-2 bg-[#1D4ED8] hover:bg-blue-700 text-white rounded-md font-semibold shadow-xs"
                 >
                   Save Question
                 </button>
