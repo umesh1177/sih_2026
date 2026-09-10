@@ -217,6 +217,39 @@ export const TraineeDashboardView = ({
 
       </div>
 
+      {/* ─── 2.5 AI PRACTICE PAPERS & QUESTION BANK LAUNCHER BANNER ─── */}
+      <div className="bg-gradient-to-r from-[#0a2558] via-blue-900 to-indigo-900 rounded-3xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1 max-w-2xl">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950 flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> NEW
+            </span>
+            <h3 className="text-base font-black text-white">AI Practice Assessment Studio & Question Bank</h3>
+          </div>
+          <p className="text-xs text-blue-100 leading-relaxed font-normal">
+            Generate customized AI question papers, test your skills with <b>Morale-Aware Adaptive Difficulty</b>, and create manual questions stored in your personal Question Bank.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+          <button
+            onClick={() => onNavigateTab("practice-papers")}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-blue-50 text-[#0a2558] font-black rounded-xl text-xs shadow-md transition-all hover:scale-105 active:scale-95"
+          >
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <span>AI Practice Papers</span>
+          </button>
+
+          <button
+            onClick={() => onNavigateTab("questions")}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs border border-white/20 transition-colors"
+          >
+            <Layers className="w-4 h-4 text-blue-300" />
+            <span>Question Bank</span>
+          </button>
+        </div>
+      </div>
+
       {/* ─── 3. ENROLLED COURSES & COMPETENCY RADAR ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         

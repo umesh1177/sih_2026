@@ -16,7 +16,7 @@ import {
   FolderKanban
 } from "lucide-react";
 
-export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
+export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage }) => {
   const { currentUser, logout } = useAuth();
 
   // Role based navigation links
@@ -49,7 +49,9 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
     return [
       ...baseItems,
       { id: "my-learning", label: "My Enrolled Courses", icon: GraduationCap },
-      { id: "trainee-quizzes", label: "My Assessments", icon: ClipboardList },
+      { id: "trainee-quizzes", label: "Scheduled Assessments", icon: ClipboardList },
+      { id: "practice-papers", label: "AI Practice Papers", icon: Sparkles },
+      { id: "questions", label: "Question Bank", icon: Layers },
       { id: "certificates", label: "Certified Credentials", icon: Award },
       { id: "profile", label: "Officer Profile", icon: FileText },
       { id: "analytics", label: "Competency Radar", icon: BarChart3 },
@@ -84,6 +86,15 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage }) => {
 
       {/* Navigation List */}
       <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+        {onOpenHomePage && (
+          <button
+            onClick={onOpenHomePage}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 transition-all text-left mb-2 shadow-sm"
+          >
+            <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="truncate">Public Portal & Verify</span>
+          </button>
+        )}
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;

@@ -5,6 +5,7 @@ import { TopNavbar } from "./components/layout/TopNavbar";
 import { QuestionBankTable } from "./components/quiz/QuestionBankTable";
 import { KioskExamMode } from "./components/quiz/KioskExamMode";
 import { TraineeAssessmentsView } from "./components/quiz/TraineeAssessmentsView";
+import { TraineePracticePapersView } from "./components/quiz/TraineePracticePapersView";
 import { AiQuestionModal } from "./components/quiz/AiQuestionModal";
 import { QuizScheduleModal } from "./components/quiz/QuizScheduleModal";
 import { QuizAnalyticsModal } from "./components/quiz/QuizAnalyticsModal";
@@ -162,6 +163,7 @@ const MainApp = () => {
             setActiveTab(tab);
           }}
           onOpenLoginPage={() => setViewMode("login")}
+          onOpenHomePage={() => setViewMode("landing")}
         />
         <div className="flex-1 flex flex-col h-screen overflow-y-auto">
           <TrainerCurriculumStudio
@@ -194,6 +196,7 @@ const MainApp = () => {
             setActiveTab(tab);
           }}
           onOpenLoginPage={() => setViewMode("login")}
+          onOpenHomePage={() => setViewMode("landing")}
         />
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <CourseLearningStudio
@@ -218,6 +221,7 @@ const MainApp = () => {
             setActiveTab(tab);
           }}
           onOpenLoginPage={() => setViewMode("login")}
+          onOpenHomePage={() => setViewMode("landing")}
         />
         <div className="flex-1 flex flex-col h-screen overflow-y-auto">
           <CourseOverviewPage
@@ -262,6 +266,7 @@ const MainApp = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenLoginPage={() => setViewMode("login")}
+        onOpenHomePage={() => setViewMode("landing")}
       />
 
       {/* Main Content Area */}
@@ -333,13 +338,25 @@ const MainApp = () => {
             />
           )}
 
-          {/* 3. QUESTION BANK */}
+          {/* 3. AI PRACTICE PAPERS & ADAPTIVE TESTING (Trainee Studio) */}
+          {activeTab === "practice-papers" && (
+            <TraineePracticePapersView
+              currentUser={currentUser}
+              onStartExam={(paper) => setActiveExamQuiz(paper)}
+              onOpenQuestionBank={() => setActiveTab("questions")}
+              onOpenAiGenerator={() => setIsAiModalOpen(true)}
+            />
+          )}
+
+          {/* 4. QUESTION BANK (Accessible by Trainees, Trainers & Admins) */}
           {activeTab === "questions" && (
             <div className="p-6 space-y-6">
               <QuestionBankTable
                 currentUser={currentUser}
                 onOpenAiGenerator={() => setIsAiModalOpen(true)}
                 onOpenScheduleQuiz={() => setIsScheduleModalOpen(true)}
+                onNavigatePracticePapers={() => setActiveTab("practice-papers")}
+                onStartExam={(paper) => setActiveExamQuiz(paper)}
               />
             </div>
           )}

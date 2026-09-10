@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { api } from "../../services/api";
 
-export const QuestionBankTable = ({ onOpenAiGenerator }) => {
+export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePracticePapers, onStartExam }) => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,6 +29,10 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
   const [previewQuestion, setPreviewQuestion] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [isGeneratePaperModalOpen, setIsGeneratePaperModalOpen] = useState(false);
+  const [generatePaperCount, setGeneratePaperCount] = useState(10);
+  const [generatePaperTitle, setGeneratePaperTitle] = useState("Adaptive Question Bank Drill");
+  const [generatingPaper, setGeneratingPaper] = useState(false);
 
   // New Question Form state
   const [newQuestionForm, setNewQuestionForm] = useState({
@@ -167,7 +171,17 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
           </div>
 
           {/* Right Action Buttons matching Screenshot 1 & 3 */}
-          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap sm:flex-nowrap">
+            {/* Generate Adaptive Practice Paper CTA */}
+            <button
+              onClick={() => setIsGeneratePaperModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-lg text-xs font-bold shadow-sm transition-all transform hover:scale-[1.02]"
+              title="Assemble an adaptive practice test from the Question Bank"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>⚡ Generate Adaptive Paper</span>
+            </button>
+
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilterModal(!showFilterModal)}
@@ -633,6 +647,160 @@ export const QuestionBankTable = ({ onOpenAiGenerator }) => {
           </div>
         </div>
       )}
+
+      {/* ═════════ GENERATE ADAPTIVE PAPER FROM QUESTION BANK MODAL ═════════ */}
+      {isGeneratePaperModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-800 relative my-8">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-md">
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-slate-900">
+                    Generate Adaptive Question Paper
+                  </h2>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Assemble practice test from {questions.length} questions in Question Bank
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsGeneratePaperModalOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setGeneratingPaper(true);
+                try {
+                  let pool = [...questions];
+                  if (selectedSubject !== "all") {
+                    pool = pool.filter(q => q.subjectId === selectedSubject);
+                  }
+                  pool = pool.sort(() => 0.5 - Math.random());
+                  const pickedQuestions = pool.slice(0, Number(generatePaperCount) || 10);
+
+                  const newQuiz = {
+                    id: `paper_qb_${Date.now()}`,
+                    title: generatePaperTitle,
+                    courseId: "crs_nwp_101",
+                    courseName: "Question Bank Adaptive Practice",
+                    trainerName: "MoES Adaptive Engine",
+                    totalMarks: pickedQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) || 20,
+                    passMarks: Math.round((pickedQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) || 20) * 0.5),
+                    durationMinutes: Number(generatePaperCount) * 2,
+                    questionCount: pickedQuestions.length,
+                    isAdaptive: true,
+                    initialDifficulty: "Medium",
+                    questions: pickedQuestions,
+                    createdAt: new Date().toISOString()
+                  };
+
+                  await api.createQuiz(newQuiz);
+                  setIsGeneratePaperModalOpen(false);
+                  
+                  if (onStartExam) {
+                    onStartExam(newQuiz);
+                  } else if (onNavigatePracticePapers) {
+                    onNavigatePracticePapers();
+                  } else {
+                    alert(`✅ Generated "${newQuiz.title}" with ${pickedQuestions.length} questions! Saved to AI Practice Papers.`);
+                  }
+                } catch (err) {
+                  alert("Failed creating question paper: " + err.message);
+                } finally {
+                  setGeneratingPaper(false);
+                }
+              }}
+              className="space-y-4 text-xs"
+            >
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Practice Paper Title:
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={generatePaperTitle}
+                  onChange={(e) => setGeneratePaperTitle(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Number of Questions:
+                  </label>
+                  <select
+                    value={generatePaperCount}
+                    onChange={(e) => setGeneratePaperCount(Number(e.target.value))}
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value={5}>5 Questions (Speed Drill)</option>
+                    <option value={10}>10 Questions (Standard)</option>
+                    <option value={15}>15 Questions (Full Drill)</option>
+                    <option value={20}>20 Questions (Comprehensive)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Subject Filter:
+                  </label>
+                  <select
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">All Subjects Pool</option>
+                    <option value="sub_nwp_01">Atmospheric Dynamics</option>
+                    <option value="sub_nwp_02">Data Assimilation</option>
+                    <option value="sub_dwr_01">Doppler Radar</option>
+                    <option value="sub_cyc_01">Cyclone Warning</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-blue-50 rounded-2xl border border-blue-200 text-[11px] text-blue-900 space-y-1">
+                <span className="font-extrabold flex items-center gap-1 text-[#0a2558]">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  Morale-Aware Dynamic Testing Enabled:
+                </span>
+                <p className="text-blue-800">
+                  If 2-3 consecutive false answers occur during the test, the engine automatically reduces difficulty to rebuild confidence.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsGeneratePaperModalOpen(false)}
+                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={generatingPaper}
+                  className="px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-black rounded-xl text-xs shadow-md transition-all disabled:opacity-60"
+                >
+                  {generatingPaper ? "Generating..." : "⚡ Generate & Start Exam"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
+

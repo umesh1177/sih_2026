@@ -32,6 +32,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator })
       case "schedule-assessment": return "Schedule Assessments";
       case "content-library": return "Trainer Content Library";
       case "trainee-quizzes": return "Scheduled Assessments";
+      case "practice-papers": return "AI Practice Papers & Adaptive Tests";
       case "my-learning": return "Enrolled Programs";
       case "certificates": return "Certified Credentials";
       case "profile": return "Professional Officer Profile";
@@ -125,11 +126,12 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiGenerator })
           </div>
         )}
 
-        {/* AI Generator Shortcut Button */}
-        {(currentUser?.role === "trainer" || currentUser?.role === "admin") && onOpenAiGenerator && (
+        {/* AI Generator Shortcut Button (Accessible by Trainees, Trainers & Admins) */}
+        {onOpenAiGenerator && (
           <button
             onClick={onOpenAiGenerator}
             className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-800 hover:from-blue-800 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md transition-all transform hover:scale-105"
+            title="Generate AI Practice Papers or Assessment Questions"
           >
             <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
             <span>AI Quiz Generator</span>
