@@ -27,6 +27,7 @@ import {
   Legend 
 } from "recharts";
 import { api } from "../../services/api";
+import { ItemAnalysisDifficultQuestionsModal } from "../trainer/ItemAnalysisDifficultQuestionsModal";
 
 const COLORS = ['#2563eb', '#0284c7', '#10b981', '#f59e0b', '#ef4444'];
 
@@ -34,6 +35,7 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "rankings" | "questions"
+  const [isItemAnalysisOpen, setIsItemAnalysisOpen] = useState(false);
   const [resettingId, setResettingId] = useState(null);
   const [resetMessage, setResetMessage] = useState(null);
 
@@ -167,6 +169,13 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
             }`}
           >
             🎯 Question Accuracy Breakdown
+          </button>
+          <button
+            onClick={() => setIsItemAnalysisOpen(true)}
+            className="ml-auto pb-1 px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-2xs hover:scale-105"
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+            <span>⚠ Weak Questions Item Analysis (Rule 11)</span>
           </button>
         </div>
 
@@ -374,6 +383,13 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
           </div>
         )}
       </div>
+
+      {/* ─── RULE 11: WEAK QUESTIONS & DIFFICULT CONCEPT DETECTION MODAL ─── */}
+      <ItemAnalysisDifficultQuestionsModal
+        isOpen={isItemAnalysisOpen}
+        onClose={() => setIsItemAnalysisOpen(false)}
+        quizTitle={quiz?.title}
+      />
     </div>
   );
 };

@@ -22,11 +22,15 @@ import {
   Medal,
   Building2,
   FileText,
-  AlertCircle
+  AlertCircle,
+  AlertTriangle,
+  BrainCircuit
 } from "lucide-react";
+import { ItemAnalysisDifficultQuestionsModal } from "../trainer/ItemAnalysisDifficultQuestionsModal";
 
-export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
+export const ExamAnalyticsModal = ({ exam, currentUser, onClose, onOpenStudio }) => {
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "responses" | "leaderboard"
+  const [isItemAnalysisOpen, setIsItemAnalysisOpen] = useState(false);
   const [responseSearch, setResponseSearch] = useState("");
   const [responseFilter, setResponseFilter] = useState("all"); // "all" | "correct" | "incorrect"
   const [activeAnalysisFilter, setActiveAnalysisFilter] = useState("subjects"); // "subjects" | "labels" | "types"
@@ -257,6 +261,15 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
             >
               <Medal className="w-4 h-4 text-amber-500" />
               <span>Leaderboard</span>
+            </button>
+
+            {/* Rule 11: Weak Questions & Item Analysis Studio Trigger */}
+            <button
+              onClick={() => setIsItemAnalysisOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-xs font-black transition-all ml-auto mb-2 shadow-2xs hover:scale-105"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+              <span>Weak Questions & Item Analysis (Rule 11)</span>
             </button>
           </div>
 
@@ -605,6 +618,15 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose }) => {
         </div>
 
       </div>
+
+      {/* ─── RULE 11: WEAK QUESTIONS & DIFFICULT CONCEPT DETECTION MODAL ─── */}
+      <ItemAnalysisDifficultQuestionsModal
+        isOpen={isItemAnalysisOpen}
+        onClose={() => setIsItemAnalysisOpen(false)}
+        currentUser={currentUser}
+        onOpenStudio={onOpenStudio}
+        quizTitle={exam?.title}
+      />
     </div>
   );
 };

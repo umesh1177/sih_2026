@@ -14,12 +14,15 @@ import {
   CheckCircle2,
   X,
   Layers,
-  HelpCircle
+  HelpCircle,
+  AlertTriangle
 } from "lucide-react";
+import { ItemAnalysisDifficultQuestionsModal } from "../trainer/ItemAnalysisDifficultQuestionsModal";
 import { api } from "../../services/api";
 
-export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePracticePapers, onStartExam }) => {
+export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePracticePapers, onStartExam, onOpenStudio }) => {
   const [questions, setQuestions] = useState([]);
+  const [isItemAnalysisOpen, setIsItemAnalysisOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("all");
@@ -203,6 +206,15 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 <span>AI Generate</span>
               </button>
             )}
+
+            {/* Rule 11: Weak Question & Difficult Concept Item Analysis */}
+            <button
+              onClick={() => setIsItemAnalysisOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-bold shadow-xs transition-all transform hover:scale-[1.02]"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+              <span>Item Analysis (Rule 11)</span>
+            </button>
 
             {/* + Create Question Button matching deep navy brand */}
             <button
@@ -878,6 +890,14 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
           </div>
         </div>
       )}
+
+      {/* ─── RULE 11: WEAK QUESTIONS & DIFFICULT CONCEPT DETECTION MODAL ─── */}
+      <ItemAnalysisDifficultQuestionsModal
+        isOpen={isItemAnalysisOpen}
+        onClose={() => setIsItemAnalysisOpen(false)}
+        currentUser={currentUser}
+        onOpenStudio={onOpenStudio}
+      />
 
     </div>
   );
