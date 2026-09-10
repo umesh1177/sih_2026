@@ -1291,27 +1291,7 @@ class DatabaseStore {
       }
     }
 
-    // 3. Fallback for generated demo certificate tokens matching MOES / IMD / CERT
-    if (query.startsWith("MOES") || query.startsWith("IMD") || query.startsWith("CERT") || query.length >= 6) {
-      return {
-        isValid: true,
-        certificateId: query.startsWith("MOES") ? query : `MOES-CERT-${query}`,
-        recipientName: "Dr. Rahul Sharma",
-        recipientCadreId: "IMD-MET-2024-001",
-        recipientRole: "trainee",
-        courseTitle: "Advanced Numerical Weather Prediction (NWP) & Data Assimilation",
-        courseCode: "NWP-401",
-        issueDate: "January 15, 2026",
-        grade: "Distinction (Honours) - 94.0%",
-        issuingAuthority: "Ministry of Earth Sciences, Government of India",
-        directorGeneral: "Dr. Mrutyunjay Mohapatra, Director General of Meteorology",
-        leadInstructor: "Dr. Amit Sengupta, Scientist 'F'",
-        cryptographicHash: `SHA256-${Buffer.from(query).toString('hex').slice(0, 24).toUpperCase()}`,
-        verificationUrl: `http://localhost:5173/?verify=${query}`,
-        status: "OFFICIALLY ISSUED & CRYPTOGRAPHICALLY VERIFIED"
-      };
-    }
-
+    // 3. If not found in user certificates or quiz submissions, return null
     return null;
   }
 }

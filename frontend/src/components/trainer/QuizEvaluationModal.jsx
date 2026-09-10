@@ -13,7 +13,8 @@ import {
   FileCheck, 
   Sparkles,
   Check,
-  RotateCcw
+  RotateCcw,
+  FileQuestion
 } from "lucide-react";
 import { api } from "../../services/api";
 
@@ -31,7 +32,7 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
       setLoading(true);
       try {
         const res = await api.getQuizSubmissions(quiz?.id);
-        if (res.success && res.submissions?.length > 0) {
+        if (res.success && res.submissions && Array.isArray(res.submissions)) {
           setSubmissions(res.submissions);
           const initialFeedback = {};
           res.submissions.forEach(s => {
@@ -39,69 +40,11 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
           });
           setFeedbackMap(initialFeedback);
         } else {
-          // Default mock candidate submissions for this quiz
-          const mockSubs = [
-            {
-              id: "sub_eval_1",
-              quizId: quiz?.id || "quiz_nwp_01",
-              traineeId: "u_trainee_1",
-              traineeName: "Rahul Sharma",
-              cadreId: "MOES-MET-2026-4491",
-              station: "Meteorological Centre, Jaipur",
-              department: "NWP Division",
-              score: 29,
-              totalMarks: quiz?.totalMarks || 40,
-              percentage: 72.5,
-              timeTakenMinutes: 13,
-              submittedAt: "14th Aug 2026 20:36",
-              status: "Passed",
-              evaluationStatus: isPublished ? "published" : "pending_publish",
-              trainerFeedback: "Strong analytical clarity in Arakawa-C grid and 4D-Var principles."
-            },
-            {
-              id: "sub_eval_2",
-              quizId: quiz?.id || "quiz_nwp_01",
-              traineeId: "u_trainee_2",
-              traineeName: "Priya Varma",
-              cadreId: "MOES-MET-2026-5512",
-              station: "Cyclone Warning Centre, Visakhapatnam",
-              department: "Cyclone Warning Division",
-              score: 38,
-              totalMarks: quiz?.totalMarks || 40,
-              percentage: 95.0,
-              timeTakenMinutes: 11,
-              submittedAt: "14th Aug 2026 21:10",
-              status: "Distinction",
-              evaluationStatus: isPublished ? "published" : "pending_publish",
-              trainerFeedback: "Exceptional mastery in convective cloud parameterization."
-            },
-            {
-              id: "sub_eval_3",
-              quizId: quiz?.id || "quiz_nwp_01",
-              traineeId: "u_trainee_3",
-              traineeName: "Vikram Malhotra",
-              cadreId: "MOES-MET-2026-7821",
-              station: "RMC Chennai",
-              department: "Radar Operations Division",
-              score: 31,
-              totalMarks: quiz?.totalMarks || 40,
-              percentage: 77.5,
-              timeTakenMinutes: 18,
-              submittedAt: "15th Aug 2026 10:15",
-              status: "Passed",
-              evaluationStatus: isPublished ? "published" : "pending_publish",
-              trainerFeedback: "Good work. Review vertical advection in sigma coordinate systems."
-            }
-          ];
-          setSubmissions(mockSubs);
-          const initialFeedback = {};
-          mockSubs.forEach(s => {
-            initialFeedback[s.id] = s.trainerFeedback || "";
-          });
-          setFeedbackMap(initialFeedback);
+          setSubmissions([]);
         }
       } catch (err) {
         console.error("Submissions load error:", err);
+        setSubmissions([]);
       } finally {
         setLoading(false);
       }
@@ -144,56 +87,56 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
   );
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
       <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto">
         
-        {/* ═════════ HEADER ═════════ */}
-        <div className="p-6 bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shrink-0 relative overflow-hidden">
-          <div className="space-y-1 z-10">
+        {/* ═════════ HEADER (CLEAN LIGHT THEME) ═════════ */}
+        <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shrink-0">
+          <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
+              <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
                 FACULTY EVALUATION DESK
               </span>
               {isPublished ? (
-                <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-300" /> Results Published to Cadets
+                <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Results Published to Cadets
                 </span>
               ) : (
-                <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-amber-500/30 text-amber-200 border border-amber-400/30 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-amber-300 animate-pulse" /> Pending Result Publication
+                <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-amber-600 animate-pulse" /> Pending Result Publication
                 </span>
               )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
               {quiz?.title || "Subject Assessment Evaluation"}
             </h1>
-            <p className="text-xs text-blue-200 font-medium">
-              Course: <b className="text-white">{quiz?.courseName || "Assigned Course"}</b> • Passing Threshold: {quiz?.passMarks || 20}/{quiz?.totalMarks || 40} Marks
+            <p className="text-xs text-slate-500 font-medium">
+              Course: <b className="text-slate-800">{quiz?.courseName || "Assigned Course"}</b> • Passing Threshold: {quiz?.passMarks || 20}/{quiz?.totalMarks || 40} Marks
             </p>
           </div>
 
-          <div className="flex items-center gap-3 z-10">
+          <div className="flex items-center gap-3">
             {/* Publish Results Button */}
             {!isPublished ? (
               <button
                 onClick={handlePublishResults}
-                disabled={publishing}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-2xl text-xs shadow-lg transition-transform hover:scale-105 active:scale-95"
+                disabled={publishing || submissions.length === 0}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs shadow-sm transition-all"
               >
                 <Sparkles className="w-4 h-4 text-emerald-100" />
-                <span>{publishing ? "Publishing..." : "Publish Quiz Results to Cadets"}</span>
+                <span>{publishing ? "Publishing..." : "Publish Quiz Results"}</span>
               </button>
             ) : (
-              <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-950/60 border border-emerald-500/60 text-emerald-300 font-bold rounded-2xl text-xs">
-                <Check className="w-4 h-4" />
+              <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold rounded-xl text-xs">
+                <Check className="w-4 h-4 text-emerald-600" />
                 <span>Scores Live on Cadet Portals</span>
               </div>
             )}
 
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white transition-colors"
+              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -201,7 +144,7 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
         </div>
 
         {/* ═════════ INFO CALLOUT ═════════ */}
-        <div className="bg-amber-50 border-b border-amber-200 px-6 py-3 flex items-center justify-between text-xs text-amber-900">
+        <div className="bg-amber-50/70 border-b border-amber-200 px-6 py-3 flex items-center justify-between text-xs text-amber-900">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
             <span>
@@ -213,105 +156,126 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
           </span>
         </div>
 
-        {/* ═════════ SUBMISSIONS TABLE ═════════ */}
-        <div className="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+        {/* ═════════ SUBMISSIONS CONTENT ═════════ */}
+        <div className="p-6 overflow-y-auto space-y-4 flex-1 text-xs bg-slate-50/50">
           
-          <div className="flex items-center justify-between gap-3">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
-              <input
-                type="text"
-                placeholder="Search candidate by name, station, cadre ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
-              />
+          {loading ? (
+            <div className="p-12 flex flex-col items-center justify-center space-y-3">
+              <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-xs font-semibold text-slate-500">Loading candidate submissions...</p>
             </div>
-            <span className="text-slate-500 font-bold text-xs">
-              Showing {filteredSubmissions.length} of {submissions.length} candidates
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            {filteredSubmissions.map((sub) => (
-              <div
-                key={sub.id}
-                className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3 hover:border-blue-300 transition-all"
-              >
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0a2558] to-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
-                      {sub.traineeName?.split(" ").map(n => n[0]).join("") || "TR"}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-black text-slate-900 text-sm">{sub.traineeName}</h4>
-                        <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold">
-                          {sub.cadreId}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                        <Building2 className="w-3 h-3 text-slate-400" />
-                        <span>{sub.station}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Score & Timing Badges */}
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <span className="text-sm font-black text-slate-900 block">
-                        {sub.score} / {sub.totalMarks} Marks
-                      </span>
-                      <span className="text-[10px] text-slate-400 font-medium">
-                        Time Spent: {sub.timeTakenMinutes || 15} mins
-                      </span>
-                    </div>
-
-                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
-                      sub.percentage >= 85
-                        ? "bg-amber-100 text-amber-900 border border-amber-300"
-                        : sub.percentage >= 50
-                        ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                        : "bg-rose-100 text-rose-900 border border-rose-300"
-                    }`}>
-                      {sub.percentage}% ({sub.status || "Passed"})
-                    </span>
-                  </div>
-                </div>
-
-                {/* Feedback Input Row */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+          ) : submissions.length === 0 ? (
+            <div className="py-16 px-4 text-center bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                <FileQuestion className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-slate-800 text-sm">No Trainee Submissions Logged Yet</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                When cadets complete and submit this assessment, their answer records, score calculations, and feedback inputs will appear here.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-3">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
                   <input
                     type="text"
-                    placeholder="Enter faculty remarks or recommendations for this cadet..."
-                    value={feedbackMap[sub.id] || ""}
-                    onChange={(e) => setFeedbackMap({ ...feedbackMap, [sub.id]: e.target.value })}
-                    className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                    placeholder="Search candidate by name, station, cadre ID..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"
                   />
-                  <button
-                    onClick={() => handleSaveEvaluation(sub.id)}
-                    disabled={savingId === sub.id}
-                    className="px-4 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs transition-colors shrink-0 flex items-center gap-1.5"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{savingId === sub.id ? "Saving..." : "Save Feedback"}</span>
-                  </button>
                 </div>
+                <span className="text-slate-500 font-bold text-xs">
+                  Showing {filteredSubmissions.length} of {submissions.length} candidates
+                </span>
               </div>
-            ))}
-          </div>
+
+              <div className="space-y-4">
+                {filteredSubmissions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-3 hover:border-blue-300 transition-all"
+                  >
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                          {sub.traineeName?.split(" ").map(n => n[0]).join("") || "TR"}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-black text-slate-900 text-sm">{sub.traineeName || "Trainee"}</h4>
+                            {sub.cadreId && (
+                              <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold">
+                                {sub.cadreId}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                            <Building2 className="w-3 h-3 text-slate-400" />
+                            <span>{sub.station || "Regional Training Center"}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Score & Timing Badges */}
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <span className="text-sm font-black text-slate-900 block">
+                            {sub.score} / {sub.totalMarks} Marks
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            Time Spent: {sub.timeTakenMinutes ? `${sub.timeTakenMinutes} mins` : (sub.timeTaken || "N/A")}
+                          </span>
+                        </div>
+
+                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
+                          (sub.percentage || 0) >= 85
+                            ? "bg-amber-100 text-amber-900 border border-amber-300"
+                            : (sub.percentage || 0) >= 50
+                            ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                            : "bg-rose-100 text-rose-900 border border-rose-300"
+                        }`}>
+                          {sub.percentage || 0}% ({sub.status || (sub.passed ? "Passed" : "Needs Review")})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Feedback Input Row */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                      <input
+                        type="text"
+                        placeholder="Enter faculty remarks or recommendations for this cadet..."
+                        value={feedbackMap[sub.id] || ""}
+                        onChange={(e) => setFeedbackMap({ ...feedbackMap, [sub.id]: e.target.value })}
+                        className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                      />
+                      <button
+                        onClick={() => handleSaveEvaluation(sub.id)}
+                        disabled={savingId === sub.id}
+                        className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shrink-0 flex items-center gap-1.5"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>{savingId === sub.id ? "Saving..." : "Save Feedback"}</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
         </div>
 
         {/* ═════════ FOOTER ═════════ */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+        <div className="p-4 bg-white border-t border-slate-200 flex items-center justify-between shrink-0">
           <p className="text-xs text-slate-500 font-medium">
-            MoES Central Examination and Quality Assurance Cell
+            Central Examination and Quality Assurance Cell
           </p>
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold rounded-xl text-xs"
+            className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors"
           >
             Close Evaluation Desk
           </button>

@@ -102,33 +102,30 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                Meteorological Domain / Topic Prompt *
+                Domain / Topic Prompt *
               </label>
-              <select
+              <input
+                type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium text-slate-800"
-              >
-                <option value="Numerical Weather Prediction (NWP) Dynamics">Numerical Weather Prediction (NWP) & WRF Physics</option>
-                <option value="Doppler Weather Radar (DWR) Dual-Polarization & Microbursts">Doppler Weather Radar (DWR) & Dual-Pol Moments</option>
-                <option value="Tropical Cyclone Dvorak Technique & Storm Surge">Tropical Cyclone Dvorak Technique & Track Forecasting</option>
-                <option value="Satellite Meteorology & INSAT-3DR Products">Satellite Meteorology & INSAT-3DR Radiance Ingestion</option>
-              </select>
+                placeholder="e.g. RSA Encryption, DBMS Normalization, NWP Models"
+                required
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none font-medium text-slate-800"
+              />
             </div>
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                Subject Association
+                Subject Name *
               </label>
-              <select
+              <input
+                type="text"
                 value={subjectName}
                 onChange={(e) => setSubjectName(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none text-slate-800"
-              >
-                <option value="Subject 1: Governing Equations & Atmospheric Dynamics">Subject 1: Governing Equations & Atmospheric Dynamics</option>
-                <option value="Subject 2: Radar Hardware & Base Products">Subject 2: Radar Hardware & Base Products</option>
-                <option value="Subject 3: Tropical Cyclogenesis">Subject 3: Tropical Cyclogenesis</option>
-              </select>
+                placeholder="e.g. Computer Networks, Database Systems, Meteorology"
+                required
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800 font-medium"
+              />
             </div>
           </div>
 
@@ -140,11 +137,11 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
               <select
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
               >
                 <option value="Easy">Easy (Conceptual / 2 Marks)</option>
                 <option value="Medium">Medium (Analytical / 3 Marks)</option>
-                <option value="Hard">Hard (Expert Mathematical / 5 Marks)</option>
+                <option value="Hard">Hard (Expert / 4 Marks)</option>
               </select>
             </div>
 
@@ -155,10 +152,10 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
               <input
                 type="number"
                 min={1}
-                max={6}
+                max={10}
                 value={count}
                 onChange={(e) => setCount(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
               />
             </div>
 
@@ -171,7 +168,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                 value={module}
                 onChange={(e) => setModule(e.target.value)}
                 placeholder="e.g. Module 1"
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
               />
             </div>
           </div>
@@ -180,7 +177,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
             <button
               type="submit"
               disabled={generating}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md transition-all transform hover:scale-105"
+              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-sm transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
             >
               {generating ? (
                 <>
@@ -189,7 +186,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-yellow-300" />
+                  <Sparkles className="w-4 h-4 text-amber-300" />
                   <span>Generate Questions Now</span>
                 </>
               )}
@@ -226,11 +223,11 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                       onChange={() =>
                         setSelectedToAdd(prev => ({ ...prev, [q.id]: !prev[q.id] }))
                       }
-                      className="mt-1 w-4 h-4 text-[#0a2558] rounded focus:ring-[#0a2558]"
+                      className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0a2558] text-white">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
                           {q.type}
                         </span>
                         <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-teal-100 text-teal-800">

@@ -346,16 +346,16 @@ export const CourseManagementHubModal = ({
                               <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-blue-600 rounded-full" 
-                                  style={{ width: `${trainee.progressPercentage || 75}%` }} 
+                                  style={{ width: `${trainee.progressPercentage !== undefined ? trainee.progressPercentage : 0}%` }} 
                                 />
                               </div>
-                              <span className="font-bold text-slate-700 text-[11px]">{trainee.progressPercentage || 75}%</span>
+                              <span className="font-bold text-slate-700 text-[11px]">{trainee.progressPercentage !== undefined ? trainee.progressPercentage : 0}%</span>
                             </div>
                           </td>
 
                           <td className="py-3.5 px-3">
-                            <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full font-bold text-[10px]">
-                              {trainee.averageScore || 85}%
+                            <span className="px-2.5 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded-full font-bold text-[10px]">
+                              {trainee.averageScore !== undefined ? `${trainee.averageScore}%` : (trainee.avgQuizScore !== undefined ? `${trainee.avgQuizScore}%` : "—")}
                             </span>
                           </td>
 

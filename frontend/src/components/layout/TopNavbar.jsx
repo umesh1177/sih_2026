@@ -28,11 +28,11 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
   };
 
   return (
-    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-6 flex items-center justify-between z-20 shrink-0 shadow-sm relative select-none">
+    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 flex items-center justify-between z-20 shrink-0 shadow-2xs relative select-none">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2.5 text-xs">
         <div className="flex items-center gap-1.5 text-slate-400">
-          <Building2 className="w-4 h-4 text-[#0a2558]" />
+          <Building2 className="w-4 h-4 text-blue-600" />
           <span className="font-semibold text-slate-500">MoES / IMD</span>
           <span>/</span>
         </div>
@@ -46,7 +46,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
           <button
             onClick={onOpenAiCourseAdvisor}
             title="Get Personalized AI Course Recommendations"
-            className="flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-[#0a2558] hover:from-blue-700 hover:via-indigo-700 hover:to-[#081e46] text-white rounded-full text-xs font-bold shadow-sm hover:shadow-md transition-all transform hover:scale-[1.02] active:scale-95 group border border-blue-400/30"
+            className="flex items-center gap-2 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-sm transition-all transform hover:scale-[1.02] active:scale-95 group border border-blue-500/30"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse group-hover:rotate-12 transition-transform" />
             <span className="tracking-wide">AI Course Advisor</span>
@@ -73,7 +73,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
         <button
           onClick={onOpenAnnouncements}
           title="MoES Notifications"
-          className="p-2 rounded-xl text-slate-500 hover:text-[#0a2558] hover:bg-slate-100 transition-colors relative border border-slate-200 shadow-sm"
+          className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition-colors relative border border-slate-200 shadow-2xs"
         >
           <Bell className="w-4 h-4" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>

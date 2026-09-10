@@ -73,159 +73,13 @@ export const TraineePracticePapersView = ({
         }));
       }
 
-      // Add local default practice papers if list is short
-      if (papersList.length < 3) {
-        papersList = [
-          {
-            id: "paper_nwp_10",
-            title: "Adaptive NWP Governing Equations & Arakawa Grids Drill",
-            courseName: "Atmospheric Modeling",
-            subjectName: "Atmospheric Dynamics",
-            totalMarks: 30,
-            questionCount: 10,
-            durationMinutes: 20,
-            isAdaptive: true,
-            initialDifficulty: "Medium",
-            createdAt: "2026-02-18T10:00:00Z",
-            questions: [
-              {
-                id: "q_p1",
-                question: "In numerical weather prediction (NWP), what is the primary role of the Arakawa C-grid staggering?",
-                options: [
-                  "Placing velocity variables (u, v) on cell faces and mass variables (T, P) at cell centres to optimise gravity wave dispersion",
-                  "Placing all variables at cell vertices exclusively",
-                  "Eliminating vertical advection across sigma coordinates",
-                  "Converting non-hydrostatic systems into hydrostatic balance"
-                ],
-                correctAnswer: 0,
-                marks: 3,
-                difficulty: "Medium",
-                subjectName: "Atmospheric Dynamics",
-                explanation: "Arakawa C-grid offers superior dispersion properties for high-frequency gravity and inertia-gravity waves."
-              },
-              {
-                id: "q_p2",
-                question: "Which condition must be satisfied to prevent numerical instability in explicit finite difference advection schemes (CFL condition)?",
-                options: [
-                  "CFL = (u · Δt) / Δx ≤ 1.0",
-                  "CFL = (u · Δx) / Δt ≥ 1.0",
-                  "CFL = (Δx · Δt) / u = 0",
-                  "CFL = u² / (g · Δz) > 2.0"
-                ],
-                correctAnswer: 0,
-                marks: 3,
-                difficulty: "Medium",
-                subjectName: "Numerical Modeling",
-                explanation: "The CFL condition requires the numerical domain of dependence to enclose the physical domain."
-              },
-              {
-                id: "q_p3",
-                question: "In dual-polarization weather radar, what physical property does Differential Reflectivity (ZDR) primarily characterize?",
-                options: [
-                  "Echo top height above sea level",
-                  "The median oblateness / eccentricity of hydrometeors (horizontal vs vertical axis ratio)",
-                  "Radial velocity toward the radar antenna",
-                  "Total atmospheric precipitable water"
-                ],
-                correctAnswer: 1,
-                marks: 3,
-                difficulty: "Medium",
-                subjectName: "Doppler Radar Meteorology",
-                explanation: "ZDR characterizes the axis ratio and oblateness of raindrops and hail particles."
-              },
-              {
-                id: "q_p4",
-                question: "For Tropical Cyclone intensity estimation via the Dvorak Technique, which satellite pattern represents the highest convective organization?",
-                options: [
-                  "Shear Pattern with displaced convective core",
-                  "Curved Band Pattern with 0.5 spiral wrap",
-                  "Eye Pattern with cold symmetrical Central Dense Overcast (CDO)",
-                  "Isolated banding without low-level center definition"
-                ],
-                correctAnswer: 2,
-                marks: 3,
-                difficulty: "Hard",
-                subjectName: "Tropical Meteorology",
-                explanation: "A distinct warm eye embedded inside a cold symmetrical CDO yields maximum T-Numbers."
-              },
-              {
-                id: "q_p5",
-                question: "In INSAT-3DR multi-channel data, which channel is most effective for mid-tropospheric jet stream and upper-air moisture tracking?",
-                options: [
-                  "Water Vapour (WV) Channel (6.5 - 7.1 µm)",
-                  "Visible Channel (0.55 - 0.75 µm)",
-                  "Shortwave Infrared (SWIR) Channel (1.55 - 1.70 µm)",
-                  "Thermal Infrared 2 (TIR-2) Channel (11.5 - 12.5 µm)"
-                ],
-                correctAnswer: 0,
-                marks: 3,
-                difficulty: "Medium",
-                subjectName: "Satellite Meteorology",
-                explanation: "The 6.7 µm WV channel absorbs strongly in upper-mid troposphere moisture."
-              }
-            ]
-          },
-          {
-            id: "paper_radar_5",
-            title: "Doppler Radar Dual-Polarization & Nowcasting Speed Test",
-            courseName: "Radar Meteorology",
-            subjectName: "Doppler Radar",
-            totalMarks: 15,
-            questionCount: 5,
-            durationMinutes: 10,
-            isAdaptive: true,
-            initialDifficulty: "Medium",
-            createdAt: "2026-02-15T14:30:00Z",
-            questions: []
-          },
-          {
-            id: "paper_sat_10",
-            title: "INSAT-3DR Satellite Meteorological Sounder & Product Drill",
-            courseName: "Satellite Meteorology",
-            subjectName: "INSAT Products",
-            totalMarks: 30,
-            questionCount: 10,
-            durationMinutes: 20,
-            isAdaptive: true,
-            initialDifficulty: "Hard",
-            createdAt: "2026-02-10T09:00:00Z",
-            questions: []
-          }
-        ];
-      }
-
       setPracticePapers(papersList);
 
-      // Score history
+      // Score history strictly from backend
       if (subRes.success && subRes.submissions) {
         setScoreHistory(subRes.submissions);
       } else {
-        setScoreHistory([
-          {
-            id: "sub_demo_1",
-            quizTitle: "Adaptive NWP Governing Equations & Arakawa Grids Drill",
-            score: 27,
-            totalMarks: 30,
-            percentage: 90.0,
-            passed: true,
-            submittedAt: "2026-02-17T18:30:00Z",
-            adaptiveTrajectory: "Medium ➔ Hard ➔ Advanced",
-            timeTakenSeconds: 742,
-            tabSwitchCount: 0
-          },
-          {
-            id: "sub_demo_2",
-            quizTitle: "Doppler Radar Dual-Polarization & Nowcasting Speed Test",
-            score: 12,
-            totalMarks: 15,
-            percentage: 80.0,
-            passed: true,
-            submittedAt: "2026-02-14T11:20:00Z",
-            adaptiveTrajectory: "Medium ➔ Easy ➔ Medium (Calibrated)",
-            timeTakenSeconds: 380,
-            tabSwitchCount: 0
-          }
-        ]);
+        setScoreHistory([]);
       }
     } catch (err) {
       console.error("Error loading practice papers:", err);
@@ -236,7 +90,7 @@ export const TraineePracticePapersView = ({
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentUser]);
 
   const [topicErrorMessage, setTopicErrorMessage] = useState("");
 
@@ -254,7 +108,7 @@ export const TraineePracticePapersView = ({
         const requestedCount = Number(generateForm.questionCount) || 10;
         // Generate with Gemini AI specifically tailored to the entered topic
         const res = await api.generateAiQuestions({
-          topic: enteredTopic || "Meteorological Science & Operational NWP",
+          topic: enteredTopic,
           difficulty: generateForm.initialDifficulty || "Medium",
           count: requestedCount,
           subjectName: generateForm.title || enteredTopic
@@ -262,11 +116,11 @@ export const TraineePracticePapersView = ({
 
         if (res.success && res.generatedQuestions && res.generatedQuestions.length > 0) {
           generatedQuestions = res.generatedQuestions;
-          // Also persist generated questions to global question bank
+          // Persist generated questions to question bank
           for (const q of generatedQuestions) {
             api.createQuestion({
               question: q.question,
-              subjectId: "sub_nwp_01",
+              subjectId: "sub_gen_01",
               subjectName: q.subjectName || generateForm.title || enteredTopic,
               module: q.module || "AI Synthesis",
               topic: enteredTopic,
@@ -279,84 +133,9 @@ export const TraineePracticePapersView = ({
             }).catch(() => {});
           }
         } else {
-          // Dynamic fallback tailored to the specific entered topic
-          const fallbackTopic = enteredTopic || "Operational Meteorological Science";
-          const diff = generateForm.initialDifficulty || "Medium";
-          const numMarks = diff === "Hard" ? 4 : diff === "Easy" ? 2 : 3;
-
-          const templates = [
-            {
-              q: `In the domain of "${fallbackTopic}", what is the primary physical mechanism or diagnostic metric evaluated during operational analysis?`,
-              opt: [
-                `Hydrodynamic energy balance and prognostic conservation equations formulated for ${fallbackTopic}`,
-                `Static dry adiabatic assumption neglecting moisture transport`,
-                `Constant atmospheric density ignoring baroclinic height gradients`,
-                `Zero boundary layer turbulent kinetic energy dissipation`
-              ],
-              ans: 0,
-              exp: `Accurate operational analysis for ${fallbackTopic} is governed by coupled momentum, thermodynamic, and mass conservation equations.`
-            },
-            {
-              q: `When calibrating numerical models and satellite observations for "${fallbackTopic}", which approach minimizes analysis uncertainty?`,
-              opt: [
-                `Flow-dependent background error covariance weighting paired with radiosonde verification for ${fallbackTopic}`,
-                `Arbitrary spectral truncation at low wave numbers`,
-                `Assuming zero observational error variance across all vertical soundings`,
-                `Setting lateral boundary conditions as impermeable static walls`
-              ],
-              ans: 0,
-              exp: `Flow-dependent covariance weighting ensures observational innovations are accurately assimilated for ${fallbackTopic}.`
-            },
-            {
-              q: `Under severe weather nowcasting for "${fallbackTopic}", which remote sensing signature indicates rapid intensification?`,
-              opt: [
-                `Cloud-top brightness temperature cooling combined with high dual-pol reflectivity gradients in ${fallbackTopic}`,
-                `Uniform surface albedo with zero Doppler velocity shear`,
-                `Stationary isothermal lapse rate in the boundary layer`,
-                `Lack of moisture convergence along surface frontal boundaries`
-              ],
-              ans: 0,
-              exp: `Rapid cloud-top cooling and steep polarimetric gradients are verified precursors of active intensification in ${fallbackTopic}.`
-            },
-            {
-              q: `Which numerical integration scheme is most effective for mitigating high-frequency acoustic wave amplification in "${fallbackTopic}"?`,
-              opt: [
-                `Split-explicit time stepping separating fast acoustic modes from meteorological advection in ${fallbackTopic}`,
-                `Purely unconstrained explicit forward Euler integration`,
-                `Removing horizontal pressure gradient terms completely`,
-                `Setting vertical velocity w = 0 universally across all domain points`
-              ],
-              ans: 0,
-              exp: `Split-explicit time integration stabilizes fast acoustic propagation while maintaining efficiency in ${fallbackTopic}.`
-            },
-            {
-              q: `For operational forecast verification in "${fallbackTopic}", which statistical metric is mandated by IMD / WMO guidelines?`,
-              opt: [
-                `Equitable Threat Score (ETS), Brier Score, and Root Mean Square Error (RMSE) calibrated for ${fallbackTopic}`,
-                `Single-point uncalibrated persistence ratio without reference climatology`,
-                `Unweighted mean absolute deviation ignoring spatial displacement errors`,
-                `Qualitative visual inspection without quantitative contingency tables`
-              ],
-              ans: 0,
-              exp: `ETS, Brier Score, and RMSE provide standardized probabilistic and categorical verification for ${fallbackTopic}.`
-            }
-          ];
-
-          generatedQuestions = [];
-          for (let i = 0; i < requestedCount; i++) {
-            const tmpl = templates[i % templates.length];
-            generatedQuestions.push({
-              id: `q_gen_${Date.now()}_${i + 1}`,
-              question: tmpl.q,
-              options: tmpl.opt,
-              correctAnswer: tmpl.ans,
-              marks: numMarks,
-              difficulty: diff,
-              subjectName: generateForm.title || fallbackTopic,
-              module: `Module ${(i % 5) + 1}`,
-              explanation: tmpl.exp
-            });
-          }
+          setTopicErrorMessage(res?.message || `AI Generation was unable to produce questions for topic "${enteredTopic}". Please check your topic name or try again.`);
+          setGenerating(false);
+          return;
         }
       } else {
         // Fetch from Question Bank with exact and semantic topic filtering
@@ -505,27 +284,27 @@ export const TraineePracticePapersView = ({
         </div>
       </div>
 
-      {/* ─── 2. ADAPTIVE TESTING ENGINE EXPLANATION BANNER ─── */}
-      <div className="p-5 sm:p-6 bg-gradient-to-r from-blue-900 via-[#0d3477] to-[#0a2558] text-white rounded-3xl border border-white/10 shadow-lg relative overflow-hidden">
+      {/* ─── 2. ADAPTIVE TESTING ENGINE EXPLANATION BANNER (LIGHT CARD) ─── */}
+      <div className="p-6 bg-white text-slate-800 rounded-3xl border border-slate-200 shadow-2xs relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30 text-[10px] font-extrabold uppercase tracking-wider">
-              <Flame className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-extrabold uppercase tracking-wider">
+              <Flame className="w-3.5 h-3.5 text-amber-600" />
               <span>Smart Practice Engine</span>
             </div>
-            <h3 className="text-lg font-black text-white tracking-tight">
+            <h3 className="text-lg font-black text-slate-900 tracking-tight">
               Adaptive Practice & Continuous Competency Calibration
             </h3>
-            <p className="text-xs text-blue-100/90 leading-relaxed font-normal">
-              Practice sessions dynamically evaluate subject understanding in real-time, tailoring question sequences across atmospheric physics, radar products, and cyclone warning protocols.
+            <p className="text-xs text-slate-500 leading-relaxed font-normal">
+              Practice sessions dynamically evaluate topic understanding in real-time, tailoring question sequences across your selected subjects.
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center space-y-2 shrink-0 w-full lg:w-64">
-            <Brain className="w-8 h-8 text-sky-300 mx-auto" />
-            <p className="font-black text-white text-xs">1-Click Fast Drill</p>
-            <p className="text-[11px] text-blue-200">
-              Start an instant 10-question adaptive NWP & radar assessment:
+          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-center space-y-2 shrink-0 w-full lg:w-64">
+            <Brain className="w-8 h-8 text-blue-600 mx-auto" />
+            <p className="font-black text-slate-900 text-xs">1-Click Fast Drill</p>
+            <p className="text-[11px] text-slate-500">
+              Start an instant adaptive assessment with available papers:
             </p>
             <button
               onClick={() => {
@@ -533,7 +312,8 @@ export const TraineePracticePapersView = ({
                   onStartExam(practicePapers[0]);
                 }
               }}
-              className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition-transform active:scale-95"
+              disabled={practicePapers.length === 0}
+              className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-xl text-xs shadow-xs transition-all active:scale-95"
             >
               Launch Quick Drill ⚡
             </button>

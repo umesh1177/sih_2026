@@ -81,7 +81,7 @@ export const CourseCatalogView = ({
         }
         return false;
       });
-      return assigned.length > 0 ? assigned : courses.slice(0, 2);
+      return assigned;
     }
 
     return courses;

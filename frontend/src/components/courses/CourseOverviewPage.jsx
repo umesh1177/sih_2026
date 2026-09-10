@@ -127,62 +127,32 @@ export const CourseOverviewPage = ({
       if (res.success && res.quizzes) {
         setCourseQuizzes(res.quizzes);
       } else {
-        // Mock fallback quizzes for this course
-        setCourseQuizzes([
-          {
-            id: "quiz_nwp_01",
-            title: "#30 Atmospheric Dynamics & NWP 4D-Var Assimilation",
-            courseId: course.id,
-            courseName: course.title,
-            subjectId: course.subjects?.[0]?.id || "subj_1",
-            subjectName: course.subjects?.[0]?.name || "Atmospheric Dynamics",
-            durationMinutes: 30,
-            totalMarks: 40,
-            passMarks: 20,
-            scheduledStartTime: new Date().toISOString(),
-            resultsPublished: false,
-            submissionsCount: 34,
-            questions: []
-          },
-          {
-            id: "quiz_nwp_02",
-            title: "#29 Doppler Weather Radar & Polarimetric Nowcasting",
-            courseId: course.id,
-            courseName: course.title,
-            subjectId: course.subjects?.[1]?.id || "subj_2",
-            subjectName: course.subjects?.[1]?.name || "Doppler Weather Radar",
-            durationMinutes: 45,
-            totalMarks: 50,
-            passMarks: 25,
-            scheduledStartTime: new Date(Date.now() - 86400000).toISOString(),
-            resultsPublished: true,
-            submissionsCount: 42,
-            questions: []
-          }
-        ]);
+        setCourseQuizzes([]);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      setCourseQuizzes([]);
+    });
   }, [currentUser?.id, course?.id, course?.title, course?.code]);
 
-  // Calculate completion percentage
+  // Calculate genuine completion percentage
   const allModules = course?.subjects?.flatMap(s => s.modules || []) || [];
-  const totalModuleCount = allModules.length || 1;
+  const totalModuleCount = allModules.length;
   const completedModuleCount = allModules.filter(m => userProgress[m.id]?.completed).length;
-  const progressPercentage = completedModuleCount > 0 
+  const progressPercentage = totalModuleCount > 0 
     ? Math.round((completedModuleCount / totalModuleCount) * 100)
-    : (isEnrolled ? 65 : 0);
+    : 0;
 
   const isCourse100Percent = progressPercentage >= 100 || currentUser?.role === "trainer" || currentUser?.role === "admin";
 
   // Derive specs counts
-  const totalSubjects = course.subjects?.length || 2;
+  const totalSubjects = course.subjects?.length || 0;
   const totalModules = totalModuleCount;
   const totalVideos = course.subjects?.reduce((acc, sub) => 
     acc + (sub.modules?.reduce((mAcc, mod) => 
-      mAcc + (mod.materials?.filter(m => m.type === "video").length || 0), 0) || 0), 0) || 3;
+      mAcc + (mod.materials?.filter(m => m.type === "video").length || 0), 0) || 0), 0) || 0;
   const totalInteractiveDocs = course.subjects?.reduce((acc, sub) => 
     acc + (sub.modules?.reduce((mAcc, mod) => 
-      mAcc + (mod.materials?.filter(m => m.type !== "video").length || 0), 0) || 0), 0) || 9;
+      mAcc + (mod.materials?.filter(m => m.type !== "video").length || 0), 0) || 0), 0) || 0;
 
   // Handle Feedback Submission
   const handleSubmitFeedback = async (e) => {

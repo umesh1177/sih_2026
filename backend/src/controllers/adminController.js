@@ -11,26 +11,34 @@ export const getAdminStats = (req, res) => {
 
     const totalCertificates = submissions.filter(s => s.certificateGenerated).length;
     const passedCount = submissions.filter(s => s.passed).length;
-    const overallPassRate = submissions.length > 0 ? Math.round((passedCount / submissions.length) * 100) : 92;
+    const overallPassRate = submissions.length > 0 ? Math.round((passedCount / submissions.length) * 100) : 0;
 
-    // Department-wise distribution
-    const deptDistribution = [
-      { name: "NWP Division", count: 42, activeTrainees: 28 },
-      { name: "Radar & Satellite", count: 35, activeTrainees: 22 },
-      { name: "Cyclone Warning", count: 29, activeTrainees: 19 },
-      { name: "Agrometeorology", count: 24, activeTrainees: 16 },
-      { name: "Seismology & Marine", count: 18, activeTrainees: 12 }
-    ];
+    // Dynamic department-wise distribution
+    const deptMap = {};
+    db.users.forEach(u => {
+      const d = u.department || "General Division";
+      if (!deptMap[d]) deptMap[d] = { name: d, count: 0, activeTrainees: 0 };
+      deptMap[d].count += 1;
+      if (u.role === "trainee") deptMap[d].activeTrainees += 1;
+    });
+    const deptDistribution = Object.values(deptMap);
 
-    // Monthly certification trend
-    const monthlyCertifications = [
-      { month: "Sep", certificates: 14, enrollments: 32 },
-      { month: "Oct", certificates: 22, enrollments: 45 },
-      { month: "Nov", certificates: 35, enrollments: 58 },
-      { month: "Dec", certificates: 48, enrollments: 70 },
-      { month: "Jan", certificates: 62, enrollments: 85 },
-      { month: "Feb", certificates: 78, enrollments: 104 }
-    ];
+    // Dynamic monthly certifications aggregated from real submissions
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthCounts = {};
+    submissions.forEach(s => {
+      const date = new Date(s.submittedAt || Date.now());
+      const m = months[date.getMonth()];
+      if (!monthCounts[m]) monthCounts[m] = { month: m, certificates: 0, enrollments: 0 };
+      if (s.certificateGenerated) monthCounts[m].certificates += 1;
+      monthCounts[m].enrollments += 1;
+    });
+    const monthlyCertifications = Object.values(monthCounts).length > 0
+      ? Object.values(monthCounts)
+      : [
+          { month: "Jan", certificates: 0, enrollments: 0 },
+          { month: "Feb", certificates: 0, enrollments: 0 }
+        ];
 
     return res.json({
       success: true,
@@ -40,7 +48,7 @@ export const getAdminStats = (req, res) => {
         pendingApprovalsCount: pendingUsers.length,
         totalCourses: courses.length,
         totalQuizzesScheduled: quizzes.length,
-        totalCertificatesIssued: totalCertificates + 142, // Combined historical + active
+        totalCertificatesIssued: totalCertificates,
         overallPassRate: overallPassRate,
         deptDistribution,
         monthlyCertifications

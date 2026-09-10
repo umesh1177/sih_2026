@@ -57,7 +57,7 @@ export const TrainerDashboardView = ({
             return false;
           });
           
-          const finalCourses = assignedOnly.length > 0 ? assignedOnly : cRes.courses.slice(0, 2);
+          const finalCourses = assignedOnly;
           setCourses(finalCourses);
         }
       } catch (err) {

@@ -142,24 +142,25 @@ export const TrainerScheduleAssessmentView = ({
           if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
           return false;
         });
-        const finalCourses = assignedOnly.length > 0 ? assignedOnly : cRes.courses.slice(0, 2);
+        const finalCourses = assignedOnly.length > 0 ? assignedOnly : (currentUser?.role === "admin" ? cRes.courses : assignedOnly);
         setCourses(finalCourses);
 
         if (finalCourses.length > 0) {
           const firstCourse = finalCourses[0];
-          const firstSubject = firstCourse.subjects?.[0] || { id: "subj_1", name: "Atmospheric Dynamics" };
+          const firstSubject = firstCourse.subjects?.[0] || null;
           setCreateForm(prev => ({
             ...prev,
             courseId: firstCourse.id,
             courseName: firstCourse.title,
-            subjectId: firstSubject.id,
-            subjectName: firstSubject.name || firstSubject.title
+            subjectId: firstSubject?.id || "",
+            subjectName: firstSubject?.name || firstSubject?.title || ""
           }));
+          const firstModule = firstSubject?.modules?.[0];
           setAiPaperConfig(prev => ({
             ...prev,
-            moduleName: firstSubject.modules?.[0]?.title || "Module 1: Primitive Equations",
-            topicName: "Atmospheric Equations & Numerical Grid Dispersion",
-            conceptName: "Arakawa-C Staggering & 4D-Var"
+            moduleName: firstModule?.title || "",
+            topicName: firstModule?.topics?.[0] || firstSubject?.name || firstCourse.title,
+            conceptName: ""
           }));
         }
       }
@@ -1367,7 +1368,7 @@ export const TrainerScheduleAssessmentView = ({
                         Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Cadets</b>
                       </span>
                       <span className="text-emerald-700 font-black">
-                        Avg: {quiz.averageScore !== undefined ? quiz.averageScore : (quiz.averagePercentage || 82.5)}%
+                        Avg: {quiz.averageScore !== undefined ? `${quiz.averageScore}%` : (quiz.averagePercentage !== undefined ? `${quiz.averagePercentage}%` : "—")}
                       </span>
                     </div>
                   </div>
