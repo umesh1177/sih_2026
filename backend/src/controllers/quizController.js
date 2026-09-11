@@ -160,12 +160,16 @@ export const getQuizzes = (req, res) => {
       });
     }
 
-    // PRACTICE PAPER FILTERING: Only papers created by this trainee
-    if (practiceOnly === "true" && traineeId) {
-      quizzes = quizzes.filter(q =>
-        q.createdBy === traineeId ||
-        (q.isPractice === true && q.createdBy === traineeId)
-      );
+    // PRACTICE PAPER FILTERING: Return practice drills created by this trainee or generated AI drills
+    if (practiceOnly === "true") {
+      if (traineeId) {
+        quizzes = quizzes.filter(q =>
+          (q.isPractice === true || q.type === "practice") &&
+          (q.createdBy === traineeId || !q.createdBy || q.createdByRole === "trainee" || q.isAllTrainees)
+        );
+      } else {
+        quizzes = quizzes.filter(q => q.isPractice === true || q.type === "practice");
+      }
     }
 
     return res.json({ success: true, count: quizzes.length, quizzes });
@@ -190,15 +194,21 @@ export const getQuizById = (req, res) => {
 
 export const createQuiz = (req, res) => {
   try {
+    const isPractice = req.body.isPractice === true || req.body.type === "practice";
     const quizData = {
       ...req.body,
+      isPractice,
+      type: isPractice ? "practice" : (req.body.type || "assessment"),
       createdBy: req.user?.id || req.body.createdBy || null,
-      createdByRole: req.user?.role || req.body.createdByRole || "trainer"
+      createdByName: req.user?.name || req.body.createdByName || (isPractice ? "Trainee" : "Trainer"),
+      createdByRole: req.user?.role || req.body.createdByRole || (isPractice ? "trainee" : "trainer")
     };
     const quiz = db.createQuiz(quizData);
     return res.status(201).json({
       success: true,
-      message: "Quiz created and scheduled successfully! Card will appear on Trainee Dashboard according to scheduled time.",
+      message: isPractice
+        ? "AI Practice Paper created and saved permanently!"
+        : "Quiz created and scheduled successfully! Card will appear on Trainee Dashboard according to scheduled time.",
       quiz
     });
   } catch (err) {

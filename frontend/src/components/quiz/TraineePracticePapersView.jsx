@@ -58,19 +58,19 @@ export const TraineePracticePapersView = ({
   const loadData = async () => {
     setLoading(true);
     try {
-      const userId = currentUser?.id || "";
+      const userId = currentUser?.id || "u_trainee_1";
+      const cacheKey = `moes_practice_papers_${userId}`;
 
-      // Fetch ONLY the current user's practice papers (practiceOnly filter)
+      // 1. Fetch practice papers from backend
       const [qRes, subRes] = await Promise.all([
         api.getQuizzes({ practiceOnly: "true", traineeId: userId }),
         api.getTraineeSubmissions(userId)
       ]);
 
-      let papersList = [];
+      let backendPapers = [];
       if (qRes.success && qRes.quizzes) {
-        // Only show papers created by this user
-        papersList = qRes.quizzes
-          .filter(q => q.createdBy === userId || q.isPractice === true)
+        backendPapers = qRes.quizzes
+          .filter(q => q.createdBy === userId || q.isPractice === true || q.type === "practice")
           .map(q => ({
             ...q,
             isPractice: true,
@@ -78,7 +78,29 @@ export const TraineePracticePapersView = ({
           }));
       }
 
-      setPracticePapers(papersList);
+      // 2. Load locally cached papers for offline/refresh resilience
+      let localPapers = [];
+      try {
+        localPapers = JSON.parse(localStorage.getItem(cacheKey) || "[]");
+      } catch (e) {
+        localPapers = [];
+      }
+
+      // 3. Merge backend and local papers by unique ID
+      const paperMap = new Map();
+      localPapers.forEach(p => { if (p && p.id) paperMap.set(p.id, p); });
+      backendPapers.forEach(p => { if (p && p.id) paperMap.set(p.id, p); });
+
+      const mergedPapers = Array.from(paperMap.values()).sort(
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+      );
+
+      // Update cache
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(mergedPapers));
+      } catch (e) {}
+
+      setPracticePapers(mergedPapers);
 
       // Score history strictly from backend
       if (subRes.success && subRes.submissions) {
@@ -88,6 +110,12 @@ export const TraineePracticePapersView = ({
       }
     } catch (err) {
       console.error("Error loading practice papers:", err);
+      // Fallback to local storage if network glitch
+      try {
+        const userId = currentUser?.id || "u_trainee_1";
+        const localPapers = JSON.parse(localStorage.getItem(`moes_practice_papers_${userId}`) || "[]");
+        if (localPapers.length > 0) setPracticePapers(localPapers);
+      } catch (e) {}
     } finally {
       setLoading(false);
     }
@@ -108,6 +136,7 @@ export const TraineePracticePapersView = ({
     try {
       let generatedQuestions = [];
       const enteredTopic = (generateForm.topic || "").trim();
+      const userId = currentUser?.id || "u_trainee_1";
 
       if (generateForm.source === "ai") {
         const requestedCount = Number(generateForm.questionCount) || 10;
@@ -192,10 +221,10 @@ export const TraineePracticePapersView = ({
         return;
       }
 
-      // Create new practice quiz object
+      // Create new practice quiz object with complete metadata
       const calculatedTotalMarks = generatedQuestions.reduce((acc, q) => acc + (Number(q.marks) || 3), 0) || 30;
       const newPaper = {
-        id: `paper_custom_${Date.now()}`,
+        id: `paper_practice_${Date.now()}`,
         title: generateForm.title || `${enteredTopic || "Meteorology"} Practice Drill`,
         courseId: "crs_nwp_101",
         courseName: "MoES Operational Meteorology",
@@ -205,18 +234,38 @@ export const TraineePracticePapersView = ({
         passMarks: Math.round(calculatedTotalMarks * 0.5),
         durationMinutes: Number(generateForm.durationMinutes) || 20,
         questionCount: generatedQuestions.length,
-        isAdaptive: generateForm.isAdaptive,
-        initialDifficulty: generateForm.initialDifficulty,
+        isPractice: true,
+        type: "practice",
+        createdBy: userId,
+        createdByName: currentUser?.name || "Trainee",
+        createdByRole: currentUser?.role || "trainee",
+        isAdaptive: generateForm.isAdaptive !== undefined ? generateForm.isAdaptive : true,
+        initialDifficulty: generateForm.initialDifficulty || "Medium",
+        source: generateForm.source || "ai",
+        topic: enteredTopic,
         questions: generatedQuestions,
         createdAt: new Date().toISOString()
       };
 
-      // Save quiz to backend
+      // Save quiz to backend DB
       try {
-        await api.createQuiz(newPaper);
-      } catch (err) {}
+        const createRes = await api.createQuiz(newPaper);
+        if (createRes?.quiz?.id) {
+          newPaper.id = createRes.quiz.id;
+        }
+      } catch (err) {
+        console.warn("Backend save warning for practice paper:", err);
+      }
 
-      setPracticePapers(prev => [newPaper, ...prev]);
+      // Persist to local storage for zero-loss refresh safety
+      try {
+        const cacheKey = `moes_practice_papers_${userId}`;
+        const existingLocal = JSON.parse(localStorage.getItem(cacheKey) || "[]");
+        const updatedLocal = [newPaper, ...existingLocal.filter(p => p.id !== newPaper.id)];
+        localStorage.setItem(cacheKey, JSON.stringify(updatedLocal));
+      } catch (e) {}
+
+      setPracticePapers(prev => [newPaper, ...prev.filter(p => p.id !== newPaper.id)]);
       setIsGenerateModalOpen(false);
       setTopicErrorMessage("");
 

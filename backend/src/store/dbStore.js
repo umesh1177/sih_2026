@@ -811,16 +811,17 @@ class DatabaseStore {
 
   createQuiz(quizData) {
     const newQuiz = {
+      ...quizData,
       id: quizData.id || `quiz_${uuidv4().substring(0, 8)}`,
       title: quizData.title,
-      courseId: quizData.courseId,
-      courseName: quizData.courseName,
+      courseId: quizData.courseId || "crs_nwp_101",
+      courseName: quizData.courseName || "MoES Operational Meteorology",
       subjectId: quizData.subjectId || "all",
       subjectName: quizData.subjectName || "",
-      topicName: quizData.topicName || "",
+      topicName: quizData.topicName || quizData.topic || "",
       conceptName: quizData.conceptName || "",
-      trainerId: quizData.trainerId,
-      trainerName: quizData.trainerName,
+      trainerId: quizData.trainerId || quizData.createdBy || "u_trainer_1",
+      trainerName: quizData.trainerName || "AI Adaptive Engine",
       department: quizData.department || "India Meteorological Department",
       totalMarks: Number(quizData.totalMarks) || 20,
       passMarks: Number(quizData.passMarks) || 10,
@@ -828,10 +829,18 @@ class DatabaseStore {
       scheduledStartTime: quizData.scheduledStartTime || new Date().toISOString(),
       deadlineTime: quizData.deadlineTime || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       status: quizData.status || "published",
-      isKioskModeRequired: true,
+      isPractice: quizData.isPractice !== undefined ? quizData.isPractice : (quizData.type === "practice"),
+      type: quizData.type || (quizData.isPractice ? "practice" : "assessment"),
+      createdBy: quizData.createdBy || null,
+      createdByRole: quizData.createdByRole || "trainer",
+      isAdaptive: quizData.isAdaptive !== undefined ? quizData.isAdaptive : true,
+      initialDifficulty: quizData.initialDifficulty || "Medium",
+      questionCount: Array.isArray(quizData.questions) ? quizData.questions.length : (quizData.questionCount || 10),
+      isKioskModeRequired: quizData.isKioskModeRequired !== undefined ? quizData.isKioskModeRequired : true,
       targetTraineeIds: Array.isArray(quizData.targetTraineeIds) ? quizData.targetTraineeIds : [],
       blueprint: Array.isArray(quizData.blueprint) ? quizData.blueprint : [],
-      questions: quizData.questions || []
+      questions: quizData.questions || [],
+      createdAt: quizData.createdAt || new Date().toISOString()
     };
     this.quizzes.unshift(newQuiz);
     this._persist();
