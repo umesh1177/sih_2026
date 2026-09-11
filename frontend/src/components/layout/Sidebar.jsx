@@ -18,11 +18,21 @@ import {
   TrendingUp,
   ShieldAlert,
   Star,
-  Users
+  Users,
+  X
 } from "lucide-react";
 
-export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage, onOpenAiAdvisor }) => {
+export const Sidebar = ({ 
+  activeTab, 
+  setActiveTab, 
+  onOpenLoginPage, 
+  onOpenHomePage, 
+  onOpenAiAdvisor,
+  isMobileOpen = false,
+  onCloseMobile
+}) => {
   const { currentUser, logout } = useAuth();
+
 
   // Role based navigation links
   const getNavItems = () => {
@@ -75,108 +85,139 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
 
   const navItems = getNavItems();
 
+  const handleItemClick = (callback) => {
+    if (callback) callback();
+    if (onCloseMobile) onCloseMobile();
+  };
+
   const handleLogout = () => {
     logout();
+    if (onCloseMobile) onCloseMobile();
     if (onOpenLoginPage) onOpenLoginPage();
   };
 
   return (
-    <aside className="w-64 bg-white text-slate-700 flex flex-col h-screen select-none shrink-0 shadow-sm relative z-30 border-r border-slate-200">
-      {/* Brand Header */}
-      <div className="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50/50">
-        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-sm tracking-wider shadow-sm shrink-0">
-          CC
-        </div>
-        <div className="overflow-hidden">
-          <div className="flex items-center gap-1.5">
-            <h1 className="font-extrabold text-sm tracking-tight text-slate-900 uppercase truncate">
-              CAPACITY CONNECT
-            </h1>
-          </div>
-          <p className="text-[10px] text-slate-500 font-medium tracking-wide truncate">
-            MoES / IMD LMS Portal
-          </p>
-        </div>
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isMobileOpen && (
+        <div 
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300"
+          aria-hidden="true"
+        />
+      )}
 
-      {/* Nav List */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin">
-        {onOpenHomePage && (
+      <aside className={`w-64 bg-white text-slate-700 flex flex-col h-screen select-none shrink-0 shadow-xl md:shadow-sm z-50 border-r border-slate-200 fixed inset-y-0 left-0 md:static md:translate-x-0 transition-transform duration-300 ease-in-out ${
+        isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      }`}>
+        {/* Brand Header */}
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-sm tracking-wider shadow-sm shrink-0">
+              CC
+            </div>
+            <div className="overflow-hidden">
+              <div className="flex items-center gap-1.5">
+                <h1 className="font-extrabold text-sm tracking-tight text-slate-900 uppercase truncate">
+                  CAPACITY CONNECT
+                </h1>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wide truncate">
+                MoES / IMD LMS Portal
+              </p>
+            </div>
+          </div>
+          
+          {/* Close button on mobile */}
           <button
-            onClick={onOpenHomePage}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 border border-emerald-200 transition-all text-left mb-2 shadow-xs"
+            onClick={onCloseMobile}
+            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+            aria-label="Close sidebar"
           >
-            <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="truncate">Public Portal & Verify</span>
+            <X className="w-5 h-5" />
           </button>
-        )}
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          const isAdvisor = item.isModalTrigger;
+        </div>
 
-          return (
+        {/* Nav List */}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin touch-scroll">
+          {onOpenHomePage && (
             <button
-              key={item.id}
-              onClick={() => {
-                if (item.isModalTrigger && onOpenAiAdvisor) {
-                  onOpenAiAdvisor();
-                } else {
-                  setActiveTab(item.id);
-                }
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
-                isActive
-                  ? "bg-blue-50 text-blue-700 font-bold border-l-4 border-blue-600 shadow-xs"
-                  : isAdvisor
-                  ? "bg-amber-50/80 text-amber-900 hover:bg-amber-100/80 border border-amber-200/80 font-bold"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              }`}
+              onClick={() => handleItemClick(onOpenHomePage)}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 border border-emerald-200 transition-all text-left mb-2 shadow-xs"
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-blue-600" : isAdvisor ? "text-amber-600" : "text-slate-500"}`} />
-              <span className="truncate">{item.label}</span>
-              {isAdvisor && (
-                <span className="ml-auto px-1.5 py-0.5 rounded-md bg-amber-200/60 text-amber-800 text-[9px] font-black uppercase tracking-wider">
-                  AI
-                </span>
-              )}
+              <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="truncate">Public Portal & Verify</span>
             </button>
-          );
-        })}
-      </nav>
+          )}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            const isAdvisor = item.isModalTrigger;
 
-      {/* User Footer Profile Card & Sign Out */}
-      <div className="border-t border-slate-200 bg-slate-50/70 p-3 space-y-2">
-        <button
-          type="button"
-          onClick={() => setActiveTab("profile")}
-          title="Click to view and edit Officer Profile"
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-white hover:bg-blue-50/60 border border-slate-200 hover:border-blue-300 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
-        >
-          <img
-            src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
-            alt="User"
-            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs group-hover:ring-blue-400 transition-all"
-          />
-          <div className="overflow-hidden flex-1">
-            <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
-              {currentUser?.name || "Institute Officer"}
-            </p>
-            <p className="text-[10px] text-slate-500 truncate capitalize font-medium">
-              {currentUser?.designation || currentUser?.department || currentUser?.email || "IMD Officer"}
-            </p>
-          </div>
-        </button>
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.isModalTrigger && onOpenAiAdvisor) {
+                    handleItemClick(onOpenAiAdvisor);
+                  } else {
+                    handleItemClick(() => setActiveTab(item.id));
+                  }
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
+                  isActive
+                    ? "bg-blue-50 text-blue-700 font-bold border-l-4 border-blue-600 shadow-xs"
+                    : isAdvisor
+                    ? "bg-amber-50/80 text-amber-900 hover:bg-amber-100/80 border border-amber-200/80 font-bold"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-blue-600" : isAdvisor ? "text-amber-600" : "text-slate-500"}`} />
+                <span className="truncate">{item.label}</span>
+                {isAdvisor && (
+                  <span className="ml-auto px-1.5 py-0.5 rounded-md bg-amber-200/60 text-amber-800 text-[9px] font-black uppercase tracking-wider">
+                    AI
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-98 cursor-pointer"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>Sign Out</span>
-        </button>
-      </div>
-    </aside>
+        {/* User Footer Profile Card & Sign Out */}
+        <div className="border-t border-slate-200 bg-slate-50/70 p-3 space-y-2">
+          <button
+            type="button"
+            onClick={() => handleItemClick(() => setActiveTab("profile"))}
+            title="Click to view and edit Officer Profile"
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-white hover:bg-blue-50/60 border border-slate-200 hover:border-blue-300 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
+          >
+            <img
+              src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
+              alt="User"
+              className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs group-hover:ring-blue-400 transition-all"
+            />
+            <div className="overflow-hidden flex-1">
+              <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
+                {currentUser?.name || "Institute Officer"}
+              </p>
+              <p className="text-[10px] text-slate-500 truncate capitalize font-medium">
+                {currentUser?.designation || currentUser?.department || currentUser?.email || "IMD Officer"}
+              </p>
+            </div>
+          </button>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-98 cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
+
 };

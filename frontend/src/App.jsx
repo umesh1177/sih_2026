@@ -85,6 +85,7 @@ const MainApp = () => {
   const [showAnnouncementsModal, setShowAnnouncementsModal] = useState(false);
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
   const [contentLibrarySubjectFilter, setContentLibrarySubjectFilter] = useState("all");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Global Data
   const [courses, setCourses] = useState([]);
@@ -171,10 +172,18 @@ const MainApp = () => {
             setActiveStudioCourse(null);
             setActiveTab(tab);
           }}
-          onOpenLoginPage={() => setViewMode("login")}
-          onOpenHomePage={() => setViewMode("landing")}
+          onOpenLoginPage={() => {
+            setIsMobileSidebarOpen(false);
+            setViewMode("login");
+          }}
+          onOpenHomePage={() => {
+            setIsMobileSidebarOpen(false);
+            setViewMode("landing");
+          }}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
-        <div className="flex-1 flex flex-col h-screen overflow-y-auto">
+        <div className="flex-1 flex flex-col h-screen overflow-y-auto w-full">
           <TrainerCurriculumStudio
             course={activeTrainerStudioCourse.course}
             initialSubjectId={activeTrainerStudioCourse.subjectId}
@@ -204,10 +213,18 @@ const MainApp = () => {
             setSelectedOverviewCourse(null);
             setActiveTab(tab);
           }}
-          onOpenLoginPage={() => setViewMode("login")}
-          onOpenHomePage={() => setViewMode("landing")}
+          onOpenLoginPage={() => {
+            setIsMobileSidebarOpen(false);
+            setViewMode("login");
+          }}
+          onOpenHomePage={() => {
+            setIsMobileSidebarOpen(false);
+            setViewMode("landing");
+          }}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
-        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        <div className="flex-1 flex flex-col h-screen overflow-hidden w-full">
           <CourseLearningStudio
             course={activeStudioCourse}
             currentUser={currentUser}
@@ -229,10 +246,18 @@ const MainApp = () => {
             setSelectedOverviewCourse(null);
             setActiveTab(tab);
           }}
-          onOpenLoginPage={() => setViewMode("login")}
-          onOpenHomePage={() => setViewMode("landing")}
+          onOpenLoginPage={() => {
+            setIsMobileSidebarOpen(false);
+            setViewMode("login");
+          }}
+          onOpenHomePage={() => {
+            setIsMobileSidebarOpen(false);
+            setViewMode("landing");
+          }}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
-        <div className="flex-1 flex flex-col h-screen overflow-y-auto">
+        <div className="flex-1 flex flex-col h-screen overflow-y-auto w-full">
           <CourseOverviewPage
             course={selectedOverviewCourse}
             currentUser={currentUser}
@@ -269,18 +294,29 @@ const MainApp = () => {
   }
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] text-slate-800 font-sans overflow-hidden select-none">
+    <div className="flex h-screen bg-[#f8fafc] text-slate-800 font-sans overflow-hidden select-none relative">
       {/* Deep Navy Sidebar */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenLoginPage={() => setViewMode("login")}
-        onOpenHomePage={() => setViewMode("landing")}
-        onOpenAiAdvisor={() => setIsAiCourseAdvisorOpen(true)}
+        onOpenLoginPage={() => {
+          setIsMobileSidebarOpen(false);
+          setViewMode("login");
+        }}
+        onOpenHomePage={() => {
+          setIsMobileSidebarOpen(false);
+          setViewMode("landing");
+        }}
+        onOpenAiAdvisor={() => {
+          setIsMobileSidebarOpen(false);
+          setIsAiCourseAdvisorOpen(true);
+        }}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden w-full">
         {/* Top Navbar */}
         <TopNavbar
           activeTab={activeTab}
@@ -288,7 +324,9 @@ const MainApp = () => {
           onOpenAiCourseAdvisor={() => setIsAiCourseAdvisorOpen(true)}
           onOpenAiGenerator={() => setIsAiModalOpen(true)}
           onOpenLoginPage={() => setViewMode("login")}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
         />
+
 
         {/* Dynamic Tab Pane */}
         <main className="flex-1 overflow-y-auto">
