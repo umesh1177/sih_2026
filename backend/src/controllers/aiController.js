@@ -4,14 +4,22 @@
 import { v4 as uuidv4 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { db } from "../store/dbStore.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // Initialize Google Gemini Client
 const getGeminiClient = () => {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY;
-  if (!apiKey) return null;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GEMINI_KEY;
+  if (!apiKey) {
+    console.warn("Gemini environment status: missing API key in backend/.env");
+    return null;
+  }
   return new GoogleGenAI({ apiKey });
 };
 
@@ -20,8 +28,8 @@ export const callGeminiAI = async (promptText) => {
   const ai = getGeminiClient();
   if (!ai) throw new Error("Google Gemini API Key is missing in environment.");
 
-  // Models to try in priority order
-  const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.6-flash", "gemini-3.8-flash"];
+  // Google now reports gemini-2.5-flash is unavailable for new users; prefer the supported gemini-3.6-flash model first.
+  const models = ["gemini-1.0-flash","gemini-1.5-flash","gemini-2.0-flash", "gemini-2.5-flash","gemini-3.5-flash", "gemini-3.6-flash"];
 
   for (const model of models) {
     try {

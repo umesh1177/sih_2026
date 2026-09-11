@@ -13,6 +13,20 @@ export const suggestTrainersForSubject = (req, res) => {
   try {
     const { subjectName = "" } = req.body;
     const rawName = (subjectName || "").trim().toLowerCase();
+
+    const hasMeaningfulSubjectName = (value = "") => {
+      const clean = (value || "").trim();
+      if (!clean) return false;
+      const lower = clean.toLowerCase();
+      if (lower === "subject title..." || lower === "specialized domain") return false;
+      const stripped = clean.replace(/^subject\s*\d*\s*[:\-]?\s*/i, "").trim();
+      if (!stripped || stripped.toLowerCase() === "specialized domain") return false;
+      return true;
+    };
+
+    if (!hasMeaningfulSubjectName(subjectName)) {
+      return res.json({ success: true, subjectName, suggestedTrainers: [] });
+    }
     
     // Get full workload and cold-start metadata from db
     const workloads = db.getTrainersWorkload();

@@ -135,7 +135,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
             description: "Core physical foundations and synoptic analysis framework.",
             requiredSkills: "NWP, WRF Modeling, Numerical Prediction",
             assignedTrainerId: "",
-            assignedTrainerName: "Dr. Amit Sengupta",
+            assignedTrainerName: "",
             modules: [
               { id: `mod_${uuidv4().substring(0, 8)}`, title: "Module 1: Governing Equations of Atmosphere", duration: "1 Week", materials: [] },
               { id: `mod_${uuidv4().substring(0, 8)}`, title: "Module 2: 4D-Var Data Assimilation", duration: "1 Week", materials: [] }
@@ -148,6 +148,19 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
   }, [isOpen, courseToEdit]);
 
   const updateForm = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
+
+  const hasMeaningfulSubjectName = (subjectName = "") => {
+    const clean = (subjectName || "").trim();
+    if (!clean) return false;
+
+    const lower = clean.toLowerCase();
+    if (lower === "subject title..." || lower === "specialized domain") return false;
+
+    const stripped = clean.replace(/^subject\s*\d*\s*[:\-]?\s*/i, "").trim();
+    if (!stripped || stripped.toLowerCase() === "specialized domain") return false;
+
+    return true;
+  };
 
   // Subject actions
   const addSubject = () => {
@@ -169,6 +182,10 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
   // Competency Matrix Trainer Suggestion Matcher strictly evaluated on Subject Title
   const getSuggestedTrainersForSubject = (subject) => {
     const rawName = (subject.name || "").trim().toLowerCase();
+
+    if (!hasMeaningfulSubjectName(subject.name)) {
+      return [];
+    }
 
     // MoES domain clusters
     const domainKnowledge = {
@@ -193,15 +210,6 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
         coreTrainerName: "Rajesh Pillai"
       }
     };
-
-    // If subject name is empty or default generic text
-    if (!rawName || rawName === "subject title..." || rawName.match(/^subject\s*\d*$/i)) {
-      return trainersWorkload.map(tw => ({
-        ...tw,
-        matchScore: 0,
-        matchLabel: "Enter Subject Title"
-      }));
-    }
 
     const tokens = rawName.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
 
@@ -267,15 +275,23 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
         if (s.id !== subId) return s;
         const updated = { ...s, [key]: val };
 
-        // If subject name changed, dynamically update trainer suggestion if not manually overridden
         if (key === "name") {
-          const suggestions = getSuggestedTrainersForSubject(updated);
-          if (suggestions.length > 0 && suggestions[0].matchScore >= 60 && !s.isManuallyAssigned) {
-            updated.assignedTrainerId = suggestions[0].trainerId;
-            updated.assignedTrainerName = suggestions[0].trainerName;
-          } else if (suggestions.length > 0 && suggestions[0].matchScore < 60 && !s.isManuallyAssigned) {
+          if (!hasMeaningfulSubjectName(val)) {
             updated.assignedTrainerId = "";
             updated.assignedTrainerName = "";
+            updated.isManuallyAssigned = false;
+            return updated;
+          }
+
+          const suggestions = getSuggestedTrainersForSubject(updated);
+          if (!s.isManuallyAssigned) {
+            if (suggestions.length > 0 && suggestions[0].matchScore >= 80) {
+              updated.assignedTrainerId = suggestions[0].trainerId;
+              updated.assignedTrainerName = suggestions[0].trainerName;
+            } else {
+              updated.assignedTrainerId = "";
+              updated.assignedTrainerName = "";
+            }
           }
         }
         return updated;
@@ -308,7 +324,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
           ? form.prerequisites.split(",").map(s => s.trim()).filter(Boolean) 
           : form.prerequisites,
         subjects: form.subjects,
-        leadTrainerName: form.subjects?.[0]?.assignedTrainerName || "Dr. Amit Sengupta"
+        leadTrainerName: form.subjects?.[0]?.assignedTrainerName || ""
       };
 
       if (isEditMode) {
@@ -340,7 +356,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
       <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 font-sans text-slate-800">
         
         {/* ═════════ HEADER ═════════ */}
-        <div className="bg-gradient-to-r from-[#0a2558] via-blue-900 to-indigo-950 p-6 sm:p-7 text-white rounded-t-3xl relative overflow-hidden flex items-center justify-between">
+        <div className="bg-linear-to-r from-[#0a2558] via-blue-900 to-indigo-950 p-6 sm:p-7 text-white rounded-t-3xl relative overflow-hidden flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-white shadow-md">
               {isEditMode ? <Edit3 className="w-6 h-6 text-amber-300" /> : <BookOpen className="w-6 h-6 text-blue-200" />}
@@ -636,7 +652,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                       </div>
 
                       {/* ─── MANUAL TRAINER SELECTION DROPDOWN (ADMIN CONTROLS) ─── */}
-                      <div className="p-3 bg-gradient-to-r from-blue-50/70 to-indigo-50/70 rounded-xl border border-blue-200/80 space-y-1.5">
+                      <div className="p-3 bg-linear-to-r from-blue-50/70 to-indigo-50/70 rounded-xl border border-blue-200/80 space-y-1.5">
                         <div className="flex items-center justify-between">
                           <label className="text-[11px] font-extrabold text-[#0a2558] flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5 text-blue-600" />
@@ -748,7 +764,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                         {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
                                       </span>
                                     </div>
-                                    <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{tw.designation}</p>
+                                    <p className="text-[10px] text-slate-500 truncate max-w-50">{tw.designation}</p>
                                     
                                     {/* Workload Badge */}
                                     <div className="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -911,7 +927,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
               </div>
 
               {/* Broadcast Notice Info Box */}
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 text-blue-950 space-y-1">
+              <div className="p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 text-blue-950 space-y-1">
                 <div className="flex items-center gap-2 font-black text-blue-900">
                   <Send className="w-4 h-4" />
                   <span>Automated Ministry Broadcast Announcement:</span>
