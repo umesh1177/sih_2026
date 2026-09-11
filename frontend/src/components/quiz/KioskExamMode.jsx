@@ -277,7 +277,9 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         submittedAt: new Date().toISOString(),
         adaptiveTrajectory,
         difficultyHistory,
-        questionAnalysis
+        questionAnalysis,
+        isPractice: Boolean(quiz?.isPractice || quiz?.type === "practice" || quiz?.id?.startsWith("paper_") || quiz?.id?.startsWith("practice_")),
+        type: (quiz?.isPractice || quiz?.type === "practice" || quiz?.id?.startsWith("paper_") || quiz?.id?.startsWith("practice_")) ? "practice" : "assessment"
       };
 
       let res = {};

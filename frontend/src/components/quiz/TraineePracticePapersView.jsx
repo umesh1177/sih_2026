@@ -102,9 +102,15 @@ export const TraineePracticePapersView = ({
 
       setPracticePapers(mergedPapers);
 
-      // Score history strictly from backend
+      // Score history strictly for practice attempts (filter out scheduled course exams and dummy records)
       if (subRes.success && subRes.submissions) {
-        setScoreHistory(subRes.submissions);
+        const genuinePracticeAttempts = subRes.submissions.filter(sub => {
+          if (sub.isPractice === true || sub.type === "practice") return true;
+          if (sub.quizId && (sub.quizId.startsWith("paper_") || sub.quizId.startsWith("practice_"))) return true;
+          if (mergedPapers.some(p => p.id === sub.quizId || (p.title && sub.quizTitle && p.title.toLowerCase() === sub.quizTitle.toLowerCase()))) return true;
+          return false;
+        });
+        setScoreHistory(genuinePracticeAttempts);
       } else {
         setScoreHistory([]);
       }
