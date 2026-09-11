@@ -110,18 +110,29 @@
       "experienceYears": 12,
       "qualifications": [
         "M.Tech Ocean Engineering (IIT Kharagpur)",
-        "M.Sc. Physics"
+        "M.Sc. Physics",
+        "Ph.D. in Hydro-Meteorology (IIT Bombay)"
       ],
       "skills": [
         "Dvorak Technique",
         "ADCIRC Surge Modeling",
         "RSMC Warning Protocols",
-        "Coastal Inundation"
+        "Coastal Inundation",
+        "Quantum Flash Flood Hydrology",
+        "Deep Learning Meteorology"
       ],
       "status": "approved",
       "bio": "Specialized in Bay of Bengal tropical cyclone track prediction and coastal vulnerability assessment.",
       "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250",
-      "createdAt": "2025-01-15T14:20:00.000Z"
+      "createdAt": "2025-01-15T14:20:00.000Z",
+      "certificates": [
+        {
+          "title": "ISRO Hydrology & Flood Specialist",
+          "issuer": "ISRO",
+          "year": "2026"
+        }
+      ],
+      "updatedAt": "2026-09-11T06:04:36.365Z"
     },
     {
       "id": "u_trainee_1",

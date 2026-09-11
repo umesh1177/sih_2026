@@ -1529,7 +1529,7 @@ class DatabaseStore {
   // --- Trainer Matching & Workload Balancing Engine (Rule 17: Cold-Start & Rule 18: Workload) ---
   getTrainersWorkload() {
     // Ensure all active trainers are retrieved
-    let trainers = this.users.filter(u => u.role === "trainer" && u.status === "approved");
+    let trainers = this.users.filter(u => u.role === "trainer" && u.status !== "rejected");
     
     // Ensure at least 5 realistic trainers exist across all states (Cold-start, High load, Optimal)
     if (trainers.length < 5) {
@@ -1579,7 +1579,7 @@ class DatabaseStore {
         }
       });
       this._persist();
-      trainers = this.users.filter(u => u.role === "trainer" && u.status === "approved");
+      trainers = this.users.filter(u => u.role === "trainer" && u.status !== "rejected");
     }
 
     return trainers.map(t => {
@@ -1608,16 +1608,28 @@ class DatabaseStore {
         }
       }
 
+      const rawQualifications = Array.isArray(t.qualifications) 
+        ? t.qualifications 
+        : (t.qualifications ? [t.qualifications] : ["M.Sc. Atmospheric Sciences"]);
+
+      const rawCertificates = Array.isArray(t.certificates) 
+        ? t.certificates 
+        : (Array.isArray(t.certifications) ? t.certifications : [
+            { title: "WMO Certified Meteorologist (Class-I)", issuer: "World Meteorological Organization", year: "2023" },
+            { title: "MoES Faculty Clearance", issuer: "Ministry of Earth Sciences", year: "2024" }
+          ]);
+
+      const rawSkills = Array.isArray(t.skills) ? t.skills : [];
+      const rawSpecs = Array.isArray(t.specialization) ? t.specialization : [];
+      const mergedSkills = Array.from(new Set([...rawSkills, ...rawSpecs])).filter(Boolean);
+
       // 4 verified pillars for matching (Competency, Certification, Experience, Qualification)
       const matchedCredentials = {
-        verifiedCompetency: t.skills || t.specialization || ["Atmospheric Observation & Forecasting"],
-        certifications: t.certificates || t.certifications || [
-          { title: "WMO Certified Meteorologist (Class-I)", issuer: "World Meteorological Organization", year: "2023" },
-          { title: "MoES Faculty Clearance", issuer: "Ministry of Earth Sciences", year: "2024" }
-        ],
-        experienceYears: t.experienceYears || 10,
+        verifiedCompetency: mergedSkills.length > 0 ? mergedSkills : ["Atmospheric Observation & Forecasting"],
+        certifications: rawCertificates,
+        experienceYears: t.experienceYears || (Array.isArray(t.experience) ? t.experience.length * 3 : 10),
         experienceDisplay: `${t.experienceYears || 10}+ Yrs Operational Forecaster`,
-        qualification: (Array.isArray(t.qualifications) ? t.qualifications[0] : t.qualifications) || "Ph.D. / M.Tech in Atmospheric Sciences",
+        qualification: rawQualifications[0] || "Ph.D. / M.Tech in Atmospheric Sciences",
         department: t.department || "India Meteorological Department",
         designation: t.designation || "Scientist 'E'"
       };
@@ -1700,9 +1712,17 @@ class DatabaseStore {
         email: t.email,
         department: t.department,
         designation: t.designation,
+        role: t.role || "trainer",
+        bio: t.bio || "",
+        interests: t.interests || [],
+        station: t.station || "",
         avatar: t.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
-        skills: t.skills || t.specialization || [],
-        specialization: t.specialization || t.skills || [],
+        skills: mergedSkills,
+        specialization: rawSpecs.length > 0 ? rawSpecs : mergedSkills,
+        qualifications: rawQualifications,
+        certificates: rawCertificates,
+        experience: Array.isArray(t.experience) ? t.experience : (t.experience ? [t.experience] : []),
+        experienceYears: t.experienceYears || 10,
         
         // Rule 17 Cold Start Metadata
         isColdStart,

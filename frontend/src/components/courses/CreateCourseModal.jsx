@@ -166,97 +166,170 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
     setExpandedSubject(newSub.id);
   };
 
-  // Competency Matrix Trainer Suggestion Matcher strictly evaluated on Subject Title
+  // Dynamic Multi-Dimensional Competency Matrix Matcher (Skills, Certificates, Qualifications, Role, Expertise)
   const getSuggestedTrainersForSubject = (subject) => {
-    const rawName = (subject.name || "").trim().toLowerCase();
+    const rawName = (subject.name || "").trim();
+    const requiredSkills = (subject.requiredSkills || "").trim();
+    const description = (subject.description || "").trim();
 
-    // MoES domain clusters
-    const domainKnowledge = {
-      nwp: {
-        keywords: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equation", "modeling", "model", "assimilation", "4d-var", "3d-var", "hpc", "arakawa", "primitive", "advection", "baroclinic", "atmospheric dynamics", "grid", "sigma", "continuity", "hydrostatic"],
-        coreTrainerName: "Amit Sengupta"
-      },
-      radar: {
-        keywords: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "kdp", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing", "microwave", "precipitable", "band"],
-        coreTrainerName: "Sunita Kulkarni"
-      },
-      cyclone: {
-        keywords: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "sea surface", "bay of bengal", "arabian sea", "cdo", "eye"],
-        coreTrainerName: "Rajiv Roy"
-      },
-      agri: {
-        keywords: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "agrometeorology"],
-        coreTrainerName: "Sunita Deshmukh"
-      },
-      climate: {
-        keywords: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "seasonal", "climatology"],
-        coreTrainerName: "Rajesh Pillai"
-      }
-    };
+    const queryCombined = [rawName, requiredSkills, description, form.category]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .trim();
 
-    // If subject name is empty or default generic text
-    if (!rawName || rawName === "subject title..." || rawName.match(/^subject\s*\d*$/i)) {
+    // If subject name is empty or default generic placeholder
+    if (!queryCombined || queryCombined === "subject title..." || queryCombined.match(/^subject\s*\d*$/i)) {
       return trainersWorkload.map(tw => ({
         ...tw,
         matchScore: 0,
-        matchLabel: "Enter Subject Title"
+        matchLabel: "Enter Subject Title",
+        matchedPills: []
       }));
     }
 
-    const tokens = rawName.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
+    const stopwords = new Set([
+      "the", "and", "for", "with", "from", "part", "unit", "chapter", "module", "study",
+      "subject", "demo", "test", "basic", "basics", "intro", "introduction", "advanced",
+      "overview", "general", "specialized", "course", "topic", "session", "lecture",
+      "admin", "umesh", "officer", "cadre", "year", "years"
+    ]);
+
+    const rawTokens = queryCombined
+      .replace(/[^\w\s\-/]/g, " ")
+      .split(/[\s,./\-&]+/)
+      .map(t => t.trim().toLowerCase())
+      .filter(t => t.length >= 3 && !stopwords.has(t));
+
+    const queryTokens = Array.from(new Set(rawTokens));
 
     return trainersWorkload.map(tw => {
-      const trainerText = [
-        tw.trainerName || "",
-        tw.department || "",
-        tw.designation || "",
-        ...(tw.skills || []),
-        ...(tw.specialization || [])
-      ].join(" ").toLowerCase();
+      const trainerSkills = (tw.skills || []).map(s => String(s).trim());
+      const trainerSpecs = (tw.specialization || []).map(s => String(s).trim());
+      const allSkills = Array.from(new Set([...trainerSkills, ...trainerSpecs])).filter(Boolean);
+
+      const rawCerts = tw.certificates || tw.certifications || tw.matchedCredentials?.certifications || [];
+      const certTitles = rawCerts.map(c => typeof c === "string" ? c : (c.title || c.name || "")).filter(Boolean);
+      const certIssuers = rawCerts.map(c => typeof c === "object" ? (c.issuer || "") : "").filter(Boolean);
+
+      const rawQuals = tw.qualifications || tw.matchedCredentials?.qualification || [];
+      const qualifications = (Array.isArray(rawQuals) ? rawQuals : [rawQuals]).map(q => String(q).trim()).filter(Boolean);
+
+      const designation = tw.designation || "";
+      const department = tw.department || "";
+      const bio = tw.bio || "";
+      const experience = (Array.isArray(tw.experience) ? tw.experience.join(" ") : String(tw.experience || ""));
+      const role = tw.role || "";
 
       let matchScore = 0;
-      let directMatches = 0;
+      const matchedPills = [];
 
-      // 1. Check direct skill/specialization overlap (excluding generic stopwords)
-      tokens.forEach(tok => {
-        if (!["umesh", "admin", "officer", "scientist", "subject", "part", "test", "demo", "title", "study"].includes(tok)) {
-          (tw.skills || []).forEach(sk => {
-            if (sk.toLowerCase().includes(tok)) directMatches += 2;
-          });
-          (tw.specialization || []).forEach(sp => {
-            if (sp.toLowerCase().includes(tok)) directMatches += 2;
-          });
+      const subjectNameLower = rawName.toLowerCase();
+
+      // 1. SKILLS & SPECIALIZATION MATCHING (Top Priority: Up to 50 pts)
+      allSkills.forEach(sk => {
+        const skLower = sk.toLowerCase();
+        if (queryCombined.includes(skLower) || (skLower.length >= 4 && subjectNameLower.includes(skLower))) {
+          matchScore += 45;
+          matchedPills.push(`Skill: ${sk}`);
+        } else if (skLower.includes(subjectNameLower) && subjectNameLower.length >= 4) {
+          matchScore += 40;
+          matchedPills.push(`Skill: ${sk}`);
+        } else {
+          const skTokens = skLower.split(/[\s,./\-&]+/).filter(t => t.length >= 3 && !stopwords.has(t));
+          const hasOverlap = queryTokens.some(qTok => skTokens.some(sTok => sTok.includes(qTok) || qTok.includes(sTok)));
+          if (hasOverlap) {
+            matchScore += 25;
+            matchedPills.push(`Skill: ${sk}`);
+          }
         }
       });
 
-      // 2. Check domain knowledge clusters
-      Object.entries(domainKnowledge).forEach(([domain, conf]) => {
-        const hasTopicKeyword = conf.keywords.some(kw => rawName.includes(kw));
-        const isCoreTrainer = (tw.trainerName && conf.coreTrainerName && tw.trainerName.toLowerCase().includes(conf.coreTrainerName.toLowerCase())) ||
-                              conf.keywords.some(kw => trainerText.includes(kw));
+      // 2. CERTIFICATES MATCHING (High Priority: Up to 35 pts)
+      certTitles.forEach((cert, idx) => {
+        const certLower = cert.toLowerCase();
+        const issuerLower = (certIssuers[idx] || "").toLowerCase();
 
-        if (hasTopicKeyword && isCoreTrainer) {
-          matchScore += 80;
-        } else if (hasTopicKeyword) {
-          matchScore -= 10;
+        if (queryCombined.includes(certLower) || (certLower.length >= 5 && subjectNameLower.includes(certLower))) {
+          matchScore += 35;
+          matchedPills.push(`Cert: ${cert}`);
+        } else {
+          const certTokens = `${certLower} ${issuerLower}`.split(/[\s,./\-&]+/).filter(t => t.length >= 3 && !stopwords.has(t));
+          const hasOverlap = queryTokens.some(qTok => certTokens.some(cTok => cTok.includes(qTok) || qTok.includes(cTok)));
+          if (hasOverlap) {
+            matchScore += 22;
+            matchedPills.push(`Cert: ${cert}`);
+          }
         }
       });
 
-      if (directMatches > 0) {
-        matchScore += directMatches * 10;
-      }
+      // 3. QUALIFICATIONS MATCHING (Factor: Up to 30 pts)
+      qualifications.forEach(qual => {
+        const qualLower = qual.toLowerCase();
+        if (queryCombined.includes(qualLower) || (qualLower.length >= 5 && subjectNameLower.includes(qualLower))) {
+          matchScore += 28;
+          matchedPills.push(`Qual: ${qual}`);
+        } else {
+          const qualTokens = qualLower.split(/[\s,./\-&]+/).filter(t => t.length >= 3 && !stopwords.has(t));
+          const hasOverlap = queryTokens.some(qTok => qualTokens.some(quTok => quTok.includes(qTok) || qTok.includes(quTok)));
+          if (hasOverlap) {
+            matchScore += 18;
+            matchedPills.push(`Qual: ${qual}`);
+          }
+        }
+      });
+
+      // 4. EXPERTISE, DESIGNATION, DEPARTMENT, ROLE, BIO & EXPERIENCE MATCHING (Factor: Up to 25 pts)
+      const profileBioText = `${designation} ${department} ${bio} ${experience} ${role}`.toLowerCase();
+      queryTokens.forEach(qTok => {
+        if (profileBioText.includes(qTok)) {
+          matchScore += 12;
+          if (designation.toLowerCase().includes(qTok)) {
+            matchedPills.push(`Expertise: ${designation}`);
+          } else if (department.toLowerCase().includes(qTok)) {
+            matchedPills.push(`Domain: ${department.split(",")[0]}`);
+          }
+        }
+      });
+
+      // 5. DOMAIN KNOWLEDGE SYNONYMS / METEOROLOGY EXPANSION (Synergy Boost: +15 pts)
+      const synonyms = {
+        nwp: ["wrf", "gfs", "numerical", "modeling", "dynamics", "equation", "assimilation", "4d-var", "3d-var", "hpc", "atmospheric"],
+        radar: ["dwr", "doppler", "reflectivity", "zdr", "kdp", "nowcast", "echo", "hydrometeor", "dual-pol"],
+        satellite: ["insat", "radiance", "sounder", "sounding", "remote sensing", "microwave", "imagery", "rgb"],
+        cyclone: ["storm", "surge", "cyclogenesis", "tropical", "marine", "ocean", "rsmc", "typhoon", "coastal"],
+        agri: ["crop", "agriculture", "fasal", "soil", "drought", "agrometeorology", "yield", "monsoon"],
+        climate: ["monsoon", "enso", "iod", "teleconnection", "cmip", "climatology", "reanalysis", "ipcc"],
+        seismology: ["earthquake", "seismic", "geophysics", "fault", "tremor", "ground motion", "tsunami"]
+      };
+
+      Object.values(synonyms).forEach(synGroup => {
+        const queryHasGroup = synGroup.some(w => queryCombined.includes(w));
+        const trainerHasGroup = synGroup.some(w => 
+          allSkills.some(s => s.toLowerCase().includes(w)) ||
+          certTitles.some(c => c.toLowerCase().includes(w)) ||
+          qualifications.some(q => q.toLowerCase().includes(w)) ||
+          profileBioText.includes(w)
+        );
+        if (queryHasGroup && trainerHasGroup) {
+          matchScore += 15;
+        }
+      });
 
       // Clamp score
       if (matchScore <= 0) {
         matchScore = 0;
       } else {
-        matchScore = Math.min(Math.max(matchScore, 10), 99);
+        matchScore = Math.min(Math.max(matchScore, 15), 99);
       }
+
+      const uniquePills = Array.from(new Set(matchedPills)).slice(0, 3);
 
       return {
         ...tw,
         matchScore,
-        matchLabel: matchScore >= 80 ? "Top Recommendation" : matchScore >= 40 ? "Moderate Match" : "Low Match"
+        matchedPills: uniquePills,
+        matchLabel: matchScore >= 80 ? "Top Recommendation" : matchScore >= 60 ? "High Competency Match" : matchScore >= 35 ? "Moderate Match" : "Low Match"
       };
     }).sort((a, b) => b.matchScore - a.matchScore);
   };
@@ -267,13 +340,13 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
         if (s.id !== subId) return s;
         const updated = { ...s, [key]: val };
 
-        // If subject name changed, dynamically update trainer suggestion if not manually overridden
-        if (key === "name") {
+        // If subject name or required skills changed, dynamically update trainer suggestion if not manually overridden
+        if (key === "name" || key === "requiredSkills") {
           const suggestions = getSuggestedTrainersForSubject(updated);
-          if (suggestions.length > 0 && suggestions[0].matchScore >= 60 && !s.isManuallyAssigned) {
+          if (suggestions.length > 0 && suggestions[0].matchScore >= 40 && !s.isManuallyAssigned) {
             updated.assignedTrainerId = suggestions[0].trainerId;
             updated.assignedTrainerName = suggestions[0].trainerName;
-          } else if (suggestions.length > 0 && suggestions[0].matchScore < 60 && !s.isManuallyAssigned) {
+          } else if (suggestions.length > 0 && suggestions[0].matchScore < 40 && !s.isManuallyAssigned) {
             updated.assignedTrainerId = "";
             updated.assignedTrainerName = "";
           }
@@ -692,16 +765,23 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                         <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">
                           <span className="text-amber-500 font-bold">💡</span>
                           <span>
-                            Type a domain subject title (e.g. <b>Doppler Radar, Tropical Cyclone, NWP Dynamics, Satellite Meteorology</b>) for AI suggestions, or select directly from the dropdown above.
+                            Type any subject title, skill, or certificate keyword (e.g. <b>Python, Radar, WRF, Cyclone, GIS, Agrometeorology</b>). Faculty profiles will be dynamically ranked across their <b>skills, certificates, expertise, qualifications, and role</b>.
                           </span>
                         </div>
                       )}
 
                       {/* Top AI Suggested Faculty Grid */}
                       <div>
-                        <div className="text-[11px] font-bold text-slate-700 mb-2 flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                          <span>AI Recommended Faculty Matches:</span>
+                        <div className="text-[11px] font-bold text-slate-700 mb-2 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                            <span>AI Dynamic Faculty Recommendations (Ranked by Competency & Workload):</span>
+                          </div>
+                          {suggestedTrainers[0]?.matchScore > 0 && (
+                            <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              Top Match: {suggestedTrainers[0]?.matchScore}% ({suggestedTrainers[0]?.trainerName})
+                            </span>
+                          )}
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -721,61 +801,82 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                     } : s)
                                   }));
                                 }}
-                                className={`p-3 rounded-xl border cursor-pointer transition-all flex items-start justify-between gap-2.5 ${
+                                className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-2 ${
                                   isAssigned 
-                                    ? "bg-purple-50 border-purple-400 ring-2 ring-purple-300 shadow-sm" 
+                                    ? "bg-purple-50/90 border-purple-400 ring-2 ring-purple-300 shadow-sm" 
                                     : tw.matchScore >= 80
-                                    ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-400"
+                                    ? "bg-emerald-50/60 border-emerald-300 hover:border-emerald-500 hover:shadow-xs"
+                                    : tw.matchScore >= 60
+                                    ? "bg-blue-50/50 border-blue-200 hover:border-blue-400"
+                                    : tw.matchScore >= 35
+                                    ? "bg-amber-50/40 border-amber-200 hover:border-amber-300"
                                     : "bg-slate-50/70 border-slate-200 hover:border-blue-300 hover:bg-blue-50/40"
                                 }`}
                               >
-                                <div className="flex items-start gap-2.5">
-                                  <img
-                                    src={tw.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
-                                    alt={tw.trainerName}
-                                    className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
-                                  />
-                                  <div>
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
-                                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
-                                        tw.matchScore >= 80 
-                                          ? "bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs" 
-                                          : tw.matchScore >= 40 
-                                          ? "bg-blue-100 text-blue-900 border-blue-200" 
-                                          : "bg-slate-100 text-slate-500 border-slate-200"
-                                      }`}>
-                                        {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
-                                      </span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{tw.designation}</p>
-                                    
-                                    {/* Workload Badge */}
-                                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                                      <span className={`px-2 py-0.2 rounded-full text-[9px] font-black ${
-                                        tw.workloadLevel === "High" || tw.recommendationTone === "warning"
-                                          ? "bg-rose-100 text-rose-800 border border-rose-200" 
-                                          : tw.workloadLevel === "Moderate" || tw.recommendationTone === "balanced"
-                                          ? "bg-amber-100 text-amber-800 border border-amber-200" 
-                                          : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                                      }`}>
-                                        {tw.finalRecommendation || (tw.workloadStatus === "High Load" ? "⚠ High Workload" : "🌟 Optimal Availability")}
-                                      </span>
-                                      <span className="text-[9px] text-slate-400 font-mono">
-                                        ({tw.assignedCoursesCount || tw.currentCourseLoad || 0} Courses)
-                                      </span>
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-start gap-2.5">
+                                    <img
+                                      src={tw.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
+                                      alt={tw.trainerName}
+                                      className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
+                                    />
+                                    <div>
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
+                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
+                                          tw.matchScore >= 80 
+                                            ? "bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs" 
+                                            : tw.matchScore >= 60 
+                                            ? "bg-blue-100 text-blue-900 border-blue-200" 
+                                            : tw.matchScore >= 35
+                                            ? "bg-amber-100 text-amber-900 border-amber-200"
+                                            : "bg-slate-100 text-slate-500 border-slate-200"
+                                        }`}>
+                                          {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
+                                        </span>
+                                      </div>
+                                      <p className="text-[10px] text-slate-500 truncate max-w-[220px]">
+                                        {tw.designation} • {tw.department?.split(",")[0]}
+                                      </p>
                                     </div>
                                   </div>
+
+                                  <button
+                                    type="button"
+                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 transition-all ${
+                                      isAssigned ? "bg-purple-700 text-white shadow-xs" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    {isAssigned ? "Assigned ✓" : "Assign"}
+                                  </button>
                                 </div>
 
-                                <button
-                                  type="button"
-                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 ${
-                                    isAssigned ? "bg-purple-700 text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
-                                  }`}
-                                >
-                                  {isAssigned ? "Selected ✓" : "Assign"}
-                                </button>
+                                {/* Matched Dimensions Reason Badges */}
+                                {tw.matchedPills && tw.matchedPills.length > 0 && (
+                                  <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                                    {tw.matchedPills.map((pill, pIdx) => (
+                                      <span key={pIdx} className="px-1.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-200/90 text-indigo-950 text-[9px] font-bold">
+                                        ✦ {pill}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Workload & Qualification Footer */}
+                                <div className="flex items-center justify-between gap-1 flex-wrap pt-1 border-t border-slate-200/60 text-[9px]">
+                                  <span className={`px-2 py-0.2 rounded-full font-black ${
+                                    tw.workloadLevel === "High" || tw.recommendationTone === "warning"
+                                      ? "bg-rose-100 text-rose-800 border border-rose-200" 
+                                      : tw.workloadLevel === "Moderate" || tw.recommendationTone === "balanced"
+                                      ? "bg-amber-100 text-amber-800 border border-amber-200" 
+                                      : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                  }`}>
+                                    {tw.finalRecommendation || (tw.workloadStatus === "High Load" ? "⚠ High Workload" : "🌟 Optimal Availability")}
+                                  </span>
+                                  <span className="text-slate-400 font-mono">
+                                    ({tw.assignedCoursesCount || tw.currentCourseLoad || 0} active courses)
+                                  </span>
+                                </div>
                               </div>
                             );
                           })}
@@ -785,7 +886,34 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                     {/* Expandable Module Builder */}
                     {isExpanded && (
-                      <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-3 pt-3">
+                      <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-4 pt-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2 border-b border-slate-100">
+                          <div>
+                            <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                              Subject Competencies & Keywords (Matches Faculty Skills & Certs):
+                            </label>
+                            <input
+                              type="text"
+                              value={subject.requiredSkills || ""}
+                              onChange={(e) => updateSubject(subject.id, "requiredSkills", e.target.value)}
+                              placeholder="e.g. Python, WRF Modeling, Radar, GIS, Agrometeorology..."
+                              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                              Subject Syllabus Description:
+                            </label>
+                            <input
+                              type="text"
+                              value={subject.description || ""}
+                              onChange={(e) => updateSubject(subject.id, "description", e.target.value)}
+                              placeholder="Operational syllabus overview and learning outcomes..."
+                              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                            />
+                          </div>
+                        </div>
+
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-slate-800 text-xs">Curriculum Lesson Modules ({subject.modules?.length || 0}):</span>
                           <button

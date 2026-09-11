@@ -9,82 +9,215 @@ export const getCompetencyMatrix = (req, res) => {
   }
 };
 
+export const calculateTrainerCompetencyMatch = (tw, queryData) => {
+  const subjectName = typeof queryData === "string" ? queryData : (queryData?.name || queryData?.title || queryData?.subjectName || "");
+  const requiredSkills = typeof queryData === "object" ? (queryData?.requiredSkills || "") : "";
+  const description = typeof queryData === "object" ? (queryData?.description || "") : "";
+  const category = typeof queryData === "object" ? (queryData?.category || "") : "";
+
+  const queryCombined = [subjectName, requiredSkills, description, category]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .trim();
+
+  // If query is blank or generic default placeholder
+  if (!queryCombined || queryCombined === "subject title..." || queryCombined.match(/^subject\s*\d*$/i)) {
+    return {
+      matchScore: 0,
+      matchLabel: "Enter Subject Title",
+      matchedPills: [],
+      matchedSkills: [],
+      matchedCertificates: [],
+      matchedQualifications: [],
+      matchedExpertise: []
+    };
+  }
+
+  const stopwords = new Set([
+    "the", "and", "for", "with", "from", "part", "unit", "chapter", "module", "study",
+    "subject", "demo", "test", "basic", "basics", "intro", "introduction", "advanced",
+    "overview", "general", "specialized", "course", "topic", "session", "lecture",
+    "admin", "umesh", "officer", "cadre", "year", "years"
+  ]);
+
+  const rawTokens = queryCombined
+    .replace(/[^\w\s\-/]/g, " ")
+    .split(/[\s,./\-&]+/)
+    .map(t => t.trim().toLowerCase())
+    .filter(t => t.length >= 3 && !stopwords.has(t));
+
+  const queryTokens = Array.from(new Set(rawTokens));
+
+  const trainerSkills = (tw.skills || []).map(s => String(s).trim());
+  const trainerSpecs = (tw.specialization || []).map(s => String(s).trim());
+  const allSkills = Array.from(new Set([...trainerSkills, ...trainerSpecs])).filter(Boolean);
+
+  const rawCerts = tw.certificates || tw.certifications || tw.matchedCredentials?.certifications || [];
+  const certTitles = rawCerts.map(c => typeof c === "string" ? c : (c.title || c.name || "")).filter(Boolean);
+  const certIssuers = rawCerts.map(c => typeof c === "object" ? (c.issuer || "") : "").filter(Boolean);
+
+  const rawQuals = tw.qualifications || tw.matchedCredentials?.qualification || [];
+  const qualifications = (Array.isArray(rawQuals) ? rawQuals : [rawQuals]).map(q => String(q).trim()).filter(Boolean);
+
+  const designation = tw.designation || "";
+  const department = tw.department || "";
+  const bio = tw.bio || "";
+  const experience = (Array.isArray(tw.experience) ? tw.experience.join(" ") : String(tw.experience || ""));
+  const role = tw.role || "";
+
+  let matchScore = 0;
+  const matchedPills = [];
+  const matchedSkills = [];
+  const matchedCertificates = [];
+  const matchedQualifications = [];
+  const matchedExpertise = [];
+
+  const subjectNameLower = subjectName.toLowerCase();
+
+  // 1. SKILLS & SPECIALIZATION MATCHING (Top Factor: 45-50 pts)
+  allSkills.forEach(sk => {
+    const skLower = sk.toLowerCase();
+    if (queryCombined.includes(skLower) || (skLower.length >= 4 && subjectNameLower.includes(skLower))) {
+      matchScore += 45;
+      matchedSkills.push(sk);
+      matchedPills.push(`Skill: ${sk}`);
+    } else if (skLower.includes(subjectNameLower) && subjectNameLower.length >= 4) {
+      matchScore += 40;
+      matchedSkills.push(sk);
+      matchedPills.push(`Skill: ${sk}`);
+    } else {
+      const skTokens = skLower.split(/[\s,./\-&]+/).filter(t => t.length >= 3 && !stopwords.has(t));
+      const hasOverlap = queryTokens.some(qTok => skTokens.some(sTok => sTok.includes(qTok) || qTok.includes(sTok)));
+      if (hasOverlap) {
+        matchScore += 25;
+        matchedSkills.push(sk);
+        matchedPills.push(`Skill: ${sk}`);
+      }
+    }
+  });
+
+  // 2. CERTIFICATES MATCHING (High Factor: 25-35 pts)
+  certTitles.forEach((cert, idx) => {
+    const certLower = cert.toLowerCase();
+    const issuerLower = (certIssuers[idx] || "").toLowerCase();
+
+    if (queryCombined.includes(certLower) || (certLower.length >= 5 && subjectNameLower.includes(certLower))) {
+      matchScore += 35;
+      matchedCertificates.push(cert);
+      matchedPills.push(`Cert: ${cert}`);
+    } else {
+      const certTokens = `${certLower} ${issuerLower}`.split(/[\s,./\-&]+/).filter(t => t.length >= 3 && !stopwords.has(t));
+      const hasOverlap = queryTokens.some(qTok => certTokens.some(cTok => cTok.includes(qTok) || qTok.includes(cTok)));
+      if (hasOverlap) {
+        matchScore += 22;
+        matchedCertificates.push(cert);
+        matchedPills.push(`Cert: ${cert}`);
+      }
+    }
+  });
+
+  // 3. QUALIFICATIONS MATCHING (Factor: 20-30 pts)
+  qualifications.forEach(qual => {
+    const qualLower = qual.toLowerCase();
+    if (queryCombined.includes(qualLower) || (qualLower.length >= 5 && subjectNameLower.includes(qualLower))) {
+      matchScore += 28;
+      matchedQualifications.push(qual);
+      matchedPills.push(`Qual: ${qual}`);
+    } else {
+      const qualTokens = qualLower.split(/[\s,./\-&]+/).filter(t => t.length >= 3 && !stopwords.has(t));
+      const hasOverlap = queryTokens.some(qTok => qualTokens.some(quTok => quTok.includes(qTok) || qTok.includes(quTok)));
+      if (hasOverlap) {
+        matchScore += 18;
+        matchedQualifications.push(qual);
+        matchedPills.push(`Qual: ${qual}`);
+      }
+    }
+  });
+
+  // 4. EXPERTISE, DESIGNATION, DEPARTMENT, ROLE, BIO & EXPERIENCE MATCHING (Factor: 15-25 pts)
+  const profileBioText = `${designation} ${department} ${bio} ${experience} ${role}`.toLowerCase();
+  queryTokens.forEach(qTok => {
+    if (profileBioText.includes(qTok)) {
+      matchScore += 12;
+      if (!matchedExpertise.includes(qTok)) {
+        matchedExpertise.push(qTok);
+        if (designation.toLowerCase().includes(qTok)) {
+          matchedPills.push(`Expertise: ${designation}`);
+        } else if (department.toLowerCase().includes(qTok)) {
+          matchedPills.push(`Domain: ${department.split(",")[0]}`);
+        }
+      }
+    }
+  });
+
+  // 5. DOMAIN KNOWLEDGE SYNONYMS / METEOROLOGY EXPANSION (Synergy Boost: +15 pts)
+  const synonyms = {
+    nwp: ["wrf", "gfs", "numerical", "modeling", "dynamics", "equation", "assimilation", "4d-var", "3d-var", "hpc", "atmospheric"],
+    radar: ["dwr", "doppler", "reflectivity", "zdr", "kdp", "nowcast", "echo", "hydrometeor", "dual-pol"],
+    satellite: ["insat", "radiance", "sounder", "sounding", "remote sensing", "microwave", "imagery", "rgb"],
+    cyclone: ["storm", "surge", "cyclogenesis", "tropical", "marine", "ocean", "rsmc", "typhoon", "coastal"],
+    agri: ["crop", "agriculture", "fasal", "soil", "drought", "agrometeorology", "yield", "monsoon"],
+    climate: ["monsoon", "enso", "iod", "teleconnection", "cmip", "climatology", "reanalysis", "ipcc"],
+    seismology: ["earthquake", "seismic", "geophysics", "fault", "tremor", "ground motion", "tsunami"]
+  };
+
+  Object.values(synonyms).forEach(synGroup => {
+    const queryHasGroup = synGroup.some(w => queryCombined.includes(w));
+    const trainerHasGroup = synGroup.some(w => 
+      allSkills.some(s => s.toLowerCase().includes(w)) ||
+      certTitles.some(c => c.toLowerCase().includes(w)) ||
+      qualifications.some(q => q.toLowerCase().includes(w)) ||
+      profileBioText.includes(w)
+    );
+    if (queryHasGroup && trainerHasGroup) {
+      matchScore += 15;
+    }
+  });
+
+  // Clamp & normalize final score
+  if (matchScore <= 0) {
+    matchScore = 0;
+  } else {
+    matchScore = Math.min(Math.max(matchScore, 15), 99);
+  }
+
+  const uniquePills = Array.from(new Set(matchedPills)).slice(0, 3);
+
+  let matchLabel = "Low Match";
+  if (matchScore >= 80) matchLabel = "Top Recommendation";
+  else if (matchScore >= 60) matchLabel = "High Competency Match";
+  else if (matchScore >= 35) matchLabel = "Moderate Match";
+
+  return {
+    matchScore,
+    matchLabel,
+    matchedPills: uniquePills,
+    matchedSkills: Array.from(new Set(matchedSkills)),
+    matchedCertificates: Array.from(new Set(matchedCertificates)),
+    matchedQualifications: Array.from(new Set(matchedQualifications)),
+    matchedExpertise: Array.from(new Set(matchedExpertise))
+  };
+};
+
 export const suggestTrainersForSubject = (req, res) => {
   try {
-    const { subjectName = "" } = req.body;
-    const rawName = (subjectName || "").trim().toLowerCase();
+    const { subjectName = "", requiredSkills = "", description = "", category = "" } = req.body;
     
     // Get full workload and cold-start metadata from db
     const workloads = db.getTrainersWorkload();
 
-    const domainKnowledge = {
-      nwp: {
-        keywords: ["nwp", "numerical", "wrf", "gfs", "dynamics", "equation", "modeling", "model", "assimilation", "4d-var", "3d-var", "hpc", "arakawa", "primitive", "advection", "baroclinic", "atmospheric dynamics", "grid", "sigma", "continuity", "hydrostatic"],
-        coreTrainerName: "Amit Sengupta"
-      },
-      radar: {
-        keywords: ["radar", "dwr", "doppler", "polarimetr", "reflectivity", "zdr", "kdp", "nowcast", "titan", "hydrometeor", "echo", "velocity", "de-alias", "satellite", "insat", "sounder", "radiance", "remote sensing", "microwave", "precipitable", "band"],
-        coreTrainerName: "Sunita Kulkarni"
-      },
-      cyclone: {
-        keywords: ["cyclone", "cyclogenesis", "storm", "surge", "dvorak", "tropical", "marine", "ocean", "rsmc", "coastal", "inundation", "track", "alipore", "depression", "sea surface", "bay of bengal", "arabian sea", "cdo", "eye"],
-        coreTrainerName: "Rajiv Roy"
-      },
-      agri: {
-        keywords: ["agro", "crop", "agriculture", "fasal", "meghdoot", "drought", "soil", "yield", "advisory", "phenology", "agrometeorology"],
-        coreTrainerName: "Rajesh Pillai"
-      },
-      climate: {
-        keywords: ["climate", "monsoon", "enso", "iod", "teleconnection", "variability", "long-range", "reanalysis", "ipcc", "seasonal", "climatology"],
-        coreTrainerName: "Rajesh Pillai"
-      },
-      satellite: {
-        keywords: ["satellite", "radiance", "insat", "sounding", "rgb", "sounder", "space", "remote sensing", "cloud", "infrared", "water vapor"],
-        coreTrainerName: "Sunita Deshmukh"
-      }
-    };
-
-    const tokens = rawName.split(/[\s,./\-&]+/).filter(tok => tok.length > 2);
-
     const scoredTrainers = workloads.map(tw => {
-      let matchScore = 0;
-      let directMatches = 0;
+      const matchResult = calculateTrainerCompetencyMatch(tw, {
+        name: subjectName,
+        requiredSkills,
+        description,
+        category
+      });
 
-      if (rawName && rawName !== "subject title..." && !rawName.match(/^subject\s*\d*$/i)) {
-        tokens.forEach(tok => {
-          if (!["umesh", "admin", "officer", "scientist", "subject", "part", "test", "demo", "title", "study"].includes(tok)) {
-            (tw.skills || []).forEach(sk => {
-              if (sk.toLowerCase().includes(tok)) directMatches += 2;
-            });
-            (tw.specialization || []).forEach(sp => {
-              if (sp.toLowerCase().includes(tok)) directMatches += 2;
-            });
-          }
-        });
+      const { matchScore, matchLabel, matchedPills, matchedSkills, matchedCertificates, matchedQualifications } = matchResult;
 
-        Object.entries(domainKnowledge).forEach(([domain, conf]) => {
-          const hasTopicKeyword = conf.keywords.some(kw => rawName.includes(kw));
-          const isCoreTrainer = (tw.trainerName && conf.coreTrainerName && tw.trainerName.toLowerCase().includes(conf.coreTrainerName.toLowerCase()));
-
-          if (hasTopicKeyword && isCoreTrainer) {
-            matchScore += 80;
-          } else if (hasTopicKeyword) {
-            matchScore -= 10;
-          }
-        });
-
-        if (directMatches > 0) {
-          matchScore += directMatches * 10;
-        }
-
-        if (matchScore <= 0) {
-          matchScore = 0;
-        } else {
-          matchScore = Math.min(Math.max(matchScore, 10), 99);
-        }
-      }
-
-      // Re-evaluate final recommendation with subject match score
+      // Re-evaluate final recommendation with dynamic subject match score
       let adjustedRec = tw.finalRecommendation;
       let adjustedBadge = tw.recommendationBadge;
 
@@ -102,8 +235,12 @@ export const suggestTrainersForSubject = (req, res) => {
       return {
         ...tw,
         name: tw.trainerName,
-        matchScore: matchScore,
-        matchLabel: matchScore >= 80 ? "Top Recommendation" : matchScore >= 40 ? "Moderate Match" : "Low Match",
+        matchScore,
+        matchLabel,
+        matchedPills,
+        matchedSkills,
+        matchedCertificates,
+        matchedQualifications,
         finalRecommendation: adjustedRec,
         recommendationBadge: adjustedBadge
       };
