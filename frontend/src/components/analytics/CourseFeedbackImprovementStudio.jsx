@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { 
   Star, 
   AlertTriangle, 
@@ -25,151 +25,10 @@ import {
   GraduationCap,
   Award,
   Layers,
-  ShieldCheck
+  ShieldCheck,
+  Inbox
 } from "lucide-react";
 import { api } from "../../services/api";
-
-const DEFAULT_COURSE_FEEDBACK_DATA = [
-  {
-    courseId: "course_nwp_01",
-    courseTitle: "Advanced Numerical Weather Prediction & Data Assimilation",
-    category: "Operational NWP",
-    leadTrainerName: "Dr. Amit Sengupta",
-    totalReviews: 48,
-    overallRating: 4.4,
-    metrics: {
-      contentQuality: 4.6,
-      trainerEffectiveness: 4.5,
-      learningMaterial: 4.2,
-      assessmentQuality: 3.8 // < 4.0 triggers alert!
-    },
-    alerts: [
-      {
-        type: "assessment_review",
-        metric: "assessmentQuality",
-        score: 3.8,
-        title: "⚠ Assessment Review Recommended",
-        description: "38% of cadets reported assessment questions contained confusing double negatives or tested CFL equations not demonstrated in the slides.",
-        recommendedAction: "Review Quiz 1 and Final Assessment items in Question Bank or generate clarifying problem-solving drills."
-      }
-    ],
-    reviews: [
-      {
-        id: "rev_1",
-        traineeName: "Rahul Sharma (Scientist B)",
-        station: "MC Jaipur",
-        date: "2 days ago",
-        overall: 4.0,
-        content: 5,
-        trainer: 5,
-        material: 4,
-        assessment: 3,
-        comment: "Dr. Sengupta's lectures on atmospheric dynamics are phenomenal. However, the final quiz questions on 4D-Var variational assimilation were ambiguous with 2 very similar options.",
-        sentiment: "mixed",
-        tags: ["Ambiguous Quiz", "Great Lectures"]
-      },
-      {
-        id: "rev_2",
-        traineeName: "Priya Nair (Radar Specialist)",
-        station: "CWC Visakhapatnam",
-        date: "4 days ago",
-        overall: 4.5,
-        content: 5,
-        trainer: 5,
-        material: 5,
-        assessment: 3,
-        comment: "Excellent practical exposure. Assessment quality needs revision—several questions had confusing wording on sigma coordinates.",
-        sentiment: "positive",
-        tags: ["Revise Assessment", "High Practical Value"]
-      },
-      {
-        id: "rev_3",
-        traineeName: "Vikram Malhotra",
-        station: "IMD Pune",
-        date: "1 week ago",
-        overall: 4.8,
-        content: 5,
-        trainer: 5,
-        material: 4,
-        assessment: 5,
-        comment: "Very comprehensive curriculum. Best training program attended so far in MoES.",
-        sentiment: "positive",
-        tags: ["Highly Recommended"]
-      }
-    ]
-  },
-  {
-    courseId: "course_radar_02",
-    courseTitle: "Doppler Weather Radar (DWR) Operations & Severe Weather",
-    category: "Radar Meteorology",
-    leadTrainerName: "Dr. Priya Nair",
-    totalReviews: 36,
-    overallRating: 4.6,
-    metrics: {
-      contentQuality: 4.7,
-      trainerEffectiveness: 4.8,
-      learningMaterial: 3.9, // < 4.0 triggers alert!
-      assessmentQuality: 4.5
-    },
-    alerts: [
-      {
-        type: "material_refresh",
-        metric: "learningMaterial",
-        score: 3.9,
-        title: "⚠ Learning Material Review Recommended",
-        description: "Cadets requested higher resolution Dual-Pol radar color bar guides and updated PDF reference charts for sea clutter classification.",
-        recommendedAction: "Upload updated high-res ZDR/KDP operational quick-reference cards to Module 2."
-      }
-    ],
-    reviews: [
-      {
-        id: "rev_4",
-        traineeName: "Ananya Roy",
-        station: "NCMRWF",
-        date: "3 days ago",
-        overall: 4.5,
-        content: 5,
-        trainer: 5,
-        material: 3,
-        assessment: 5,
-        comment: "Radar simulations were fantastic. The PDF slides for Dual-Pol parameters were low resolution when zoomed in.",
-        sentiment: "positive",
-        tags: ["Low Res Slides", "Superb Simulator"]
-      }
-    ]
-  },
-  {
-    courseId: "course_marine_03",
-    courseTitle: "Coastal Oceanographic Modeling & Cyclone Inundation",
-    category: "Marine Meteorology",
-    leadTrainerName: "Dr. Sandeep Kulkarni",
-    totalReviews: 29,
-    overallRating: 4.7,
-    metrics: {
-      contentQuality: 4.8,
-      trainerEffectiveness: 4.7,
-      learningMaterial: 4.6,
-      assessmentQuality: 4.7
-    },
-    alerts: [],
-    reviews: [
-      {
-        id: "rev_5",
-        traineeName: "Rohan Kulkarni",
-        station: "IMD HQ",
-        date: "5 days ago",
-        overall: 5.0,
-        content: 5,
-        trainer: 5,
-        material: 5,
-        assessment: 5,
-        comment: "Seamless instruction, clear assignments, and well-calibrated quiz pass thresholds.",
-        sentiment: "positive",
-        tags: ["Flawless Track"]
-      }
-    ]
-  }
-];
 
 export const CourseFeedbackImprovementStudio = ({ 
   currentUser, 
@@ -181,12 +40,10 @@ export const CourseFeedbackImprovementStudio = ({
   const isTrainer = currentUser?.role === "trainer" || isAdmin;
 
   // ─── STATE ───
-  const [coursesFeedback, setCoursesFeedback] = useState(() => {
-    const saved = localStorage.getItem("moes_courses_feedback_data");
-    return saved ? JSON.parse(saved) : DEFAULT_COURSE_FEEDBACK_DATA;
-  });
-
-  const [selectedCourseId, setSelectedCourseId] = useState("course_nwp_01");
+  const [courses, setCourses] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
   const [alertThreshold, setAlertThreshold] = useState(4.0); // Metric < 4.0 triggers alert
   const [reviewFilter, setReviewFilter] = useState("all"); // "all" | "critical" | "positive"
   const [searchQuery, setSearchQuery] = useState("");
@@ -199,14 +56,122 @@ export const CourseFeedbackImprovementStudio = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const selectedCourse = coursesFeedback.find(c => c.courseId === selectedCourseId) || coursesFeedback[0];
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [coursesRes, feedbacksRes] = await Promise.all([
+          api.getCourses().catch(() => ({ success: false, courses: [] })),
+          api.getFeedbacks().catch(() => ({ success: false, feedbacks: [] }))
+        ]);
+
+        const courseList = Array.isArray(coursesRes) ? coursesRes : (coursesRes.courses || []);
+        const feedbackList = Array.isArray(feedbacksRes) ? feedbacksRes : (feedbacksRes.feedbacks || feedbacksRes.data || []);
+
+        setCourses(courseList);
+        setFeedbacks(feedbackList);
+
+        if (courseList.length > 0) {
+          setSelectedCourseId(prev => prev && courseList.some(c => c.id === prev) ? prev : courseList[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to load feedback telemetry:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Compute aggregated stats for each course dynamically
+  const coursesFeedback = useMemo(() => {
+    return courses.map(c => {
+      const courseReviews = feedbacks.filter(f => f.courseId === c.id || f.courseId === c.courseId);
+      const total = courseReviews.length;
+
+      let sumOverall = 0;
+      let sumContent = 0;
+      let sumTrainer = 0;
+      let sumMaterial = 0;
+      let sumAssessment = 0;
+
+      const mappedReviews = courseReviews.map((r, idx) => {
+        const cRating = Number(r.contentRating || r.contentQuality || r.content || 5);
+        const tRating = Number(r.trainerRating || r.trainerEffectiveness || r.trainer || 5);
+        const mRating = Number(r.materialRating || r.learningMaterial || r.material || (r.relevanceRating || 4.5));
+        const aRating = Number(r.assessmentRating || r.assessmentQuality || r.assessment || (r.relevanceRating || 4.5));
+        const overall = Number(r.overallRating || r.overall || ((cRating + tRating + mRating + aRating) / 4).toFixed(1));
+
+        sumOverall += overall;
+        sumContent += cRating;
+        sumTrainer += tRating;
+        sumMaterial += mRating;
+        sumAssessment += aRating;
+
+        return {
+          id: r.id || `rev_${idx}`,
+          traineeName: r.traineeName || "Cadet Trainee",
+          station: r.station || r.designation || "MoES/IMD Center",
+          date: r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "Recent",
+          overall: overall,
+          content: cRating,
+          trainer: tRating,
+          material: mRating,
+          assessment: aRating,
+          comment: r.comment || "Course covered essential concepts and operational workflows.",
+          sentiment: overall >= 4.5 ? "positive" : overall <= 3.5 ? "critical" : "mixed",
+          tags: r.tags || (overall >= 4.5 ? ["Highly Recommended"] : overall <= 3.5 ? ["Needs Review"] : ["Operational Value"])
+        };
+      });
+
+      const metrics = total > 0 ? {
+        contentQuality: parseFloat((sumContent / total).toFixed(1)),
+        trainerEffectiveness: parseFloat((sumTrainer / total).toFixed(1)),
+        learningMaterial: parseFloat((sumMaterial / total).toFixed(1)),
+        assessmentQuality: parseFloat((sumAssessment / total).toFixed(1))
+      } : {
+        contentQuality: 0,
+        trainerEffectiveness: 0,
+        learningMaterial: 0,
+        assessmentQuality: 0
+      };
+
+      const overallRating = total > 0 ? parseFloat((sumOverall / total).toFixed(1)) : 0;
+
+      return {
+        courseId: c.id,
+        courseTitle: c.title || c.name || "Specialized Training Course",
+        category: c.category || c.department || "Meteorological Science",
+        leadTrainerName: c.leadTrainerName || c.instructor || "Faculty Lead",
+        totalReviews: total,
+        overallRating: overallRating,
+        metrics: metrics,
+        reviews: mappedReviews
+      };
+    });
+  }, [courses, feedbacks]);
+
+  const selectedCourse = useMemo(() => {
+    return coursesFeedback.find(c => c.courseId === selectedCourseId) || coursesFeedback[0] || {
+      courseId: "none",
+      courseTitle: "No Courses Available",
+      category: "N/A",
+      leadTrainerName: "N/A",
+      totalReviews: 0,
+      overallRating: 0,
+      metrics: { contentQuality: 0, trainerEffectiveness: 0, learningMaterial: 0, assessmentQuality: 0 },
+      reviews: []
+    };
+  }, [coursesFeedback, selectedCourseId]);
 
   // Recalculate dynamic alerts based on configurable alertThreshold
   const evaluatedAlerts = useMemo(() => {
+    if (!selectedCourse || selectedCourse.totalReviews === 0) return [];
     const alerts = [];
     const m = selectedCourse.metrics;
 
-    if (m.assessmentQuality < alertThreshold) {
+    if (m.assessmentQuality > 0 && m.assessmentQuality < alertThreshold) {
       alerts.push({
         type: "assessment_review",
         metricName: "Assessment Quality",
@@ -218,7 +183,7 @@ export const CourseFeedbackImprovementStudio = ({
       });
     }
 
-    if (m.learningMaterial < alertThreshold) {
+    if (m.learningMaterial > 0 && m.learningMaterial < alertThreshold) {
       alerts.push({
         type: "material_refresh",
         metricName: "Learning Material",
@@ -230,7 +195,7 @@ export const CourseFeedbackImprovementStudio = ({
       });
     }
 
-    if (m.contentQuality < alertThreshold) {
+    if (m.contentQuality > 0 && m.contentQuality < alertThreshold) {
       alerts.push({
         type: "content_review",
         metricName: "Content Quality",
@@ -247,10 +212,11 @@ export const CourseFeedbackImprovementStudio = ({
 
   // Filtered reviews
   const filteredReviews = useMemo(() => {
-    return (selectedCourse.reviews || []).filter(r => {
-      const matchSearch = r.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          r.traineeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          r.station.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!selectedCourse || !selectedCourse.reviews) return [];
+    return selectedCourse.reviews.filter(r => {
+      const matchSearch = (r.comment || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (r.traineeName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (r.station || "").toLowerCase().includes(searchQuery.toLowerCase());
       
       if (reviewFilter === "critical") return matchSearch && (r.overall <= 4.0 || r.assessment <= 3 || r.material <= 3);
       if (reviewFilter === "positive") return matchSearch && r.overall >= 4.5;

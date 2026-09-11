@@ -17,6 +17,27 @@ import {
 } from "lucide-react";
 import { api } from "../../services/api";
 
+const formatVideoEmbedUrl = (url) => {
+  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/NRE2up9GxAI";
+  let cleanUrl = url.trim();
+  if (cleanUrl.includes("youtu.be/")) {
+    const parts = cleanUrl.split("youtu.be/")[1];
+    const videoId = parts ? parts.split("?")[0].split("&")[0].split("/")[0] : null;
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (cleanUrl.includes("youtube.com/watch")) {
+    try {
+      const urlObj = new URL(cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
+      const v = urlObj.searchParams.get("v");
+      if (v) return `https://www.youtube.com/embed/${v}`;
+    } catch (e) {}
+  }
+  if (cleanUrl.includes("youtube.com/embed/")) {
+    return cleanUrl;
+  }
+  return cleanUrl;
+};
+
 export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnrollSuccess }) => {
   const [activeTab, setActiveTab] = useState("curriculum"); // "curriculum" | "feedback" | "upload"
   const [activeMaterial, setActiveMaterial] = useState(null);
@@ -399,8 +420,8 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
               <div className="aspect-video bg-black rounded-xl overflow-hidden flex items-center justify-center">
                 <iframe
                   className="w-full h-full"
-                  src={activeMaterial.url || "https://www.youtube.com/embed/dQw4w9WgXcQ"}
-                  title="Lecture Video"
+                  src={formatVideoEmbedUrl(activeMaterial?.url)}
+                  title={activeMaterial?.title || "Lecture Video"}
                   allowFullScreen
                 ></iframe>
               </div>

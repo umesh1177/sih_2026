@@ -56,6 +56,27 @@ import {
 } from "lucide-react";
 import { api } from "../../services/api";
 
+export const formatVideoEmbedUrl = (url) => {
+  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/NRE2up9GxAI";
+  let cleanUrl = url.trim();
+  if (cleanUrl.includes("youtu.be/")) {
+    const parts = cleanUrl.split("youtu.be/")[1];
+    const videoId = parts ? parts.split("?")[0].split("&")[0].split("/")[0] : null;
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (cleanUrl.includes("youtube.com/watch")) {
+    try {
+      const urlObj = new URL(cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
+      const v = urlObj.searchParams.get("v");
+      if (v) return `https://www.youtube.com/embed/${v}`;
+    } catch (e) {}
+  }
+  if (cleanUrl.includes("youtube.com/embed/")) {
+    return cleanUrl;
+  }
+  return cleanUrl;
+};
+
 const DEFAULT_SUBJECTS = [
   {
     id: "sub_dyn_1",
@@ -73,7 +94,7 @@ const DEFAULT_SUBJECTS = [
             duration: "45 mins",
             durationSeconds: 2700,
             allowDownload: false,
-            url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            url: "https://www.youtube.com/embed/NRE2up9GxAI",
             uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
             uploadedAt: "Uploaded on: Jan 15, 2025",
             prerequisiteConfig: {
@@ -132,7 +153,7 @@ const DEFAULT_SUBJECTS = [
             duration: "50 mins",
             durationSeconds: 3000,
             allowDownload: false,
-            url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            url: "https://www.youtube.com/embed/NRE2up9GxAI",
             uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
             uploadedAt: "Uploaded on: Jan 16, 2025",
             prerequisiteConfig: {
@@ -225,12 +246,115 @@ const DEFAULT_SUBJECTS = [
   }
 ];
 
+const ensureRichMaterials = (subjList, leadTrainer) => {
+  if (!Array.isArray(subjList) || subjList.length === 0) return DEFAULT_SUBJECTS;
+  return subjList.map((sub, sIdx) => {
+    const rawModules = Array.isArray(sub.modules) && sub.modules.length > 0 
+      ? sub.modules 
+      : [
+          { id: `mod_${sub.id || sIdx}_1`, title: "Module 1: Core Formulations & Atmospheric Laws", duration: "1 Week", materials: [] },
+          { id: `mod_${sub.id || sIdx}_2`, title: "Module 2: Diagnostic Analysis & Operational Methods", duration: "1 Week", materials: [] }
+        ];
+
+    return {
+      ...sub,
+      modules: rawModules.map((mod, mIdx) => {
+        if (Array.isArray(mod.materials) && mod.materials.length > 0) {
+          return mod;
+        }
+        const cleanTitle = (mod.title || `Module ${mIdx + 1}`).replace(/^Module\s*\d+(\.\d+)?\s*:\s*/i, '');
+        return {
+          ...mod,
+          materials: [
+            {
+              id: `mat_${sub.id || sIdx}_${mod.id || mIdx}_v1`,
+              title: `Video ${mIdx + 1}: Recorded Masterclass — ${cleanTitle}`,
+              type: "video",
+              url: "https://www.youtube.com/embed/NRE2up9GxAI",
+              duration: "45 mins",
+              durationSeconds: 2700,
+              allowDownload: false,
+              uploadedBy: sub.assignedTrainerName || leadTrainer || "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
+              uploadedAt: "Uploaded on: Jan 15, 2026",
+              topic: cleanTitle,
+              prerequisiteConfig: { enabled: false, condition: "ALL", requiredWatchThreshold: 80, prerequisites: [] }
+            },
+            {
+              id: `mat_${sub.id || sIdx}_${mod.id || mIdx}_ppt`,
+              title: `Slide Deck: ${cleanTitle} Operational Presentation Deck (PPT)`,
+              type: "presentation",
+              pages: 30,
+              duration: "30 Slides",
+              allowDownload: true,
+              uploadedBy: sub.assignedTrainerName || leadTrainer || "Dr. Amit Sengupta (Lead Trainer)",
+              uploadedAt: "Uploaded on: Jan 16, 2026",
+              topic: cleanTitle
+            },
+            {
+              id: `mat_${sub.id || sIdx}_${mod.id || mIdx}_pdf`,
+              title: `Technical Handbook: ${cleanTitle} Formulation & Protocol Guide (PDF)`,
+              type: "pdf",
+              size: "3.6 MB",
+              pages: 22,
+              duration: "22 Pages",
+              allowDownload: true,
+              uploadedBy: sub.assignedTrainerName || leadTrainer || "Dr. Amit Sengupta (Lead Trainer)",
+              uploadedAt: "Uploaded on: Jan 17, 2026",
+              topic: cleanTitle
+            },
+            {
+              id: `mat_${sub.id || sIdx}_${mod.id || mIdx}_qz`,
+              title: `Video Quiz ${mIdx + 1}: ${cleanTitle} Prerequisite Assessment`,
+              type: "quiz",
+              duration: "15 mins",
+              totalMarks: 10,
+              passPercentage: 50,
+              allowDownload: false,
+              uploadedBy: sub.assignedTrainerName || leadTrainer || "Dr. Amit Sengupta (Lead Trainer)",
+              uploadedAt: "Uploaded on: Jan 18, 2026",
+              topic: cleanTitle,
+              questions: [
+                {
+                  id: `q_${sIdx}_${mIdx}_1`,
+                  question: `In operational weather prediction, what is the core physical governing principle in ${cleanTitle}?`,
+                  options: [
+                    "Courant-Friedrichs-Lewy (CFL) numerical stability & mass conservation",
+                    "Unconstrained geostrophic divergence without friction",
+                    "Zero vertical motion in non-hydrostatic regime",
+                    "Uniform moisture flux across all boundary layers"
+                  ],
+                  correctAnswer: 0,
+                  marks: 5,
+                  explanation: "Numerical stability and conservation laws are the fundamental constraints."
+                },
+                {
+                  id: `q_${sIdx}_${mIdx}_2`,
+                  question: `How are diagnostic observations validated in ${cleanTitle}?`,
+                  options: [
+                    "Through standardized IMD NWP and radar verification protocols",
+                    "By excluding background error covariances",
+                    "Using uncalibrated raw radar noise levels",
+                    "Without spatial coordinate transformation"
+                  ],
+                  correctAnswer: 0,
+                  marks: 5,
+                  explanation: "Operational forecasting workflows require systematic verification against ground observations and sounding profiles."
+                }
+              ]
+            }
+          ]
+        };
+      })
+    };
+  });
+};
+
 export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSuccess }) => {
   // Check if current user has Trainer or Admin authority
   const isTrainer = currentUser?.role === "trainer" || currentUser?.role === "admin";
 
-  const [curriculumSubjects, setCurriculumSubjects] = useState(
-    (course?.subjects && course.subjects.length > 0) ? course.subjects : DEFAULT_SUBJECTS
+  const [curriculumSubjects, setCurriculumSubjects] = useState(() => 
+    ensureRichMaterials(course?.subjects, course?.leadTrainerName)
   );
   
   const subjects = curriculumSubjects;
@@ -242,7 +366,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
     duration: "45 mins",
     durationSeconds: 2700,
     allowDownload: false,
-    url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    url: "https://www.youtube.com/embed/NRE2up9GxAI",
     uploadedBy: course?.leadTrainerName || "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
     uploadedAt: "Uploaded on: Jan 15, 2025"
   };
@@ -250,6 +374,24 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
   const [selectedSubjectId, setSelectedSubjectId] = useState(subjects[0]?.id || "");
   const [selectedModuleId, setSelectedModuleId] = useState(subjects[0]?.modules?.[0]?.id || "");
   const [selectedMaterial, setSelectedMaterial] = useState(initialMaterial);
+
+  useEffect(() => {
+    if (course?.subjects) {
+      const enriched = ensureRichMaterials(course.subjects, course.leadTrainerName);
+      setCurriculumSubjects(enriched);
+      if (enriched[0]?.modules?.[0]?.materials?.[0]) {
+        setSelectedSubjectId(enriched[0].id);
+        setSelectedModuleId(enriched[0].modules[0].id);
+        setSelectedMaterial(enriched[0].modules[0].materials[0]);
+      }
+      const expMap = {};
+      enriched.forEach(s => { expMap[s.id] = true; });
+      setExpandedSubjects(expMap);
+    }
+  }, [course]);
+
+  const currentSubject = subjects.find(s => s.id === selectedSubjectId) || subjects[0] || {};
+  const currentModule = currentSubject?.modules?.find(m => m.id === selectedModuleId) || currentSubject?.modules?.[0] || {};
 
   // ─── CONTROLLED LEARNING PATH & UNLOCK CONSTRAINTS STATE ───
   // Default is ON (Strict Lock Progression)
@@ -519,7 +661,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
       allowDownload: newResourceForm.type !== "quiz" && newResourceForm.type !== "video",
       uploadedBy: currentUser?.name ? `${currentUser.name} (Trainer)` : "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
       uploadedAt: `Uploaded on: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
-      url: newResourceForm.url || (newResourceForm.type === "video" ? "https://www.youtube.com/embed/dQw4w9WgXcQ" : ""),
+      url: newResourceForm.url ? formatVideoEmbedUrl(newResourceForm.url) : (newResourceForm.type === "video" ? "https://www.youtube.com/embed/NRE2up9GxAI" : ""),
       totalMarks: newResourceForm.type === "quiz" ? (newResourceForm.questions.length * 5) : undefined,
       passPercentage: newResourceForm.type === "quiz" ? newResourceForm.passPercentage : undefined,
       questions: newResourceForm.type === "quiz" ? newResourceForm.questions : undefined,
@@ -685,24 +827,29 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
     setGeneratingSummary(true);
     try {
       const payload = {
-        materialTitle: selectedMaterial?.title,
-        materialType: selectedMaterial?.type,
-        courseTitle: course?.title,
-        customNotes: lectureNote
+        materialTitle: selectedMaterial?.title || "Meteorological Training Material",
+        materialType: selectedMaterial?.type || "video",
+        courseTitle: course?.title || "Operational Meteorological Training Program",
+        subjectName: currentSubject?.title || currentSubject?.name || course?.subjects?.[0]?.name || "Atmospheric Dynamics & Numerical Weather Prediction",
+        moduleTitle: currentModule?.title || "Operational Meteorological Methods",
+        topic: selectedMaterial?.topic || selectedMaterial?.title || "Core Meteorology",
+        materialUrl: selectedMaterial?.url || "",
+        keyConcepts: selectedMaterial?.description || (Array.isArray(selectedMaterial?.tags) ? selectedMaterial.tags.join(", ") : ""),
+        customNotes: lectureNote || ""
       };
       const res = await api.generateMaterialSummary(payload);
       if (res.success && res.summary) {
         setAiSummary(res.summary);
         setSummarySource(res.source || "Gemini 1.5 Flash");
         // Cache locally
-        const summaryKey = `moes_ai_sum_${course?.id || "c"}_${selectedMaterial.id}`;
+        const summaryKey = `moes_ai_sum_${course?.id || "c"}_${selectedMaterial?.id || "mat"}`;
         localStorage.setItem(summaryKey, JSON.stringify({ summary: res.summary, source: res.source }));
         setRightPanelTab("ai_summary");
         if (viewMode === "standard") setViewMode("split");
       }
     } catch (err) {
       console.error("AI Summary generation failed:", err);
-      alert("AI Summary generation failed: " + err.message);
+      alert("AI Summary generation failed: " + (err.response?.data?.message || err.message));
     } finally {
       setGeneratingSummary(false);
     }
@@ -826,6 +973,21 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
     setSelectedModuleId(modId);
     setSelectedMaterial(mat);
     setCurrentSlidePage(1);
+
+    // Automatically check cached AI summary or reset for selected material
+    const summaryKey = `moes_ai_sum_${course?.id || "c"}_${mat.id}`;
+    const cached = localStorage.getItem(summaryKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setAiSummary(parsed.summary);
+        setSummarySource(parsed.source || "Gemini 1.5 Flash (Cached)");
+      } catch (e) {
+        setAiSummary(null);
+      }
+    } else {
+      setAiSummary(null);
+    }
   };
 
   // Jump to specific prerequisite material
@@ -1511,8 +1673,8 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     <div className="aspect-video w-full bg-black flex items-center justify-center relative shadow-inner">
                       <iframe
                         className="w-full h-full"
-                        src={selectedMaterial.url || "https://www.youtube.com/embed/dQw4w9WgXcQ"}
-                        title={selectedMaterial.title}
+                        src={formatVideoEmbedUrl(selectedMaterial?.url)}
+                        title={selectedMaterial?.title || "Lecture Video"}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       ></iframe>
@@ -1775,7 +1937,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 )}
 
                 {/* 3. 📊 PRESENTATION / SLIDE DECK STAGE */}
-                {selectedMaterial?.type === "presentation" && (
+                {(selectedMaterial?.type === "presentation" || selectedMaterial?.type === "ppt") && (
                   <div className="w-full max-w-5xl bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
                     <div className="p-3 sm:p-4 bg-slate-50 text-slate-800 flex items-center justify-between border-b border-slate-200">
                       <div className="flex items-center gap-2">
@@ -1862,7 +2024,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 )}
 
                 {/* 4. 📄 SCIENTIFIC STUDY NOTES / PDF HANDBOOK STAGE */}
-                {selectedMaterial?.type === "pdf" && (
+                {(selectedMaterial?.type === "pdf" || selectedMaterial?.type === "manual" || selectedMaterial?.type === "document" || selectedMaterial?.type === "doc") && (
                   <div className="w-full max-w-5xl bg-white rounded-3xl shadow-md border border-slate-200 p-5 sm:p-8 space-y-5">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                       <div className="flex items-center gap-3">

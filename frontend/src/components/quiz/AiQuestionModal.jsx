@@ -1,38 +1,127 @@
-import React, { useState } from "react";
-import { Sparkles, X, CheckCircle2, ArrowRight, Loader2, BookOpen, Layers } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Sparkles, X, CheckCircle2, ArrowRight, Loader2, BookOpen, Layers, Hash, FileQuestion, HelpCircle, Check } from "lucide-react";
 import { api } from "../../services/api";
 
-export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
+export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, currentUser }) => {
   const [topic, setTopic] = useState("Numerical Weather Prediction (NWP) Dynamics");
+  const [subjectName, setSubjectName] = useState("Governing Equations & Atmospheric Dynamics");
+  const [selectedModule, setSelectedModule] = useState("");
+  const [customModule, setCustomModule] = useState("");
+  const [questionType, setQuestionType] = useState("mcq"); // "mcq" | "one_word"
   const [difficulty, setDifficulty] = useState("Medium");
-  const [count, setCount] = useState(3);
-  const [subjectName, setSubjectName] = useState("Subject 1: Governing Equations & Atmospheric Dynamics");
-  const [module, setModule] = useState("Module 1");
+  const [count, setCount] = useState(5);
+  
+  const [availableModules, setAvailableModules] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [generatedList, setGeneratedList] = useState([]);
   const [selectedToAdd, setSelectedToAdd] = useState({});
+  const [importing, setImporting] = useState(false);
+
+  // Load modules from trainer's assigned courses
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const loadModules = async () => {
+      try {
+        const cRes = await api.getCourses();
+        if (cRes?.success && Array.isArray(cRes.courses)) {
+          // Filter assigned courses for trainer
+          const assignedCourses = cRes.courses.filter(c => {
+            if (currentUser?.role === "admin") return true;
+            if (currentUser?.id && (c.leadTrainerId === currentUser.id || c.trainerId === currentUser.id)) return true;
+            if (currentUser?.name && c.leadTrainerName && c.leadTrainerName.toLowerCase() === currentUser.name.toLowerCase()) return true;
+            if (c.subjects && Array.isArray(c.subjects)) {
+              return c.subjects.some(s => 
+                (currentUser?.id && (s.trainerId === currentUser.id || s.facultyId === currentUser.id || s.assignedTrainerId === currentUser.id)) ||
+                (currentUser?.name && (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName) && 
+                  (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName).toLowerCase().includes(currentUser.name.toLowerCase()))
+              );
+            }
+            return false;
+          });
+
+          const modulesList = [];
+          assignedCourses.forEach(c => {
+            (c.subjects || []).forEach(s => {
+              const isSubjTrainer = currentUser?.role === "admin" || 
+                (currentUser?.id && (s.trainerId === currentUser.id || s.facultyId === currentUser.id || s.assignedTrainerId === currentUser.id || c.leadTrainerId === currentUser.id)) ||
+                (currentUser?.name && (s.trainerName || s.facultyName || s.trainer || c.leadTrainerName || "").toLowerCase().includes(currentUser.name.toLowerCase()));
+              
+              if (isSubjTrainer) {
+                (s.modules || []).forEach((m, mIdx) => {
+                  modulesList.push({
+                    id: m.id || `mod_${mIdx}`,
+                    courseTitle: c.title,
+                    subjectName: s.name || s.title || "Subject Unit",
+                    moduleTitle: m.title || `Module ${mIdx + 1}`,
+                    fullLabel: `${s.name || s.title} — ${m.title || `Module ${mIdx + 1}`}`,
+                    topics: m.topics || []
+                  });
+                });
+              }
+            });
+          });
+
+          setAvailableModules(modulesList);
+          if (modulesList.length > 0) {
+            setSelectedModule(modulesList[0].fullLabel);
+            setSubjectName(modulesList[0].subjectName);
+            if (modulesList[0].topics && modulesList[0].topics.length > 0) {
+              setTopic(modulesList[0].topics[0]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed loading course modules for AI Generator:", err);
+      }
+    };
+
+    loadModules();
+  }, [isOpen, currentUser]);
 
   if (!isOpen) return null;
+
+  const handleModuleSelectChange = (val) => {
+    setSelectedModule(val);
+    if (val !== "custom") {
+      const found = availableModules.find(m => m.fullLabel === val);
+      if (found) {
+        setSubjectName(found.subjectName);
+        if (found.topics && found.topics.length > 0) {
+          setTopic(found.topics[0]);
+        }
+      }
+    }
+  };
 
   const handleGenerate = async (e) => {
     e.preventDefault();
     setGenerating(true);
+    setGeneratedList([]);
     try {
+      const activeModule = selectedModule === "custom" 
+        ? (customModule.trim() || "General Module") 
+        : (selectedModule || "Module 1");
+
       const res = await api.generateAiQuestions({
-        topic,
+        topic: topic.trim(),
+        subjectName: subjectName.trim(),
+        module: activeModule,
         difficulty,
-        count: Number(count),
-        subjectName,
-        module
+        count: Math.max(1, Number(count) || 5),
+        type: questionType,
+        questionType
       });
 
-      if (res.success && res.generatedQuestions) {
+      if (res.success && Array.isArray(res.generatedQuestions)) {
         setGeneratedList(res.generatedQuestions);
         const selMap = {};
         res.generatedQuestions.forEach(q => {
           selMap[q.id] = true;
         });
         setSelectedToAdd(selMap);
+      } else {
+        alert(res.message || "Failed to generate questions. Please try a different topic or prompt.");
       }
     } catch (err) {
       alert("AI Generation failed: " + err.message);
@@ -44,54 +133,68 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
   const handleAddSelectedToBank = async () => {
     const toAdd = generatedList.filter(q => selectedToAdd[q.id]);
     if (toAdd.length === 0) {
-      alert("Please select at least one question to add.");
+      alert("Please select at least one question to import into the Question Bank.");
       return;
     }
 
+    setImporting(true);
     try {
+      const activeModule = selectedModule === "custom" ? (customModule || "Module 1") : (selectedModule || "Module 1");
+
       for (const q of toAdd) {
         await api.createQuestion({
           question: q.question,
-          subjectId: "sub_nwp_01",
-          subjectName: q.subjectName,
-          module: q.module,
-          marks: q.marks,
-          type: q.type,
-          difficulty: q.difficulty,
-          options: q.options,
-          correctAnswer: q.correctAnswer,
-          explanation: q.explanation
+          subjectName: q.subjectName || subjectName,
+          topic: q.topic || topic,
+          module: q.module || activeModule,
+          marks: Number(q.marks) || (questionType === "one_word" ? 2 : 3),
+          type: q.type || questionType,
+          difficulty: q.difficulty || difficulty,
+          options: q.options || [],
+          correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+          expectedAnswer: q.expectedAnswer || (q.options ? q.options[0] : ""),
+          acceptedAnswers: q.acceptedAnswers || (q.expectedAnswer ? [q.expectedAnswer] : []),
+          explanation: q.explanation || "",
+          createdBy: currentUser?.id || "u_trainer_1",
+          createdByEmail: currentUser?.email || null,
+          createdByName: currentUser?.name || null,
+          createdByRole: currentUser?.role || "trainer"
         });
       }
 
-      if (onQuestionsGenerated) onQuestionsGenerated();
+      if (onQuestionsGenerated) {
+        await onQuestionsGenerated();
+      }
       onClose();
     } catch (err) {
       alert("Failed saving AI questions: " + err.message);
+    } finally {
+      setImporting(false);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+        
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
-              <Sparkles className="w-5 h-5 text-yellow-300" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0a2558] to-indigo-600 flex items-center justify-center text-white shadow-md">
+              <Sparkles className="w-5 h-5 text-amber-300" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">
-                IMD Meteorological AI Question Generator
+              <h2 className="text-base font-black text-slate-900">
+                MoES Domain AI Question Generator
               </h2>
               <p className="text-[11px] text-slate-500">
-                Auto-generate high-quality domain assessment questions with formulas and physics options
+                Auto-generate high-quality technical MCQs or One-Word questions tailored to your assigned modules and topics.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -99,95 +202,181 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
 
         {/* Input Parameters Form */}
         <form onSubmit={handleGenerate} className="py-4 space-y-4 text-xs">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">
-                Domain / Topic Prompt *
+          
+          {/* Question Format Selector (MCQ vs One Word) */}
+          <div className="space-y-1.5">
+            <label className="block font-bold text-slate-700">
+              Select Question Format *
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setQuestionType("mcq")}
+                className={`p-3 rounded-2xl border flex items-center gap-2.5 font-bold transition-all text-left ${
+                  questionType === "mcq"
+                    ? "bg-indigo-50/80 border-indigo-500 text-indigo-950 ring-2 ring-indigo-200 shadow-2xs"
+                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs ${
+                  questionType === "mcq" ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700"
+                }`}>
+                  A
+                </div>
+                <div>
+                  <p className="text-xs font-black">Multiple Choice (MCQ)</p>
+                  <p className="text-[10px] text-slate-500 font-normal">4 options with 1 verified correct choice</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setQuestionType("one_word")}
+                className={`p-3 rounded-2xl border flex items-center gap-2.5 font-bold transition-all text-left ${
+                  questionType === "one_word"
+                    ? "bg-indigo-50/80 border-indigo-500 text-indigo-950 ring-2 ring-indigo-200 shadow-2xs"
+                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs ${
+                  questionType === "one_word" ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700"
+                }`}>
+                  1
+                </div>
+                <div>
+                  <p className="text-xs font-black">One Word / Short Answer</p>
+                  <p className="text-[10px] text-slate-500 font-normal">Single scientific term, acronym, or metric</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Module Dropdown (Populated from assigned subjects) */}
+          <div className="space-y-1">
+            <label className="block font-bold text-slate-700">
+              Assigned Course Module *
+            </label>
+            <select
+              value={selectedModule}
+              onChange={(e) => handleModuleSelectChange(e.target.value)}
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+            >
+              {availableModules.length > 0 ? (
+                <>
+                  {availableModules.map((m, idx) => (
+                    <option key={m.id || idx} value={m.fullLabel}>
+                      {m.fullLabel}
+                    </option>
+                  ))}
+                  <option value="custom">✏️ Custom Module (Type module name below)</option>
+                </>
+              ) : (
+                <>
+                  <option value="Module 1: Atmospheric Dynamics">Module 1: Atmospheric Dynamics & Primitive Equations</option>
+                  <option value="Module 2: Polarimetric Radar">Module 2: Doppler Weather Radar Polarimetric Analysis</option>
+                  <option value="Module 3: Tropical Cyclogenesis">Module 3: Tropical Cyclogenesis & Dvorak Technique</option>
+                  <option value="custom">✏️ Custom Module (Type module name below)</option>
+                </>
+              )}
+            </select>
+          </div>
+
+          {/* Custom Module Input if selected */}
+          {selectedModule === "custom" && (
+            <div className="space-y-1 animate-in fade-in duration-150">
+              <label className="block font-bold text-slate-700">
+                Custom Module Name *
               </label>
               <input
                 type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="e.g. RSA Encryption, DBMS Normalization, NWP Models"
+                value={customModule}
+                onChange={(e) => setCustomModule(e.target.value)}
+                placeholder="e.g. Module 4: Numerical Boundary Layer Schemes"
                 required
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none font-medium text-slate-800"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               />
             </div>
+          )}
 
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+          {/* Subject & Topic Text Inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700">
                 Subject Name *
               </label>
               <input
                 type="text"
                 value={subjectName}
                 onChange={(e) => setSubjectName(e.target.value)}
-                placeholder="e.g. Computer Networks, Database Systems, Meteorology"
+                placeholder="e.g. Governing Equations & Dynamics"
                 required
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none text-slate-800 font-medium"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700">
+                Specific Topic / Prompt *
+              </label>
+              <input
+                type="text"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="e.g. CFL Numerical Stability Criterion, 4D-Var Assimilation"
+                required
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">
+          {/* Target Difficulty & Question Count */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700">
                 Target Difficulty
               </label>
               <select
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               >
                 <option value="Easy">Easy (Conceptual / 2 Marks)</option>
                 <option value="Medium">Medium (Analytical / 3 Marks)</option>
-                <option value="Hard">Hard (Expert / 4 Marks)</option>
+                <option value="Hard">Hard (Expert Scenario / 4 Marks)</option>
               </select>
             </div>
 
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">
-                Number of Questions
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-700">
+                Number of Questions to Generate
               </label>
               <input
                 type="number"
                 min={1}
-                max={10}
+                max={25}
                 value={count}
                 onChange={(e) => setCount(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">
-                Module Tag
-              </label>
-              <input
-                type="text"
-                value={module}
-                onChange={(e) => setModule(e.target.value)}
-                placeholder="e.g. Module 1"
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-bold text-slate-900"
               />
             </div>
           </div>
 
+          {/* Submit Action */}
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
               disabled={generating}
-              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-sm transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-blue-900 text-white rounded-2xl font-black shadow-sm transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
             >
               {generating ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Synthesizing Questions with AI...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
+                  <span>Synthesizing Domain Questions with AI...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Generate Questions Now</span>
+                  <span>Generate {count} {questionType === "one_word" ? "One-Word" : "MCQ"} Questions</span>
                 </>
               )}
             </button>
@@ -196,23 +385,40 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
 
         {/* AI Results Preview List */}
         {generatedList.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Generated Questions Preview ({generatedList.length})
-              </h3>
-              <span className="text-[11px] text-slate-500">
-                Check questions to add to the Question Bank
-              </span>
+              <div>
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Generated Questions Preview ({generatedList.length})</span>
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Select questions to import directly into your Question Bank.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const allSelected = Object.keys(selectedToAdd).length === generatedList.length && Object.values(selectedToAdd).every(Boolean);
+                  const selMap = {};
+                  generatedList.forEach(q => {
+                    selMap[q.id] = !allSelected;
+                  });
+                  setSelectedToAdd(selMap);
+                }}
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
+              >
+                {Object.values(selectedToAdd).filter(Boolean).length === generatedList.length ? "Deselect All" : "Select All"}
+              </button>
             </div>
 
             <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
               {generatedList.map((q, idx) => (
                 <div
                   key={q.id || idx}
-                  className={`p-4 rounded-xl border text-xs transition-colors ${
+                  className={`p-4 rounded-2xl border text-xs transition-colors ${
                     selectedToAdd[q.id]
-                      ? "bg-blue-50/50 border-blue-200"
+                      ? "bg-indigo-50/40 border-indigo-300"
                       : "bg-slate-50 border-slate-200 opacity-60"
                   }`}
                 >
@@ -223,14 +429,16 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                       onChange={() =>
                         setSelectedToAdd(prev => ({ ...prev, [q.id]: !prev[q.id] }))
                       }
-                      className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="mt-1 w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
                     />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
-                          {q.type}
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          (q.type || "").includes("word") ? "bg-amber-100 text-amber-900" : "bg-[#0a2558] text-white"
+                        }`}>
+                          {(q.type || "").includes("word") ? "One Word" : "MCQ"}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-teal-100 text-teal-800">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-100 text-indigo-800">
                           {q.difficulty}
                         </span>
                         <span className="text-[11px] font-semibold text-slate-500">
@@ -238,26 +446,40 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
                         </span>
                       </div>
 
-                      <p className="font-semibold text-slate-800 mb-2">{q.question}</p>
+                      <p className="font-bold text-slate-900">{q.question}</p>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 pl-2 text-slate-600">
-                        {q.options.map((opt, optIdx) => (
-                          <div
-                            key={optIdx}
-                            className={`p-1.5 rounded-md ${
-                              q.correctAnswer === optIdx
-                                ? "bg-emerald-100/70 text-emerald-900 font-bold border border-emerald-300"
-                                : "bg-white/80 border border-slate-200"
-                            }`}
-                          >
-                            {String.fromCharCode(65 + optIdx)}. {opt}
-                          </div>
-                        ))}
-                      </div>
+                      {/* Display based on format */}
+                      {(q.type || "").includes("word") || q.expectedAnswer ? (
+                        <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1 text-slate-800">
+                          <p className="font-bold text-amber-950">
+                            🔑 Expected Answer: <span className="font-mono text-emerald-700">{q.expectedAnswer}</span>
+                          </p>
+                          {q.acceptedAnswers && q.acceptedAnswers.length > 1 && (
+                            <p className="text-[10px] text-slate-500">
+                              Accepted variants: {q.acceptedAnswers.join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 pl-1 text-slate-700">
+                          {(q.options || []).map((opt, optIdx) => (
+                            <div
+                              key={optIdx}
+                              className={`p-2 rounded-xl text-xs ${
+                                q.correctAnswer === optIdx
+                                  ? "bg-emerald-100 text-emerald-950 font-bold border border-emerald-300"
+                                  : "bg-white border border-slate-200"
+                              }`}
+                            >
+                              {String.fromCharCode(65 + optIdx)}. {opt}
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
                       {q.explanation && (
-                        <p className="mt-2 text-[11px] text-blue-800 bg-white p-2 rounded-lg border border-blue-100">
-                          💡 <b>Key Concept:</b> {q.explanation}
+                        <p className="text-[11px] text-indigo-900 bg-white p-2.5 rounded-xl border border-indigo-100">
+                          💡 <b>Key Domain Concept:</b> {q.explanation}
                         </p>
                       )}
                     </div>
@@ -267,15 +489,26 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated }) => {
             </div>
 
             <div className="pt-3 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
-                {Object.values(selectedToAdd).filter(Boolean).length} selected
+              <span className="text-xs font-bold text-slate-500">
+                {Object.values(selectedToAdd).filter(Boolean).length} of {generatedList.length} questions selected
               </span>
               <button
+                type="button"
                 onClick={handleAddSelectedToBank}
-                className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md transition-transform hover:scale-105"
+                disabled={importing || Object.values(selectedToAdd).filter(Boolean).length === 0}
+                className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-black shadow-md transition-transform hover:scale-105 disabled:opacity-50"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Import to Question Bank</span>
+                {importing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Importing into Question Bank...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Import Selected to Question Bank</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

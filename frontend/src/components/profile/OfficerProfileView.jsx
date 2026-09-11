@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   User, 
   Award, 
@@ -37,7 +37,7 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
   const [newQualInput, setNewQualInput] = useState("");
   const [newExpInput, setNewExpInput] = useState("");
 
-  const parseArray = (val, defaults) => {
+  const parseArray = (val, defaults = []) => {
     if (Array.isArray(val) && val.length > 0) return val.filter(Boolean);
     if (typeof val === "string" && val.trim().length > 0) {
       if (val.includes("•")) return val.split("•").map(s => s.trim()).filter(Boolean);
@@ -47,41 +47,30 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
     return defaults;
   };
 
-  const [form, setForm] = useState({
-    name: currentUser?.name || currentUser?.email || "Officer Trainee",
-    email: currentUser?.email || "rahul.sharma@imd.gov.in",
-    department: currentUser?.department || "Numerical Weather Prediction (NWP) Division",
-    designation: currentUser?.designation || "Scientist 'B' (Trainee)",
-    station: currentUser?.station || "National Weather Forecasting Centre, IMD HQ New Delhi",
-    cadreId: currentUser?.cadreId || "MOES-MET-2026-4491",
-    phone: currentUser?.phone || "+91 98765 43210",
-    skills: parseArray(currentUser?.skills, [
-      "Python for Meteorology",
-      "Synoptic Analysis",
-      "QGIS",
-      "Data Assimilation",
-      "Meso-scale WRF",
-      "Doppler Radar Interpretation",
-      "INSAT-3DR Satellite Processing"
-    ]),
-    qualifications: parseArray(currentUser?.qualifications, [
-      "M.Sc. Atmospheric Science & Meteorology (Pune University)",
-      "B.Tech Computer Science & Environmental Engineering (IIT Delhi)",
-      "Advanced Diploma in Operational Numerical Weather Prediction (IMD Pune)"
-    ]),
-    experience: parseArray(currentUser?.experience, [
-      "National Weather Forecasting Centre New Delhi (3 Yrs - 4D-Var Data Assimilation)",
-      "Cyclone Warning Centre Visakhapatnam (1.5 Yrs - Radar & Dvorak Tracking)",
-      "Doppler Weather Radar Station Chennai (1 Yr - Severe Weather Nowcasting)"
-    ]),
-    interests: currentUser?.interests?.join(", ") || "Monsoon Dynamics, High-Resolution NWP Modeling, Machine Learning in Nowcasting, Tropical Cyclogenesis",
-    bio: currentUser?.bio || "Meteorological scientist specializing in operational numerical weather prediction, high-performance computing ensembles, and polarimetric radar data assimilation under the Ministry of Earth Sciences.",
-    certificates: currentUser?.certificates || [
-      { title: "Advanced Numerical Weather Prediction (NWP)", issuer: "IMD Training Division", year: "2026", grade: "Distinction (100%)" },
-      { title: "Doppler Weather Radar (DWR) Polarimetric Interpretation", issuer: "RMC Chennai", year: "2026", grade: "Distinction (95%)" },
-      { title: "Satellite Meteorology: INSAT-3DR Imager", issuer: "IMD HQ New Delhi", year: "2026", grade: "First Class (85%)" }
-    ]
+  const getInitialForm = (user) => ({
+    name: user?.name || user?.email || "Officer Trainee",
+    email: user?.email || "",
+    department: user?.department || "",
+    designation: user?.designation || (user?.role === "trainer" ? "Faculty Trainer" : "Scientist 'B' (Trainee)"),
+    station: user?.station || "",
+    cadreId: user?.cadreId || "",
+    phone: user?.phone || "",
+    skills: parseArray(user?.skills, []),
+    qualifications: parseArray(user?.qualifications, []),
+    experience: parseArray(user?.experience, []),
+    interests: Array.isArray(user?.interests) ? user.interests.join(", ") : (user?.interests || ""),
+    bio: user?.bio || "",
+    certificates: user?.certificates || []
   });
+
+  const [form, setForm] = useState(() => getInitialForm(currentUser));
+
+  // Sync form when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      setForm(getInitialForm(currentUser));
+    }
+  }, [currentUser]);
 
   const [newCert, setNewCert] = useState({ title: "", issuer: "", year: "2026", grade: "Verified" });
 
@@ -590,39 +579,90 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
         </div>
 
         {/* Certificate Cards List */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {form.certificates.map((cert, cIdx) => (
-            <div key={cIdx} className="p-4 bg-slate-50/90 rounded-2xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full text-[10px] font-extrabold">
-                    {cert.grade || "Verified"}
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-400">{cert.year}</span>
-                </div>
-                <h4 className="font-extrabold text-xs text-slate-900 mt-2">{cert.title}</h4>
-                <p className="text-[11px] text-slate-500">{cert.issuer}</p>
-              </div>
-
-              <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => onOpenCertificate && onOpenCertificate({ score: 20, totalMarks: 20, percentage: 100 }, cert.title, form.name)}
-                  className="text-[11px] font-bold text-blue-700 hover:text-blue-900"
-                >
-                  View Credential →
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveCertificate(cIdx)}
-                  className="text-slate-400 hover:text-red-600 p-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
+        {form.certificates.length === 0 ? (
+          <div className="py-10 text-center space-y-3">
+            <div className="w-12 h-12 bg-amber-50 text-amber-400 rounded-2xl flex items-center justify-center mx-auto">
+              <Award className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <h4 className="font-bold text-slate-700 text-sm">No Certificates Yet</h4>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+              Certificates are issued by Admin when you complete a course. Complete a course and ask the admin to generate certificates for it.
+              You can also manually log external certifications below.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {form.certificates.map((cert, cIdx) => {
+              const categoryColors = {
+                "Distinction": "bg-emerald-100 text-emerald-800 border-emerald-200",
+                "Merit": "bg-blue-100 text-blue-800 border-blue-200",
+                "Pass": "bg-amber-100 text-amber-800 border-amber-200",
+                "Remedial": "bg-red-100 text-red-800 border-red-200"
+              };
+              const catClass = categoryColors[cert.performanceCategory] || "bg-amber-100 text-amber-800 border-amber-200";
+              return (
+                <div key={cIdx} className="p-4 bg-slate-50/90 rounded-2xl border border-slate-200/80 space-y-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${catClass}`}>
+                        {cert.performanceCategory || cert.grade || "Verified"}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-400">{cert.year}</span>
+                    </div>
+                    <h4 className="font-extrabold text-xs text-slate-900 mt-2">{cert.title}</h4>
+                    <p className="text-[11px] text-slate-500">{cert.issuer}</p>
+                    {cert.grade && (
+                      <p className="text-[11px] font-bold text-slate-600 mt-0.5">{cert.grade}</p>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => onOpenCertificate && onOpenCertificate({
+                          certificateId: cert.credentialId || cert.id,
+                          score: cert.finalScore || 100,
+                          totalMarks: 100,
+                          percentage: cert.finalScore || 100,
+                          performanceCategory: cert.performanceCategory,
+                          grade: cert.grade,
+                          issuer: cert.issuer,
+                          year: cert.year,
+                          submittedAt: cert.issuedAt
+                        }, cert.title, form.name)}
+                        className="text-[11px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 hover:underline"
+                      >
+                        <Award className="w-3.5 h-3.5" />
+                        <span>View Certificate</span>
+                      </button>
+                      {cert.verificationUrl && (
+                        <a
+                          href={cert.verificationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 hover:underline"
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Verify</span>
+                        </a>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCertificate(cIdx)}
+                      className="text-slate-400 hover:text-red-600 p-1"
+                      title="Remove Certificate"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
 
         {/* Add Certificate Row */}
         <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-col md:flex-row items-center gap-3">

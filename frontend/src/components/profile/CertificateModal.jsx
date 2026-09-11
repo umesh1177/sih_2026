@@ -4,14 +4,27 @@ import { X, Award, Download, Printer, ShieldCheck, CheckCircle2, Building2 } fro
 export const CertificateModal = ({ isOpen, onClose, submission, courseTitle, traineeName }) => {
   if (!isOpen) return null;
 
-  const certId = submission?.certificateId || "MOES-IMD-CERT-2025-0981";
-  const name = traineeName || submission?.traineeName || currentUser?.name || currentUser?.email || "Officer Trainee";
-  const course = courseTitle || submission?.quizTitle || "Advanced Numerical Weather Prediction (NWP)";
-  const date = submission?.submittedAt ? new Date(submission.submittedAt).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  }) : "10 February 2025";
+  const certId = submission?.certificateId || submission?.credentialId || submission?.id || `MOES-IMD-${Date.now().toString(36).toUpperCase()}`;
+  const name = traineeName || submission?.traineeName || submission?.recipientName || "Officer Trainee";
+  const course = courseTitle || submission?.title || submission?.quizTitle || "Operational Meteorology Capacity Building Program";
+  
+  const pct = submission?.percentage ?? submission?.finalScore ?? submission?.score;
+  const gradeDisplay = submission?.performanceCategory 
+    ? `${submission.performanceCategory} (${pct ? `${pct}%` : "Verified"})`
+    : submission?.grade 
+      ? submission.grade 
+      : pct !== undefined 
+        ? (pct >= 90 ? `Distinction (${pct}%)` : pct >= 75 ? `Merit (${pct}%)` : `Pass (${pct}%)`)
+        : "Distinction (Verified)";
+
+  const date = submission?.submittedAt 
+    ? new Date(submission.submittedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : submission?.issuedAt 
+      ? new Date(submission.issuedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+      : (submission?.year || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }));
+
+  const designation = submission?.designation || "Scientist / Operational Weather Forecaster";
+  const issuer = submission?.issuer || submission?.division || "Ministry of Earth Sciences / IMD Training Directorate";
 
   const handlePrint = () => {
     window.print();
@@ -80,30 +93,35 @@ export const CertificateModal = ({ isOpen, onClose, submission, courseTitle, tra
               {name}
             </h2>
             <p className="text-xs font-semibold text-slate-600 mt-2">
-              Scientist 'B' / Operational Weather Forecaster
+              {designation}
             </p>
           </div>
 
           <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed mb-4">
-            has successfully completed all rigorous theoretical modules, operational simulations, and secured mastery in the standardized national assessment for
+            has successfully completed all required modules, operational simulations, and secured competency verification in
           </p>
 
           {/* Course Name */}
           <div className="p-3 bg-white/80 border border-slate-200 rounded-xl max-w-lg mx-auto mb-6 shadow-sm">
             <p className="text-sm font-bold text-slate-900">{course}</p>
             <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">
-              Grade: Distinction ({submission?.percentage || 95}%) • Tab Integrity Verified
+              Grade: {gradeDisplay} • Tab Integrity Verified
             </p>
+            {submission?.score !== undefined && submission?.totalMarks !== undefined && (
+              <p className="text-[10px] text-slate-500 font-medium">
+                Assessment Score: {submission.score} / {submission.totalMarks} Marks
+              </p>
+            )}
           </div>
 
           {/* Signatures & Seal */}
           <div className="grid grid-cols-3 gap-4 items-end pt-4 border-t border-slate-200 max-w-lg mx-auto text-xs text-slate-600">
             <div className="text-center">
               <div className="h-8 flex items-end justify-center font-serif italic text-slate-700 font-bold text-sm">
-                Dr. Amit Sengupta
+                Training Cell
               </div>
               <div className="border-t border-slate-400 pt-1 text-[10px] font-semibold text-slate-500">
-                Lead Trainer & NWP Head
+                Course Coordinator
               </div>
             </div>
 

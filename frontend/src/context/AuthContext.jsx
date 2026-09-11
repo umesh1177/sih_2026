@@ -60,9 +60,7 @@ export const AuthProvider = ({ children }) => {
         skills: ["Python for Meteorology", "Synoptic Analysis", "QGIS", "Data Assimilation"],
         qualifications: "M.Sc. Physics (University of Rajasthan), Advanced PG Diploma in Meteorology",
         experience: "2 years as Trainee Scientific Assistant at IMD Jaipur Field Station.",
-        certificates: [
-          { title: "Basic Meteorological Forecaster (BMF)", issuer: "IMD Training Centre Pune", year: "2024" }
-        ],
+        certificates: [],
         avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"
       }
     },
@@ -103,12 +101,25 @@ export const AuthProvider = ({ children }) => {
     }
   ];
 
-  const switchAccount = (accountObj) => {
+  const switchAccount = async (accountObj) => {
     const user = accountObj.user;
     setCurrentUser(user);
     setStoredUser(user);
     // Use a demo token for fast-switch accounts
     setToken(`demo-jwt-token-${user.id}`);
+
+    // Dynamically fetch fresh data from backend
+    if (user.id) {
+      try {
+        const fresh = await api.getProfile(user.id);
+        if (fresh.success && fresh.user) {
+          setCurrentUser(fresh.user);
+          setStoredUser(fresh.user);
+        }
+      } catch (e) {
+        console.warn("Could not fetch fresh profile on switch:", e);
+      }
+    }
   };
 
   const login = async (email, password, role) => {
@@ -170,11 +181,14 @@ export const AuthProvider = ({ children }) => {
     setToken(`demo-jwt-token-${defaultUser.id}`);
   };
 
-  // On mount: ensure token exists for the persisted user
+  // On mount: ensure token exists and fetch fresh user profile from backend
   useEffect(() => {
     const token = getToken();
     if (!token && currentUser?.id) {
       setToken(`demo-jwt-token-${currentUser.id}`);
+    }
+    if (currentUser?.id) {
+      refreshProfile();
     }
   }, []);
 

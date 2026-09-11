@@ -29,19 +29,46 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
   const [selectedExamForAnalytics, setSelectedExamForAnalytics] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [allQuizzes, setAllQuizzes] = useState(quizzes);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const loadAssessmentsAndSubmissions = async () => {
     setLoading(true);
     try {
+      const userId = currentUser?.id || "";
+
+      // Fetch enrolled courses first
+      const coursesRes = await api.getCourses().catch(() => ({ success: false, courses: [] }));
+      let enrolledIds = [];
+      if (coursesRes.success && coursesRes.courses) {
+        enrolledIds = coursesRes.courses
+          .filter(c => (c.enrolledTraineeIds || []).includes(userId))
+          .map(c => c.id);
+      }
+      setEnrolledCourseIds(enrolledIds);
+
+      // Fetch quizzes filtered by enrollment (backend enrolledOnly filter)
+      const params = {};
+      if (userId) {
+        params.traineeId = userId;
+        params.enrolledOnly = "true";
+      }
+
       const [qRes, subRes] = await Promise.all([
-        api.getQuizzes().catch(() => ({ success: false, quizzes: [] })),
-        api.getTraineeSubmissions(currentUser?.id || "").catch(() => ({ success: false, submissions: [] }))
+        api.getQuizzes(params).catch(() => ({ success: false, quizzes: [] })),
+        api.getTraineeSubmissions(userId).catch(() => ({ success: false, submissions: [] }))
       ]);
 
       if (qRes.success && qRes.quizzes) {
-        setAllQuizzes(qRes.quizzes);
+        // Additional client-side safety filter: only show quizzes from enrolled courses
+        const filteredQuizzes = enrolledIds.length > 0
+          ? qRes.quizzes.filter(q => !q.courseId || enrolledIds.includes(q.courseId))
+          : [];
+        setAllQuizzes(filteredQuizzes);
+      } else {
+        setAllQuizzes([]);
       }
+
       if (subRes.success && subRes.submissions) {
         setSubmissions(subRes.submissions);
       }
@@ -183,7 +210,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-            My Scheduled Assessments & Exams
+            My Scheduled Assessments &amp; Exams
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Attempt official assessments in proctored fullscreen kiosk mode to earn verified credentials.
@@ -227,8 +254,22 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
         </div>
       </div>
 
+      {/* ═════════ NOT ENROLLED EMPTY STATE ═════════ */}
+      {!loading && enrolledCourseIds.length === 0 && (
+        <div className="bg-white rounded-3xl border border-slate-200 p-14 text-center space-y-4 shadow-2xs">
+          <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mx-auto">
+            <Layers className="w-8 h-8" />
+          </div>
+          <h3 className="font-black text-slate-900 text-lg">No Assessments Available</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+            You are not enrolled in any course yet. Assessments appear here only for courses you are enrolled in.
+            Browse the <span className="font-bold text-blue-600">Courses</span> tab to enroll in a program.
+          </p>
+        </div>
+      )}
+
       {/* ═════════ SUB-TAB 1: AVAILABLE (LIGHT CARDS) ═════════ */}
-      {activeSubTab === "available" && (
+      {enrolledCourseIds.length > 0 && activeSubTab === "available" && (
         <div className="space-y-4">
           {filteredAvailable.length === 0 ? (
             <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3">
@@ -359,7 +400,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       )}
 
       {/* ═════════ SUB-TAB 2: UPCOMING ═════════ */}
-      {activeSubTab === "upcoming" && (
+      {enrolledCourseIds.length > 0 && activeSubTab === "upcoming" && (
         <div className="space-y-4">
           {filteredUpcoming.length === 0 ? (
             <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3">
@@ -451,7 +492,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       )}
 
       {/* ═════════ SUB-TAB 3: COMPLETED EXAMS TABLE VIEW ═════════ */}
-      {activeSubTab === "completed" && (
+      {enrolledCourseIds.length > 0 && activeSubTab === "completed" && (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-2xs overflow-hidden space-y-4 p-6 animate-in fade-in duration-150">
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">

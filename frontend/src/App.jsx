@@ -604,6 +604,7 @@ const MainApp = () => {
       {/* Other Modals */}
       <AiQuestionModal
         isOpen={isAiModalOpen}
+        currentUser={currentUser}
         onClose={() => setIsAiModalOpen(false)}
         onQuestionsGenerated={() => {
           refreshGlobalData();

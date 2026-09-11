@@ -63,11 +63,23 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
       if (searchQuery) params.search = searchQuery;
 
       const res = await api.getQuestions(params);
-      if (res.success) {
-        setQuestions(res.questions);
+      if (res?.success) {
+        let qs = Array.isArray(res.questions) ? res.questions : [];
+        // DATA ISOLATION: Trainee and Trainer see only their own questions
+        if (currentUser?.role === "trainee" || currentUser?.role === "trainer") {
+          qs = qs.filter(q => 
+            q.createdBy === currentUser.id || 
+            q.createdBy === currentUser.email ||
+            (currentUser.name && q.createdByName && q.createdByName.toLowerCase() === currentUser.name.toLowerCase())
+          );
+        }
+        setQuestions(qs);
+      } else {
+        setQuestions([]);
       }
     } catch (err) {
       console.error("Failed to load questions:", err);
+      setQuestions([]);
     } finally {
       setLoading(false);
     }
@@ -81,22 +93,38 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
   const handleCreateQuestion = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.createQuestion(newQuestionForm);
-      if (res.success) {
+      const isOneWord = (newQuestionForm.type || "").toLowerCase().includes("word") || (newQuestionForm.type || "").toLowerCase().includes("short");
+      const payload = {
+        ...newQuestionForm,
+        type: isOneWord ? "one_word" : "MCQ",
+        expectedAnswer: isOneWord ? (newQuestionForm.expectedAnswer || newQuestionForm.options?.[0] || "") : "",
+        acceptedAnswers: isOneWord && newQuestionForm.expectedAnswer ? [newQuestionForm.expectedAnswer] : [],
+        createdBy: currentUser?.id || "u_trainer_1",
+        createdByEmail: currentUser?.email || null,
+        createdByName: currentUser?.name || null,
+        createdByRole: currentUser?.role || "trainer"
+      };
+
+      const res = await api.createQuestion(payload);
+      if (res?.success) {
         setIsCreateModalOpen(false);
         setNewQuestionForm({
           question: "",
           subjectId: "sub_nwp_01",
-          subjectName: "Subject 1: Governing Equations & Atmospheric Dynamics",
+          subjectName: "Governing Equations & Dynamics",
           module: "Module 1",
+          topic: "",
           marks: 2,
           type: "MCQ",
           difficulty: "Medium",
           options: ["", "", "", ""],
           correctAnswer: 0,
+          expectedAnswer: "",
           explanation: ""
         });
-        fetchQuestions();
+        await fetchQuestions();
+      } else {
+        alert(res?.message || "Failed to create question");
       }
     } catch (err) {
       alert("Failed to create question: " + err.message);
@@ -456,7 +484,8 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 {previewQuestion.question}
               </h3>
 
-              {previewQuestion.options && previewQuestion.options.length > 0 && (
+              {/* MCQ Options Display */}
+              {previewQuestion.options && previewQuestion.options.length > 0 ? (
                 <div className="space-y-2 mt-3">
                   {previewQuestion.options.map((opt, i) => (
                     <div
@@ -477,7 +506,17 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                     </div>
                   ))}
                 </div>
-              )}
+              ) : previewQuestion.expectedAnswer ? (
+                <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1 text-slate-800">
+                  <span className="font-bold block text-amber-950">🔑 Expected Answer / Keyword:</span>
+                  <p className="font-mono text-emerald-800 font-bold text-sm">{previewQuestion.expectedAnswer}</p>
+                  {previewQuestion.acceptedAnswers && previewQuestion.acceptedAnswers.length > 1 && (
+                    <p className="text-[10px] text-slate-500">
+                      Accepted variations: {previewQuestion.acceptedAnswers.join(", ")}
+                    </p>
+                  )}
+                </div>
+              ) : null}
 
               {previewQuestion.explanation && (
                 <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl text-xs text-blue-900">
@@ -502,14 +541,19 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
       {/* Create / Edit Question Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 my-8">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <h2 className="text-base font-bold text-slate-900">
-                {newQuestionForm.id ? "Edit Question" : "Create New Assessment Question"}
-              </h2>
+              <div>
+                <h2 className="text-base font-black text-slate-900">
+                  {newQuestionForm.id ? "Edit Assessment Question" : "Create New Assessment Question"}
+                </h2>
+                <p className="text-[11px] text-slate-500">
+                  Add domain questions directly into your trainer Question Bank.
+                </p>
+              </div>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -517,81 +561,88 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
             <form onSubmit={handleCreateQuestion} className="py-4 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Question Prompt *</label>
+                <label className="block font-bold text-slate-700 mb-1">Question Prompt *</label>
                 <textarea
                   required
                   rows={3}
                   value={newQuestionForm.question}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, question: e.target.value })}
                   placeholder="Enter the meteorological problem or question here..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0a2558] focus:outline-none"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0a2558] focus:outline-none text-slate-900 font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Question Type</label>
+                  <label className="block font-bold text-slate-700 mb-1">Question Format</label>
                   <select
                     value={newQuestionForm.type}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, type: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-bold text-slate-800"
                   >
                     <option value="MCQ">Multiple Choice (MCQ)</option>
-                    <option value="Descriptive">Descriptive Question</option>
-                    <option value="One Word">One Word / Numerical</option>
+                    <option value="One Word">One Word / Short Answer</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Difficulty Level</label>
+                  <label className="block font-bold text-slate-700 mb-1">Difficulty Level</label>
                   <select
                     value={newQuestionForm.difficulty}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, difficulty: e.target.value })}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
                   >
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
+                    <option value="Easy">Easy (Conceptual)</option>
+                    <option value="Medium">Medium (Analytical)</option>
+                    <option value="Hard">Hard (Expert)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Marks Assigned</label>
+                  <label className="block font-bold text-slate-700 mb-1">Marks Assigned</label>
                   <input
                     type="number"
                     min={1}
                     max={20}
                     value={newQuestionForm.marks}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, marks: Number(e.target.value) })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-bold"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Subject Association</label>
-                  <select
-                    value={newQuestionForm.subjectId}
-                    onChange={(e) => setNewQuestionForm({ ...newQuestionForm, subjectId: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
-                  >
-                    <option value="sub_nwp_01">Subject 1: Governing Equations & Dynamics</option>
-                    <option value="sub_nwp_02">Subject 2: Data Assimilation & Radiance</option>
-                    <option value="sub_dwr_01">Subject 1: Radar Hardware & Base Products</option>
-                    <option value="sub_dwr_02">Subject 2: Severe Storm Signatures</option>
-                    <option value="sub_cyc_01">Subject 1: Cyclogenesis & Dvorak Technique</option>
-                  </select>
+                  <label className="block font-bold text-slate-700 mb-1">Subject Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newQuestionForm.subjectName}
+                    onChange={(e) => setNewQuestionForm({ ...newQuestionForm, subjectName: e.target.value })}
+                    placeholder="e.g. Governing Equations & Dynamics"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium"
+                  />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Module Label</label>
+                  <label className="block font-bold text-slate-700 mb-1">Module</label>
                   <input
                     type="text"
                     value={newQuestionForm.module}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, module: e.target.value })}
                     placeholder="e.g. Module 1, Module 2"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Topic Name</label>
+                  <input
+                    type="text"
+                    value={newQuestionForm.topic || ""}
+                    onChange={(e) => setNewQuestionForm({ ...newQuestionForm, topic: e.target.value })}
+                    placeholder="e.g. CFL Condition, Doppler Moments"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium"
                   />
                 </div>
               </div>
@@ -599,8 +650,8 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
               {/* MCQ Options */}
               {newQuestionForm.type === "MCQ" && (
                 <div className="space-y-2 pt-2">
-                  <label className="block font-semibold text-slate-700">
-                    Multiple Choice Options (Select radio for correct answer)
+                  <label className="block font-bold text-slate-700">
+                    Multiple Choice Options (Select radio button for the correct option)
                   </label>
                   {newQuestionForm.options.map((opt, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -624,21 +675,41 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                           setNewQuestionForm({ ...newQuestionForm, options: updated });
                         }}
                         placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                        className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none"
+                        className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
                       />
                     </div>
                   ))}
                 </div>
               )}
 
+              {/* One Word / Short Answer Expected Answer */}
+              {newQuestionForm.type === "One Word" && (
+                <div className="space-y-1.5 pt-2 animate-in fade-in duration-150">
+                  <label className="block font-bold text-slate-700">
+                    Expected Single Word / Keyword Answer *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newQuestionForm.expectedAnswer || ""}
+                    onChange={(e) => setNewQuestionForm({ ...newQuestionForm, expectedAnswer: e.target.value })}
+                    placeholder="e.g. Rossby Number, Vorticity, 4D-Var"
+                    className="w-full p-2.5 bg-amber-50/70 border border-amber-300 rounded-xl focus:bg-white focus:outline-none font-bold text-slate-900"
+                  />
+                  <p className="text-[10px] text-slate-500">
+                    Cadets must submit this specific term (case-insensitive) to receive full marks.
+                  </p>
+                </div>
+              )}
+
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Explanation / Solution Note</label>
+                <label className="block font-bold text-slate-700 mb-1">Explanation / Solution Note</label>
                 <textarea
                   rows={2}
                   value={newQuestionForm.explanation}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, explanation: e.target.value })}
                   placeholder="Reference formulas, physics equations, or IMD SOP notes..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium"
                 />
               </div>
 
@@ -646,15 +717,15 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-lg font-bold shadow-md"
+                  className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md"
                 >
-                  Save Question
+                  Save Question to Bank
                 </button>
               </div>
             </form>

@@ -184,32 +184,36 @@ export const TrainerScheduleAssessmentView = ({
         api.getTrainerEnrolledTrainees().catch(() => ({ success: false }))
       ]);
 
-      if (tRes?.success && tRes.trainees) {
+      if (tRes?.success && Array.isArray(tRes.trainees)) {
         setEnrolledTrainees(tRes.trainees);
       } else {
-        setEnrolledTrainees([
-          { id: "u_trainee_1", name: "Rahul Sharma", email: "rahul.sharma@imd.gov.in", station: "New Delhi HQ", department: "Numerical Weather Prediction Division" },
-          { id: "u_trainee_2", name: "Priya Nair", email: "priya.nair@imd.gov.in", station: "RMC Chennai", department: "Satellite Meteorology Division" },
-          { id: "u_trainee_3", name: "Amitav Roy", email: "amitav.roy@imd.gov.in", station: "RMC Kolkata", department: "Radar & Convective Storms Division" },
-          { id: "u_trainee_4", name: "Sunita Deshmukh", email: "sunita.deshmukh@imd.gov.in", station: "RMC Mumbai", department: "Aviation & Severe Weather Center" }
-        ]);
+        setEnrolledTrainees([]);
       }
 
-      if (cRes.success && cRes.courses) {
-        // Filter assigned courses for trainer
+      if (cRes?.success && Array.isArray(cRes.courses)) {
+        // Filter assigned courses and subjects for trainer
         const assignedOnly = cRes.courses.filter(c => {
+          if (currentUser?.id && (c.leadTrainerId === currentUser.id || c.trainerId === currentUser.id)) return true;
           if (currentUser?.name && c.leadTrainerName) {
             const cName = c.leadTrainerName.toLowerCase();
             const uName = currentUser.name.toLowerCase();
-            if (cName.includes(uName) || uName.includes(cName)) return true;
-            if (uName.includes("sengupta") && cName.includes("sengupta")) return true;
-            if (uName.includes("kulkarni") && cName.includes("kulkarni")) return true;
-            if (uName.includes("roy") && cName.includes("roy")) return true;
+            if (cName === uName || cName.includes(uName) || uName.includes(cName)) return true;
           }
-          if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
+          if (c.subjects && Array.isArray(c.subjects)) {
+            return c.subjects.some(s => {
+              if (currentUser?.id && (s.trainerId === currentUser.id || s.facultyId === currentUser.id || s.assignedTrainerId === currentUser.id)) return true;
+              if (currentUser?.name && (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName)) {
+                const sName = (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName).toLowerCase();
+                const uName = currentUser.name.toLowerCase();
+                if (sName === uName || sName.includes(uName) || uName.includes(sName)) return true;
+              }
+              return false;
+            });
+          }
           return false;
         });
-        const finalCourses = assignedOnly.length > 0 ? assignedOnly : (currentUser?.role === "admin" ? cRes.courses : assignedOnly);
+
+        const finalCourses = currentUser?.role === "admin" ? cRes.courses : assignedOnly;
         setCourses(finalCourses);
 
         if (finalCourses.length > 0) {
@@ -229,64 +233,44 @@ export const TrainerScheduleAssessmentView = ({
             topicName: firstModule?.topics?.[0] || firstSubject?.name || firstCourse.title,
             conceptName: ""
           }));
+        } else {
+          setCreateForm(prev => ({
+            ...prev,
+            courseId: "",
+            courseName: "",
+            subjectId: "",
+            subjectName: ""
+          }));
         }
       }
 
-      if (qRes.success && qRes.quizzes) {
-        setQuizzes(qRes.quizzes);
+      if (qRes?.success && Array.isArray(qRes.quizzes)) {
+        let finalQuizzes = qRes.quizzes;
+        if (currentUser?.role === "trainer") {
+          finalQuizzes = finalQuizzes.filter(q => {
+            if (currentUser?.id && (q.trainerId === currentUser.id || q.createdBy === currentUser.id || q.authorId === currentUser.id)) return true;
+            if (currentUser?.name && q.trainerName) {
+              const qName = q.trainerName.toLowerCase();
+              const uName = currentUser.name.toLowerCase();
+              if (qName === uName || qName.includes(uName) || uName.includes(qName)) return true;
+            }
+            if (currentUser?.name && q.createdByName) {
+              const qName = q.createdByName.toLowerCase();
+              const uName = currentUser.name.toLowerCase();
+              if (qName === uName || qName.includes(uName) || uName.includes(qName)) return true;
+            }
+            return false;
+          });
+        }
+        setQuizzes(finalQuizzes);
       } else {
-        // Dynamic rich fallback quizzes
-        setQuizzes([
-          {
-            id: "quiz_nwp_01",
-            title: "#30 Atmospheric Dynamics & NWP 4D-Var Assimilation",
-            courseName: "Advanced Numerical Weather Prediction (NWP) & Data Assimilation",
-            subjectName: "Atmospheric Dynamics & Primitive Equations",
-            durationMinutes: 30,
-            totalMarks: 40,
-            passMarks: 20,
-            scheduledStartTime: new Date(Date.now() - 3600000).toISOString(),
-            deadlineTime: new Date(Date.now() + 86400000 * 5).toISOString(),
-            resultsPublished: false,
-            submissionsCount: 34,
-            averageScore: 78.5,
-            questions: []
-          },
-          {
-            id: "quiz_dwr_02",
-            title: "#29 Doppler Weather Radar Polarimetric Classification",
-            courseName: "Doppler Weather Radar (DWR) Operations & Polarimetric Nowcasting",
-            subjectName: "Doppler Weather Radar Dual-Polarization Moments",
-            durationMinutes: 45,
-            totalMarks: 50,
-            passMarks: 25,
-            scheduledStartTime: new Date(Date.now() - 86400000 * 3).toISOString(),
-            deadlineTime: new Date(Date.now() - 86400000).toISOString(),
-            resultsPublished: true,
-            submissionsCount: 42,
-            averageScore: 86.2,
-            questions: []
-          },
-          {
-            id: "quiz_cyclone_03",
-            title: "#31 Tropical Cyclogenesis & Dvorak Intensity Estimation",
-            courseName: "Advanced Numerical Weather Prediction (NWP) & Data Assimilation",
-            subjectName: "Tropical Meteorology & Severe Weather",
-            durationMinutes: 60,
-            totalMarks: 60,
-            passMarks: 30,
-            scheduledStartTime: new Date(Date.now() + 86400000 * 4).toISOString(),
-            deadlineTime: new Date(Date.now() + 86400000 * 10).toISOString(),
-            resultsPublished: false,
-            submissionsCount: 0,
-            averageScore: 0,
-            questions: []
-          }
-        ]);
+        setQuizzes([]);
       }
 
-      if (qbRes.success && qbRes.questions) {
+      if (qbRes?.success && Array.isArray(qbRes.questions)) {
         setQuestionBank(qbRes.questions);
+      } else {
+        setQuestionBank([]);
       }
     } catch (err) {
       console.error("Failed loading assessment data:", err);

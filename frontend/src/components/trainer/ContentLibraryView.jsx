@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { 
   FolderKanban, 
   LayoutGrid, 
@@ -59,9 +59,30 @@ export const cleanSubject = (str) => {
 export const cleanTopic = (str) => {
   if (!str) return "Meteorological Formulations & Physics";
   return String(str)
-    .replace(/^Module\s*\d+\s*:\s*/i, "")
-    .replace(/^Module\s*\d+\s*-\s*/i, "")
+    .replace(/^Module\s*\d+(\.\d+)?\s*:\s*/i, "")
+    .replace(/^Module\s*\d+(\.\d+)?\s*-\s*/i, "")
     .trim();
+};
+
+export const formatVideoEmbedUrl = (url) => {
+  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/NRE2up9GxAI";
+  let cleanUrl = url.trim();
+  if (cleanUrl.includes("youtu.be/")) {
+    const parts = cleanUrl.split("youtu.be/")[1];
+    const videoId = parts ? parts.split("?")[0].split("&")[0].split("/")[0] : null;
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (cleanUrl.includes("youtube.com/watch")) {
+    try {
+      const urlObj = new URL(cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
+      const v = urlObj.searchParams.get("v");
+      if (v) return `https://www.youtube.com/embed/${v}`;
+    } catch (e) {}
+  }
+  if (cleanUrl.includes("youtube.com/embed/")) {
+    return cleanUrl;
+  }
+  return cleanUrl;
 };
 
 export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFilter = "all" }) => {
@@ -83,6 +104,11 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [previewZoom, setPreviewZoom] = useState(100);
+
+  // File Upload State & Input Reference
+  const fileInputRef = useRef(null);
+  const [selectedFileObj, setSelectedFileObj] = useState(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   // AI Summary States
   const [aiSummaryGenerating, setAiSummaryGenerating] = useState(false);
@@ -109,6 +135,8 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
     pages: "36",
     size: "14.8 MB",
     url: "",
+    fileName: "",
+    fileData: "",
     subject: "Atmospheric Dynamics & Modeling",
     customSubject: "",
     topic: "",
@@ -119,6 +147,73 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+
+  // Handle Local File Selection (PPT, PDF, DOCX, MP4, etc.)
+  const handleFileSelect = (e) => {
+    const file = e.target?.files?.[0] || e.dataTransfer?.files?.[0];
+    if (!file) return;
+
+    setSelectedFileObj(file);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    const sizeDisplay = Number(sizeMb) > 0.1 ? `${sizeMb} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+    const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
+    const ext = file.name.split('.').pop()?.toLowerCase() || "";
+
+    let inferredType = uploadFormData.type;
+    let inferredFormat = uploadFormData.format;
+    let defaultPages = uploadFormData.pages || "24";
+    let defaultDuration = uploadFormData.duration;
+
+    if (["ppt", "pptx"].includes(ext)) {
+      inferredType = "ppt";
+      inferredFormat = "PowerPoint Presentation (PPTX)";
+      defaultPages = "28";
+      defaultDuration = "";
+    } else if (["pdf"].includes(ext)) {
+      inferredType = "pdf";
+      inferredFormat = "PDF Study Guide";
+      defaultPages = "16";
+      defaultDuration = "";
+    } else if (["doc", "docx"].includes(ext)) {
+      inferredType = "manual";
+      inferredFormat = "Technical Manual (DOCX)";
+      defaultPages = "12";
+      defaultDuration = "";
+    } else if (["mp4", "webm", "mkv", "mov", "avi"].includes(ext)) {
+      inferredType = "video";
+      inferredFormat = "MP4 Video Recording";
+      defaultDuration = "45 mins";
+      defaultPages = "";
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result || "";
+      setUploadFormData(prev => ({
+        ...prev,
+        title: prev.title.trim() ? prev.title : cleanName,
+        type: inferredType,
+        format: inferredFormat,
+        size: sizeDisplay,
+        pages: defaultPages,
+        duration: defaultDuration,
+        fileName: file.name,
+        fileData: dataUrl,
+        url: dataUrl
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearSelectedFile = () => {
+    setSelectedFileObj(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setUploadFormData(prev => ({
+      ...prev,
+      fileName: "",
+      fileData: ""
+    }));
+  };
 
   // Fetch Library Items
   const fetchLibraryData = async () => {
@@ -1452,28 +1547,125 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
                   </div>
                 </div>
 
-                {/* URL or Upload File Simulation */}
-                {uploadFormData.type === "video" ? (
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Video Stream / Embed URL</label>
-                    <input
-                      type="url"
-                      placeholder="https://www.youtube.com/embed/... or MP4 link"
-                      value={uploadFormData.url}
-                      onChange={(e) => setUploadFormData({ ...uploadFormData, url: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0a2558] text-xs font-semibold"
-                    />
+                {/* Hidden Real File Input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  accept={
+                    uploadFormData.type === "ppt"
+                      ? ".ppt,.pptx"
+                      : uploadFormData.type === "pdf"
+                      ? ".pdf"
+                      : uploadFormData.type === "video"
+                      ? ".mp4,.webm,.mkv,.mov"
+                      : ".pdf,.doc,.docx,.ppt,.pptx,.mp4"
+                  }
+                  className="hidden"
+                />
+
+                {/* URL or Upload File Box */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-700">
+                      {uploadFormData.type === "video" ? "Upload Video File or Embed Stream URL" : "Select Local File (PPTX / PDF / DOCX)"} *
+                    </label>
+                    {uploadFormData.type === "video" && (
+                      <span className="text-[10px] text-blue-600 font-bold">Supports MP4 file upload or Web stream</span>
+                    )}
                   </div>
-                ) : (
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Select Local File (PPTX / PDF / DOCX)</label>
-                    <div className="p-3.5 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 text-center hover:bg-slate-100 transition-colors cursor-pointer">
-                      <UploadCloud className="w-7 h-7 text-[#0a2558] mx-auto mb-1 opacity-80" />
-                      <p className="text-xs font-bold text-slate-700">Click to browse or drop {uploadFormData.type === "ppt" ? "PowerPoint (.pptx)" : "Document (.pdf)"} here</p>
-                      <p className="text-[10px] text-slate-400">File verified & preview generated automatically</p>
+
+                  {/* Dropzone Container */}
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDraggingFile(true);
+                    }}
+                    onDragLeave={() => setIsDraggingFile(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDraggingFile(false);
+                      handleFileSelect(e);
+                    }}
+                    className={`p-4 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center relative ${
+                      isDraggingFile
+                        ? "border-[#0a2558] bg-blue-50 ring-2 ring-blue-200"
+                        : selectedFileObj || uploadFormData.fileName
+                        ? "border-emerald-400 bg-emerald-50/50"
+                        : "border-slate-200 bg-slate-50/70 hover:bg-slate-100 hover:border-slate-300"
+                    }`}
+                  >
+                    {selectedFileObj || uploadFormData.fileName ? (
+                      <div className="flex items-center justify-between gap-3 text-left">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-xs">
+                            <FileCheck className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900 text-xs truncate max-w-xs">
+                              {selectedFileObj?.name || uploadFormData.fileName}
+                            </p>
+                            <p className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1.5">
+                              <span>{uploadFormData.size}</span>
+                              <span>•</span>
+                              <span>File ready for upload & preview</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              fileInputRef.current?.click();
+                            }}
+                            className="px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg border border-slate-200 text-[11px] shadow-2xs"
+                          >
+                            Change
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleClearSelectedFile();
+                            }}
+                            className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        <UploadCloud className="w-8 h-8 text-[#0a2558] mx-auto mb-1 opacity-80 animate-pulse" />
+                        <p className="text-xs font-bold text-slate-700">
+                          Click to browse or drop {uploadFormData.type === "ppt" ? "PowerPoint (.ppt, .pptx)" : uploadFormData.type === "pdf" ? "Document (.pdf)" : uploadFormData.type === "video" ? "Video (.mp4, .webm)" : "File"} here
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          File verified & instant local preview rendered automatically
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Video Stream URL Option */}
+                  {uploadFormData.type === "video" && (
+                    <div className="mt-2.5">
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                        Or enter Stream / Embed / YouTube URL:
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://www.youtube.com/embed/... or direct MP4 URL"
+                        value={uploadFormData.url.startsWith("data:") ? "" : uploadFormData.url}
+                        onChange={(e) => setUploadFormData({ ...uploadFormData, url: e.target.value })}
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0a2558] text-xs font-semibold"
+                      />
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Duration / Pages & File Size */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1768,8 +1960,8 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
                 <div className="space-y-3">
                   <div className="aspect-video max-h-[540px] w-full mx-auto bg-black rounded-2xl overflow-hidden shadow-2xl relative">
                     <iframe
-                      src={previewItem.url || "https://www.youtube.com/embed/dQw4w9WgXcQ"}
-                      title={previewItem.title}
+                      src={formatVideoEmbedUrl(previewItem.url)}
+                      title={previewItem.title || "Lecture Video"}
                       className="w-full h-full border-0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen

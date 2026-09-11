@@ -61,6 +61,7 @@ router.post("/ai/generate-questions", requireAuth, aiController.generateQuestion
 router.post("/ai/generate-pattern-questions", requireAuth, aiController.generatePatternQuestionsWithAI);
 router.post("/ai/recommend-courses", requireAuth, aiController.recommendCoursesWithAI);
 router.post("/ai/generate-summary", requireAuth, aiController.generateMaterialSummaryWithAI);
+router.post("/ai/material-summary", requireAuth, aiController.generateMaterialSummaryWithAI);
 router.post("/ai/synthesize-paper", requireAuth, aiController.synthesizeAssessmentPaperWithAI);
 
 router.get("/quizzes", requireAuth, quizController.getQuizzes);

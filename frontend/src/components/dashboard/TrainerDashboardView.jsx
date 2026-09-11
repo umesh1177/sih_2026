@@ -57,21 +57,29 @@ export const TrainerDashboardView = ({
       ]);
 
       if (cRes.success) {
-        // Filter courses assigned to this trainer
+        // Filter courses where trainer is lead trainer OR assigned to a subject
         const assignedOnly = cRes.courses.filter(c => {
+          if (currentUser?.id && (c.leadTrainerId === currentUser.id || c.trainerId === currentUser.id)) return true;
           if (currentUser?.name && c.leadTrainerName) {
             const cName = c.leadTrainerName.toLowerCase();
             const uName = currentUser.name.toLowerCase();
-            if (cName.includes(uName) || uName.includes(cName)) return true;
-            if (uName.includes("sengupta") && cName.includes("sengupta")) return true;
-            if (uName.includes("kulkarni") && cName.includes("kulkarni")) return true;
-            if (uName.includes("roy") && cName.includes("roy")) return true;
+            if (cName === uName || cName.includes(uName) || uName.includes(cName)) return true;
           }
-          if (currentUser?.id && c.leadTrainerId === currentUser.id) return true;
+          if (c.subjects && Array.isArray(c.subjects)) {
+            return c.subjects.some(s => {
+              if (currentUser?.id && (s.trainerId === currentUser.id || s.facultyId === currentUser.id || s.assignedTrainerId === currentUser.id || s.leadTrainerId === currentUser.id)) return true;
+              if (currentUser?.name && (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName)) {
+                const sName = (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName).toLowerCase();
+                const uName = currentUser.name.toLowerCase();
+                if (sName === uName || sName.includes(uName) || uName.includes(sName)) return true;
+              }
+              return false;
+            });
+          }
           return false;
         });
         
-        const finalCourses = assignedOnly.length > 0 ? assignedOnly : (currentUser?.role === "admin" ? cRes.courses : assignedOnly);
+        const finalCourses = currentUser?.role === "admin" ? cRes.courses : assignedOnly;
         setCourses(finalCourses);
       }
 
@@ -106,16 +114,25 @@ export const TrainerDashboardView = ({
   // Extract all assigned subjects from the trainer's assigned courses
   const assignedSubjects = [];
   courses.forEach(course => {
+    const isLead = (currentUser?.id && (course.leadTrainerId === currentUser.id || course.trainerId === currentUser.id)) || 
+      (course.leadTrainerName && currentUser?.name && (course.leadTrainerName.toLowerCase() === currentUser.name.toLowerCase() || course.leadTrainerName.toLowerCase().includes(currentUser.name.toLowerCase()) || currentUser.name.toLowerCase().includes(course.leadTrainerName.toLowerCase())));
+
     course.subjects?.forEach((subj, sIdx) => {
-      assignedSubjects.push({
-        ...subj,
-        code: `S${sIdx + 1}`,
-        parentCourse: course,
-        courseTitle: course.title,
-        courseCode: course.code,
-        courseDepartment: course.department,
-        courseId: course.id
-      });
+      const sTrainerName = subj.trainerName || subj.facultyName || subj.trainer || subj.assignedTrainerName;
+      const isSubjTrainer = (currentUser?.id && (subj.trainerId === currentUser.id || subj.facultyId === currentUser.id || subj.assignedTrainerId === currentUser.id)) || 
+        (sTrainerName && currentUser?.name && (sTrainerName.toLowerCase() === currentUser.name.toLowerCase() || sTrainerName.toLowerCase().includes(currentUser.name.toLowerCase()) || currentUser.name.toLowerCase().includes(sTrainerName.toLowerCase())));
+
+      if (isLead || isSubjTrainer || currentUser?.role === "admin") {
+        assignedSubjects.push({
+          ...subj,
+          code: `S${sIdx + 1}`,
+          parentCourse: course,
+          courseTitle: course.title,
+          courseCode: course.code,
+          courseDepartment: course.department,
+          courseId: course.id
+        });
+      }
     });
   });
 
@@ -176,7 +193,7 @@ export const TrainerDashboardView = ({
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Welcome, {currentUser?.name || "Dr. Amit Sengupta"}
+            Welcome, {currentUser?.name || "Faculty Trainer"}
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
@@ -423,10 +440,18 @@ export const TrainerDashboardView = ({
           ))}
 
           {filteredSubjects.length === 0 && (
-            <div className="col-span-2 text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-6">
-              <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-xs font-bold text-slate-700">No matching subjects found</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Try clearing your search query.</p>
+            <div className="col-span-2 text-center py-14 bg-white rounded-3xl border border-dashed border-slate-200 p-8 space-y-3 shadow-2xs">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                <BookOpen className="w-7 h-7" />
+              </div>
+              <h4 className="text-sm font-bold text-slate-900">
+                {assignedSubjects.length === 0 ? "No Course Subjects Assigned Yet" : "No Matching Subjects Found"}
+              </h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                {assignedSubjects.length === 0 
+                  ? "You have not been assigned to any course subjects yet. Once administrative allocation assigns course tracks to your faculty profile, your subjects, modules, and learning media will appear here."
+                  : "No subjects match your current search query. Try clearing your filters."}
+              </p>
             </div>
           )}
         </div>

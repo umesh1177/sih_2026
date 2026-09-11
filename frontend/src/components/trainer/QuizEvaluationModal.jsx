@@ -286,6 +286,38 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
                             </div>
                           </div>
 
+                          {/* Adaptive Progression Trail (if recorded for this attempt) */}
+                          {Array.isArray(sub.difficultyHistory) && sub.difficultyHistory.length > 0 && (
+                            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                                Adaptive Difficulty Path & Question Calibrations:
+                              </span>
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {sub.difficultyHistory.map((h, idx) => {
+                                  const diff = h.difficulty || "Moderate";
+                                  const isEasy = diff === "Easy";
+                                  const isHard = diff === "Hard";
+                                  const isMod = !isEasy && !isHard;
+
+                                  return (
+                                    <span
+                                      key={idx}
+                                      className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold ${
+                                        isHard
+                                          ? "bg-purple-50 border-purple-200 text-purple-900"
+                                          : isMod
+                                          ? "bg-blue-50 border-blue-200 text-blue-900"
+                                          : "bg-emerald-50 border-emerald-200 text-emerald-900"
+                                      }`}
+                                    >
+                                      Q{h.questionNumber || idx + 1}: {diff}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
                           {/* Feedback Input Row */}
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
                             <input

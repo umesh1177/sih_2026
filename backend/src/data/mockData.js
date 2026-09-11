@@ -313,7 +313,7 @@ export const initialData = {
               title: "Module 1: Navier-Stokes & Primitive Equation Systems",
               duration: "4 Hours",
               materials: [
-                { id: "mat_01", title: "Lecture 1: Primitive Equations in Sigma & Pressure Coordinates", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "45 mins", allowDownload: false },
+                { id: "mat_01", title: "Lecture 1: Primitive Equations in Sigma & Pressure Coordinates", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "45 mins", allowDownload: false },
                 { id: "mat_02", title: "Presentation: Atmospheric Governing Equations Deck", type: "presentation", pages: 34, allowDownload: true },
                 { id: "mat_03", title: "Study Guide: Boundary Layer Parameterization Notes", type: "pdf", size: "2.4 MB", allowDownload: true }
               ]
@@ -323,7 +323,7 @@ export const initialData = {
               title: "Module 2: Discretization & Spatial-Temporal Grid Staggering",
               duration: "6 Hours",
               materials: [
-                { id: "mat_04", title: "Lecture 2: Arakawa Grids (A-E) & CFL Condition", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "52 mins", allowDownload: false },
+                { id: "mat_04", title: "Lecture 2: Arakawa Grids (A-E) & CFL Condition", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "52 mins", allowDownload: false },
                 { id: "mat_05", title: "Lab Manual: Configuring WRF Preprocessing System (WPS)", type: "pdf", size: "5.1 MB", allowDownload: true }
               ]
             }
@@ -338,7 +338,7 @@ export const initialData = {
               title: "Module 3: 3D-Var / 4D-Var & Kalman Filtering in NWP",
               duration: "5 Hours",
               materials: [
-                { id: "mat_06", title: "Lecture 3: Assimilating INSAT-3DR and Doppler Radar Reflectivity", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "48 mins", allowDownload: false },
+                { id: "mat_06", title: "Lecture 3: Assimilating INSAT-3DR and Doppler Radar Reflectivity", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "48 mins", allowDownload: false },
                 { id: "mat_07", title: "Slide Deck: Background Error Covariance (B-Matrix) Estimation", type: "presentation", pages: 42, allowDownload: true }
               ]
             }
@@ -372,7 +372,7 @@ export const initialData = {
               title: "Module 1: PPI, RHI, MAX(Z) and Radial Velocity De-aliasing",
               duration: "6 Hours",
               materials: [
-                { id: "mat_dwr_01", title: "Masterclass: Nyquist Velocity & Dual-PRF Algorithms", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "40 mins", allowDownload: false },
+                { id: "mat_dwr_01", title: "Masterclass: Nyquist Velocity & Dual-PRF Algorithms", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "40 mins", allowDownload: false },
                 { id: "mat_dwr_02", title: "DWR Product Atlas (CAPPI, PACP, SRI, ETOP)", type: "pdf", size: "8.7 MB", allowDownload: true }
               ]
             }
@@ -387,7 +387,7 @@ export const initialData = {
               title: "Module 2: Hook Echo, BWER, Microbursts & Hail Core Detection",
               duration: "8 Hours",
               materials: [
-                { id: "mat_dwr_03", title: "Lecture: Dual-Pol Fuzzy Logic Hydrometeor Classification (HCA)", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "60 mins", allowDownload: false },
+                { id: "mat_dwr_03", title: "Lecture: Dual-Pol Fuzzy Logic Hydrometeor Classification (HCA)", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "60 mins", allowDownload: false },
                 { id: "mat_dwr_04", title: "Case Study: Mumbai 2005 Extreme Rainfall — DWR Analysis", type: "pdf", size: "4.2 MB", allowDownload: true }
               ]
             }
@@ -421,7 +421,7 @@ export const initialData = {
               title: "Module 1: Genesis Potential Index & Warm Core Structure",
               duration: "5 Hours",
               materials: [
-                { id: "mat_cyc_01", title: "Lecture: Carnot Heat Engine Model of Tropical Cyclones", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "50 mins", allowDownload: false },
+                { id: "mat_cyc_01", title: "Lecture: Carnot Heat Engine Model of Tropical Cyclones", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "50 mins", allowDownload: false },
                 { id: "mat_cyc_02", title: "Case Study: Cyclone Amphan (2020) — Intensification & Track", type: "pdf", size: "6.1 MB", allowDownload: true }
               ]
             },
@@ -444,7 +444,7 @@ export const initialData = {
               title: "Module 3: ADCIRC Storm Surge Model Setup & Validation",
               duration: "6 Hours",
               materials: [
-                { id: "mat_cyc_04", title: "Lecture: ADCIRC Grid Setup for Indian Coastline", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "55 mins", allowDownload: false },
+                { id: "mat_cyc_04", title: "Lecture: ADCIRC Grid Setup for Indian Coastline", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "55 mins", allowDownload: false },
                 { id: "mat_cyc_05", title: "Lab Manual: Running SLOSH Model for Coastal Odisha", type: "pdf", size: "3.8 MB", allowDownload: true }
               ]
             }
@@ -478,7 +478,7 @@ export const initialData = {
               title: "Module 1: 6-Channel Imager Products & Interpretation",
               duration: "4 Hours",
               materials: [
-                { id: "mat_sat_01", title: "Lecture: INSAT-3DR Image Interpretation for Convective Monitoring", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "35 mins", allowDownload: false },
+                { id: "mat_sat_01", title: "Lecture: INSAT-3DR Image Interpretation for Convective Monitoring", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "35 mins", allowDownload: false },
                 { id: "mat_sat_02", title: "Cloud Classification Atlas for Indian Region", type: "pdf", size: "12.4 MB", allowDownload: true }
               ]
             }
@@ -526,7 +526,7 @@ export const initialData = {
               title: "Module 1: AMFU Setup, Crop Phenological Observations & Bulletin Formats",
               duration: "4 Hours",
               materials: [
-                { id: "mat_agro_01", title: "Lecture: Agro-Meteorological Field Units (AMFU) Network in India", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "38 mins", allowDownload: false },
+                { id: "mat_agro_01", title: "Lecture: Agro-Meteorological Field Units (AMFU) Network in India", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "38 mins", allowDownload: false },
                 { id: "mat_agro_02", title: "Manual: Writing District-Level Agromet Advisory Bulletins", type: "pdf", size: "2.8 MB", allowDownload: true }
               ]
             }
@@ -560,7 +560,7 @@ export const initialData = {
               title: "Module 1: ISM Onset, Active-Break Cycles & Low Pressure Systems",
               duration: "6 Hours",
               materials: [
-                { id: "mat_cli_01", title: "Lecture: Heat Low over Thar Desert & Monsoon Trough Variability", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "55 mins", allowDownload: false },
+                { id: "mat_cli_01", title: "Lecture: Heat Low over Thar Desert & Monsoon Trough Variability", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "55 mins", allowDownload: false },
                 { id: "mat_cli_02", title: "Research Paper Collection: ISM Active-Break Mechanisms", type: "pdf", size: "9.2 MB", allowDownload: true }
               ]
             },
@@ -569,7 +569,7 @@ export const initialData = {
               title: "Module 2: ENSO, IOD & MJO Teleconnections to Indian Monsoon",
               duration: "5 Hours",
               materials: [
-                { id: "mat_cli_03", title: "Lecture: El Niño Impact on ISM Deficit Years (1972, 1982, 2002, 2023)", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "60 mins", allowDownload: false },
+                { id: "mat_cli_03", title: "Lecture: El Niño Impact on ISM Deficit Years (1972, 1982, 2002, 2023)", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "60 mins", allowDownload: false },
                 { id: "mat_cli_04", title: "Data Practicum: Calculating Oceanic Niño Index (ONI) & IOD DMI", type: "presentation", pages: 36, allowDownload: true }
               ]
             }
@@ -584,7 +584,7 @@ export const initialData = {
               title: "Module 3: IMD Statistical Forecast Models & CMIP6 Projections",
               duration: "8 Hours",
               materials: [
-                { id: "mat_cli_05", title: "Lecture: Ensemble Mean vs Probabilistic Seasonal Forecast Verification", type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", duration: "65 mins", allowDownload: false }
+                { id: "mat_cli_05", title: "Lecture: Ensemble Mean vs Probabilistic Seasonal Forecast Verification", type: "video", url: "https://www.youtube.com/embed/NRE2up9GxAI", duration: "65 mins", allowDownload: false }
               ]
             }
           ]

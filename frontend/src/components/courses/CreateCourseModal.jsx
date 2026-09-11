@@ -592,16 +592,99 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                       </div>
                     </div>
 
-                    {/* Competency Matrix Faculty Suggester with Workload */}
-                    <div className="p-4 bg-white rounded-2xl border border-blue-100 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                          <span>AI Competency Matrix Faculty Matching:</span>
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          Assigned Faculty: <b className={subject.assignedTrainerName ? "text-purple-900 font-bold" : "text-slate-400 font-normal"}>{subject.assignedTrainerName || "None (Type subject or click Assign)"}</b>
-                        </span>
+                    {/* Competency Matrix Faculty Suggester with Workload & Manual Selection */}
+                    <div className="p-4 bg-white rounded-2xl border border-blue-100 space-y-3.5">
+                      
+                      {/* Top Bar: Assignment Status & Actions */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                          <span className="font-extrabold text-slate-900 text-xs">
+                            Subject Faculty Assignment:
+                          </span>
+                          {subject.isManuallyAssigned && (
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-purple-100 text-purple-900 border border-purple-200">
+                              Manual Override
+                            </span>
+                          )}
+                        </div>
+
+                        {subject.assignedTrainerName && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-slate-600 font-medium">
+                              Assigned: <b className="text-purple-900 font-bold">{subject.assignedTrainerName}</b>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setForm(prev => ({
+                                  ...prev,
+                                  subjects: prev.subjects.map(s => s.id === subject.id ? {
+                                    ...s,
+                                    assignedTrainerId: "",
+                                    assignedTrainerName: "",
+                                    isManuallyAssigned: false
+                                  } : s)
+                                }));
+                              }}
+                              className="text-[10px] text-rose-600 hover:text-rose-800 font-bold underline"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* ─── MANUAL TRAINER SELECTION DROPDOWN (ADMIN CONTROLS) ─── */}
+                      <div className="p-3 bg-gradient-to-r from-blue-50/70 to-indigo-50/70 rounded-xl border border-blue-200/80 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[11px] font-extrabold text-[#0a2558] flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Manual Faculty Selection (All Registered Trainers):</span>
+                          </label>
+                          <span className="text-[10px] text-slate-500 font-mono">
+                            {trainersWorkload.length} Faculty Available
+                          </span>
+                        </div>
+                        
+                        <select
+                          value={subject.assignedTrainerId || ""}
+                          onChange={(e) => {
+                            const selId = e.target.value;
+                            if (!selId) {
+                              setForm(prev => ({
+                                ...prev,
+                                subjects: prev.subjects.map(s => s.id === subject.id ? {
+                                  ...s,
+                                  assignedTrainerId: "",
+                                  assignedTrainerName: "",
+                                  isManuallyAssigned: false
+                                } : s)
+                              }));
+                            } else {
+                              const found = trainersWorkload.find(t => t.trainerId === selId);
+                              if (found) {
+                                setForm(prev => ({
+                                  ...prev,
+                                  subjects: prev.subjects.map(s => s.id === subject.id ? {
+                                    ...s,
+                                    assignedTrainerId: found.trainerId,
+                                    assignedTrainerName: found.trainerName,
+                                    isManuallyAssigned: true
+                                  } : s)
+                                }));
+                              }
+                            }
+                          }}
+                          className="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none shadow-sm cursor-pointer"
+                        >
+                          <option value="">-- Choose / Assign Any Faculty from Complete List --</option>
+                          {trainersWorkload.map(tw => (
+                            <option key={tw.trainerId} value={tw.trainerId}>
+                              {tw.trainerName} — {tw.designation} ({tw.department}) • [Workload: {tw.workloadLevel || "Optimal"} ({tw.assignedCoursesCount || 0} Courses)]
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
                       {/* Guidance notice when no domain match */}
@@ -609,102 +692,94 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                         <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">
                           <span className="text-amber-500 font-bold">💡</span>
                           <span>
-                            Type a meteorological subject title (e.g. <b>Doppler Radar, Tropical Cyclone, NWP Dynamics, Satellite Meteorology</b>) to see live AI Faculty Matching, or click <b>Assign</b> on any faculty below.
+                            Type a domain subject title (e.g. <b>Doppler Radar, Tropical Cyclone, NWP Dynamics, Satellite Meteorology</b>) for AI suggestions, or select directly from the dropdown above.
                           </span>
                         </div>
                       )}
 
-                      {/* Top Trainers Grid with Workload Indicator */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {suggestedTrainers.slice(0, 4).map(tw => {
-                          const isAssigned = subject.assignedTrainerName === tw.trainerName || subject.assignedTrainerId === tw.trainerId;
-                          return (
-                            <div 
-                              key={tw.trainerId}
-                              onClick={() => {
-                                setForm(prev => ({
-                                  ...prev,
-                                  subjects: prev.subjects.map(s => s.id === subject.id ? {
-                                    ...s,
-                                    assignedTrainerId: tw.trainerId,
-                                    assignedTrainerName: tw.trainerName,
-                                    isManuallyAssigned: true
-                                  } : s)
-                                }));
-                              }}
-                              className={`p-3 rounded-xl border cursor-pointer transition-all flex items-start justify-between gap-2.5 ${
-                                isAssigned 
-                                  ? "bg-purple-50 border-purple-400 ring-2 ring-purple-300 shadow-sm" 
-                                  : tw.matchScore >= 80
-                                  ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-400"
-                                  : "bg-slate-50/70 border-slate-200 hover:border-blue-300 hover:bg-blue-50/40"
-                              }`}
-                            >
-                              <div className="flex items-start gap-2.5">
-                                <img
-                                  src={tw.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
-                                  alt={tw.trainerName}
-                                  className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
-                                />
-                                <div>
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
-                                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
-                                      tw.matchScore >= 80 
-                                        ? "bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs" 
-                                        : tw.matchScore >= 40 
-                                        ? "bg-blue-100 text-blue-900 border-blue-200" 
-                                        : "bg-slate-100 text-slate-500 border-slate-200"
-                                    }`}>
-                                      {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
-                                    </span>
-                                  </div>
-                                  <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{tw.designation}</p>
-                                  
-                                  {/* Rule 17 Cold Start Indicator */}
-                                  {tw.isColdStart ? (
-                                    <div className="mt-1 flex items-center gap-1">
-                                      <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px] border border-slate-200">
-                                        Performance history unavailable
-                                      </span>
-                                      <span className="text-[9px] text-emerald-700 font-bold">🌱 Cold-Start</span>
-                                    </div>
-                                  ) : (
-                                    <div className="mt-1 flex items-center gap-1.5 text-[9px] text-slate-500 font-medium">
-                                      <span className="text-amber-600 font-bold">★ {tw.performanceScore || "4.8"}</span>
-                                      <span>({tw.feedbackCount || 15}+ Trainee Reviews)</span>
-                                    </div>
-                                  )}
+                      {/* Top AI Suggested Faculty Grid */}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                          <span>AI Recommended Faculty Matches:</span>
+                        </div>
 
-                                  {/* Rule 18 Workload Balancing & Recommendation Badge */}
-                                  <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-                                    <span className={`px-2 py-0.2 rounded-full text-[9px] font-black ${
-                                      tw.workloadLevel === "High" || tw.recommendationTone === "warning"
-                                        ? "bg-rose-100 text-rose-800 border border-rose-200" 
-                                        : tw.workloadLevel === "Moderate" || tw.recommendationTone === "balanced"
-                                        ? "bg-amber-100 text-amber-800 border border-amber-200" 
-                                        : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                                    }`}>
-                                      {tw.finalRecommendation || (tw.workloadStatus === "High Load" ? "⚠ Workload Warning" : "🌟 Optimal Availability")}
-                                    </span>
-                                    <span className="text-[9px] text-slate-400 font-mono">
-                                      ({tw.assignedCoursesCount || tw.currentCourseLoad || 0} Courses • {tw.activeLearners || 0} Cadets)
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <button
-                                type="button"
-                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 ${
-                                  isAssigned ? "bg-purple-700 text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {suggestedTrainers.slice(0, 4).map(tw => {
+                            const isAssigned = subject.assignedTrainerName === tw.trainerName || subject.assignedTrainerId === tw.trainerId;
+                            return (
+                              <div 
+                                key={tw.trainerId}
+                                onClick={() => {
+                                  setForm(prev => ({
+                                    ...prev,
+                                    subjects: prev.subjects.map(s => s.id === subject.id ? {
+                                      ...s,
+                                      assignedTrainerId: tw.trainerId,
+                                      assignedTrainerName: tw.trainerName,
+                                      isManuallyAssigned: true
+                                    } : s)
+                                  }));
+                                }}
+                                className={`p-3 rounded-xl border cursor-pointer transition-all flex items-start justify-between gap-2.5 ${
+                                  isAssigned 
+                                    ? "bg-purple-50 border-purple-400 ring-2 ring-purple-300 shadow-sm" 
+                                    : tw.matchScore >= 80
+                                    ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-400"
+                                    : "bg-slate-50/70 border-slate-200 hover:border-blue-300 hover:bg-blue-50/40"
                                 }`}
                               >
-                                {isAssigned ? "Selected ✓" : "Assign"}
-                              </button>
-                            </div>
-                          );
-                        })}
+                                <div className="flex items-start gap-2.5">
+                                  <img
+                                    src={tw.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
+                                    alt={tw.trainerName}
+                                    className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
+                                  />
+                                  <div>
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
+                                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
+                                        tw.matchScore >= 80 
+                                          ? "bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs" 
+                                          : tw.matchScore >= 40 
+                                          ? "bg-blue-100 text-blue-900 border-blue-200" 
+                                          : "bg-slate-100 text-slate-500 border-slate-200"
+                                      }`}>
+                                        {tw.matchScore > 0 ? `${tw.matchScore}% Match` : "0% Match"}
+                                      </span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 truncate max-w-[200px]">{tw.designation}</p>
+                                    
+                                    {/* Workload Badge */}
+                                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                                      <span className={`px-2 py-0.2 rounded-full text-[9px] font-black ${
+                                        tw.workloadLevel === "High" || tw.recommendationTone === "warning"
+                                          ? "bg-rose-100 text-rose-800 border border-rose-200" 
+                                          : tw.workloadLevel === "Moderate" || tw.recommendationTone === "balanced"
+                                          ? "bg-amber-100 text-amber-800 border border-amber-200" 
+                                          : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                      }`}>
+                                        {tw.finalRecommendation || (tw.workloadStatus === "High Load" ? "⚠ High Workload" : "🌟 Optimal Availability")}
+                                      </span>
+                                      <span className="text-[9px] text-slate-400 font-mono">
+                                        ({tw.assignedCoursesCount || tw.currentCourseLoad || 0} Courses)
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 ${
+                                    isAssigned ? "bg-purple-700 text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
+                                  }`}
+                                >
+                                  {isAssigned ? "Selected ✓" : "Assign"}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
 
@@ -795,6 +870,43 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                   <p className="font-semibold text-slate-800">
                     {form.subjects.reduce((acc, s) => acc + (s.modules?.length || 0), 0)} Modules
                   </p>
+                </div>
+              </div>
+
+              {/* Subjects & Faculty Assignment Review Breakdown */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                  <Compass className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Curriculum Subjects & Assigned Faculty ({form.subjects.length}):</span>
+                </h4>
+
+                <div className="space-y-2">
+                  {form.subjects.map((sub, idx) => (
+                    <div key={sub.id || idx} className="p-3 bg-white rounded-2xl border border-slate-200 flex items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-md bg-blue-600 text-white font-black text-[10px] flex items-center justify-center">
+                            S{idx + 1}
+                          </span>
+                          <span className="font-bold text-slate-900 text-xs">{sub.name}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          {sub.modules?.length || 0} Lesson Modules
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase">Faculty:</span>
+                        <span className={`px-2.5 py-1 rounded-xl text-xs font-bold ${
+                          sub.assignedTrainerName 
+                            ? "bg-purple-100 text-purple-900 border border-purple-200" 
+                            : "bg-amber-100 text-amber-900 border border-amber-200"
+                        }`}>
+                          {sub.assignedTrainerName ? `👨‍🏫 ${sub.assignedTrainerName}` : "⚠ Unassigned"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 

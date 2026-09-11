@@ -1,10 +1,22 @@
 import { db } from "../store/dbStore.js";
 
-// --- Question Bank Management (Matches Screenshot 1 & 3 UI) ---
+// --- Question Bank Management ---
 export const getQuestionBank = (req, res) => {
   try {
     const { subjectId, type, difficulty, search } = req.query;
-    const questions = db.getQuestions({ subjectId, type, difficulty, search });
+    let questions = db.getQuestions({ subjectId, type, difficulty, search });
+
+    // DATA ISOLATION: Trainees and Trainers can ONLY see their own uploaded/generated questions
+    if (req.user && req.user.role === "trainee") {
+      questions = questions.filter(q => q.createdBy === req.user.id || q.createdBy === req.user.email);
+    } else if (req.user && req.user.role === "trainer") {
+      questions = questions.filter(q => 
+        q.createdBy === req.user.id || 
+        q.createdBy === req.user.email || 
+        (req.user.name && q.createdByName && q.createdByName.toLowerCase() === req.user.name.toLowerCase())
+      );
+    }
+
     return res.json({ success: true, count: questions.length, questions });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -13,7 +25,14 @@ export const getQuestionBank = (req, res) => {
 
 export const createQuestion = (req, res) => {
   try {
-    const question = db.createQuestion(req.body);
+    const questionData = {
+      ...req.body,
+      createdBy: req.user?.id || req.body.createdBy || "u_trainer_1",
+      createdByEmail: req.user?.email || req.body.createdByEmail || null,
+      createdByName: req.user?.name || req.body.createdByName || null,
+      createdByRole: req.user?.role || req.body.createdByRole || "trainer"
+    };
+    const question = db.createQuestion(questionData);
     return res.status(201).json({ success: true, message: "Question created successfully", question });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
@@ -23,7 +42,7 @@ export const createQuestion = (req, res) => {
 export const duplicateQuestion = (req, res) => {
   try {
     const { id } = req.params;
-    const duplicated = db.duplicateQuestion(id);
+    const duplicated = db.duplicateQuestion(id, req.user);
     if (!duplicated) {
       return res.status(404).json({ success: false, message: "Question not found" });
     }
@@ -49,8 +68,31 @@ export const deleteQuestion = (req, res) => {
 // --- Quiz Scheduling & Management ---
 export const getQuizzes = (req, res) => {
   try {
-    const { courseId, trainerId, subjectId, subjectName, traineeId } = req.query;
+    const { courseId, trainerId, subjectId, subjectName, traineeId, practiceOnly, enrolledOnly } = req.query;
     let quizzes = db.getQuizzes();
+
+    // TRAINER DATA ISOLATION: Trainer can ONLY see scheduled assessments they created/conduct
+    const isTrainerRole = req.user && req.user.role === "trainer";
+    const currentTrainerId = isTrainerRole ? req.user.id : (trainerId || null);
+    const currentTrainerName = isTrainerRole ? req.user.name : null;
+
+    if (isTrainerRole || currentTrainerId) {
+      quizzes = quizzes.filter(q => {
+        if (currentTrainerId && (q.trainerId === currentTrainerId || q.createdBy === currentTrainerId || q.authorId === currentTrainerId)) return true;
+        if (currentTrainerName && q.trainerName) {
+          const qName = q.trainerName.toLowerCase();
+          const tName = currentTrainerName.toLowerCase();
+          if (qName === tName || qName.includes(tName) || tName.includes(qName)) return true;
+        }
+        if (currentTrainerName && q.createdByName) {
+          const qName = q.createdByName.toLowerCase();
+          const tName = currentTrainerName.toLowerCase();
+          if (qName === tName || qName.includes(tName) || tName.includes(qName)) return true;
+        }
+        return false;
+      });
+    }
+
     if (courseId) {
       quizzes = quizzes.filter(q => q.courseId === courseId);
     }
@@ -61,23 +103,52 @@ export const getQuizzes = (req, res) => {
       quizzes = quizzes.filter(q => q.subjectId === subjectId || q.subjectId === "all");
     }
     if (subjectName) {
-      quizzes = quizzes.filter(q => 
+      quizzes = quizzes.filter(q =>
         (q.subjectName && q.subjectName.toLowerCase().includes(subjectName.toLowerCase())) ||
         (q.title && q.title.toLowerCase().includes(subjectName.toLowerCase()))
       );
     }
     if (traineeId) {
-      quizzes = quizzes.filter(q => 
-        !q.targetTraineeIds || 
-        q.targetTraineeIds.length === 0 || 
+      quizzes = quizzes.filter(q =>
+        !q.targetTraineeIds ||
+        q.targetTraineeIds.length === 0 ||
         q.targetTraineeIds.includes(traineeId)
       );
     }
+
+    // ENROLLMENT-BASED FILTERING: For trainee role, only return quizzes whose courseId
+    // matches one of the trainee's enrolled courses (official quizzes).
+    // Practice papers (isPractice=true) are filtered by createdBy when practiceOnly=true.
+    if (enrolledOnly === "true" && traineeId) {
+      const traineeUser = db.findUserById(traineeId);
+      const enrolledCourseIds = new Set();
+      if (traineeUser) {
+        db.getCourses().forEach(c => {
+          if ((c.enrolledTraineeIds || []).includes(traineeId)) {
+            enrolledCourseIds.add(c.id);
+          }
+        });
+      }
+      quizzes = quizzes.filter(q => {
+        if (!q.courseId) return false;
+        return enrolledCourseIds.has(q.courseId);
+      });
+    }
+
+    // PRACTICE PAPER FILTERING: Only papers created by this trainee
+    if (practiceOnly === "true" && traineeId) {
+      quizzes = quizzes.filter(q =>
+        q.createdBy === traineeId ||
+        (q.isPractice === true && q.createdBy === traineeId)
+      );
+    }
+
     return res.json({ success: true, count: quizzes.length, quizzes });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 export const getQuizById = (req, res) => {
   try {
@@ -94,7 +165,12 @@ export const getQuizById = (req, res) => {
 
 export const createQuiz = (req, res) => {
   try {
-    const quiz = db.createQuiz(req.body);
+    const quizData = {
+      ...req.body,
+      createdBy: req.user?.id || req.body.createdBy || null,
+      createdByRole: req.user?.role || req.body.createdByRole || "trainer"
+    };
+    const quiz = db.createQuiz(quizData);
     return res.status(201).json({
       success: true,
       message: "Quiz created and scheduled successfully! Card will appear on Trainee Dashboard according to scheduled time.",

@@ -120,7 +120,7 @@ export const generateBulkCertificates = (req, res) => {
     }
     return res.json({
       success: true,
-      message: `Bulk certification completed! Generated and issued ${result.totalIssued} accredited certificates for trainees and instructors.`,
+      message: `Bulk certification completed! Generated and issued ${result.count ?? result.totalIssued ?? 0} accredited certificates for trainees.`,
       result
     });
   } catch (err) {
@@ -309,4 +309,6 @@ export const verifyCertificate = (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+
 

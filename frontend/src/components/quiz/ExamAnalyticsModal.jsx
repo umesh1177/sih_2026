@@ -421,6 +421,45 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose, onOpenStudio })
           {activeTab === "responses" && (
             <div className="space-y-6 animate-in fade-in duration-150">
               
+              {/* Adaptive Difficulty Journey Trail (Post-Exam Analysis) */}
+              {Array.isArray(exam?.difficultyHistory) && exam.difficultyHistory.length > 0 && (
+                <div className="p-4 bg-gradient-to-r from-blue-50/60 via-indigo-50/40 to-purple-50/50 rounded-2xl border border-blue-200/80 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Adaptive Difficulty Journey & Performance Calibration</span>
+                    </span>
+                    <span className="text-[10px] font-mono bg-blue-100/80 border border-blue-200 text-blue-800 px-2.5 py-0.5 rounded-full font-bold">
+                      {exam.difficultyHistory.length} Question Steps Calibrated
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 text-[11px]">
+                    {exam.difficultyHistory.map((h, idx) => {
+                      const diff = h.difficulty || "Moderate";
+                      const isEasy = diff === "Easy";
+                      const isHard = diff === "Hard";
+                      const isMod = !isEasy && !isHard;
+
+                      return (
+                        <div
+                          key={idx}
+                          className={`p-2 rounded-xl border flex items-center justify-between font-bold ${
+                            isHard 
+                              ? "bg-purple-50 border-purple-200 text-purple-900"
+                              : isMod
+                              ? "bg-blue-50 border-blue-200 text-blue-900"
+                              : "bg-emerald-50 border-emerald-200 text-emerald-900"
+                          }`}
+                        >
+                          <span className="font-mono text-[10px]">Q{h.questionNumber || idx + 1}</span>
+                          <span className="text-[10px] font-black uppercase">{diff}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Filter Controls Bar */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200">
                 <div className="flex items-center gap-2 w-full sm:w-auto">

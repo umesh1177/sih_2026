@@ -204,6 +204,7 @@ export const LearningGapDetectionHub = ({
 }) => {
   const isAdmin = currentUser?.role === "admin";
   const isTrainer = currentUser?.role === "trainer" || isAdmin;
+  const isTrainee = currentUser?.role === "trainee" && !isTrainer;
 
   // ─── STATE ───
   const [gapThreshold, setGapThreshold] = useState(() => {
@@ -211,8 +212,10 @@ export const LearningGapDetectionHub = ({
     return saved ? Number(saved) : DEFAULT_GAP_THRESHOLD;
   });
 
-  const [topicsData, setTopicsData] = useState(TOPIC_REMEDIATION_KB);
-  const [selectedTopicKey, setSelectedTopicKey] = useState("Radar Interpretation");
+  // Start with empty data; gaps are computed 100% from real submissions
+  const [topicsData, setTopicsData] = useState({});
+  const [hasSubmissions, setHasSubmissions] = useState(null); // null = loading, false = no data, true = has data
+  const [selectedTopicKey, setSelectedTopicKey] = useState("");
   const [activeModal, setActiveModal] = useState(null); // null | "ai_summary" | "remediation_plan" | "config"
   const [retestedScores, setRetestedScores] = useState(() => {
     const saved = localStorage.getItem("moes_retested_topics");
@@ -233,70 +236,111 @@ export const LearningGapDetectionHub = ({
   useEffect(() => {
     const loadDynamicGaps = async () => {
       try {
-        const userId = currentUser?.id || currentUser?.traineeId;
-        if (!userId) return;
-        const [analyticsRes, qbRes] = await Promise.all([
-          api.getTraineeAnalytics(userId).catch(() => ({ success: false })),
-          api.getQuestions().catch(() => ({ success: false }))
-        ]);
+        let submissions = [];
 
-        const updatedTopics = { ...TOPIC_REMEDIATION_KB };
-
-        if (analyticsRes.success && analyticsRes.submissions && analyticsRes.submissions.length > 0) {
-          const subs = analyticsRes.submissions;
-          const dynamicTopicScores = {};
-
-          subs.forEach(s => {
-            const topic = s.topic || s.subject || s.quizTitle || "Atmospheric Dynamics";
-            if (!dynamicTopicScores[topic]) {
-              dynamicTopicScores[topic] = { total: 0, count: 0, subject: s.subject || "Meteorology" };
-            }
-            dynamicTopicScores[topic].total += (s.percentage || 0);
-            dynamicTopicScores[topic].count += 1;
-          });
-
-          Object.entries(dynamicTopicScores).forEach(([top, stats]) => {
-            const acc = Math.round(stats.total / stats.count);
-            if (updatedTopics[top]) {
-              updatedTopics[top] = {
-                ...updatedTopics[top],
-                baselineAccuracy: acc,
-                totalQuestions: stats.count * 10,
-                wrongQuestions: Math.round((1 - acc / 100) * stats.count * 10),
-                status: acc < 50 ? "critical" : acc < 70 ? "moderate" : "mastered"
-              };
-            }
-          });
+        if (isTrainee) {
+          const userId = currentUser?.id || currentUser?.traineeId;
+          if (userId) {
+            const [analyticsRes, subRes] = await Promise.all([
+              api.getTraineeAnalytics(userId).catch(() => ({ success: false })),
+              api.getTraineeSubmissions(userId).catch(() => ({ success: false }))
+            ]);
+            submissions = (subRes.success && subRes.submissions) ? subRes.submissions :
+                          (analyticsRes.success && analyticsRes.submissions) ? analyticsRes.submissions : [];
+          }
+        } else if (currentUser?.role === "trainer") {
+          const trainerRes = await api.getTrainerEnrolledTrainees(currentUser?.name, currentUser?.id).catch(() => ({ success: false }));
+          if (trainerRes.success && Array.isArray(trainerRes.trainees)) {
+            submissions = trainerRes.trainees.flatMap(t => t.submissions || []);
+          }
+        } else {
+          // Admin: fetch overall submissions
+          const adminRes = await api.getTrainerEnrolledTrainees().catch(() => ({ success: false }));
+          if (adminRes.success && Array.isArray(adminRes.trainees)) {
+            submissions = adminRes.trainees.flatMap(t => t.submissions || []);
+          }
         }
 
-        if (qbRes.success && Array.isArray(qbRes.questions) && qbRes.questions.length > 0) {
-          Object.keys(updatedTopics).forEach(k => {
-            const matchedQs = qbRes.questions.filter(q => 
-              (q.topic && q.topic.toLowerCase().includes(k.toLowerCase())) ||
-              (q.subjectName && q.subjectName.toLowerCase().includes(k.toLowerCase()))
-            );
-            if (matchedQs.length > 0) {
-              updatedTopics[k] = {
-                ...updatedTopics[k],
-                sampleQuestions: matchedQs.slice(0, 5).map(q => ({
-                  question: q.question,
-                  options: q.options || [],
-                  correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
-                  explanation: q.explanation || ""
-                }))
-              };
-            }
-          });
+        const hasData = Array.isArray(submissions) && submissions.length > 0;
+        setHasSubmissions(hasData);
+
+        if (!hasData) {
+          setTopicsData({});
+          return;
         }
 
-        setTopicsData(updatedTopics);
+        const dynamicTopicScores = {};
+
+        submissions.forEach(s => {
+          const topic = s.topic || s.subject || s.subjectName || s.quizTitle || "General Assessment";
+          if (!dynamicTopicScores[topic]) {
+            dynamicTopicScores[topic] = { total: 0, count: 0, subject: s.subject || s.courseTitle || "Meteorology" };
+          }
+          dynamicTopicScores[topic].total += (s.percentage || 0);
+          dynamicTopicScores[topic].count += 1;
+        });
+
+        const qbRes = await api.getQuestions().catch(() => ({ success: false, questions: [] }));
+        const qbQuestions = (qbRes.success && Array.isArray(qbRes.questions)) ? qbRes.questions : [];
+
+        const computedTopics = {};
+
+        Object.entries(dynamicTopicScores).forEach(([topic, stats]) => {
+          const acc = Math.round(stats.total / stats.count);
+          const kbMatch = TOPIC_REMEDIATION_KB[topic] || Object.values(TOPIC_REMEDIATION_KB).find(v => 
+            topic.toLowerCase().includes(v.topic.toLowerCase()) || v.topic.toLowerCase().includes(topic.toLowerCase())
+          );
+
+          const matchedQs = qbQuestions.filter(q =>
+            (q.topic && q.topic.toLowerCase().includes(topic.toLowerCase())) ||
+            (q.subjectName && q.subjectName.toLowerCase().includes(topic.toLowerCase()))
+          );
+
+          computedTopics[topic] = {
+            topic: topic,
+            subject: stats.subject,
+            baselineAccuracy: acc,
+            totalQuestions: stats.count * 10,
+            wrongQuestions: Math.round((1 - acc / 100) * stats.count * 10),
+            status: acc < 50 ? "critical" : acc < 70 ? "moderate" : "mastered",
+            summary: kbMatch?.summary || {
+              headline: `${topic} Operational Foundations & Diagnostic Overview`,
+              keyPrinciples: [
+                `Core theoretical formulations and operational protocols in ${topic}.`,
+                `Standard quality metrics, error limits, and verification guidelines.`,
+                `Practical analysis and cross-sensor validation procedures.`
+              ],
+              commonPitfalls: [
+                `Misinterpreting edge cases or boundary conditions in ${topic}.`,
+                `Overlooking sensor-specific error margins or calibration drift.`
+              ],
+              keyFormulas: [
+                { label: "Accuracy Index", formula: "Accuracy = (Correct / Total) * 100%" }
+              ]
+            },
+            sampleQuestions: matchedQs.length > 0 ? matchedQs.slice(0, 5).map(q => ({
+              question: q.question,
+              options: q.options || [],
+              correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+              explanation: q.explanation || ""
+            })) : (kbMatch?.sampleQuestions || [])
+          };
+        });
+
+        setTopicsData(computedTopics);
+
+        const firstKey = Object.keys(computedTopics)[0];
+        if (firstKey) setSelectedTopicKey(firstKey);
+
       } catch (err) {
         console.error("Failed to load dynamic learning gap telemetry:", err);
+        setHasSubmissions(false);
       }
     };
 
     loadDynamicGaps();
-  }, [currentUser]);
+  }, [currentUser, isTrainee]);
+
 
   // ─── GAP DETECTION CLASSIFICATION ───
   const detectedGaps = useMemo(() => {
@@ -323,7 +367,7 @@ export const LearningGapDetectionHub = ({
   const moderateGapsCount = detectedGaps.filter(g => g.severity === "moderate").length;
   const masteredCount = detectedGaps.filter(g => g.severity === "mastered").length;
 
-  const currentTopic = topicsData[selectedTopicKey] || topicsData["Radar Interpretation"];
+  const currentTopic = topicsData[selectedTopicKey] || Object.values(topicsData)[0] || null;
 
   // ─── LAUNCH TARGETED PRACTICE QUIZ HANDLER ───
   const handleLaunchTargetedQuiz = async (topicKey) => {
@@ -516,8 +560,42 @@ export const LearningGapDetectionHub = ({
         </div>
       </div>
 
+      {/* ═════════ EMPTY STATE: No Assessments / Submissions Taken ═════════ */}
+      {hasSubmissions === false && (
+        <div className="bg-white rounded-3xl border border-slate-200 p-14 text-center space-y-5 shadow-sm animate-in fade-in">
+          <div className="w-16 h-16 bg-indigo-50 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="font-black text-slate-900 text-lg">No Learning Gaps Detected Yet</h3>
+            <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+              {isTrainee
+                ? "Your gap analysis will appear here once you complete assessments. Take an official exam in the Assessments tab or a practice paper to build your diagnostic profile."
+                : isTrainer
+                ? "No trainee assessment submissions recorded yet for your assigned subjects. Learning gap analytics will automatically compute once enrolled trainees attempt quizzes."
+                : "No assessment telemetry submissions recorded in the database yet. Gap detection triggers automatically upon assessment completion."}
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold text-slate-600">
+              <span>1.</span> {isTrainer ? "Assign course subjects" : "Enroll in a course"}
+            </div>
+            <span className="text-slate-300">→</span>
+            <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold text-slate-600">
+              <span>2.</span> {isTrainer ? "Conduct assessments" : "Take an assessment"}
+            </div>
+            <span className="text-slate-300">→</span>
+            <div className="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-xl text-xs font-bold text-indigo-700">
+              <span>3.</span> Real-time Gap Telemetry
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═════════ 2. MAIN SPLIT VIEW: GAP TOPIC CARDS vs REMEDIATION ACTION CENTER ═════════ */}
+      {hasSubmissions === true && detectedGaps.length > 0 && (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
         
         {/* ─── LEFT COLUMN: DETECTED TOPIC GAPS LIST (5 COLUMNS) ─── */}
         <div className="lg:col-span-5 space-y-3">
@@ -791,6 +869,7 @@ export const LearningGapDetectionHub = ({
 
         </div>
       </div>
+      )}
 
       {/* ═════════ 3. AI SUMMARY & KNOWLEDGE CHECK MODAL ═════════ */}
       {activeModal === "ai_summary" && (

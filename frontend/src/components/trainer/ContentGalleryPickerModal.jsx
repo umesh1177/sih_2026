@@ -31,10 +31,12 @@ export const ContentGalleryPickerModal = ({
   course,
   subject,
   targetModule,
+  moduleItem,
   currentUser,
   onAttachedSuccess,
   onOpenPreview
 }) => {
+  const activeModule = targetModule || moduleItem;
   const [libraryItems, setLibraryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,25 +95,27 @@ export const ContentGalleryPickerModal = ({
 
   const handleAttachSubmit = async () => {
     if (selectedItemIds.length === 0) return;
-    if (!targetModule) return;
 
     setAttaching(true);
     try {
       const selectedMaterials = libraryItems.filter(i => selectedItemIds.includes(i.id));
       let successCount = 0;
+      const targetModId = activeModule?.id || "mod_01";
+      const courseId = course?.id || "crs_01";
+      const subjectId = subject?.id || "sub_01";
 
       for (const item of selectedMaterials) {
         // Try mapped attach API endpoint
         const attachRes = await api.attachContentLibraryItem(
           item.id, 
-          course.id, 
-          subject.id, 
-          targetModule.id
+          courseId, 
+          subjectId, 
+          targetModId
         ).catch(() => ({ success: false }));
 
         if (!attachRes.success) {
           // Fallback to uploadMaterial payload
-          await api.uploadMaterial(course.id, subject.id, targetModule.id, {
+          await api.uploadMaterial(courseId, subjectId, targetModId, {
             id: item.id,
             title: item.title,
             type: item.type === "ppt" ? "presentation" : item.type,
@@ -128,11 +132,11 @@ export const ContentGalleryPickerModal = ({
 
       setFeedback({
         type: "success",
-        message: `Successfully attached ${successCount} learning material(s) to ${targetModule.title}!`
+        message: `Successfully attached ${successCount} learning material(s) to ${activeModule?.title || "Module"}!`
       });
 
       if (onAttachedSuccess) {
-        onAttachedSuccess(targetModule.id, selectedMaterials);
+        onAttachedSuccess(targetModId, selectedMaterials);
       }
 
       setTimeout(() => {
@@ -177,7 +181,7 @@ export const ContentGalleryPickerModal = ({
                 Select Materials from Content Library
               </h3>
               <p className="text-xs text-slate-500">
-                Attaching to: <b>{subject?.name || "Assigned Subject"}</b> &rsaquo; <span className="text-blue-700 font-bold">{targetModule?.title || "Target Module"}</span>
+                Attaching to: <b>{subject?.name || "Assigned Subject"}</b> &rsaquo; <span className="text-blue-700 font-bold">{activeModule?.title || "Target Module"}</span>
               </p>
             </div>
           </div>
@@ -349,7 +353,7 @@ export const ContentGalleryPickerModal = ({
               <span className="text-slate-400">No items selected</span>
             ) : (
               <span className="text-blue-900">
-                <b>{selectedItemIds.length}</b> material(s) selected for <b>{targetModule?.title}</b>
+                <b>{selectedItemIds.length}</b> material(s) selected for <b>{activeModule?.title || "Module"}</b>
               </span>
             )}
           </div>
@@ -368,7 +372,7 @@ export const ContentGalleryPickerModal = ({
               disabled={selectedItemIds.length === 0 || attaching}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
-              {attaching ? "Attaching to Module..." : `Attach & Upload to ${targetModule?.title?.split(":")[0] || "Module"}`}
+              {attaching ? "Attaching to Module..." : `Attach & Upload to ${activeModule?.title?.split(":")[0] || "Module"}`}
             </button>
           </div>
         </div>

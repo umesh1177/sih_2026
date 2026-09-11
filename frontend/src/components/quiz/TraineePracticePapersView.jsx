@@ -58,19 +58,24 @@ export const TraineePracticePapersView = ({
   const loadData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch available quizzes / practice papers from API
+      const userId = currentUser?.id || "";
+
+      // Fetch ONLY the current user's practice papers (practiceOnly filter)
       const [qRes, subRes] = await Promise.all([
-        api.getQuizzes(),
-        api.getTraineeSubmissions(currentUser?.id || "u_trainee_1")
+        api.getQuizzes({ practiceOnly: "true", traineeId: userId }),
+        api.getTraineeSubmissions(userId)
       ]);
 
       let papersList = [];
       if (qRes.success && qRes.quizzes) {
-        papersList = qRes.quizzes.map(q => ({
-          ...q,
-          isPractice: true,
-          isAdaptive: q.isAdaptive !== undefined ? q.isAdaptive : true
-        }));
+        // Only show papers created by this user
+        papersList = qRes.quizzes
+          .filter(q => q.createdBy === userId || q.isPractice === true)
+          .map(q => ({
+            ...q,
+            isPractice: true,
+            isAdaptive: q.isAdaptive !== undefined ? q.isAdaptive : true
+          }));
       }
 
       setPracticePapers(papersList);

@@ -314,16 +314,69 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
     return Array.from(set);
   }, [processedTrainees]);
 
-  const uniqueCompetencies = [
-    "Atmospheric Dynamics",
-    "Radar Interpretation",
-    "Numerical Prediction",
-    "Satellite Data Assimilation",
-    "Cyclone Tracking",
-    "CFL Stability Limits"
-  ];
+  const uniqueCompetencies = useMemo(() => {
+    const set = new Set(processedTrainees.flatMap(t => [...(t.strengths || []), ...(t.needsImprovement || [])]).filter(Boolean));
+    return Array.from(set);
+  }, [processedTrainees]);
 
   // ─── ADMIN CROSS-ORGANIZATIONAL AGGREGATES ───
+  const [expandedCourseId, setExpandedCourseId] = useState(null);
+
+  const courseAggregates = useMemo(() => {
+    return courses.map(course => {
+      const courseTrainees = processedTrainees.filter(t => t.courseId === course.id || (course.enrolledTraineeIds || []).includes(t.id || t.traineeId));
+      const count = courseTrainees.length;
+      const totalScore = courseTrainees.reduce((acc, t) => acc + (t.compositeScore || 0), 0);
+      const avgScore = count > 0 ? Math.round(totalScore / count) : 0;
+      const totalComp = courseTrainees.reduce((acc, t) => acc + (t.completionPercentage || 0), 0);
+      const avgCompletion = count > 0 ? Math.round(totalComp / count) : 0;
+
+      // Subject-wise learner performance breakdown
+      const subjectsWithPerformance = (course.subjects || []).map(subj => {
+        const sName = subj.name || subj.title || "Subject";
+        const sTrainer = subj.trainerName || subj.facultyName || subj.trainer || course.leadTrainerName || "Assigned Faculty";
+        
+        const traineesInSubj = courseTrainees.map(t => {
+          const sData = (t.subjectBreakdown || []).find(sb => sb.subjectId === subj.id || (sb.subjectName && sb.subjectName.toLowerCase() === sName.toLowerCase()));
+          return {
+            id: t.id || t.traineeId,
+            name: t.name,
+            department: t.department,
+            cadreId: t.cadreId,
+            category: t.category,
+            avgScore: sData ? sData.avgScore : t.assessmentScore,
+            progressPercentage: sData ? sData.progressPercentage : t.completionPercentage
+          };
+        });
+
+        const subjTotalScore = traineesInSubj.reduce((acc, t) => acc + (t.avgScore || 0), 0);
+        const subjAvgScore = traineesInSubj.length > 0 ? Math.round(subjTotalScore / traineesInSubj.length) : 0;
+        const subjTotalProg = traineesInSubj.reduce((acc, t) => acc + (t.progressPercentage || 0), 0);
+        const subjAvgProg = traineesInSubj.length > 0 ? Math.round(subjTotalProg / traineesInSubj.length) : 0;
+
+        return {
+          id: subj.id,
+          name: sName,
+          trainer: sTrainer,
+          modulesCount: subj.modules?.length || 0,
+          traineesCount: traineesInSubj.length,
+          avgScore: subjAvgScore,
+          avgProgress: subjAvgProg,
+          trainees: traineesInSubj
+        };
+      });
+
+      return {
+        ...course,
+        enrolledCount: count,
+        avgScore,
+        avgCompletion,
+        trainees: courseTrainees,
+        subjects: subjectsWithPerformance
+      };
+    });
+  }, [courses, processedTrainees]);
+
   const departmentAggregates = useMemo(() => {
     const map = {};
     processedTrainees.forEach(t => {
@@ -481,6 +534,27 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
         </div>
       )}
 
+      {loading ? (
+        <div className="py-20 text-center space-y-3 bg-white rounded-3xl border border-slate-200 shadow-sm">
+          <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs font-semibold text-slate-500">Loading learner performance telemetry...</p>
+        </div>
+      ) : processedTrainees.length === 0 ? (
+        <div className="bg-white rounded-3xl border border-slate-200 p-14 text-center space-y-4 shadow-sm animate-in fade-in">
+          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+            <Users className="w-8 h-8" />
+          </div>
+          <div className="space-y-1.5">
+            <h3 className="font-black text-slate-900 text-lg">No Enrolled Learners Found</h3>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+              {currentUser?.role === "trainer"
+                ? "You have not been assigned to any course subjects with enrolled trainees yet. Once courses/subjects are assigned to your faculty profile and trainees enroll, their live performance metrics and diagnostic categorizations will appear here automatically."
+                : "No trainee records currently found in the system. Enrolled cadets taking assessments will populate performance metrics automatically."}
+            </p>
+          </div>
+        </div>
+      ) : (
+      <>
       {/* ═════════ 3. PERFORMANCE CATEGORY PILLS & FILTER BAR ═════════ */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
         
@@ -631,7 +705,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
       </div>
 
-      {/* ═════════ 4. MAIN CONTENT VIEW (LEARNERS CARDS vs ADMIN CROSS-DEPARTMENT) ═════════ */}
+      {/* ═════════ 4. MAIN CONTENT VIEW (LEARNERS CARDS vs ADMIN CROSS-DEPARTMENT / COURSES) ═════════ */}
       {isAdmin && activeAdminTab === "departments" ? (
         /* ─── ADMIN VIEW: CROSS-DEPARTMENT BENCHMARKING ─── */
         <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
@@ -679,6 +753,146 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             ))}
           </div>
         </div>
+      ) : isAdmin && activeAdminTab === "courses" ? (
+        /* ─── ADMIN VIEW: COURSE & SUBJECT-WISE LEARNER PERFORMANCE ─── */
+        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h3 className="font-extrabold text-base text-slate-900">
+                Course & Subject-wise Learner Performance
+              </h3>
+              <p className="text-xs text-slate-500">
+                Institutional overview of enrolled trainees, course progress, and detailed subject-wise diagnostic scores.
+              </p>
+            </div>
+            <span className="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-black rounded-xl">
+              {courses.length} Active Courses
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {courseAggregates.map(course => {
+              const isExpanded = expandedCourseId === course.id;
+              return (
+                <div key={course.id} className="border border-slate-200 rounded-3xl overflow-hidden bg-slate-50/50 transition-all">
+                  {/* Course Summary Header */}
+                  <div 
+                    onClick={() => setExpandedCourseId(isExpanded ? null : course.id)}
+                    className="p-5 bg-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/80 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl bg-[#0a2558] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                        <BookOpen className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-mono font-bold text-[10px] border border-indigo-200">
+                            {course.code || course.id}
+                          </span>
+                          <span className="text-xs text-slate-500 font-medium">
+                            Lead Faculty: <b>{course.leadTrainerName || "Directorate Faculty"}</b>
+                          </span>
+                        </div>
+                        <h4 className="font-black text-slate-900 text-sm mt-0.5">{course.title}</h4>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-6 self-stretch md:self-auto justify-between md:justify-end">
+                      <div className="text-left md:text-right">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enrolled Trainees</p>
+                        <p className="text-sm font-black text-slate-800">{course.enrolledCount} Officers</p>
+                      </div>
+                      <div className="text-left md:text-right">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Performance</p>
+                        <p className={`text-sm font-black font-mono ${course.avgScore >= 75 ? "text-emerald-600" : course.avgScore >= 60 ? "text-blue-600" : "text-amber-600"}`}>
+                          {course.avgScore}%
+                        </p>
+                      </div>
+                      <div className="text-left md:text-right">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Completion</p>
+                        <p className="text-sm font-black font-mono text-indigo-700">{course.avgCompletion}%</p>
+                      </div>
+                      <button className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
+                        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expandable Subject-wise Breakdown */}
+                  {isExpanded && (
+                    <div className="p-5 border-t border-slate-200 bg-slate-50/70 space-y-4 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-extrabold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                          <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Subject-Wise Performance & Assigned Faculty Breakdown</span>
+                        </h5>
+                        <span className="text-xs text-slate-500 font-medium">
+                          {course.subjects?.length || 0} Subject Units
+                        </span>
+                      </div>
+
+                      {(!course.subjects || course.subjects.length === 0) ? (
+                        <p className="text-xs text-slate-500 italic py-2">No subjects structured under this course yet.</p>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {course.subjects.map((subj, sIdx) => (
+                            <div key={subj.id || sIdx} className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                                    Unit {sIdx + 1} • {subj.modulesCount} Modules
+                                  </span>
+                                  <h6 className="font-black text-slate-900 text-sm mt-1">{subj.name}</h6>
+                                  <p className="text-xs text-slate-500 mt-0.5">
+                                    Assigned Trainer: <span className="font-bold text-indigo-900">{subj.trainer}</span>
+                                  </p>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-black bg-indigo-50 text-indigo-900 border border-indigo-200">
+                                    Score: {subj.avgScore}%
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Trainee list under this subject */}
+                              <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                  Enrolled Trainees ({subj.trainees?.length || 0})
+                                </p>
+                                <div className="max-h-36 overflow-y-auto space-y-1 pr-1">
+                                  {(subj.trainees || []).length === 0 ? (
+                                    <p className="text-xs text-slate-400 italic py-1">No enrolled trainees.</p>
+                                  ) : (
+                                    (subj.trainees || []).map(t => (
+                                      <div key={t.id} className="flex items-center justify-between text-xs p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-5 h-5 rounded-full bg-[#0a2558] text-white text-[9px] font-bold flex items-center justify-center">
+                                            {t.name.charAt(0)}
+                                          </div>
+                                          <span className="font-bold text-slate-800">{t.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-[10px] text-slate-500 font-mono">{t.avgScore}%</span>
+                                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
+                                            {t.category}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    ))
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       ) : (
         /* ─── TRAINER & ADMIN PRIMARY VIEW: TRAINEE PERFORMANCE CARDS ─── */
         <div className="space-y-4">
@@ -687,7 +901,19 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             <span>Category Formula: ({weights.assessmentWeight}% Assess + {weights.courseCompletionWeight}% Comp + {weights.practiceWeight}% Prac + {weights.consistencyWeight}% Cons)</span>
           </div>
 
-          {filteredTrainees.length === 0 ? (
+          {processedTrainees.length === 0 ? (
+            <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-3">
+              <Users className="w-12 h-12 text-slate-400 mx-auto" />
+              <h3 className="font-bold text-slate-800 text-sm">
+                {!isAdmin ? "No Enrolled Learners Found for Your Assigned Subjects" : "No Enrolled Trainees Found"}
+              </h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                {!isAdmin 
+                  ? "You have not been assigned to any course subjects yet, or no trainees are enrolled in your assigned subjects. Once course subjects are assigned by an administrator, real-time learner diagnostics and test analytics will appear here."
+                  : "No trainees are currently enrolled in any active courses."}
+              </p>
+            </div>
+          ) : filteredTrainees.length === 0 ? (
             <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-3">
               <Users className="w-12 h-12 text-slate-400 mx-auto" />
               <h3 className="font-bold text-slate-800 text-sm">No Trainees Match Selected Filter Criteria</h3>
@@ -798,6 +1024,8 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             </div>
           )}
         </div>
+      )}
+      </>
       )}
 
       {/* ═════════ 5. TRAINEE PERFORMANCE DOSSIER & DIAGNOSTIC MODAL ═════════ */}

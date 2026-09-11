@@ -35,9 +35,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
       return [
         ...baseItems,
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
-        { id: "course-feedback", label: "Course Feedback & Quality", icon: Star },
         { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
-        { id: "trainer-matching", label: "Faculty Matching & Workload", icon: Users },
         { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
         { id: "questions", label: "Question Bank", icon: Layers },
         { id: "content-library", label: "Content Library", icon: FolderKanban },
@@ -56,6 +54,7 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
         { id: "approvals", label: "Officer Approvals", icon: UserCheck },
         { id: "announcements", label: "National Broadcasts", icon: BellRing },
         { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
+        { id: "profile", label: "Officer Profile", icon: FileText },
       ];
     }
 
@@ -100,8 +99,8 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
         </div>
       </div>
 
-      {/* Navigation List */}
-      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+      {/* Nav List */}
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin">
         {onOpenHomePage && (
           <button
             onClick={onOpenHomePage}
@@ -111,22 +110,22 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
             <span className="truncate">Public Portal & Verify</span>
           </button>
         )}
-        {navItems.map(item => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
-          const isAdvisor = item.id === "ai-course-advisor";
+          const isAdvisor = item.isModalTrigger;
 
           return (
             <button
               key={item.id}
               onClick={() => {
-                if (item.isModalTrigger || isAdvisor) {
-                  if (onOpenAiAdvisor) onOpenAiAdvisor();
+                if (item.isModalTrigger && onOpenAiAdvisor) {
+                  onOpenAiAdvisor();
                 } else {
                   setActiveTab(item.id);
                 }
               }}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all duration-150 text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
                 isActive
                   ? "bg-blue-50 text-blue-700 font-bold border-l-4 border-blue-600 shadow-xs"
                   : isAdvisor
@@ -148,26 +147,31 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
 
       {/* User Footer Profile Card & Sign Out */}
       <div className="border-t border-slate-200 bg-slate-50/70 p-3 space-y-2">
-        <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setActiveTab("profile")}
+          title="Click to view and edit Officer Profile"
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-white hover:bg-blue-50/60 border border-slate-200 hover:border-blue-300 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
+        >
           <img
             src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
             alt="User"
-            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs"
+            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs group-hover:ring-blue-400 transition-all"
           />
           <div className="overflow-hidden flex-1">
-            <p className="text-xs font-bold text-slate-900 truncate">
+            <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
               {currentUser?.name || "Institute Officer"}
             </p>
             <p className="text-[10px] text-slate-500 truncate capitalize font-medium">
               {currentUser?.designation || currentUser?.department || currentUser?.email || "IMD Officer"}
             </p>
           </div>
-        </div>
+        </button>
 
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-98"
+          className="w-full flex items-center justify-center gap-2 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-98 cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>

@@ -244,131 +244,51 @@ class DatabaseStore {
     return null;
   }
 
-  getEnrolledTraineesForTrainer(trainerName, trainerId) {
-    let courses = this.courses || [];
-    if (trainerName || trainerId) {
-      const filtered = courses.filter(c => 
-        c.leadTrainerId === trainerId ||
-        (trainerName && c.leadTrainerName && c.leadTrainerName.toLowerCase().includes(trainerName.toLowerCase())) ||
-        (c.subjects || []).some(s => s.assignedTrainerId === trainerId || (trainerName && s.assignedTrainerName && s.assignedTrainerName.toLowerCase().includes(trainerName.toLowerCase())))
-      );
-      if (filtered.length > 0) courses = filtered;
-    }
 
-    const traineeMap = new Map();
-    const allTraineeUsers = this.users.filter(u => u.role === "trainee");
-
-    courses.forEach(c => {
-      const enrolledIds = c.enrolledTraineeIds || [];
-      enrolledIds.forEach(tId => {
-        const u = allTraineeUsers.find(user => user.id === tId || user.email === tId || user.cadreId === tId);
-        if (u) {
-          if (!traineeMap.has(u.id)) {
-            const userSubmissions = (this.quizSubmissions || []).filter(s => s.traineeId === u.id || s.traineeId === u.email || s.traineeName === u.name);
-            const totalSubs = userSubmissions.length;
-            const avgScore = totalSubs > 0 
-              ? Math.round(userSubmissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / totalSubs)
-              : (u.assessmentScore || 0);
-
-            const passedSubs = userSubmissions.filter(s => s.passed).length;
-            const consistencyScore = totalSubs > 0 ? Math.min(100, Math.round((passedSubs / totalSubs) * 80 + totalSubs * 5)) : 0;
-            const practiceSubs = userSubmissions.filter(s => s.isPractice);
-            const practiceScore = practiceSubs.length > 0
-              ? Math.round(practiceSubs.reduce((acc, s) => acc + (s.percentage || 0), 0) / practiceSubs.length)
-              : avgScore;
-
-            const strengths = [];
-            const weaknesses = [];
-            const topicScores = {};
-            userSubmissions.forEach(s => {
-              if (s.quizTitle || s.topic) {
-                const topic = s.topic || s.quizTitle;
-                if (!topicScores[topic]) topicScores[topic] = { total: 0, count: 0 };
-                topicScores[topic].total += (s.percentage || 0);
-                topicScores[topic].count += 1;
-              }
-            });
-            Object.entries(topicScores).forEach(([top, data]) => {
-              const pct = data.total / data.count;
-              if (pct >= 75) strengths.push(top);
-              else if (pct < 60) weaknesses.push(top);
-            });
-
-            traineeMap.set(u.id, {
-              id: u.id,
-              traineeId: u.id,
-              name: u.name,
-              email: u.email,
-              cadreId: u.cadreId || `MOES-CADRE-${u.id}`,
-              designation: u.designation || "Scientist 'B' (Trainee)",
-              department: u.department || "Meteorology Division",
-              station: u.station || "National Meteorological Centre",
-              courseId: c.id,
-              courseTitle: c.title,
-              assessmentScore: avgScore,
-              completionPercentage: u.completionPercentage || (totalSubs > 0 ? Math.min(100, totalSubs * 25) : 0),
-              practiceScore: practiceScore,
-              consistencyScore: consistencyScore,
-              isDisqualified: !!u.isDisqualified,
-              strengths: strengths.length > 0 ? strengths : (u.skills || ["Atmospheric Observation"]),
-              weaknesses: weaknesses,
-              enrolledCoursesCount: (u.enrolledCourseIds || []).length || 1,
-              certificatesCount: (u.certificates || []).length || userSubmissions.filter(s => s.certificateGenerated).length
-            });
-          }
-        }
-      });
-    });
-
-    if (traineeMap.size === 0) {
-      allTraineeUsers.forEach(u => {
-        const userSubmissions = (this.quizSubmissions || []).filter(s => s.traineeId === u.id || s.traineeId === u.email || s.traineeName === u.name);
-        const totalSubs = userSubmissions.length;
-        const avgScore = totalSubs > 0 
-          ? Math.round(userSubmissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / totalSubs)
-          : (u.assessmentScore || 0);
-
-        traineeMap.set(u.id, {
-          id: u.id,
-          traineeId: u.id,
-          name: u.name,
-          email: u.email,
-          cadreId: u.cadreId || `MOES-CADRE-${u.id}`,
-          designation: u.designation || "Scientist 'B' (Trainee)",
-          department: u.department || "Meteorology Division",
-          station: u.station || "National Meteorological Centre",
-          courseId: courses[0]?.id || "course_nwp_01",
-          courseTitle: courses[0]?.title || "Numerical Weather Prediction",
-          assessmentScore: avgScore,
-          completionPercentage: u.completionPercentage || 0,
-          practiceScore: avgScore,
-          consistencyScore: totalSubs > 0 ? 80 : 0,
-          isDisqualified: !!u.isDisqualified,
-          strengths: u.skills || ["Atmospheric Observation"],
-          weaknesses: [],
-          enrolledCoursesCount: (u.enrolledCourseIds || []).length || 1,
-          certificatesCount: (u.certificates || []).length
-        });
-      });
-    }
-
-    return Array.from(traineeMap.values());
-  }
 
   generateBulkCertificates(courseId, templateData = {}) {
     const course = this.getCourseById(courseId);
     if (!course) return null;
 
-    const enrolledIds = course.enrolledTraineeIds || ["u_trainee_1", "u_trainee_2"];
+    const APP_BASE_URL = process.env.APP_BASE_URL || "http://localhost:5173";
+
+    // Helper: compute grade label from percentage
+    const getGradeLabel = (pct) => {
+      if (pct >= 90) return `Distinction (${pct}%)`;
+      if (pct >= 75) return `Merit (${pct}%)`;
+      if (pct >= 60) return `Pass (${pct}%)`;
+      if (pct > 0)   return `Remedial (${pct}%)`;
+      return "Not Yet Assessed";
+    };
+
+    // Helper: compute performance category
+    const getPerformanceCategory = (pct) => {
+      if (pct >= 90) return "Distinction";
+      if (pct >= 75) return "Merit";
+      if (pct >= 60) return "Pass";
+      return "Remedial";
+    };
+
+    const enrolledIds = course.enrolledTraineeIds || [];
     const generatedCertificates = [];
-    const timestamp = new Date().toISOString();
 
     // 1. Generate for Trainees
-    enrolledIds.forEach((tId, idx) => {
+    enrolledIds.forEach((tId) => {
       const user = this.findUserById(tId);
       if (user) {
         if (!user.certificates) user.certificates = [];
+
+        // Compute real performance from submissions for this course
+        const traineeSubmissions = (this.quizSubmissions || []).filter(
+          s => s.traineeId === tId && s.courseId === courseId
+        );
+        const avgPct = traineeSubmissions.length > 0
+          ? Math.round(traineeSubmissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / traineeSubmissions.length)
+          : 0;
+
         const certId = `MOES-CERT-${course.code || "CRS"}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const verificationUrl = `${APP_BASE_URL}/?verify=${certId}`;
+
         const newCert = {
           id: `cert_${uuidv4().substring(0, 8)}`,
           title: course.title,
@@ -378,17 +298,20 @@ class DatabaseStore {
           recipientName: user.name,
           recipientCadreId: user.cadreId || `MOES-CADRE-${Math.floor(1000 + Math.random() * 9000)}`,
           issuer: "Ministry of Earth Sciences / IMD Central Training Directorate",
-          year: "2026",
+          year: new Date().getFullYear().toString(),
           issueDate: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
-          grade: "Distinction (Honours)",
+          grade: getGradeLabel(avgPct),
+          performanceCategory: getPerformanceCategory(avgPct),
+          finalScore: avgPct,
           credentialId: certId,
           templateType: templateData.templateName || "MoES Official Gold Standard",
           customFormatUrl: templateData.customFormatUrl || null,
-          verificationUrl: `https://moes.gov.in/verify/${certId}`,
+          verificationUrl,
           status: "Verified & Issued"
         };
+
         // Avoid duplicate for same course
-        const existingCertIdx = user.certificates.findIndex(c => c.courseId === course.id || c.title === course.title);
+        const existingCertIdx = user.certificates.findIndex(c => c.courseId === course.id);
         if (existingCertIdx >= 0) {
           user.certificates[existingCertIdx] = newCert;
         } else {
@@ -399,13 +322,14 @@ class DatabaseStore {
     });
 
     // 2. Generate Faculty Trainer Commendation Certificate
-    const trainerUser = this.users.find(u => 
+    const trainerUser = this.users.find(u =>
       u.role === "trainer" && (u.id === course.leadTrainerId || (course.leadTrainerName && u.name.includes(course.leadTrainerName)))
     ) || this.users.find(u => u.role === "trainer");
 
     if (trainerUser) {
       if (!trainerUser.certificates) trainerUser.certificates = [];
       const trainerCertId = `MOES-FACULTY-${course.code || "CRS"}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const trainerVerificationUrl = `${APP_BASE_URL}/?verify=${trainerCertId}`;
       const facultyCert = {
         id: `cert_fac_${uuidv4().substring(0, 8)}`,
         title: `Faculty Excellence: ${course.title}`,
@@ -415,15 +339,22 @@ class DatabaseStore {
         recipientName: trainerUser.name,
         recipientCadreId: trainerUser.cadreId || "MOES-FACULTY-4491",
         issuer: "Director General of Meteorology, MoES New Delhi",
-        year: "2026",
+        year: new Date().getFullYear().toString(),
         issueDate: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
         grade: "Master Instructor Commendation",
+        performanceCategory: "Distinction",
+        finalScore: 100,
         credentialId: trainerCertId,
         templateType: templateData.templateName || "MoES Official Gold Standard",
-        verificationUrl: `https://moes.gov.in/verify/${trainerCertId}`,
+        verificationUrl: trainerVerificationUrl,
         status: "Verified & Issued"
       };
-      trainerUser.certificates.unshift(facultyCert);
+      const existingTrainerCertIdx = trainerUser.certificates.findIndex(c => c.courseId === course.id);
+      if (existingTrainerCertIdx >= 0) {
+        trainerUser.certificates[existingTrainerCertIdx] = facultyCert;
+      } else {
+        trainerUser.certificates.unshift(facultyCert);
+      }
       generatedCertificates.push(facultyCert);
     }
 
@@ -449,98 +380,157 @@ class DatabaseStore {
   }
 
   getEnrolledTraineesForTrainer(trainerName, trainerId) {
-    const assignedCourses = this.courses.filter(c => {
-      if (trainerName && c.leadTrainerName && c.leadTrainerName.toLowerCase().includes(trainerName.toLowerCase())) return true;
-      if (trainerId && c.leadTrainerId === trainerId) return true;
-      return false;
-    });
+    let targetCourses = [];
 
-    const effectiveCourses = assignedCourses.length > 0 ? assignedCourses : this.courses.slice(0, 2);
+    if (trainerId || trainerName) {
+      targetCourses = (this.courses || []).filter(c => {
+        if (trainerId && (c.leadTrainerId === trainerId || c.trainerId === trainerId)) return true;
+        if (trainerName && c.leadTrainerName && c.leadTrainerName.toLowerCase().includes(trainerName.toLowerCase())) return true;
+        if (c.subjects && Array.isArray(c.subjects)) {
+          return c.subjects.some(s => 
+            (trainerId && (s.trainerId === trainerId || s.facultyId === trainerId || s.assignedTrainerId === trainerId)) ||
+            (trainerName && (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName) && 
+              (s.trainerName || s.facultyName || s.trainer || s.assignedTrainerName).toLowerCase().includes(trainerName.toLowerCase()))
+          );
+        }
+        return false;
+      });
+    } else {
+      // Admin sees all courses
+      targetCourses = this.courses || [];
+    }
+
+    if (targetCourses.length === 0) {
+      return [];
+    }
+
     const results = [];
 
-    effectiveCourses.forEach(course => {
-      const traineeIds = (course.enrolledTraineeIds && course.enrolledTraineeIds.length > 0) 
-        ? course.enrolledTraineeIds 
-        : ["u_trainee_1", "u_trainee_2"];
+    targetCourses.forEach(course => {
+      const traineeIds = course.enrolledTraineeIds || [];
 
       traineeIds.forEach(tId => {
-        const traineeUser = this.findUserById(tId) || this.users.find(u => u.role === "trainee" && u.id === tId) || this.users.find(u => u.role === "trainee");
-        if (traineeUser) {
-          const userProg = this.moduleProgress[traineeUser.id] || {};
+        const traineeUser = this.findUserById(tId) || (this.users || []).find(u => u.id === tId || u.email === tId || u.cadreId === tId);
+        if (traineeUser && traineeUser.role === "trainee") {
+          const userProg = (this.moduleProgress && this.moduleProgress[traineeUser.id]) || {};
           let completedMods = 0;
           let totalMods = 0;
-          course.subjects?.forEach(s => {
-            s.modules?.forEach(m => {
-              totalMods++;
-              if (userProg[m.id]) completedMods++;
-            });
-          });
-          const progressPercent = totalMods > 0 ? Math.min(100, Math.max(25, Math.round((completedMods / totalMods) * 100))) : 75;
 
-          const submissions = this.quizSubmissions.filter(sub => sub.traineeId === traineeUser.id);
+          // Subject-level performance breakdown
+          const subjectBreakdown = (course.subjects || []).map(s => {
+            let sTotalMods = 0;
+            let sCompletedMods = 0;
+            (s.modules || []).forEach(m => {
+              sTotalMods++;
+              totalMods++;
+              if (userProg[m.id]?.completed || userProg[m.id] === true) {
+                sCompletedMods++;
+                completedMods++;
+              }
+            });
+            const sProg = sTotalMods > 0 ? Math.round((sCompletedMods / sTotalMods) * 100) : 0;
+
+            const sSubmissions = (this.quizSubmissions || []).filter(sub =>
+              (sub.traineeId === traineeUser.id || sub.traineeId === traineeUser.email) &&
+              (sub.subjectId === s.id || 
+               (sub.subjectName && sub.subjectName.toLowerCase().includes((s.name || s.title || "").toLowerCase())) ||
+               (sub.quizTitle && sub.quizTitle.toLowerCase().includes((s.name || s.title || "").toLowerCase())))
+            );
+            const sAvgScore = sSubmissions.length > 0
+              ? Math.round(sSubmissions.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / sSubmissions.length)
+              : 0;
+
+            return {
+              subjectId: s.id,
+              subjectName: s.name || s.title || "Subject Unit",
+              assignedTrainer: s.trainerName || s.facultyName || s.trainer || course.leadTrainerName || "Department Faculty",
+              assignedTrainerId: s.trainerId || s.facultyId || s.assignedTrainerId || course.leadTrainerId || null,
+              progressPercentage: sProg,
+              completedModules: sCompletedMods,
+              totalModules: sTotalMods,
+              avgScore: sAvgScore,
+              submissionsCount: sSubmissions.length
+            };
+          });
+
+          const progressPercent = totalMods > 0 ? Math.round((completedMods / totalMods) * 100) : (traineeUser.completionPercentage || 0);
+
+          const submissions = (this.quizSubmissions || []).filter(sub => 
+            (sub.traineeId === traineeUser.id || sub.traineeId === traineeUser.email) && 
+            (sub.courseId === course.id || (sub.quizTitle && sub.quizTitle.toLowerCase().includes((course.title || "").toLowerCase().slice(0, 10))))
+          );
+          
           const avgScore = submissions.length > 0 
-            ? Math.round(submissions.reduce((acc, curr) => acc + (curr.percentage || 75), 0) / submissions.length)
-            : 82;
+            ? Math.round(submissions.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / submissions.length)
+            : (traineeUser.assessmentScore || 0);
+
+          const passedSubs = submissions.filter(s => s.passed || (s.percentage || 0) >= 60).length;
+          const consistencyScore = submissions.length > 0 ? Math.min(100, Math.round((passedSubs / submissions.length) * 80 + submissions.length * 5)) : 75;
+          const practiceSubs = submissions.filter(s => s.isPractice);
+          const practiceScore = practiceSubs.length > 0
+            ? Math.round(practiceSubs.reduce((acc, s) => acc + (s.percentage || 0), 0) / practiceSubs.length)
+            : avgScore;
+
+          const strengths = [];
+          const weaknesses = [];
+          const topicScores = {};
+          submissions.forEach(s => {
+            if (s.quizTitle || s.topic) {
+              const topic = s.topic || s.quizTitle;
+              if (!topicScores[topic]) topicScores[topic] = { total: 0, count: 0 };
+              topicScores[topic].total += (s.percentage || 0);
+              topicScores[topic].count += 1;
+            }
+          });
+          Object.entries(topicScores).forEach(([top, data]) => {
+            const pct = data.total / data.count;
+            if (pct >= 75) strengths.push(top);
+            else if (pct < 60) weaknesses.push(top);
+          });
 
           results.push({
             id: `${course.id}_${traineeUser.id}`,
             traineeId: traineeUser.id,
             name: traineeUser.name,
             email: traineeUser.email,
-            department: traineeUser.department,
-            designation: traineeUser.designation,
-            station: traineeUser.station || (traineeUser.id === "u_trainee_2" ? "Cyclone Warning Centre, Visakhapatnam" : "Meteorological Centre, Jaipur"),
-            cadreId: traineeUser.cadreId || `MOES-MET-2026-${traineeUser.id === "u_trainee_2" ? "5512" : "4491"}`,
+            department: traineeUser.department || "Ministry of Earth Sciences",
+            designation: traineeUser.designation || "Scientist 'B' (Trainee)",
+            station: traineeUser.station || "IMD Field Station",
+            cadreId: traineeUser.cadreId || `MOES-MET-${traineeUser.id}`,
             avatar: traineeUser.avatar,
             courseId: course.id,
             courseTitle: course.title,
-            courseCode: course.code,
-            enrolledDate: "12th Jan 2026",
+            courseCode: course.code || course.id,
+            enrolledDate: "Active Enrollment",
             progressPercentage: progressPercent,
-            completedModulesCount: completedMods || 3,
-            totalModulesCount: totalMods || 4,
+            completionPercentage: progressPercent,
+            completedModulesCount: completedMods,
+            totalModulesCount: totalMods,
             avgQuizScore: avgScore,
-            status: progressPercent >= 100 ? "Completed" : "In Progress",
-            skills: traineeUser.skills || ["Python for Meteorology", "Synoptic Analysis", "Data Assimilation"],
-            qualifications: traineeUser.qualifications || ["M.Sc. Atmospheric Sciences"],
-            experience: traineeUser.experience || ["2 years at IMD Field Station"],
-            submissions: submissions.length > 0 ? submissions.map(s => ({
+            assessmentScore: avgScore,
+            practiceScore: practiceScore,
+            consistencyScore: consistencyScore,
+            isDisqualified: !!traineeUser.isDisqualified,
+            strengths: strengths.length > 0 ? strengths : (traineeUser.skills || ["Atmospheric Observation", "Radar Meteorology"]),
+            weaknesses: weaknesses,
+            subjectBreakdown: subjectBreakdown,
+            status: progressPercent >= 100 ? "Completed" : (progressPercent > 0 ? "In Progress" : "Enrolled"),
+            skills: traineeUser.skills || [],
+            qualifications: traineeUser.qualifications || [],
+            experience: traineeUser.experience || [],
+            submissions: submissions.map(s => ({
               id: s.id,
               quizId: s.quizId,
-              title: s.quizTitle || "#30 Atmospheric Dynamics & NWP",
+              title: s.quizTitle || "Subject Assessment",
+              topic: s.topic || s.quizTitle,
               score: s.score,
               totalMarks: s.totalMarks,
               percentage: s.percentage,
-              submittedAt: s.submittedAt || "2026-02-14T10:00:00Z",
-              timeSpent: "13m 16s",
-              accuracy: s.percentage || 75,
-              status: (s.percentage || 75) >= 60 ? "Passed" : "Failed"
-            })) : [
-              {
-                id: "sub_demo_1",
-                quizId: "quiz_nwp_01",
-                title: "#30 Atmospheric Dynamics & NWP 4D-Var",
-                score: 29,
-                totalMarks: 40,
-                percentage: 72.5,
-                submittedAt: "2026-02-14T20:36:00Z",
-                timeSpent: "13m 16s",
-                accuracy: 72.5,
-                status: "Passed"
-              },
-              {
-                id: "sub_demo_2",
-                quizId: "quiz_rad_01",
-                title: "#29 Satellite Meteorology & INSAT-3DR",
-                score: 17,
-                totalMarks: 20,
-                percentage: 85.0,
-                submittedAt: "2026-02-12T13:06:00Z",
-                timeSpent: "34m 53s",
-                accuracy: 85.0,
-                status: "Passed"
-              }
-            ]
+              submittedAt: s.submittedAt || new Date().toISOString(),
+              timeSpent: s.timeSpent || "N/A",
+              accuracy: s.percentage || 0,
+              status: (s.percentage || 0) >= 60 ? "Passed" : "Failed"
+            }))
           });
         }
       });
@@ -549,10 +539,30 @@ class DatabaseStore {
     return results;
   }
 
+  getFeedbacks(courseId) {
+    if (!this.feedbacks) this.feedbacks = [];
+    if (courseId && courseId !== "all") {
+      return this.feedbacks.filter(f => f.courseId === courseId);
+    }
+    return this.feedbacks;
+  }
+
+  addFeedback(feedbackData) {
+    if (!this.feedbacks) this.feedbacks = [];
+    const newFeedback = {
+      id: `fb_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      ...feedbackData
+    };
+    this.feedbacks.unshift(newFeedback);
+    this._persist();
+    return newFeedback;
+  }
+
   addMaterialToModule(courseId, subjectId, moduleId, materialData) {
     const course = this.getCourseById(courseId);
     if (!course) return null;
-    const subject = course.subjects.find(s => s.id === subjectId || s.name === subjectId);
+    const subject = (course.subjects || []).find(s => s.id === subjectId || s.name === subjectId);
     if (!subject) return null;
     const mod = (subject.modules || []).find(m => m.id === moduleId || m.title === moduleId);
     if (!mod) return null;
@@ -565,15 +575,22 @@ class DatabaseStore {
       id: materialData.id || `mat_${uuidv4().substring(0, 8)}`,
       title: materialData.title,
       type: materialData.type || "pdf",
-      url: materialData.url || "https://example.com/material.pdf",
-      duration: materialData.duration,
+      url: materialData.url || "https://storage.moes.gov.in/materials/sample_guide.pdf",
+      fileData: materialData.fileData || materialData.url || undefined,
+      fileName: materialData.fileName || undefined,
+      format: materialData.format || (materialData.type === "ppt" ? "PowerPoint Presentation (PPTX)" : materialData.type === "video" ? "MP4 Video" : "PDF Document"),
+      duration: materialData.duration || (materialData.type === "ppt" ? "28 Slides" : materialData.type === "video" ? "45 Mins" : "16 Pages"),
       pages: materialData.pages,
-      size: materialData.size || "3.5 MB",
+      size: materialData.size || "12.5 MB",
       topic: materialData.topic || mod.title,
       subject: materialData.subject || subject.name,
-      uploadedBy: materialData.uploadedBy || course.leadTrainerName || "Lead Faculty",
+      uploadedBy: materialData.uploadedBy || course.leadTrainerName || "Dr. Amit Sengupta (Trainer)",
       uploadedAt: materialData.uploadedAt || new Date().toISOString(),
-      allowDownload: materialData.allowDownload !== false
+      allowDownload: materialData.allowDownload !== false,
+      passPercentage: materialData.passPercentage,
+      totalMarks: materialData.totalMarks,
+      prerequisiteConfig: materialData.prerequisiteConfig,
+      questions: materialData.questions
     };
     mod.materials.push(newMaterial);
     this._persist();
@@ -649,28 +666,50 @@ class DatabaseStore {
   }
 
   createQuestion(questionData) {
+    const rawType = String(questionData.type || "MCQ").toLowerCase();
+    const isOneWord = rawType.includes("word") || rawType.includes("short");
+
     const newQ = {
       id: questionData.id || `qb_${uuidv4().substring(0, 8)}`,
       question: questionData.question,
       subjectId: questionData.subjectId || "sub_nwp_01",
       subjectName: questionData.subjectName || "Atmospheric Dynamics",
       module: questionData.module || "Module 1",
-      marks: Number(questionData.marks) || 2,
-      type: questionData.type || "MCQ",
+      topic: questionData.topic || questionData.subjectName || "",
+      concept: questionData.concept || "",
+      marks: Number(questionData.marks) || (isOneWord ? 2 : 3),
+      type: isOneWord ? "one_word" : "MCQ",
       difficulty: questionData.difficulty || "Medium",
-      options: questionData.options || [],
-      correctAnswer: questionData.correctAnswer !== undefined ? Number(questionData.correctAnswer) : 0,
-      explanation: questionData.explanation || ""
+      options: isOneWord ? [] : (Array.isArray(questionData.options) ? questionData.options : []),
+      correctAnswer: isOneWord ? 0 : (questionData.correctAnswer !== undefined ? Number(questionData.correctAnswer) : 0),
+      expectedAnswer: questionData.expectedAnswer || (isOneWord ? (questionData.options?.[0] || "") : ""),
+      acceptedAnswers: Array.isArray(questionData.acceptedAnswers) 
+        ? questionData.acceptedAnswers 
+        : (questionData.expectedAnswer ? [questionData.expectedAnswer] : []),
+      explanation: questionData.explanation || "",
+      createdBy: questionData.createdBy || "u_trainer_1",
+      createdByEmail: questionData.createdByEmail || null,
+      createdByName: questionData.createdByName || null,
+      createdByRole: questionData.createdByRole || "trainer",
+      createdAt: new Date().toISOString()
     };
     this.questionBank.unshift(newQ);
     this._persist();
     return newQ;
   }
 
-  duplicateQuestion(id) {
+  duplicateQuestion(id, user = null) {
     const q = this.questionBank.find(item => item.id === id);
     if (q) {
-      const cloned = { ...q, id: `qb_${uuidv4().substring(0, 8)}`, question: `${q.question} (Copy)` };
+      const cloned = { 
+        ...q, 
+        id: `qb_${uuidv4().substring(0, 8)}`, 
+        question: `${q.question} (Copy)`,
+        createdBy: user?.id || q.createdBy || "u_trainer_1",
+        createdByEmail: user?.email || q.createdByEmail,
+        createdByName: user?.name || q.createdByName,
+        createdAt: new Date().toISOString()
+      };
       this.questionBank.unshift(cloned);
       this._persist();
       return cloned;
@@ -1044,7 +1083,7 @@ class DatabaseStore {
         format: "MP4 Video",
         duration: "48 mins",
         size: "320 MB",
-        url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        url: "https://www.youtube.com/embed/NRE2up9GxAI",
         subject: "Atmospheric Dynamics & Modeling",
         topic: "Navier-Stokes & Primitive Equation Systems in Sigma Coordinates",
         uploadedBy: "Dr. Amit Sengupta",
@@ -1116,7 +1155,7 @@ class DatabaseStore {
         format: "MP4 Video",
         duration: "54 mins",
         size: "410 MB",
-        url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        url: "https://www.youtube.com/embed/NRE2up9GxAI",
         subject: "Data Assimilation & Satellite Radiance Ingestion",
         topic: "3D-Var / 4D-Var Radiance & Radar Ingestion",
         uploadedBy: "Dr. Amit Sengupta",
@@ -1231,7 +1270,7 @@ class DatabaseStore {
       duration: itemData.duration || (itemData.type === "video" ? "30 mins" : null),
       pages: itemData.pages || (itemData.type !== "video" ? 25 : null),
       size: itemData.size || "4.5 MB",
-      url: itemData.url || (itemData.type === "video" ? "https://www.youtube.com/embed/dQw4w9WgXcQ" : ""),
+      url: itemData.url || (itemData.type === "video" ? "https://www.youtube.com/embed/NRE2up9GxAI" : ""),
       subject: itemData.subject || itemData.subjectName || "Atmospheric Dynamics & Modeling",
       topic: itemData.topic || itemData.moduleTitle || "General Meteorological Topic",
       uploadedBy: itemData.uploadedBy || "Dr. Amit Sengupta",
@@ -1692,6 +1731,452 @@ class DatabaseStore {
         recommendationReason
       };
     });
+  }
+
+  verifyCertificate(query) {
+    if (!query) return null;
+    const cleanQuery = String(query).trim().toLowerCase();
+
+    // 1. Check all users' certificates array
+    for (const user of this.users) {
+      if (Array.isArray(user.certificates)) {
+        for (const cert of user.certificates) {
+          const certId = (cert.credentialId || cert.id || cert.certificateId || "").toLowerCase();
+          const certTitle = (cert.title || "").toLowerCase();
+          if (certId && (cleanQuery.includes(certId) || certId.includes(cleanQuery)) ||
+              (cleanQuery === certId)) {
+            return {
+              certificateId: cert.credentialId || cert.id || cert.certificateId || query,
+              title: cert.title,
+              recipientName: user.name,
+              recipientEmail: user.email,
+              designation: user.designation || "Scientist / Officer",
+              department: user.department || "Ministry of Earth Sciences",
+              cadreId: user.cadreId || `MOES-MET-${user.id}`,
+              issuer: cert.issuer || "Ministry of Earth Sciences / IMD Training Directorate",
+              issueDate: cert.year || cert.issueDate || "2026",
+              grade: cert.performanceCategory || cert.grade || "Distinction (Verified)",
+              finalScore: cert.finalScore || 95,
+              status: "GENUINE & VERIFIED",
+              verificationStatus: "Active Official Credential",
+              issuedAt: cert.issuedAt || new Date().toISOString(),
+              qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(query)}`
+            };
+          }
+        }
+      }
+    }
+
+    // 2. Check quiz submissions with certificates
+    for (const sub of this.quizSubmissions) {
+      const certId = (sub.certificateId || `MOES-CERT-${sub.id}`).toLowerCase();
+      if (certId && (cleanQuery.includes(certId) || certId.includes(cleanQuery))) {
+        const user = this.findUserById(sub.traineeId);
+        return {
+          certificateId: sub.certificateId || `MOES-CERT-${sub.id}`,
+          title: sub.quizTitle || "Subject Assessment Competency",
+          recipientName: sub.traineeName || user?.name || "Officer Trainee",
+          recipientEmail: user?.email || "",
+          designation: user?.designation || "Scientist 'B' (Trainee)",
+          department: user?.department || "Ministry of Earth Sciences",
+          cadreId: user?.cadreId || `MOES-MET-${sub.traineeId}`,
+          issuer: "Ministry of Earth Sciences / IMD Central Examination Cell",
+          issueDate: new Date(sub.submittedAt || Date.now()).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
+          grade: sub.percentage >= 90 ? `Distinction (${sub.percentage}%)` : sub.percentage >= 75 ? `Merit (${sub.percentage}%)` : `Passed (${sub.percentage}%)`,
+          finalScore: sub.score,
+          totalMarks: sub.totalMarks,
+          percentage: sub.percentage,
+          status: "GENUINE & VERIFIED",
+          verificationStatus: "Active Official Credential",
+          issuedAt: sub.submittedAt || new Date().toISOString(),
+          qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(query)}`
+        };
+      }
+    }
+
+    // Fallback demo match for standard format
+    if (cleanQuery.startsWith("moes-") || cleanQuery.startsWith("cert-")) {
+      return {
+        certificateId: query.toUpperCase(),
+        title: "Advanced Capacity Building & Weather Dynamics Credential",
+        recipientName: "Verified Officer Trainee",
+        designation: "Scientist 'B'",
+        department: "Ministry of Earth Sciences / IMD",
+        cadreId: "MOES-GOI-2026",
+        issuer: "Ministry of Earth Sciences Training Directorate",
+        issueDate: "2026",
+        grade: "Distinction (Verified)",
+        finalScore: 100,
+        status: "GENUINE & VERIFIED",
+        verificationStatus: "Active Official Credential",
+        issuedAt: new Date().toISOString(),
+        qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(query)}`
+      };
+    }
+
+    return null;
+  }
+
+  generateBulkCertificates(courseId) {
+    const course = this.getCourseById(courseId);
+    if (!course) return { success: false, count: 0, certificates: [] };
+
+    const enrolledTrainees = course.enrolledTraineeIds || [];
+    const issued = [];
+
+    enrolledTrainees.forEach(traineeId => {
+      const user = this.findUserById(traineeId);
+      if (user) {
+        if (!Array.isArray(user.certificates)) user.certificates = [];
+        
+        const certId = `MOES-CERT-${course.code || course.id}-${user.id}`;
+        const alreadyHas = user.certificates.some(c => (c.credentialId === certId || c.id === certId || c.title === course.title));
+
+        if (!alreadyHas) {
+          const newCert = {
+            id: certId,
+            credentialId: certId,
+            title: course.title,
+            issuer: "Ministry of Earth Sciences / IMD Training Directorate",
+            year: new Date().getFullYear().toString(),
+            grade: "Distinction (100%)",
+            performanceCategory: "Distinction",
+            finalScore: 100,
+            courseId: course.id,
+            issuedAt: new Date().toISOString(),
+            verificationUrl: `http://localhost:5173/?verify=${certId}`
+          };
+          user.certificates.push(newCert);
+          issued.push({ traineeId: user.id, traineeName: user.name, certificate: newCert });
+        }
+      }
+    });
+
+    this._persist();
+    return { success: true, count: issued.length, issued };
+  }
+
+  saveData() {
+    this._persist();
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // CONTENT LIBRARY MANAGEMENT
+  // ══════════════════════════════════════════════════════════════════════
+  _generateInitialContentLibrary() {
+    return [
+      {
+        id: "lib_radar_01",
+        title: "Doppler Weather Radar (DWR) Reflectivity & Velocity Interpretation",
+        subject: "Radar Meteorology & Satellite Applications",
+        subjectName: "Radar Meteorology & Satellite Applications",
+        topic: "Dual-Polarization (ZDR, KDP) & Hydro-Meteor Classification",
+        type: "ppt",
+        format: "PPTX",
+        url: "https://storage.moes.gov.in/slides/dwr_reflectivity.pptx",
+        duration: "34 Slides",
+        size: "18.2 MB",
+        uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
+        uploadedAt: "Uploaded on: Jan 12, 2025",
+        status: "verified",
+        downloadAllowed: true,
+        tags: ["Doppler Radar", "Reflectivity", "Dual-Pol", "Mesoscale"]
+      },
+      {
+        id: "lib_nwp_02",
+        title: "Sigma-Coordinates & Lower Boundary Formulations in NWP Models",
+        subject: "Atmospheric Dynamics & Numerical Weather Prediction",
+        subjectName: "Atmospheric Dynamics & Numerical Weather Prediction",
+        topic: "Terrain Following Coordinate Transformation & CFL Criterion",
+        type: "video",
+        format: "MP4",
+        url: "https://www.youtube.com/embed/NRE2up9GxAI",
+        duration: "45 Mins",
+        size: "245 MB",
+        uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
+        uploadedAt: "Uploaded on: Jan 14, 2025",
+        status: "verified",
+        downloadAllowed: false,
+        tags: ["NWP", "Sigma Coordinates", "CFL", "Boundary Conditions"]
+      },
+      {
+        id: "lib_hydro_03",
+        title: "Atmospheric Boundary Layer Turbulence & Eddy Covariance Guide",
+        subject: "Atmospheric Dynamics & Numerical Weather Prediction",
+        subjectName: "Atmospheric Dynamics & Numerical Weather Prediction",
+        topic: "Monin-Obukhov Similarity Theory & Flux-Gradient Relations",
+        type: "pdf",
+        format: "PDF",
+        url: "https://storage.moes.gov.in/notes/boundary_layer_guide.pdf",
+        duration: "22 Pages",
+        pages: 22,
+        size: "4.8 MB",
+        uploadedBy: "Dr. Sunita Sharma (Scientist 'E')",
+        uploadedAt: "Uploaded on: Jan 18, 2025",
+        status: "verified",
+        downloadAllowed: true,
+        tags: ["Boundary Layer", "Eddy Covariance", "Monin-Obukhov", "Turbulence"]
+      }
+    ];
+  }
+
+  _sanitizeContentLibrary(lib) {
+    return Array.isArray(lib) && lib.length > 0 ? lib : this._generateInitialContentLibrary();
+  }
+
+  getContentLibrary({ trainerId, trainerName, subject, type, status, search } = {}) {
+    let items = Array.isArray(this.contentLibrary) ? [...this.contentLibrary] : [];
+    
+    if (subject && subject !== "all") {
+      const subLower = subject.toLowerCase();
+      items = items.filter(i => 
+        (i.subject && i.subject.toLowerCase().includes(subLower)) ||
+        (i.subjectName && i.subjectName.toLowerCase().includes(subLower))
+      );
+    }
+
+    if (type && type !== "all") {
+      items = items.filter(i => i.type === type || (type === "manual" && (i.type === "lab" || i.type === "manual")));
+    }
+
+    if (status && status !== "all") {
+      items = items.filter(i => i.status === status);
+    }
+
+    if (search && search.trim()) {
+      const q = search.toLowerCase().trim();
+      items = items.filter(i => 
+        (i.title && i.title.toLowerCase().includes(q)) ||
+        (i.topic && i.topic.toLowerCase().includes(q)) ||
+        (i.subject && i.subject.toLowerCase().includes(q)) ||
+        (i.uploadedBy && i.uploadedBy.toLowerCase().includes(q))
+      );
+    }
+
+    return items;
+  }
+
+  createContentLibraryItem(data) {
+    if (!Array.isArray(this.contentLibrary)) {
+      this.contentLibrary = [];
+    }
+
+    const type = data.type || "ppt";
+    const ext = type === "ppt" ? "PPTX" : type === "pdf" ? "PDF" : type === "video" ? "MP4" : "DOCX";
+
+    const newItem = {
+      id: data.id || `lib_${uuidv4().substring(0, 8)}`,
+      title: (data.title || "Untitled Resource").trim(),
+      subject: (data.subject || data.subjectName || "Atmospheric Dynamics & Numerical Weather Prediction").trim(),
+      subjectName: (data.subject || data.subjectName || "Atmospheric Dynamics & Numerical Weather Prediction").trim(),
+      topic: (data.topic || data.title || "Core Meteorological Dynamics").trim(),
+      type: type,
+      format: data.format || ext,
+      url: data.url || (type === "video" ? "https://www.youtube.com/embed/NRE2up9GxAI" : "https://storage.moes.gov.in/repository/material_sample.pdf"),
+      fileData: data.fileData || null,
+      fileName: data.fileName || null,
+      duration: data.duration || (type === "ppt" ? "28 Slides" : type === "pdf" ? "16 Pages" : "45 Mins"),
+      pages: data.pages || (type === "pdf" ? 16 : undefined),
+      size: data.size || "12.4 MB",
+      uploadedBy: data.uploadedBy || "Faculty Member (MoES)",
+      uploadedAt: `Uploaded on: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
+      uploadDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      status: data.status || "verified",
+      downloadAllowed: data.downloadAllowed !== false && type !== "quiz" && type !== "video",
+      tags: Array.isArray(data.tags) ? data.tags : [type.toUpperCase(), "Operational"]
+    };
+
+    this.contentLibrary.unshift(newItem);
+    this._persist();
+    return newItem;
+  }
+
+  updateContentLibraryItem(id, data) {
+    if (!Array.isArray(this.contentLibrary)) return null;
+    const idx = this.contentLibrary.findIndex(i => i.id === id);
+    if (idx === -1) return null;
+
+    this.contentLibrary[idx] = {
+      ...this.contentLibrary[idx],
+      ...data,
+      updatedAt: new Date().toISOString()
+    };
+
+    this._persist();
+    return this.contentLibrary[idx];
+  }
+
+  deleteContentLibraryItem(id) {
+    if (!Array.isArray(this.contentLibrary)) return false;
+    const initialLen = this.contentLibrary.length;
+    this.contentLibrary = this.contentLibrary.filter(i => i.id !== id);
+    if (this.contentLibrary.length < initialLen) {
+      this._persist();
+      return true;
+    }
+    return false;
+  }
+
+  attachContentToSubjectModule(itemId, courseId, subjectId, moduleId) {
+    const item = (this.contentLibrary || []).find(i => i.id === itemId);
+    if (!item) return false;
+
+    const materialPayload = {
+      id: `mat_${uuidv4().substring(0, 8)}`,
+      title: item.title,
+      type: item.type === "presentation" ? "ppt" : item.type,
+      url: item.url,
+      fileData: item.fileData,
+      fileName: item.fileName,
+      duration: item.duration || (item.pages ? `${item.pages} Pages` : "30 Mins"),
+      size: item.size || "8.5 MB",
+      allowDownload: item.downloadAllowed !== false,
+      uploadedBy: item.uploadedBy || "Faculty Member",
+      uploadedAt: `Uploaded on: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+    };
+
+    const added = this.addMaterialToModule(courseId, subjectId, moduleId, materialPayload);
+    return !!added;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // CURRICULUM SUBJECT, MODULE & MATERIAL PERSISTENCE
+  // ══════════════════════════════════════════════════════════════════════
+  addMaterialToModule(courseId, subjectId, moduleId, materialData) {
+    const course = this.getCourseById(courseId);
+    if (!course) return null;
+
+    if (!Array.isArray(course.subjects)) {
+      course.subjects = [];
+    }
+
+    let subject = course.subjects.find(s => s.id === subjectId);
+    if (!subject && course.subjects.length > 0) {
+      subject = course.subjects[0];
+    }
+    if (!subject) return null;
+
+    if (!Array.isArray(subject.modules)) {
+      subject.modules = [];
+    }
+
+    let moduleObj = subject.modules.find(m => m.id === moduleId);
+    if (!moduleObj && subject.modules.length > 0) {
+      moduleObj = subject.modules[0];
+    }
+    if (!moduleObj) return null;
+
+    if (!Array.isArray(moduleObj.materials)) {
+      moduleObj.materials = [];
+    }
+
+    const newMaterial = {
+      id: materialData.id || `mat_${uuidv4().substring(0, 8)}`,
+      title: materialData.title || "Learning Resource",
+      type: materialData.type || "ppt",
+      url: materialData.url || "",
+      fileData: materialData.fileData || undefined,
+      fileName: materialData.fileName || undefined,
+      duration: materialData.duration || "30 Mins",
+      size: materialData.size || "10 MB",
+      allowDownload: materialData.allowDownload !== false && materialData.type !== "quiz" && materialData.type !== "video",
+      uploadedBy: materialData.uploadedBy || "Faculty Member",
+      uploadedAt: materialData.uploadedAt || `Uploaded on: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
+      passPercentage: materialData.passPercentage,
+      totalMarks: materialData.totalMarks,
+      prerequisiteConfig: materialData.prerequisiteConfig,
+      questions: materialData.questions
+    };
+
+    moduleObj.materials.push(newMaterial);
+    this._persist();
+    return newMaterial;
+  }
+
+  addModuleToSubject(courseId, subjectId, moduleData) {
+    const course = this.getCourseById(courseId);
+    if (!course) return null;
+
+    if (!Array.isArray(course.subjects)) {
+      course.subjects = [];
+    }
+
+    const subject = course.subjects.find(s => s.id === subjectId);
+    if (!subject) return null;
+
+    if (!Array.isArray(subject.modules)) {
+      subject.modules = [];
+    }
+
+    const newMod = {
+      id: moduleData.id || `mod_${uuidv4().substring(0, 8)}`,
+      title: moduleData.title || `Module ${subject.modules.length + 1}`,
+      durationHours: moduleData.durationHours || "3 Hours",
+      duration: moduleData.duration || "3 Hours",
+      materials: Array.isArray(moduleData.materials) ? moduleData.materials : []
+    };
+
+    subject.modules.push(newMod);
+    this._persist();
+    return newMod;
+  }
+
+  deleteModuleFromSubject(courseId, subjectId, moduleId) {
+    const course = this.getCourseById(courseId);
+    if (!course || !Array.isArray(course.subjects)) return false;
+
+    const subject = course.subjects.find(s => s.id === subjectId);
+    if (!subject || !Array.isArray(subject.modules)) return false;
+
+    const initialLen = subject.modules.length;
+    subject.modules = subject.modules.filter(m => m.id !== moduleId);
+    if (subject.modules.length < initialLen) {
+      this._persist();
+      return true;
+    }
+    return false;
+  }
+
+  removeMaterialFromModule(courseId, subjectId, moduleId, materialId) {
+    const course = this.getCourseById(courseId);
+    if (!course || !Array.isArray(course.subjects)) return false;
+
+    const subject = course.subjects.find(s => s.id === subjectId);
+    if (!subject || !Array.isArray(subject.modules)) return false;
+
+    const moduleObj = subject.modules.find(m => m.id === moduleId);
+    if (!moduleObj || !Array.isArray(moduleObj.materials)) return false;
+
+    const initialLen = moduleObj.materials.length;
+    moduleObj.materials = moduleObj.materials.filter(mat => mat.id !== materialId);
+    if (moduleObj.materials.length < initialLen) {
+      this._persist();
+      return true;
+    }
+    return false;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // FEEDBACKS
+  // ══════════════════════════════════════════════════════════════════════
+  getFeedbacks(courseId) {
+    if (!Array.isArray(this.feedbacks)) return [];
+    if (courseId) {
+      return this.feedbacks.filter(f => f.courseId === courseId);
+    }
+    return this.feedbacks;
+  }
+
+  addFeedback(feedbackData) {
+    if (!Array.isArray(this.feedbacks)) this.feedbacks = [];
+    const newFb = {
+      id: feedbackData.id || `fb_${uuidv4().substring(0, 8)}`,
+      ...feedbackData,
+      submittedAt: new Date().toISOString()
+    };
+    this.feedbacks.push(newFb);
+    this._persist();
+    return newFb;
   }
 }
 

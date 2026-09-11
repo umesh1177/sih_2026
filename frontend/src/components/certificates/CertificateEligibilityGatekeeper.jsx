@@ -67,10 +67,11 @@ export const CertificateEligibilityGatekeeper = ({
   // Load trainee progress and submissions
   useEffect(() => {
     const loadTraineeData = async () => {
+      if (!currentUser?.id) return;
       try {
         const [progRes, subRes] = await Promise.all([
-          api.getUserProgress(currentUser?.id || "u_trainee_1").catch(() => ({ success: false })),
-          api.getTraineeSubmissions(currentUser?.id || "u_trainee_1").catch(() => ({ success: false }))
+          api.getUserProgress(currentUser.id).catch(() => ({ success: false })),
+          api.getTraineeSubmissions(currentUser.id).catch(() => ({ success: false }))
         ]);
 
         if (progRes.success && progRes.progress) setUserProgress(progRes.progress);
@@ -83,36 +84,19 @@ export const CertificateEligibilityGatekeeper = ({
     loadTraineeData();
   }, [currentUser]);
 
-  // Fallback realistic courses if empty
+  // Dynamic courses: For trainees, only show courses they are enrolled in
   const activeCourses = useMemo(() => {
-    if (courses && courses.length > 0) return courses;
-    return [
-      {
-        id: "course_nwp_01",
-        title: "Advanced Numerical Weather Prediction & Data Assimilation",
-        category: "Operational Meteorology",
-        leadTrainerName: "Dr. Amit Sengupta",
-        modulesCount: 3,
-        finalAssessmentTitle: "NWP Grid Physics & Data Assimilation Final Assessment"
-      },
-      {
-        id: "course_radar_02",
-        title: "Doppler Weather Radar (DWR) Operations & Severe Weather",
-        category: "Radar Meteorology",
-        leadTrainerName: "Dr. Priya Nair",
-        modulesCount: 4,
-        finalAssessmentTitle: "Doppler Velocity Interpretation Final Evaluation"
-      },
-      {
-        id: "course_marine_03",
-        title: "Coastal Oceanographic Modeling & Cyclone Inundation",
-        category: "Marine & Coastal",
-        leadTrainerName: "Dr. Sandeep Kulkarni",
-        modulesCount: 3,
-        finalAssessmentTitle: "Cyclone Storm Surge & Inundation Assessment"
-      }
-    ];
-  }, [courses]);
+    if (!courses || courses.length === 0) return [];
+    
+    if (currentUser?.role === "trainee") {
+      const enrolled = courses.filter(c => 
+        (c.enrolledTraineeIds || []).includes(currentUser.id) ||
+        (userProgress && Object.keys(userProgress).some(mId => (c.subjects || []).some(s => (s.modules || []).some(m => m.id === mId))))
+      );
+      return enrolled;
+    }
+    return courses;
+  }, [courses, currentUser, userProgress]);
 
   // ─── ELIGIBILITY EVALUATION PER COURSE ───
   const courseEligibilityList = useMemo(() => {
@@ -122,33 +106,29 @@ export const CertificateEligibilityGatekeeper = ({
 
       // 1. Calculate Module Completion
       let completedMods = 0;
-      let totalMods = course.modulesCount || 3;
+      let totalMods = 0;
       if (course.subjects && course.subjects.length > 0) {
         const allMods = course.subjects.flatMap(s => s.modules || []);
-        totalMods = allMods.length || totalMods;
-        completedMods = allMods.filter(m => userProgress[m.id]?.completed).length;
-      } else {
-        // Realistic simulation based on user progress
-        completedMods = courseId === "course_nwp_01" ? 3 : (courseId === "course_radar_02" ? 3 : 2);
+        totalMods = allMods.length;
+        completedMods = allMods.filter(m => userProgress[m.id]?.completed || userProgress[m.id] === true).length;
       }
-      const modulePct = totalMods > 0 ? Math.round((completedMods / totalMods) * 100) : 0;
+      if (totalMods === 0) totalMods = 1;
+      const modulePct = Math.round((completedMods / totalMods) * 100);
       const isModulesPassed = modulePct >= rules.minModuleCompletionPct;
 
       // 2. Calculate Required Assessment Pass Score
-      // Match submissions for this course
       const matchingSub = userSubmissions.find(s => 
         s.courseId === courseId || 
-        (s.quizTitle && s.quizTitle.toLowerCase().includes(course.category?.toLowerCase() || "")) ||
-        (s.quizTitle && s.quizTitle.toLowerCase().includes("nwp") && courseId === "course_nwp_01") ||
-        (s.quizTitle && s.quizTitle.toLowerCase().includes("radar") && courseId === "course_radar_02")
+        (s.quizTitle && s.quizTitle.toLowerCase().includes(course.title.toLowerCase().slice(0, 10))) ||
+        (course.subjects || []).some(sub => s.quizTitle && s.quizTitle.toLowerCase().includes(sub.name?.toLowerCase()))
       );
       
-      const assessmentScore = matchingSub ? Number(matchingSub.percentage || 85) : (courseId === "course_nwp_01" ? 88 : (courseId === "course_radar_02" ? 62 : 45));
-      const hasAttemptedAssessment = matchingSub !== undefined || courseId === "course_nwp_01" || courseId === "course_radar_02";
+      const hasAttemptedAssessment = !!matchingSub;
+      const assessmentScore = matchingSub ? Number(matchingSub.percentage || 0) : 0;
       const isAssessmentPassed = hasAttemptedAssessment && assessmentScore >= rules.minAssessmentPassScore;
 
-      // 3. Minimum Attendance / Participation
-      const attendancePct = courseId === "course_nwp_01" ? 92 : (courseId === "course_radar_02" ? 80 : 65);
+      // 3. Minimum Attendance / Participation (tied to module progress)
+      const attendancePct = modulePct;
       const isAttendancePassed = attendancePct >= rules.minAttendancePct;
 
       // 4. No Disqualification Integrity Check
@@ -157,7 +137,8 @@ export const CertificateEligibilityGatekeeper = ({
 
       // ─── OVERALL ELIGIBILITY ───
       const isEligible = isModulesPassed && isAssessmentPassed && isAttendancePassed && isIntegrityPassed;
-      const isClaimed = claimedCertificates[courseId] !== undefined;
+      const isClaimed = claimedCertificates[courseId] !== undefined || 
+        (currentUser?.certificates && currentUser.certificates.some(c => c.courseId === courseId || c.title === course.title));
 
       const unmetConditionsCount = [isModulesPassed, isAssessmentPassed, isAttendancePassed, isIntegrityPassed].filter(c => !c).length;
 
@@ -183,7 +164,7 @@ export const CertificateEligibilityGatekeeper = ({
         unmetConditionsCount
       };
     });
-  }, [activeCourses, rulesMap, userProgress, userSubmissions, claimedCertificates]);
+  }, [activeCourses, rulesMap, userProgress, userSubmissions, claimedCertificates, currentUser]);
 
   // Open Course Rule Config Modal
   const handleOpenConfigModal = (course) => {
@@ -203,23 +184,51 @@ export const CertificateEligibilityGatekeeper = ({
   };
 
   // Claim Certificate Handler
-  const handleClaim = (item) => {
-    const certId = `MOES-CERT-${Date.now().toString().slice(-6)}`;
+  const handleClaim = async (item) => {
+    const certId = `MOES-CERT-${(item.course.code || item.courseId || "ACCR").replace(/[^a-zA-Z0-9]/g, "")}-${Date.now().toString(36).toUpperCase()}`;
     const newClaimed = { ...claimedCertificates, [item.courseId]: { certId, claimedAt: new Date().toISOString() } };
     setClaimedCertificates(newClaimed);
     localStorage.setItem("moes_claimed_certs", JSON.stringify(newClaimed));
     
+    // Save to user's profile on backend
+    const newCertObj = {
+      id: certId,
+      credentialId: certId,
+      title: item.course.title,
+      courseId: item.courseId,
+      issuer: "Ministry of Earth Sciences / IMD Training Directorate",
+      year: new Date().getFullYear().toString(),
+      grade: item.telemetry.assessmentScore >= 90 ? "Distinction (90%+)" : "Merit Pass",
+      performanceCategory: item.telemetry.assessmentScore >= 90 ? "Distinction" : "Merit",
+      finalScore: item.telemetry.assessmentScore,
+      issuedAt: new Date().toISOString(),
+      verificationUrl: `${window.location.origin}/?verify=${certId}`
+    };
+
+    if (currentUser?.id) {
+      try {
+        const existingCerts = currentUser.certificates || [];
+        await api.updateProfile(currentUser.id, {
+          certificates: [...existingCerts, newCertObj]
+        });
+      } catch (e) {
+        console.warn("Could not sync claimed certificate to backend profile:", e);
+      }
+    }
+
     showToast(`🎉 Official Certificate Issued! Credential ID: ${certId}`);
 
     if (onClaimCertificate) {
       onClaimCertificate({
         credentialId: certId,
-        title: `${item.course.title} — Executive Accreditation`,
+        title: item.course.title,
         courseTitle: item.course.title,
         traineeName: currentUser?.name || "Officer Trainee",
-        grade: item.telemetry.assessmentScore >= 90 ? "Distinction (90%+)" : "First Class",
-        issueDate: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        grade: item.telemetry.assessmentScore >= 90 ? "Distinction (90%+)" : "Merit Pass",
+        performanceCategory: item.telemetry.assessmentScore >= 90 ? "Distinction" : "Merit",
+        issueDate: new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
         submission: {
+          certificateId: certId,
           score: Math.round((item.telemetry.assessmentScore / 100) * 40),
           totalMarks: 40,
           percentage: item.telemetry.assessmentScore,
@@ -303,11 +312,23 @@ export const CertificateEligibilityGatekeeper = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-5">
-          {courseEligibilityList.map(item => {
-            const { course, courseId, rules, telemetry, isEligible, isClaimed } = item;
+        {courseEligibilityList.length === 0 ? (
+          <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-sm">
+            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+              <Award className="w-8 h-8" />
+            </div>
+            <h3 className="font-extrabold text-slate-900 text-base">No Enrolled Courses Found</h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+              Certificate eligibility is tracked per enrolled course. Browse available training programs in the 
+              <span className="font-bold text-blue-600"> Courses</span> tab and enroll to track your 4-pillar compliance.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5">
+            {courseEligibilityList.map(item => {
+              const { course, courseId, rules, telemetry, isEligible, isClaimed } = item;
 
-            return (
+              return (
               <div
                 key={courseId}
                 className={`p-6 rounded-3xl border bg-white transition-all space-y-5 shadow-xs ${
@@ -541,6 +562,7 @@ export const CertificateEligibilityGatekeeper = ({
             );
           })}
         </div>
+        )}
       </div>
 
       {/* ═════════ 3. CONFIG COURSE CERTIFICATE ELIGIBILITY CRITERIA MODAL ═════════ */}

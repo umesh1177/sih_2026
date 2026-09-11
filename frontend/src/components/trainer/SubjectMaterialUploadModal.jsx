@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { 
   X, 
   Upload, 
@@ -16,7 +16,9 @@ import {
   HardDrive,
   HelpCircle,
   Lock,
-  PlusCircle
+  PlusCircle,
+  UploadCloud,
+  FileCheck
 } from "lucide-react";
 import { api } from "../../services/api";
 
@@ -29,20 +31,76 @@ export const SubjectMaterialUploadModal = ({
   onMaterialUploaded 
 }) => {
   const [selectedModuleId, setSelectedModuleId] = useState(subject?.modules?.[0]?.id || "");
-  const [materialType, setMaterialType] = useState("video"); // "video" | "quiz" | "ppt" | "pdf" | "lab"
+  const [materialType, setMaterialType] = useState("ppt"); // "ppt" | "pdf" | "video" | "quiz" | "lab"
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
-  const [duration, setDuration] = useState("45 Mins");
-  const [fileSize, setFileSize] = useState("2.4 MB");
+  const [duration, setDuration] = useState("28 Slides");
+  const [fileSize, setFileSize] = useState("14.5 MB");
   const [passPercentage, setPassPercentage] = useState(50);
   const [allowDownload, setAllowDownload] = useState(true);
   const [enablePrereqLock, setEnablePrereqLock] = useState(true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // File Upload State
+  const fileInputRef = useRef(null);
+  const [selectedFileObj, setSelectedFileObj] = useState(null);
+  const [fileDataUrl, setFileDataUrl] = useState("");
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+
   if (!isOpen || !subject) return null;
 
   const modules = subject.modules || [];
+
+  // File Selector Handler
+  const handleFileSelect = (e) => {
+    const file = e.target?.files?.[0] || e.dataTransfer?.files?.[0];
+    if (!file) return;
+
+    setSelectedFileObj(file);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    const sizeDisplay = Number(sizeMb) > 0.1 ? `${sizeMb} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+    const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
+    const ext = file.name.split('.').pop()?.toLowerCase() || "";
+
+    let inferredType = materialType;
+    let defaultDuration = duration;
+
+    if (["ppt", "pptx"].includes(ext)) {
+      inferredType = "ppt";
+      defaultDuration = "28 Slides";
+    } else if (["pdf"].includes(ext)) {
+      inferredType = "pdf";
+      defaultDuration = "16 Pages";
+    } else if (["doc", "docx"].includes(ext)) {
+      inferredType = "lab";
+      defaultDuration = "12 Pages";
+    } else if (["mp4", "webm", "mkv", "mov"].includes(ext)) {
+      inferredType = "video";
+      defaultDuration = "45 Mins";
+    }
+
+    setMaterialType(inferredType);
+    setFileSize(sizeDisplay);
+    setDuration(defaultDuration);
+    if (!title.trim()) {
+      setTitle(cleanName);
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result || "";
+      setFileDataUrl(dataUrl);
+      setUrl(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearFile = () => {
+    setSelectedFileObj(null);
+    setFileDataUrl("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
@@ -62,10 +120,14 @@ export const SubjectMaterialUploadModal = ({
         ? "https://storage.moes.gov.in/slides/atmospheric_dynamics.pptx"
         : "https://storage.moes.gov.in/notes/boundary_layer_notes.pdf";
 
+      const finalUrl = fileDataUrl || url.trim() || defaultUrl;
+
       const payload = {
         title: title.trim(),
         type: materialType,
-        url: url.trim() || defaultUrl,
+        url: finalUrl,
+        fileData: fileDataUrl || undefined,
+        fileName: selectedFileObj?.name || undefined,
         duration: duration.trim(),
         size: fileSize.trim(),
         allowDownload: materialType !== "quiz" && allowDownload,
@@ -254,10 +316,121 @@ export const SubjectMaterialUploadModal = ({
             </div>
           </div>
 
+          {/* Hidden File Input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept={
+              materialType === "ppt"
+                ? ".ppt,.pptx"
+                : materialType === "pdf"
+                ? ".pdf"
+                : materialType === "video"
+                ? ".mp4,.webm,.mkv,.mov"
+                : ".pdf,.doc,.docx,.ppt,.pptx,.mp4"
+            }
+            className="hidden"
+          />
+
+          {/* Local File Upload Dropzone (For PPT, PDF, Video, Lab Docs) */}
+          {materialType !== "quiz" && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block font-bold text-slate-700">
+                  Select Local File ({materialType === "ppt" ? "PPTX / PPT" : materialType === "pdf" ? "PDF Document" : materialType === "video" ? "MP4 Video" : "DOCX / PDF"}) *
+                </label>
+                <span className="text-[10px] text-indigo-600 font-bold">Verified for Trainee Study Studio</span>
+              </div>
+
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDraggingFile(true);
+                }}
+                onDragLeave={() => setIsDraggingFile(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDraggingFile(false);
+                  handleFileSelect(e);
+                }}
+                className={`p-4 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center ${
+                  isDraggingFile
+                    ? "border-indigo-600 bg-indigo-50 ring-2 ring-indigo-200"
+                    : selectedFileObj || fileDataUrl
+                    ? "border-emerald-400 bg-emerald-50/50"
+                    : "border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300"
+                }`}
+              >
+                {selectedFileObj ? (
+                  <div className="flex items-center justify-between gap-3 text-left">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                        <FileCheck className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900 text-xs truncate max-w-xs">{selectedFileObj.name}</p>
+                        <p className="text-[10px] text-emerald-700 font-semibold">{fileSize} • Ready to upload to module</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          fileInputRef.current?.click();
+                        }}
+                        className="px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg border border-slate-200 text-[11px]"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClearFile();
+                        }}
+                        className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <UploadCloud className="w-7 h-7 text-indigo-600 mx-auto mb-1 opacity-80" />
+                    <p className="text-xs font-bold text-slate-700">
+                      Click to browse or drop {materialType === "ppt" ? "PowerPoint (.ppt, .pptx)" : materialType === "pdf" ? "PDF Document (.pdf)" : materialType === "video" ? "MP4 Video (.mp4)" : "Lab Guide"} here
+                    </p>
+                    <p className="text-[10px] text-slate-400">File verified & preview generated automatically</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Video Stream URL Link Option */}
+              {materialType === "video" && (
+                <div className="mt-2.5">
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    Or enter Stream / Embed / YouTube URL:
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://www.youtube.com/embed/... or direct MP4 URL"
+                    value={url.startsWith("data:") ? "" : url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Title Input */}
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              {materialType === "quiz" ? "Assessment / Quiz Title" : "Material Title"}
+              {materialType === "quiz" ? "Assessment / Quiz Title" : "Material Title *"}
             </label>
             <input
               type="text"
