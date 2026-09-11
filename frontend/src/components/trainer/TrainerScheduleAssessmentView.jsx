@@ -2137,7 +2137,9 @@ export const TrainerScheduleAssessmentView = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredQuizzes.map((quiz) => {
               const isPublished = quiz.resultsPublished;
-              const isUpcoming = new Date(quiz.scheduledStartTime) > now;
+              const isUpcoming = quiz.scheduledStartTime && new Date(quiz.scheduledStartTime) > now;
+              const isDeadlinePassed = !quiz.deadlineTime || now >= new Date(quiz.deadlineTime);
+              const deadlineFormatted = quiz.deadlineTime ? new Date(quiz.deadlineTime).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "Open Window";
 
               return (
                 <div
@@ -2155,9 +2157,13 @@ export const TrainerScheduleAssessmentView = ({
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Results Live
                         </span>
+                      ) : !isDeadlinePassed ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 border border-blue-300 flex items-center gap-1" title={`Window active until ${deadlineFormatted}`}>
+                          <Clock className="w-3 h-3 text-blue-600" /> Active Window
+                        </span>
                       ) : (
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-amber-600 animate-pulse" /> Pending Evaluation
+                          <Clock className="w-3 h-3 text-amber-600" /> Deadline Passed (Ready to Publish)
                         </span>
                       )}
                     </div>
@@ -2167,7 +2173,7 @@ export const TrainerScheduleAssessmentView = ({
                     </h3>
 
                     <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
-                      Course: {quiz.courseName}
+                      Course: {quiz.courseName || "Operational Training"}
                     </p>
 
                     {/* Timeline & Marks Summary */}
@@ -2177,8 +2183,8 @@ export const TrainerScheduleAssessmentView = ({
                         <p className="font-bold text-slate-800">{quiz.durationMinutes || 30} Mins Kiosk</p>
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-slate-400 font-extrabold uppercase text-[9px] block">PASS / TOTAL</span>
-                        <p className="font-bold text-slate-800">{quiz.passMarks || 20} / {quiz.totalMarks || 40} Marks</p>
+                        <span className="text-slate-400 font-extrabold uppercase text-[9px] block">DEADLINE</span>
+                        <p className="font-bold text-slate-800 truncate" title={deadlineFormatted}>{deadlineFormatted}</p>
                       </div>
                     </div>
 
@@ -2187,29 +2193,43 @@ export const TrainerScheduleAssessmentView = ({
                         Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Cadets</b>
                       </span>
                       <span className="text-emerald-700 font-black">
-                        Avg: {quiz.averageScore !== undefined ? `${quiz.averageScore}%` : (quiz.averagePercentage !== undefined ? `${quiz.averagePercentage}%` : "—")}
+                        {isDeadlinePassed ? "Window Closed" : "Exam Live"}
                       </span>
                     </div>
                   </div>
 
                   {/* Card Actions */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                     <button
                       onClick={() => handleInspectQuiz(quiz)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-100 hover:bg-[#0a2558] text-slate-800 hover:text-white font-extrabold rounded-xl text-xs transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-[#0a2558] text-slate-800 hover:text-white font-extrabold rounded-xl text-xs transition-colors shadow-xs"
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
-                      <span>Class Analytics & Submissions</span>
+                      <span>Class Analytics</span>
                     </button>
 
-                    {!isPublished && (
-                      <button
-                        onClick={() => handlePublishResultsForQuiz(quiz.id)}
-                        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-xs transition-transform hover:scale-105"
-                        title="Publish Results to Cadets"
-                      >
-                        Publish
-                      </button>
+                    {!isPublished ? (
+                      isDeadlinePassed ? (
+                        <button
+                          onClick={() => handlePublishResultsForQuiz(quiz.id)}
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-xs transition-transform hover:scale-105"
+                          title="Publish Results to Cadets"
+                        >
+                          Publish Results
+                        </button>
+                      ) : (
+                        <div
+                          className="px-2.5 py-2 bg-slate-100 border border-slate-200 text-slate-400 font-bold rounded-xl text-[11px] flex items-center gap-1 cursor-not-allowed"
+                          title={`Results can be published after deadline: ${deadlineFormatted}`}
+                        >
+                          <Clock className="w-3 h-3 text-amber-500" />
+                          <span>Publish Locked</span>
+                        </div>
+                      )
+                    ) : (
+                      <span className="px-2.5 py-1.5 bg-emerald-50 text-emerald-800 font-bold rounded-xl text-[11px] border border-emerald-200">
+                        Published ✓
+                      </span>
                     )}
                   </div>
                 </div>
@@ -2262,20 +2282,41 @@ export const TrainerScheduleAssessmentView = ({
                 <span>Export PDF</span>
               </button>
 
-              {!selectedQuizForDetails.resultsPublished ? (
-                <button
-                  onClick={() => handlePublishResultsForQuiz(selectedQuizForDetails.id)}
-                  className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-black rounded-xl text-xs shadow-md transition-transform hover:scale-105"
-                >
-                  <Sparkles className="w-4 h-4 text-emerald-200" />
-                  <span>Publish Ratified Quiz Results to Cadets</span>
-                </button>
-              ) : (
-                <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold rounded-xl text-xs">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Results Officially Published</span>
-                </div>
-              )}
+              {(() => {
+                const isDetailsDeadlinePassed = !selectedQuizForDetails.deadlineTime || now >= new Date(selectedQuizForDetails.deadlineTime);
+                const deadlineFormatted = selectedQuizForDetails.deadlineTime ? new Date(selectedQuizForDetails.deadlineTime).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+
+                if (selectedQuizForDetails.resultsPublished) {
+                  return (
+                    <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold rounded-xl text-xs">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Results Officially Published</span>
+                    </div>
+                  );
+                }
+
+                if (!isDetailsDeadlinePassed) {
+                  return (
+                    <div 
+                      className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-300 text-amber-900 font-extrabold rounded-xl text-xs shadow-xs" 
+                      title={`Results can be published after the exam deadline passes on ${deadlineFormatted}.`}
+                    >
+                      <Clock className="w-4 h-4 text-amber-600" />
+                      <span>Window Active (Closes {deadlineFormatted}) • Publish Locked</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    onClick={() => handlePublishResultsForQuiz(selectedQuizForDetails.id)}
+                    className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-black rounded-xl text-xs shadow-md transition-transform hover:scale-105"
+                  >
+                    <Sparkles className="w-4 h-4 text-emerald-200" />
+                    <span>Publish Ratified Quiz Results to Cadets</span>
+                  </button>
+                );
+              })()}
             </div>
           </div>
 
@@ -2291,7 +2332,7 @@ export const TrainerScheduleAssessmentView = ({
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
-                <span>Class Performance Analytics</span>
+                <span>Class Performance &amp; Analytics</span>
               </button>
 
               <button
@@ -2336,154 +2377,257 @@ export const TrainerScheduleAssessmentView = ({
             </div>
           </div>
 
-          {/* ═════════ TAB 1: TRAINER DETAILED PERFORMANCE ANALYTICS (12 KPIS + TOPIC + DIFFICULTY) ═════════ */}
-          {analyticsSubTab === "class-analytics" && (
-            <div className="space-y-8 animate-in fade-in duration-150">
-              
-              {/* 12 Performance Metric Cards */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-blue-600" />
-                    <span>Comprehensive Trainer Performance Analytics</span>
-                  </h3>
-                  <span className="text-[11px] font-bold text-slate-400">12 Core Assessment Indicators</span>
+          {/* ═════════ TAB 1: TRAINER DETAILED PERFORMANCE ANALYTICS (100% DYNAMIC METRICS) ═════════ */}
+          {analyticsSubTab === "class-analytics" && (() => {
+            const totalSubs = activeSubmissions.length;
+            const totalEnrolled = quizAnalytics?.totalEnrolled || (enrolledTrainees.length > 0 ? enrolledTrainees.length : totalSubs);
+            const activeLearners = quizAnalytics?.activeLearners || totalSubs;
+            const completedLearners = totalSubs > 0 ? activeSubmissions.filter(s => !s.isDisqualified).length : 0;
+            const assessmentAttempts = totalSubs;
+            
+            const totalQuizMarks = selectedQuizForDetails.totalMarks || 20;
+            const avgScoreVal = totalSubs > 0
+              ? (activeSubmissions.reduce((acc, s) => acc + (s.percentage !== undefined ? s.percentage : (s.score / totalQuizMarks * 100)), 0) / totalSubs).toFixed(1)
+              : "0.0";
+            
+            const highestScore = totalSubs > 0 ? Math.max(...activeSubmissions.map(s => s.score || 0)) : 0;
+            const lowestScore = totalSubs > 0 ? Math.min(...activeSubmissions.map(s => s.score || 0)) : 0;
+            
+            const avgMarksVal = totalSubs > 0
+              ? (activeSubmissions.reduce((acc, s) => acc + (s.score || 0), 0) / totalSubs).toFixed(1)
+              : "0.0";
+            
+            const passedCount = totalSubs > 0 
+              ? activeSubmissions.filter(s => (s.percentage !== undefined ? s.percentage : (s.score / totalQuizMarks * 100)) >= 50).length 
+              : 0;
+            const passRateVal = totalSubs > 0 ? ((passedCount / totalSubs) * 100).toFixed(1) : "0.0";
+            const completionRateVal = totalEnrolled > 0 ? Math.min(100, Math.round((completedLearners / totalEnrolled) * 100)) : (totalSubs > 0 ? 100 : 0);
+
+            const avgTimeSecs = totalSubs > 0
+              ? Math.round(activeSubmissions.reduce((acc, s) => acc + (s.timeTakenSeconds || 0), 0) / totalSubs)
+              : 0;
+            const avgMins = Math.floor(avgTimeSecs / 60);
+            const avgRemSecs = avgTimeSecs % 60;
+            const avgTimeFormatted = totalSubs > 0 
+              ? (avgMins > 0 ? `${avgMins}m ${avgRemSecs}s` : `${avgRemSecs}s`)
+              : "0s";
+
+            // Dynamic Topics
+            const qList = selectedQuizForDetails.questions || [];
+            let dynamicTopics = [];
+            if (quizAnalytics?.topicPerformance && quizAnalytics.topicPerformance.length > 0) {
+              dynamicTopics = quizAnalytics.topicPerformance;
+            } else if (qList.length > 0) {
+              const tMap = {};
+              qList.forEach(q => {
+                const top = q.subjectName || q.topic || selectedQuizForDetails.subjectName || "Atmospheric Dynamics";
+                if (!tMap[top]) {
+                  tMap[top] = { topic: top, questionsCount: 0, totalAttempts: 0, correctCount: 0 };
+                }
+                tMap[top].questionsCount++;
+              });
+
+              Object.keys(tMap).forEach(tKey => {
+                const topicQIds = new Set(qList.filter(q => (q.subjectName || q.topic || selectedQuizForDetails.subjectName || "Atmospheric Dynamics") === tKey).map(q => q.id));
+                let attempts = 0;
+                let correct = 0;
+                activeSubmissions.forEach(sub => {
+                  qList.filter(q => topicQIds.has(q.id)).forEach(q => {
+                    attempts++;
+                    const ans = sub.answers ? sub.answers[q.id] : undefined;
+                    if (ans !== undefined && (ans === q.correctAnswer || String(ans).trim().toLowerCase() === String(q.expectedAnswer || "").trim().toLowerCase())) {
+                      correct++;
+                    }
+                  });
+                });
+                tMap[tKey].totalAttempts = attempts || (totalSubs * tMap[tKey].questionsCount);
+                tMap[tKey].correctCount = correct;
+                tMap[tKey].accuracyRate = attempts > 0 ? Math.round((correct / attempts) * 100) : (totalSubs > 0 ? Math.round(parseFloat(avgScoreVal)) : 0);
+                tMap[tKey].averageScore = tMap[tKey].accuracyRate;
+              });
+              dynamicTopics = Object.values(tMap);
+            } else {
+              dynamicTopics = [{
+                topic: selectedQuizForDetails.subjectName || "Core Modules",
+                questionsCount: 1,
+                totalAttempts: totalSubs,
+                correctCount: passedCount,
+                accuracyRate: parseFloat(avgScoreVal),
+                averageScore: parseFloat(avgScoreVal)
+              }];
+            }
+
+            // Dynamic Difficulty
+            const diffStats = {
+              Easy: { accuracy: 0, count: 0 },
+              Medium: { accuracy: 0, count: 0 },
+              Hard: { accuracy: 0, count: 0 }
+            };
+            if (quizAnalytics?.difficultyPerformance) {
+              diffStats.Easy.accuracy = quizAnalytics.difficultyPerformance.Easy?.accuracy ?? 0;
+              diffStats.Medium.accuracy = quizAnalytics.difficultyPerformance.Medium?.accuracy ?? 0;
+              diffStats.Hard.accuracy = quizAnalytics.difficultyPerformance.Hard?.accuracy ?? 0;
+            } else if (qList.length > 0) {
+              ["Easy", "Medium", "Hard"].forEach(d => {
+                const dQList = qList.filter(q => (q.difficulty || "Medium").toLowerCase() === d.toLowerCase());
+                if (dQList.length > 0) {
+                  let dAttempts = 0;
+                  let dCorrect = 0;
+                  activeSubmissions.forEach(sub => {
+                    dQList.forEach(q => {
+                      dAttempts++;
+                      const ans = sub.answers ? sub.answers[q.id] : undefined;
+                      if (ans !== undefined && (ans === q.correctAnswer || String(ans).trim().toLowerCase() === String(q.expectedAnswer || "").trim().toLowerCase())) {
+                        dCorrect++;
+                      }
+                    });
+                  });
+                  diffStats[d].accuracy = dAttempts > 0 ? Math.round((dCorrect / dAttempts) * 100) : (totalSubs > 0 ? Math.round(parseFloat(avgScoreVal)) : 0);
+                  diffStats[d].count = dQList.length;
+                } else {
+                  diffStats[d].accuracy = totalSubs > 0 ? Math.round(parseFloat(avgScoreVal)) : 0;
+                }
+              });
+            }
+
+            return (
+              <div className="space-y-8 animate-in fade-in duration-150">
+                
+                {/* 12 Performance Metric Cards */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-blue-600" />
+                      <span>Dynamic Cohort Performance Analytics</span>
+                    </h3>
+                    <span className="text-[11px] font-bold text-slate-400">12 Live Assessment Indicators</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
+                    {/* 1. Total Enrolled */}
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL ENROLLED</span>
+                      <p className="text-lg font-black text-slate-900">
+                        {totalEnrolled} Learners
+                      </p>
+                      <span className="text-[10px] text-slate-500">Course Cohort Size</span>
+                    </div>
+
+                    {/* 2. Active Learners */}
+                    <div className="p-3.5 bg-blue-50/70 rounded-2xl border border-blue-200 space-y-1">
+                      <span className="text-blue-600 font-extrabold uppercase text-[9px] block">ACTIVE LEARNERS</span>
+                      <p className="text-lg font-black text-blue-900">
+                        {activeLearners} Active
+                      </p>
+                      <span className="text-[10px] text-blue-600">Currently in Assessment</span>
+                    </div>
+
+                    {/* 3. Completed Learners */}
+                    <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-1">
+                      <span className="text-emerald-600 font-extrabold uppercase text-[9px] block">COMPLETED LEARNERS</span>
+                      <p className="text-lg font-black text-emerald-900">
+                        {completedLearners} Finished
+                      </p>
+                      <span className="text-[10px] text-emerald-600">Graded Submissions</span>
+                    </div>
+
+                    {/* 4. Assessment Attempts */}
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ASSESSMENT ATTEMPTS</span>
+                      <p className="text-lg font-black text-[#0a2558]">
+                        {assessmentAttempts} Attempts
+                      </p>
+                      <span className="text-[10px] text-slate-500">100% Proctored Kiosk</span>
+                    </div>
+
+                    {/* 5. Average Score */}
+                    <div className="p-3.5 bg-indigo-50/70 rounded-2xl border border-indigo-200 space-y-1">
+                      <span className="text-indigo-600 font-extrabold uppercase text-[9px] block">AVERAGE SCORE</span>
+                      <p className="text-lg font-black text-indigo-900">
+                        {avgScoreVal}%
+                      </p>
+                      <span className="text-[10px] text-indigo-600">Cohort Mean Accuracy</span>
+                    </div>
+
+                    {/* 6. Highest Score */}
+                    <div className="p-3.5 bg-purple-50/70 rounded-2xl border border-purple-200 space-y-1">
+                      <span className="text-purple-600 font-extrabold uppercase text-[9px] block">HIGHEST SCORE</span>
+                      <p className="text-lg font-black text-purple-900">
+                        {highestScore} / {totalQuizMarks}
+                      </p>
+                      <span className="text-[10px] text-purple-600 truncate block">Top Performer</span>
+                    </div>
+
+                    {/* 7. Lowest Score */}
+                    <div className="p-3.5 bg-rose-50/70 rounded-2xl border border-rose-200 space-y-1">
+                      <span className="text-rose-600 font-extrabold uppercase text-[9px] block">LOWEST SCORE</span>
+                      <p className="text-lg font-black text-rose-900">
+                        {lowestScore} / {totalQuizMarks}
+                      </p>
+                      <span className="text-[10px] text-rose-600">Remediation Threshold</span>
+                    </div>
+
+                    {/* 8. Average Marks */}
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">AVERAGE MARKS</span>
+                      <p className="text-lg font-black text-slate-900">
+                        {avgMarksVal} / {totalQuizMarks}
+                      </p>
+                      <span className="text-[10px] text-slate-500">Cohort Marks Earned</span>
+                    </div>
+
+                    {/* 9. Pass Rate */}
+                    <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-1">
+                      <span className="text-emerald-600 font-extrabold uppercase text-[9px] block">PASS RATE</span>
+                      <p className="text-lg font-black text-emerald-900">
+                        {passRateVal}%
+                      </p>
+                      <span className="text-[10px] text-emerald-600">Threshold: 50%</span>
+                    </div>
+
+                    {/* 10. Completion Rate */}
+                    <div className="p-3.5 bg-teal-50/70 rounded-2xl border border-teal-200 space-y-1">
+                      <span className="text-teal-600 font-extrabold uppercase text-[9px] block">COMPLETION RATE</span>
+                      <p className="text-lg font-black text-teal-900">
+                        {completionRateVal}%
+                      </p>
+                      <span className="text-[10px] text-teal-600">Attempted & Submitted</span>
+                    </div>
+
+                    {/* 11. Average Assessment Time */}
+                    <div className="p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200 space-y-1">
+                      <span className="text-amber-600 font-extrabold uppercase text-[9px] block">AVG ASSESSMENT TIME</span>
+                      <p className="text-lg font-black text-amber-900">
+                        {avgTimeFormatted}
+                      </p>
+                      <span className="text-[10px] text-amber-600 font-mono">
+                        ~{Math.round((avgTimeSecs || 60) / Math.max(1, (selectedQuizForDetails.questions || []).length || 5))}s / question
+                      </span>
+                    </div>
+
+                    {/* 12. Integrity Violations */}
+                    <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">INTEGRITY VIOLATIONS</span>
+                      <p className="text-lg font-black text-rose-700">
+                        {activeSubmissions.filter(s => s.tabSwitchCount > 0 || s.isDisqualified).length} Flagged
+                      </p>
+                      <span className="text-[10px] text-slate-500">Context-Switch Alerts</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
-                  {/* 1. Total Enrolled */}
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL ENROLLED</span>
-                    <p className="text-lg font-black text-slate-900">
-                      {quizAnalytics?.totalEnrolled || enrolledTrainees.length || 42} Learners
-                    </p>
-                    <span className="text-[10px] text-slate-500">Course Cohort Size</span>
+                {/* ─── TOPIC PERFORMANCE SECTION ─── */}
+                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-blue-600" />
+                      <span>Topic Performance Breakdown</span>
+                    </h3>
+                    <span className="text-[11px] font-bold text-slate-400">Dynamic Curriculum Topic Accuracy</span>
                   </div>
 
-                  {/* 2. Active Learners */}
-                  <div className="p-3.5 bg-blue-50/70 rounded-2xl border border-blue-200 space-y-1">
-                    <span className="text-blue-600 font-extrabold uppercase text-[9px] block">ACTIVE LEARNERS</span>
-                    <p className="text-lg font-black text-blue-900">
-                      {quizAnalytics?.activeLearners || activeSubmissions.length || 38} Active
-                    </p>
-                    <span className="text-[10px] text-blue-600">Currently in Assessment</span>
-                  </div>
-
-                  {/* 3. Completed Learners */}
-                  <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-1">
-                    <span className="text-emerald-600 font-extrabold uppercase text-[9px] block">COMPLETED LEARNERS</span>
-                    <p className="text-lg font-black text-emerald-900">
-                      {quizAnalytics?.completedLearners || activeSubmissions.length} Finished
-                    </p>
-                    <span className="text-[10px] text-emerald-600">Graded Submissions</span>
-                  </div>
-
-                  {/* 4. Assessment Attempts */}
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ASSESSMENT ATTEMPTS</span>
-                    <p className="text-lg font-black text-[#0a2558]">
-                      {quizAnalytics?.assessmentAttempts || activeSubmissions.length} Attempts
-                    </p>
-                    <span className="text-[10px] text-slate-500">100% Proctored Kiosk</span>
-                  </div>
-
-                  {/* 5. Average Score */}
-                  <div className="p-3.5 bg-indigo-50/70 rounded-2xl border border-indigo-200 space-y-1">
-                    <span className="text-indigo-600 font-extrabold uppercase text-[9px] block">AVERAGE SCORE</span>
-                    <p className="text-lg font-black text-indigo-900">
-                      {quizAnalytics?.averageScore !== undefined ? `${quizAnalytics.averageScore}%` : (quizAnalytics?.averagePercentage !== undefined ? `${quizAnalytics.averagePercentage}%` : "78.5%")}
-                    </p>
-                    <span className="text-[10px] text-indigo-600">Cohort Mean Accuracy</span>
-                  </div>
-
-                  {/* 6. Highest Score */}
-                  <div className="p-3.5 bg-purple-50/70 rounded-2xl border border-purple-200 space-y-1">
-                    <span className="text-purple-600 font-extrabold uppercase text-[9px] block">HIGHEST SCORE</span>
-                    <p className="text-lg font-black text-purple-900">
-                      {quizAnalytics?.highestScore !== undefined ? quizAnalytics.highestScore : (activeSubmissions.length > 0 ? Math.max(...activeSubmissions.map(s => s.score || 0)) : 38)} / {selectedQuizForDetails.totalMarks || 40}
-                    </p>
-                    <span className="text-[10px] text-purple-600 truncate block">Top Performer</span>
-                  </div>
-
-                  {/* 7. Lowest Score */}
-                  <div className="p-3.5 bg-rose-50/70 rounded-2xl border border-rose-200 space-y-1">
-                    <span className="text-rose-600 font-extrabold uppercase text-[9px] block">LOWEST SCORE</span>
-                    <p className="text-lg font-black text-rose-900">
-                      {quizAnalytics?.lowestScore !== undefined ? quizAnalytics.lowestScore : (activeSubmissions.length > 0 ? Math.min(...activeSubmissions.map(s => s.score || 0)) : 14)} / {selectedQuizForDetails.totalMarks || 40}
-                    </p>
-                    <span className="text-[10px] text-rose-600">Remediation Threshold</span>
-                  </div>
-
-                  {/* 8. Average Marks */}
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <span className="text-slate-400 font-extrabold uppercase text-[9px] block">AVERAGE MARKS</span>
-                    <p className="text-lg font-black text-slate-900">
-                      {quizAnalytics?.averageMarks !== undefined ? quizAnalytics.averageMarks : "31.4"} / {selectedQuizForDetails.totalMarks || 40}
-                    </p>
-                    <span className="text-[10px] text-slate-500">Cohort Marks Earned</span>
-                  </div>
-
-                  {/* 9. Pass Rate */}
-                  <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-1">
-                    <span className="text-emerald-600 font-extrabold uppercase text-[9px] block">PASS RATE</span>
-                    <p className="text-lg font-black text-emerald-900">
-                      {quizAnalytics?.passRate !== undefined ? `${quizAnalytics.passRate}%` : "91.2%"}
-                    </p>
-                    <span className="text-[10px] text-emerald-600">Threshold: 50%</span>
-                  </div>
-
-                  {/* 10. Completion Rate */}
-                  <div className="p-3.5 bg-teal-50/70 rounded-2xl border border-teal-200 space-y-1">
-                    <span className="text-teal-600 font-extrabold uppercase text-[9px] block">COMPLETION RATE</span>
-                    <p className="text-lg font-black text-teal-900">
-                      {quizAnalytics?.completionRate !== undefined ? `${quizAnalytics.completionRate}%` : "89.5%"}
-                    </p>
-                    <span className="text-[10px] text-teal-600">Attempted & Submitted</span>
-                  </div>
-
-                  {/* 11. Average Assessment Time */}
-                  <div className="p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200 space-y-1">
-                    <span className="text-amber-600 font-extrabold uppercase text-[9px] block">AVG ASSESSMENT TIME</span>
-                    <p className="text-lg font-black text-amber-900">
-                      {quizAnalytics?.averageAssessmentTime || "14m 22s"}
-                    </p>
-                    <span className="text-[10px] text-amber-600 font-mono">
-                      ~{Math.round(14 * 60 / Math.max(1, (selectedQuizForDetails.questions || []).length || 5))}s / question
-                    </span>
-                  </div>
-
-                  {/* 12. Integrity Violations */}
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-                    <span className="text-slate-400 font-extrabold uppercase text-[9px] block">INTEGRITY VIOLATIONS</span>
-                    <p className="text-lg font-black text-rose-700">
-                      {activeSubmissions.filter(s => s.tabSwitchCount > 0 || s.isDisqualified).length} Flagged
-                    </p>
-                    <span className="text-[10px] text-slate-500">Context-Switch Alerts</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ─── TOPIC PERFORMANCE SECTION ─── */}
-              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <Target className="w-4 h-4 text-blue-600" />
-                    <span>Topic Performance Breakdown</span>
-                  </h3>
-                  <span className="text-[11px] font-bold text-slate-400">Curriculum Topic Ratios</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                  {(() => {
-                    const topics = quizAnalytics?.topicPerformance && quizAnalytics.topicPerformance.length > 0 
-                      ? quizAnalytics.topicPerformance 
-                      : [
-                          { topic: selectedQuizForDetails.subjectName || "Atmospheric Dynamics", questionsCount: 4, totalAttempts: 42, correctCount: 35, accuracyRate: 83.3, averageScore: 84.0 },
-                          { topic: "Pressure Systems & Isobaric Analysis", questionsCount: 3, totalAttempts: 42, correctCount: 31, accuracyRate: 73.8, averageScore: 75.2 },
-                          { topic: "Radar & Convective Diagnostics", questionsCount: 3, totalAttempts: 42, correctCount: 28, accuracyRate: 66.7, averageScore: 68.5 }
-                        ];
-
-                    return topics.map((t, idx) => (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    {dynamicTopics.map((t, idx) => (
                       <div key={idx} className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2.5 shadow-2xs">
                         <div className="flex items-start justify-between gap-2">
                           <div>
@@ -2502,142 +2646,143 @@ export const TrainerScheduleAssessmentView = ({
                             className={`h-full rounded-full ${
                               t.accuracyRate >= 80 ? "bg-emerald-500" : t.accuracyRate >= 65 ? "bg-blue-600" : "bg-amber-500"
                             }`}
-                            style={{ width: `${t.accuracyRate}%` }}
+                            style={{ width: `${Math.min(100, Math.max(0, t.accuracyRate))}%` }}
                           />
                         </div>
 
                         <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
-                          <span>{t.correctCount || 0} / {t.totalAttempts || 42} Correct</span>
-                          <span className="font-bold text-slate-800">Avg Score: {t.averageScore}%</span>
+                          <span>{t.correctCount || 0} / {t.totalAttempts || totalSubs} Correct</span>
+                          <span className="font-bold text-slate-800">Avg Score: {t.averageScore || t.accuracyRate}%</span>
                         </div>
                       </div>
-                    ));
-                  })()}
-                </div>
-              </div>
-
-              {/* ─── DIFFICULTY-WISE PERFORMANCE SECTION ─── */}
-              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-purple-600" />
-                    <span>Difficulty-Wise Performance</span>
-                  </h3>
-                  <span className="text-[11px] font-bold text-slate-400">Easy • Medium • Hard Calibration</span>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  {/* Easy */}
-                  <div className="p-4 bg-white rounded-2xl border border-emerald-200 space-y-2">
-                    <div className="flex items-center justify-between font-black">
-                      <span className="text-emerald-900 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                        <span>Easy Difficulty</span>
-                      </span>
-                      <span className="text-emerald-700">
-                        {quizAnalytics?.difficultyPerformance?.Easy?.accuracy ?? 0}% Accuracy
-                      </span>
+                {/* ─── DIFFICULTY-WISE PERFORMANCE SECTION ─── */}
+                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-purple-600" />
+                      <span>Difficulty-Wise Performance</span>
+                    </h3>
+                    <span className="text-[11px] font-bold text-slate-400">Easy • Medium • Hard Calibration</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    {/* Easy */}
+                    <div className="p-4 bg-white rounded-2xl border border-emerald-200 space-y-2">
+                      <div className="flex items-center justify-between font-black">
+                        <span className="text-emerald-900 flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                          <span>Easy Difficulty</span>
+                        </span>
+                        <span className="text-emerald-700">
+                          {diffStats.Easy.accuracy}% Accuracy
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, diffStats.Easy.accuracy))}%` }} />
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Fundamental concepts and direct recall
+                      </p>
                     </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Easy?.accuracy ?? 0}%` }} />
+
+                    {/* Medium */}
+                    <div className="p-4 bg-white rounded-2xl border border-blue-200 space-y-2">
+                      <div className="flex items-center justify-between font-black">
+                        <span className="text-blue-900 flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+                          <span>Medium Difficulty</span>
+                        </span>
+                        <span className="text-blue-700">
+                          {diffStats.Medium.accuracy}% Accuracy
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="bg-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, diffStats.Medium.accuracy))}%` }} />
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Operational meteorological scenarios & synthesis
+                      </p>
                     </div>
-                    <p className="text-[10px] text-slate-400 font-medium">
-                      Fundamental concepts and direct formula recall
+
+                    {/* Hard */}
+                    <div className="p-4 bg-white rounded-2xl border border-amber-200 space-y-2">
+                      <div className="flex items-center justify-between font-black">
+                        <span className="text-amber-900 flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                          <span>Hard Difficulty</span>
+                        </span>
+                        <span className="text-amber-700">
+                          {diffStats.Hard.accuracy}% Accuracy
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="bg-amber-500 h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, diffStats.Hard.accuracy))}%` }} />
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium">
+                        Discriminative analysis & advanced diagnostic equations
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ─── QUICK JUMP ACTION CARDS ─── */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
+                  <div 
+                    onClick={() => setAnalyticsSubTab("question-analytics")}
+                    className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50/50 hover:from-blue-100/70 hover:to-indigo-100/70 border border-blue-200 rounded-3xl cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
+                      <HelpCircle className="w-4 h-4" />
+                    </div>
+                    <h4 className="font-black text-slate-900 text-sm">Question-Level Analytics</h4>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">
+                      Inspect Question #, Topic, Attempts, Correct/Incorrect, Accuracy, Average Marks, Time, and Difficulty.
                     </p>
+                    <span className="inline-flex items-center gap-1 font-black text-blue-700 text-[11px] pt-1">
+                      Open Question Analytics →
+                    </span>
                   </div>
 
-                  {/* Medium */}
-                  <div className="p-4 bg-white rounded-2xl border border-blue-200 space-y-2">
-                    <div className="flex items-center justify-between font-black">
-                      <span className="text-blue-900 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                        <span>Medium Difficulty</span>
-                      </span>
-                      <span className="text-blue-700">
-                        {quizAnalytics?.difficultyPerformance?.Medium?.accuracy ?? 0}% Accuracy
-                      </span>
+                  <div 
+                    onClick={() => setAnalyticsSubTab("trainee-responses")}
+                    className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50/50 hover:from-emerald-100/70 hover:to-teal-100/70 border border-emerald-200 rounded-3xl cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
+                      <Users className="w-4 h-4" />
                     </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-600 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Medium?.accuracy ?? 0}%` }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">
-                      Operational meteorological scenarios & synthesis
+                    <h4 className="font-black text-slate-900 text-sm">Individual Trainee Performance</h4>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">
+                      Review each cadet's submitted responses question-by-question, time spent, and submit faculty remarks.
                     </p>
+                    <span className="inline-flex items-center gap-1 font-black text-emerald-700 text-[11px] pt-1">
+                      Open Responses Desk →
+                    </span>
                   </div>
 
-                  {/* Hard */}
-                  <div className="p-4 bg-white rounded-2xl border border-amber-200 space-y-2">
-                    <div className="flex items-center justify-between font-black">
-                      <span className="text-amber-900 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                        <span>Hard Difficulty</span>
-                      </span>
-                      <span className="text-amber-700">
-                        {quizAnalytics?.difficultyPerformance?.Hard?.accuracy ?? 0}% Accuracy
-                      </span>
+                  <div 
+                    onClick={() => setAnalyticsSubTab("leaderboard")}
+                    className="p-5 bg-gradient-to-br from-amber-50 to-orange-50/50 hover:from-amber-100/70 hover:to-orange-100/70 border border-amber-200 rounded-3xl cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold">
+                      <Trophy className="w-4 h-4 text-amber-100" />
                     </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-amber-500 h-full rounded-full" style={{ width: `${quizAnalytics?.difficultyPerformance?.Hard?.accuracy ?? 0}%` }} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-medium">
-                      Discriminative analysis & advanced diagnostic equations
+                    <h4 className="font-black text-slate-900 text-sm">Exam Leaderboard &amp; Merits</h4>
+                    <p className="text-slate-600 text-[11px] leading-relaxed">
+                      View full cohort ranking, time taken, score certificates generated, and merit classifications.
                     </p>
+                    <span className="inline-flex items-center gap-1 font-black text-amber-700 text-[11px] pt-1">
+                      Open Leaderboard →
+                    </span>
                   </div>
                 </div>
+
               </div>
-
-              {/* ─── QUICK JUMP ACTION CARDS ─── */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
-                <div 
-                  onClick={() => setAnalyticsSubTab("question-analytics")}
-                  className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50/50 hover:from-blue-100/70 hover:to-indigo-100/70 border border-blue-200 rounded-3xl cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
-                    <HelpCircle className="w-4 h-4" />
-                  </div>
-                  <h4 className="font-black text-slate-900 text-sm">Question-Level Analytics</h4>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    Inspect Question #, Topic, Attempts, Correct/Incorrect, Accuracy, Average Marks, Time, and Difficulty.
-                  </p>
-                  <span className="inline-flex items-center gap-1 font-black text-blue-700 text-[11px] pt-1">
-                    Open Question Analytics →
-                  </span>
-                </div>
-
-                <div 
-                  onClick={() => setAnalyticsSubTab("trainee-responses")}
-                  className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50/50 hover:from-emerald-100/70 hover:to-teal-100/70 border border-emerald-200 rounded-3xl cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                    <Users className="w-4 h-4" />
-                  </div>
-                  <h4 className="font-black text-slate-900 text-sm">Individual Trainee Performance</h4>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    Review each cadet's submitted responses question-by-question, time spent, and submit faculty remarks.
-                  </p>
-                  <span className="inline-flex items-center gap-1 font-black text-emerald-700 text-[11px] pt-1">
-                    Open Responses Desk →
-                  </span>
-                </div>
-
-                <div 
-                  onClick={() => setAnalyticsSubTab("leaderboard")}
-                  className="p-5 bg-gradient-to-br from-amber-50 to-yellow-50/50 hover:from-amber-100/70 hover:to-yellow-100/70 border border-amber-200 rounded-3xl cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold">
-                    <Trophy className="w-4 h-4" />
-                  </div>
-                  <h4 className="font-black text-slate-900 text-sm">Exam Leaderboard & Rankings</h4>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
-                    View top examinee rankings, completion speed, percentile distribution, and Gold/Silver/Bronze laurels.
-                  </p>
-                  <span className="inline-flex items-center gap-1 font-black text-amber-800 text-[11px] pt-1">
-                    View Leaderboard 🏆 →
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ═════════ TAB 2: QUESTION-LEVEL ANALYTICS (EXACT USER SPECIFICATION) ═════════ */}
           {analyticsSubTab === "question-analytics" && (

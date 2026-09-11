@@ -198,8 +198,12 @@ export const deleteLearningMaterial = (req, res) => {
 
 export const getTrainerEnrolledTrainees = (req, res) => {
   try {
-    const trainerName = req.query.trainerName || req.user?.name;
-    const trainerId = req.query.trainerId || req.user?.id;
+    let trainerName = req.query.trainerName;
+    let trainerId = req.query.trainerId;
+    if (!trainerName && !trainerId && req.user?.role === "trainer") {
+      trainerName = req.user?.name;
+      trainerId = req.user?.id;
+    }
     const trainees = db.getEnrolledTraineesForTrainer(trainerName, trainerId);
     return res.json({ success: true, count: trainees.length, trainees });
   } catch (err) {

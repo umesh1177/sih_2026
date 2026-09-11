@@ -23,15 +23,16 @@ export const PrerequisiteCheckModal = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [waiverRequested, setWaiverRequested] = useState(false);
+  const [enrollSuccessNotice, setEnrollSuccessNotice] = useState(false);
 
   if (!isOpen || !course) return null;
 
-  // Prerequisites array
+  // Prerequisites array safely parsed
   const prerequisites = Array.isArray(course.prerequisites) 
     ? course.prerequisites 
-    : (course.prerequisites ? [course.prerequisites] : ["Basic Atmospheric Sciences", "Meteorological Observations"]);
+    : (typeof course.prerequisites === "string" ? [course.prerequisites] : ["Basic Atmospheric Sciences", "Meteorological Observations"]);
 
-  // Trainee skills and background
+  // Trainee skills and background safely parsed
   const userSkills = Array.isArray(currentUser?.skills) 
     ? currentUser.skills 
     : (currentUser?.skills ? [currentUser.skills] : []);
@@ -40,35 +41,45 @@ export const PrerequisiteCheckModal = ({
     ? currentUser.interests
     : [];
 
-  const qualificationsStr = (currentUser?.qualifications || "").toLowerCase();
+  const qualificationsArr = Array.isArray(currentUser?.qualifications)
+    ? currentUser.qualifications
+    : (currentUser?.qualifications ? [currentUser.qualifications] : []);
+  const qualificationsStr = qualificationsArr.join(" ").toLowerCase();
   const departmentStr = (currentUser?.department || "").toLowerCase();
 
   // Evaluate each prerequisite
   const evaluatedPrereqs = prerequisites.map(prereq => {
-    const prereqLower = prereq.toLowerCase();
+    const prereqLower = String(prereq || "").toLowerCase();
     
     // Check direct skill match
-    const hasSkillMatch = userSkills.some(s => 
-      prereqLower.includes(s.toLowerCase()) || s.toLowerCase().includes(prereqLower)
-    );
+    const hasSkillMatch = userSkills.some(s => {
+      const sLower = String(s || "").toLowerCase();
+      return prereqLower.includes(sLower) || sLower.includes(prereqLower);
+    });
 
     // Check interest match
-    const hasInterestMatch = userInterests.some(i => 
-      prereqLower.includes(i.toLowerCase()) || i.toLowerCase().includes(prereqLower)
-    );
+    const hasInterestMatch = userInterests.some(i => {
+      const iLower = String(i || "").toLowerCase();
+      return prereqLower.includes(iLower) || iLower.includes(prereqLower);
+    });
 
     // Check degree / qualification match
     const hasDegreeMatch = qualificationsStr.includes("meteorology") || 
       qualificationsStr.includes("physics") || 
       qualificationsStr.includes("tech") ||
-      qualificationsStr.includes("m.sc");
+      qualificationsStr.includes("m.sc") ||
+      qualificationsStr.includes("b.sc") ||
+      qualificationsStr.includes("diploma");
 
     // Check department relevance
     const hasDeptMatch = departmentStr.includes("radar") || 
       departmentStr.includes("cyclone") || 
       departmentStr.includes("nwp") || 
       departmentStr.includes("satellite") || 
-      departmentStr.includes("agrimet");
+      departmentStr.includes("agrimet") ||
+      departmentStr.includes("centre") ||
+      departmentStr.includes("jaipur") ||
+      departmentStr.includes("pune");
 
     const isSatisfied = hasSkillMatch || hasInterestMatch || (hasDegreeMatch && course.level !== "Advanced") || (hasDeptMatch && hasDegreeMatch);
 
@@ -89,7 +100,10 @@ export const PrerequisiteCheckModal = ({
       if (onEnrollSuccess) {
         await onEnrollSuccess(course.id);
       }
-      onClose();
+      setEnrollSuccessNotice(true);
+      setTimeout(() => {
+        onClose();
+      }, 1200);
     } catch (err) {
       console.error("Enrollment error:", err);
     } finally {
@@ -101,7 +115,7 @@ export const PrerequisiteCheckModal = ({
     setWaiverRequested(true);
     setTimeout(() => {
       handleConfirmEnroll();
-    }, 1200);
+    }, 1000);
   };
 
   return (
@@ -245,8 +259,21 @@ export const PrerequisiteCheckModal = ({
             </div>
           )}
 
+          {/* Enrollment Success Notice */}
+          {enrollSuccessNotice && (
+            <div className="p-4 bg-emerald-500 text-white rounded-2xl shadow-md text-xs flex items-center gap-3 animate-in zoom-in-95">
+              <CheckCircle2 className="w-6 h-6 text-white shrink-0" />
+              <div>
+                <h4 className="font-extrabold text-sm">Enrollment Confirmed!</h4>
+                <p className="text-emerald-100 text-[11px] mt-0.5">
+                  You are now officially enrolled in {course.title}. Learning Studio is ready.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Status Alert Message (When approved) */}
-          {(!currentUser || currentUser.status === "approved") && (
+          {!enrollSuccessNotice && (!currentUser || currentUser.status === "approved") && (
             isEligible ? (
               <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />

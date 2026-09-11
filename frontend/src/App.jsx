@@ -112,17 +112,20 @@ const MainApp = () => {
 
   const handleEnrollCourseSuccess = async (courseId) => {
     try {
-      const res = await api.enrollCourse(courseId, currentUser?.id || "u_trainee_1");
+      const traineeId = currentUser?.id || "u_trainee_1";
+      const res = await api.enrollCourse(courseId, traineeId);
       if (res.success) {
         await refreshGlobalData();
         // Update selected overview course state if open
         if (selectedOverviewCourse && selectedOverviewCourse.id === courseId) {
-          setSelectedOverviewCourse(prev => ({
-            ...prev,
-            enrolledTraineeIds: [...(prev.enrolledTraineeIds || []), currentUser?.id]
-          }));
+          setSelectedOverviewCourse(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              enrolledTraineeIds: Array.from(new Set([...(prev.enrolledTraineeIds || []), traineeId]))
+            };
+          });
         }
-        alert("✅ " + res.message);
       } else {
         alert("❌ " + (res.message || "Enrollment failed. Administrative approval is required."));
       }

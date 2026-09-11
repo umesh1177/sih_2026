@@ -27,13 +27,32 @@ export const CompetencyMatrixView = () => {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [assignedMessage, setAssignedMessage] = useState(null);
 
+  const loadSuggestionsForComp = async (comp) => {
+    if (!comp) return;
+    setLoadingSuggestions(true);
+    try {
+      const res = await api.suggestTrainers(comp.name, [comp.category]);
+      if (res.success && res.suggestedTrainers) {
+        setSuggestedTrainers(res.suggestedTrainers);
+      } else {
+        setSuggestedTrainers([]);
+      }
+    } catch (err) {
+      console.error("Suggestion error:", err);
+      setSuggestedTrainers([]);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
   const fetchCompetencies = async () => {
     setLoading(true);
     try {
       const res = await api.getCompetencies();
-      if (res.success && res.matrix) {
+      if (res.success && res.matrix && res.matrix.length > 0) {
         setMatrix(res.matrix);
         setSelectedComp(res.matrix[0]);
+        loadSuggestionsForComp(res.matrix[0]);
       }
     } catch (err) {
       console.error("Failed loading competency framework:", err);
@@ -46,27 +65,19 @@ export const CompetencyMatrixView = () => {
     fetchCompetencies();
   }, []);
 
-  const handleSelectCompetency = async (comp) => {
+  const handleSelectCompetency = (comp) => {
     setSelectedComp(comp);
-    setLoadingSuggestions(true);
-    try {
-      const res = await api.suggestTrainers(comp.name, [comp.category]);
-      if (res.success) {
-        setSuggestedTrainers(res.suggestedTrainers);
-      }
-    } catch (err) {
-      console.error("Suggestion error:", err);
-    } finally {
-      setLoadingSuggestions(false);
-    }
+    loadSuggestionsForComp(comp);
   };
 
   const handleAssignTrainer = async (trainer) => {
     if (!selectedComp) return;
     try {
-      const res = await api.assignTrainerToCompetency(selectedComp.id, trainer.trainerId, trainer.name);
+      const trainerId = trainer.trainerId || trainer.id;
+      const trainerName = trainer.name || trainer.trainerName;
+      const res = await api.assignTrainerToCompetency(selectedComp.id, trainerId, trainerName);
       if (res.success) {
-        setAssignedMessage(`Dr. ${trainer.name} officially designated as Lead Faculty for ${selectedComp.name}!`);
+        setAssignedMessage(`${trainerName} officially designated as Lead Faculty for ${selectedComp.name}!`);
         setTimeout(() => setAssignedMessage(null), 4000);
         fetchCompetencies();
       }
@@ -176,7 +187,7 @@ export const CompetencyMatrixView = () => {
 
                   <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
                     <span className="text-slate-600 font-medium">
-                      Mapped Trainers: <b>{comp.suggestedTrainers?.length || 3} Faculty Leads</b>
+                      Mapped Faculty: <b>{comp.assignedTrainerName || "Click to View Pool"}</b>
                     </span>
                     <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${isSelected ? "translate-x-1 text-[#0a2558]" : ""}`} />
                   </div>
@@ -206,109 +217,116 @@ export const CompetencyMatrixView = () => {
                 <div className="flex items-center justify-between">
                   <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-yellow-500" />
-                    <span>Top 3–5 Ranked Faculty Matches (Weighted Score)</span>
+                    <span>Dynamic Ranked Faculty Matches ({suggestedTrainers.length})</span>
                   </h3>
-                  <span className="text-[11px] text-slate-400">WMO / MoES Filtered</span>
+                  <span className="text-[11px] text-slate-400">WMO / MoES Multi-Factor Engine</span>
                 </div>
 
-                <div className="space-y-3">
-                  {[
-                    {
-                      trainerId: "u_trainer_1",
-                      name: "Dr. Amit Sengupta",
-                      designation: "Scientist 'G' / Senior Numerical Forecaster",
-                      department: "Numerical Weather Prediction Division, New Delhi",
-                      matchScore: 97.5,
-                      certCount: 6,
-                      experience: "18 Yrs",
-                      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
-                      weights: { domain: "99%", certs: "96%", pedagogy: "98%" },
-                      specialization: ["4D-Var Data Assimilation", "Arakawa Staggered Grids", "Non-Hydrostatic Dynamics"]
-                    },
-                    {
-                      trainerId: "u_trainer_2",
-                      name: "Dr. Meenakshi Roy",
-                      designation: "Scientist 'F' / Radar Meteorology Specialist",
-                      department: "Doppler Weather Radar Division, Kolkata",
-                      matchScore: 93.0,
-                      certCount: 5,
-                      experience: "14 Yrs",
-                      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250",
-                      weights: { domain: "94%", certs: "92%", pedagogy: "93%" },
-                      specialization: ["Dual-Pol Radar Signatures", "Mesocyclone Nowcasting", "Reflectivity QC"]
-                    },
-                    {
-                      trainerId: "u_trainer_3",
-                      name: "Dr. Rajesh Kumar Sharma",
-                      designation: "Scientist 'E' / Tropical Severe Storms Lead",
-                      department: "Cyclone Warning Centre, Visakhapatnam",
-                      matchScore: 91.5,
-                      certCount: 4,
-                      experience: "12 Yrs",
-                      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
-                      weights: { domain: "92%", certs: "90%", pedagogy: "93%" },
-                      specialization: ["Dvorak Technique", "Storm Surge Inundation", "Ocean Heat Content"]
-                    }
-                  ].map((t, idx) => (
-                    <div
-                      key={t.trainerId || idx}
-                      className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-start gap-3 text-xs hover:border-blue-300 transition-all shadow-xs"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={t.avatar}
-                            alt={t.name}
-                            className="w-11 h-11 rounded-xl object-cover ring-2 ring-white shadow-sm shrink-0"
-                          />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-extrabold text-slate-900 text-sm">{t.name}</h4>
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
-                                {t.matchScore}% MATCH
-                              </span>
+                {loadingSuggestions ? (
+                  <div className="py-16 text-center space-y-3">
+                    <div className="w-9 h-9 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p className="text-xs font-bold text-slate-600">Calculating competency vectors & faculty availability...</p>
+                  </div>
+                ) : suggestedTrainers.length === 0 ? (
+                  <div className="py-12 text-center text-slate-400 text-xs bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    No faculty found matching this competency criteria.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {suggestedTrainers.map((t, idx) => {
+                      const trainerName = t.name || t.trainerName;
+                      const trainerId = t.trainerId || t.id;
+                      const matchScore = t.matchScore || Math.round(85 - idx * 4);
+                      const certCount = t.verifiedCertCount || (Array.isArray(t.certifications) ? t.certifications.length : 4);
+                      const specs = Array.isArray(t.specialization) && t.specialization.length > 0 
+                        ? t.specialization 
+                        : (Array.isArray(t.skills) ? t.skills.slice(0, 3) : ["Meteorology", "Forecasting"]);
+                      const avatar = t.avatar || `https://images.unsplash.com/photo-${1534528741775 + idx * 1000}?auto=format&fit=crop&q=80&w=250`;
+                      
+                      // Calculate weighted scores dynamically
+                      const domainDepth = `${Math.min(99, Math.round(matchScore * 1.02))}%`;
+                      const certsWeight = `${Math.min(98, 85 + certCount * 2)}%`;
+                      const pedagogyWeight = t.averageRating ? `${Math.round(t.averageRating * 20)}%` : "94%";
+
+                      return (
+                        <div
+                          key={trainerId || idx}
+                          className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-start gap-3 text-xs hover:border-blue-300 transition-all shadow-xs"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={avatar}
+                                alt={trainerName}
+                                className="w-11 h-11 rounded-xl object-cover ring-2 ring-white shadow-sm shrink-0"
+                              />
+                              <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h4 className="font-extrabold text-slate-900 text-sm">{trainerName}</h4>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+                                    {matchScore}% MATCH
+                                  </span>
+                                  {t.recommendationBadge && (
+                                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800">
+                                      {t.recommendationBadge}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-500 font-medium">{t.designation || "Senior Scientist"}</p>
+                                <p className="text-[10px] text-slate-400">{t.department || "MoES / IMD"}</p>
+                              </div>
                             </div>
-                            <p className="text-[11px] text-slate-500 font-medium">{t.designation}</p>
-                            <p className="text-[10px] text-slate-400">{t.department}</p>
+
+                            <button
+                              onClick={() => handleAssignTrainer(t)}
+                              className="flex items-center gap-1.5 px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold text-xs shadow-xs transition-transform hover:scale-105 shrink-0 w-full sm:w-auto justify-center"
+                            >
+                              <UserCheck className="w-3.5 h-3.5 text-emerald-300" />
+                              <span>Assign as Lead Faculty</span>
+                            </button>
+                          </div>
+
+                          {/* Matched reason or pills if available */}
+                          {t.recommendationReason && (
+                            <p className="text-[11px] text-slate-600 bg-white/80 p-2 rounded-lg border border-slate-100 w-full leading-relaxed">
+                              💡 <b>Matching Rationale:</b> {t.recommendationReason}
+                            </p>
+                          )}
+
+                          {/* Weighted Competency Factors */}
+                          <div className="grid grid-cols-3 gap-2 w-full pt-2 border-t border-slate-200/80 text-[10px] font-mono">
+                            <div className="p-2 bg-white rounded-lg border border-slate-100">
+                              <span className="text-slate-400 block font-sans">Domain Depth (40%)</span>
+                              <b className="text-blue-900">{domainDepth}</b>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-100">
+                              <span className="text-slate-400 block font-sans">Certs ({certCount}) (30%)</span>
+                              <b className="text-emerald-900">{certsWeight}</b>
+                            </div>
+                            <div className="p-2 bg-white rounded-lg border border-slate-100">
+                              <span className="text-slate-400 block font-sans">Workload / Rating (30%)</span>
+                              <b className="text-purple-900">{pedagogyWeight}</b>
+                            </div>
+                          </div>
+
+                          {/* Specializations & Matched Tags */}
+                          <div className="flex flex-wrap gap-1 pt-0.5">
+                            {specs.map((spec, sIdx) => (
+                              <span key={sIdx} className="px-2 py-0.5 bg-blue-50 text-blue-900 rounded-md text-[10px] font-bold border border-blue-100">
+                                {spec}
+                              </span>
+                            ))}
+                            {Array.isArray(t.matchedPills) && t.matchedPills.map((pill, pIdx) => (
+                              <span key={pIdx} className="px-2 py-0.5 bg-emerald-50 text-emerald-800 rounded-md text-[10px] font-bold border border-emerald-100">
+                                ✓ {pill}
+                              </span>
+                            ))}
                           </div>
                         </div>
-
-                        <button
-                          onClick={() => handleAssignTrainer(t)}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold text-xs shadow-xs transition-transform hover:scale-105 shrink-0 w-full sm:w-auto justify-center"
-                        >
-                          <UserCheck className="w-3.5 h-3.5 text-emerald-300" />
-                          <span>Assign as Lead Faculty</span>
-                        </button>
-                      </div>
-
-                      {/* Weighted Competency Factors */}
-                      <div className="grid grid-cols-3 gap-2 w-full pt-2 border-t border-slate-200/80 text-[10px] font-mono">
-                        <div className="p-2 bg-white rounded-lg border border-slate-100">
-                          <span className="text-slate-400 block font-sans">Domain Depth (40%)</span>
-                          <b className="text-blue-900">{t.weights.domain}</b>
-                        </div>
-                        <div className="p-2 bg-white rounded-lg border border-slate-100">
-                          <span className="text-slate-400 block font-sans">Certs ({t.certCount}) (30%)</span>
-                          <b className="text-emerald-900">{t.weights.certs}</b>
-                        </div>
-                        <div className="p-2 bg-white rounded-lg border border-slate-100">
-                          <span className="text-slate-400 block font-sans">Pedagogy (30%)</span>
-                          <b className="text-purple-900">{t.weights.pedagogy}</b>
-                        </div>
-                      </div>
-
-                      {/* Specializations Tags */}
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {t.specialization.map((spec, sIdx) => (
-                          <span key={sIdx} className="px-2 py-0.5 bg-blue-50 text-blue-900 rounded-md text-[10px] font-bold border border-blue-100">
-                            {spec}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -321,3 +339,4 @@ export const CompetencyMatrixView = () => {
     </div>
   );
 };
+

@@ -157,8 +157,7 @@
         "Data Assimilation"
       ],
       "qualifications": [
-        "M.Sc. Physics (University of Rajasthan)",
-        "Advanced PG Diploma in Meteorology (IMD Pune)"
+        "M.Sc. Physics (University of Rajasthan)"
       ],
       "experience": [
         "2 years as Trainee Scientific Assistant at IMD Jaipur Field Station."
@@ -171,7 +170,9 @@
         }
       ],
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
-      "createdAt": "2025-01-20T10:00:00.000Z"
+      "createdAt": "2025-01-20T10:00:00.000Z",
+      "bio": "",
+      "updatedAt": "2026-09-11T08:15:43.229Z"
     },
     {
       "id": "u_trainee_2",
@@ -595,9 +596,95 @@
       "bio": "",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
       "createdAt": "2026-09-11T03:51:05.483Z"
+    },
+    {
+      "id": "u_trainer_67333581",
+      "name": "Hp1707697",
+      "email": "hp1707697@gmailcom",
+      "passwordHash": null,
+      "role": "trainer",
+      "department": "India Meteorological Department",
+      "designation": "Officer",
+      "station": "National Weather Forecasting Centre, IMD HQ New Delhi",
+      "cadreId": "MOES-MET-2026-4491",
+      "phone": "+91 98765 43210",
+      "status": "approved",
+      "interests": [],
+      "skills": [],
+      "qualifications": [],
+      "experience": [],
+      "specialization": [],
+      "certificates": [],
+      "bio": "",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+      "createdAt": "2026-09-11T07:25:56.869Z"
     }
   ],
   "courses": [
+    {
+      "id": "crs_44e56303",
+      "code": "MOES-IMD-583",
+      "title": "data science",
+      "category": "Numerical Weather Prediction",
+      "level": "Intermediate",
+      "duration": "4 Weeks",
+      "creditHours": 3,
+      "maxEnrollment": 50,
+      "department": "Directorate General of Meteorology, New Delhi",
+      "leadTrainerId": "",
+      "leadTrainerName": "virat",
+      "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+      "description": "my name is umesh",
+      "prerequisites": [
+        "Atmospheric Dynamics",
+        "Synoptic Observations"
+      ],
+      "enrolledTraineeIds": [],
+      "competenciesGained": [],
+      "subjects": [
+        {
+          "id": "sub_nqqhubje",
+          "name": "Atmospheric Dynamics & Data Modeling",
+          "description": "Core physical foundations and synoptic analysis framework.",
+          "requiredSkills": "NWP, WRF Modeling, Numerical Prediction",
+          "assignedTrainerId": "u_trainer_dfcec11f",
+          "assignedTrainerName": "virat",
+          "modules": [
+            {
+              "id": "mod_4mmlgwc6",
+              "title": "Module 1: Governing Equations of Atmosphere",
+              "duration": "1 Week",
+              "materials": []
+            },
+            {
+              "id": "mod_py02oalw",
+              "title": "Module 2: 4D-Var Data Assimilation",
+              "duration": "1 Week",
+              "materials": []
+            }
+          ],
+          "isManuallyAssigned": true
+        },
+        {
+          "id": "sub_48s318ua",
+          "name": "Subject 2: Specialized Domain",
+          "description": "",
+          "requiredSkills": "Numerical Weather Prediction",
+          "assignedTrainerId": "",
+          "assignedTrainerName": "",
+          "modules": [
+            {
+              "id": "mod_aqosulfr",
+              "title": "Module 1: Principles & Observation Basics",
+              "duration": "1 Week",
+              "materials": []
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-09-11T07:06:44.194Z",
+      "isNew": true
+    },
     {
       "id": "crs_f37fa2df",
       "code": "MOES-IMD-890",
@@ -1421,6 +1508,141 @@
     }
   ],
   "questionBank": [
+    {
+      "id": "qb_8059da54",
+      "question": "In a hydrostatic primitive equation dynamic core using pressure (p) as the vertical coordinate, how is the vertical velocity metric omega = dp/dt calculated dynamically?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Governing Equations & Atmospheric Dynamics",
+      "module": "Module 1",
+      "topic": "Numerical Weather Prediction (NWP) Dynamics",
+      "concept": "",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "From a prognostic vertical momentum equation containing vertical pressure acceleration.",
+        "Diagnostically by integrating the horizontal velocity divergence vertically using the continuity equation.",
+        "Directly from the thermodynamic energy equation assuming strictly zero adiabatic heating.",
+        "By setting it equal to the geometric vertical velocity w scaled by the surface density."
+      ],
+      "correctAnswer": 1,
+      "expectedAnswer": "From a prognostic vertical momentum equation containing vertical pressure acceleration.",
+      "acceptedAnswers": [],
+      "explanation": "In isobaric (pressure) coordinates, the continuity equation takes the simple linear form: div_h(V) + d(omega)/dp = 0. Because there is no prognostic equation for vertical velocity in a hydrostatic system, omega (dp/dt) is determined diagnostically by integrating the horizontal divergence div_h(V) vertically from the top/bottom boundaries.",
+      "createdBy": "u_trainee_1",
+      "createdByEmail": "rahul.sharma@imd.gov.in",
+      "createdByName": "Rahul Sharma",
+      "createdByRole": "trainee",
+      "createdAt": "2026-09-11T07:47:32.390Z"
+    },
+    {
+      "id": "qb_97c5d0b9",
+      "question": "Why do modern global and regional NWP dynamic cores frequently employ Semi-Implicit Semi-Lagrangian (SISL) time-stepping schemes rather than explicit Eulerian schemes?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Governing Equations & Atmospheric Dynamics",
+      "module": "Module 1",
+      "topic": "Numerical Weather Prediction (NWP) Dynamics",
+      "concept": "",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "SISL schemes completely eliminate the need for vertical coordinate transformations and grid staggering.",
+        "SISL schemes bypass the strict CFL time-step restriction for both high-speed advection and fast wave modes, allowing significantly larger time steps.",
+        "SISL schemes guarantee exact non-linear conservation of total energy, enstrophy, and moisture under all conditions.",
+        "SISL schemes transform non-hydrostatic equation systems into linear hydrostatic systems."
+      ],
+      "correctAnswer": 1,
+      "expectedAnswer": "SISL schemes completely eliminate the need for vertical coordinate transformations and grid staggering.",
+      "acceptedAnswers": [],
+      "explanation": "The Semi-Lagrangian treatment of advection relaxes the advective CFL stability limit (u * dt / dx <= 1), while the Semi-Implicit treatment of fast gravity and acoustic waves treats the fast modes implicitly to prevent wave instability. Combined, the SISL approach allows models to run efficiently with time steps several times larger than explicit Eulerian schemes.",
+      "createdBy": "u_trainee_1",
+      "createdByEmail": "rahul.sharma@imd.gov.in",
+      "createdByName": "Rahul Sharma",
+      "createdByRole": "trainee",
+      "createdAt": "2026-09-11T07:47:32.357Z"
+    },
+    {
+      "id": "qb_1a3c4318",
+      "question": "Terrain-following sigma (sigma = p/p_s) vertical coordinates are widely used in NWP to accommodate surface topography. However, over steep mountain slopes, what significant numerical error arises when evaluating the horizontal pressure gradient force (PGF)?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Governing Equations & Atmospheric Dynamics",
+      "module": "Module 1",
+      "topic": "Numerical Weather Prediction (NWP) Dynamics",
+      "concept": "",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "Spurious mass generation due to violation of the horizontal divergence theorem.",
+        "Large truncation errors resulting from calculating the difference between two large terms of opposite sign on sloping coordinate surfaces.",
+        "Immediate violation of the Courant-Friedrichs-Lewy (CFL) stability criterion in the vertical direction.",
+        "Complete suppression of vertical motion (dot_sigma = 0) along coordinate slopes."
+      ],
+      "correctAnswer": 1,
+      "expectedAnswer": "Spurious mass generation due to violation of the horizontal divergence theorem.",
+      "acceptedAnswers": [],
+      "explanation": "In terrain-following coordinates, the horizontal PGF splits into two terms: the gradient along the constant-sigma surface and the topographic correction term. Over steep topography, both terms become extremely large and opposite in sign. Computing their difference leads to significant truncation errors, which can produce spurious hydrostatic acceleration and false winds along mountain slopes.",
+      "createdBy": "u_trainee_1",
+      "createdByEmail": "rahul.sharma@imd.gov.in",
+      "createdByName": "Rahul Sharma",
+      "createdByRole": "trainee",
+      "createdAt": "2026-09-11T07:47:32.306Z"
+    },
+    {
+      "id": "qb_b35f32d5",
+      "question": "In spatial discretization on horizontal grids within NWP dynamic cores, which Arakawa grid staggering is generally preferred for high-resolution models (where grid spacing is smaller than the Rossby deformation radius) because it accurately represents geostrophic adjustment and gravity wave dispersion without grid-scale computational noise?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Governing Equations & Atmospheric Dynamics",
+      "module": "Module 1",
+      "topic": "Numerical Weather Prediction (NWP) Dynamics",
+      "concept": "",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "Arakawa A-grid (unstaggered), because all variables are co-located at the same grid point.",
+        "Arakawa B-grid, because horizontal velocity components are co-located at cell corners while mass variables are at cell centers.",
+        "Arakawa C-grid, because normal velocity components are defined at the cell faces containing the mass flux, yielding optimal dispersion for short gravity waves.",
+        "Arakawa E-grid, because it aligns grid points along diagonal axes relative to the main coordinate system."
+      ],
+      "correctAnswer": 2,
+      "expectedAnswer": "Arakawa A-grid (unstaggered), because all variables are co-located at the same grid point.",
+      "acceptedAnswers": [],
+      "explanation": "The Arakawa C-grid places normal velocity components directly on the interfaces of the mass grid boxes. This staggering provides the best representation of spatial derivatives for pressure gradient and velocity divergence, leading to accurate gravity wave dispersion characteristics at small grid scales (high resolution) without the uncoupled computational modes found in A- or B-grids.",
+      "createdBy": "u_trainee_1",
+      "createdByEmail": "rahul.sharma@imd.gov.in",
+      "createdByName": "Rahul Sharma",
+      "createdByRole": "trainee",
+      "createdAt": "2026-09-11T07:47:32.244Z"
+    },
+    {
+      "id": "qb_b8c01438",
+      "question": "In hydrostatic primitive equation NWP models, how does the hydrostatic approximation modify the vertical momentum equation, and what specific class of atmospheric waves is eliminated as a direct consequence?",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Governing Equations & Atmospheric Dynamics",
+      "module": "Module 1",
+      "topic": "Numerical Weather Prediction (NWP) Dynamics",
+      "concept": "",
+      "marks": 3,
+      "type": "MCQ",
+      "difficulty": "Medium",
+      "options": [
+        "It replaces the prognostic vertical momentum equation with a diagnostic relation, eliminating acoustic (sound) waves propagating vertically.",
+        "It converts the horizontal momentum equations into diagnostic relations, eliminating inertia-gravity waves.",
+        "It replaces the continuity equation with a prognostic relation, eliminating Lamb waves.",
+        "It sets vertical velocity to zero everywhere, eliminating all buoyancy/gravity waves."
+      ],
+      "correctAnswer": 0,
+      "expectedAnswer": "It replaces the prognostic vertical momentum equation with a diagnostic relation, eliminating acoustic (sound) waves propagating vertically.",
+      "acceptedAnswers": [],
+      "explanation": "The hydrostatic approximation assumes that the vertical pressure gradient force is balanced by gravity, reducing the prognostic vertical momentum equation (dw/dt) to a diagnostic relation (dp/dz = -rho*g). This filters out fast vertically propagating sound waves, allowing larger time steps in hydrostatic models without triggering numerical instability associated with acoustic speeds.",
+      "createdBy": "u_trainee_1",
+      "createdByEmail": "rahul.sharma@imd.gov.in",
+      "createdByName": "Rahul Sharma",
+      "createdByRole": "trainee",
+      "createdAt": "2026-09-11T07:47:32.182Z"
+    },
     {
       "id": "qb_c54dabf6",
       "question": "Which diagnostic polarimetric / observational moment provides the most reliable verification in Numerical Weather Prediction & Radar Data Assimilation?",
@@ -2566,6 +2788,808 @@
     }
   ],
   "quizzes": [
+    {
+      "id": "paper_custom_1789111738706",
+      "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology",
+      "subjectId": "all",
+      "subjectName": "Numerical Weather Prediction & Radar Data Assimilation",
+      "topicName": "",
+      "conceptName": "",
+      "trainerName": "AI Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 29,
+      "passMarks": 15,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-11T07:28:58.747Z",
+      "deadlineTime": "2026-09-18T07:28:58.747Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "targetTraineeIds": [],
+      "blueprint": [],
+      "questions": [
+        {
+          "id": "qb_59f97ef5",
+          "question": "In terrain-following coordinates (such as the sigma coordinate $\\sigma = p / p_s$), the horizontal pressure gradient force $-\\nabla_p \\Phi$ is split into two terms: $-\\nabla_\\sigma \\Phi - \\frac{R T}{p_s} \\nabla_\\sigma p_s$. What critical numerical issue arises when evaluating this form over steep topography in NWP models?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "mcq",
+          "difficulty": "Medium",
+          "options": [
+            "The two terms are of comparable magnitude and opposite signs over steep slopes, causing catastrophic cancellation and large truncation errors that generate spurious horizontal accelerations.",
+            "The vertical coordinate transformation becomes singular when $\\nabla_\\sigma p_s \\neq 0$, rendering the Jacobian of the transformation non-invertible.",
+            "The Coriolis acceleration decouples from the horizontal velocity components, requiring artificial divergence damping to maintain geostrophic balance.",
+            "The diagnostic equation for geopotential height becomes hyperbolic, preventing the use of standard iterative elliptic solvers."
+          ],
+          "correctAnswer": 0,
+          "explanation": "Over steeply sloping terrain, the gradient along constant sigma surfaces ($-\\nabla_\\sigma \\Phi$) and the surface pressure correction term ($-RT/p_s \\nabla_\\sigma p_s$) are both very large but have opposite signs. Because finite-difference approximations evaluate these two terms separately, small discretization errors in each term fail to cancel properly, leading to significant truncation errors that produce spurious unphysical winds and pressure forces."
+        },
+        {
+          "id": "qb_nwp_104",
+          "subjectId": "sub_nwp_02",
+          "subjectName": "Subject 2: Data Assimilation & Radiance",
+          "module": "Module 1: Variational Assimilation",
+          "question": "In 4D-Var Data Assimilation, what is the core role of the Adjoint Model?",
+          "options": [
+            "To extrapolate infrared satellite brightness temperatures over desert surfaces",
+            "To integrate sensitivities of the cost function backwards in time to obtain gradient vectors with respect to initial state",
+            "To filter high-frequency tidal oscillations in the stratosphere",
+            "To perform horizontal bi-linear interpolation on irregular grids"
+          ],
+          "correctAnswer": 1,
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "explanation": "The adjoint model integrates backward through the assimilation window, computing exact gradients of the observation misfit cost function for minimization."
+        },
+        {
+          "id": "qb_9549db97",
+          "question": "In the context of Adaptive Atmospheric Dynamics & NWP Practice Paper (Numerical Weather Prediction & Radar Data Assimilation), how are boundary layer sub-grid scale turbulent fluxes parameterized?",
+          "subjectId": "sub_gen_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Via non-local eddy diffusivity and mixing length turbulent closure schemes",
+            "By assuming laminar molecular viscosity everywhere above surface",
+            "Through hardcoded constant horizontal advection constants",
+            "By setting convective available potential energy (CAPE) to zero"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "explanation": "Planetary boundary layer schemes parameterize vertical sub-grid turbulent fluxes using eddy diffusivity profiles and K-theory.",
+          "createdBy": "u_trainee_1",
+          "createdByEmail": null,
+          "createdByName": null,
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T04:08:09.931Z"
+        },
+        {
+          "id": "qb_43bed1f0",
+          "question": "Which of the following statements correctly describes the relationship between return types and method overloading in Java?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Method overloading can be achieved solely by changing the return type of a method.",
+            "Changing only the return type without altering the parameter list causes a compile-time error.",
+            "Overloaded methods are required to return the exact same data type.",
+            "The return type of an overloaded method must always be void."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Java, the method signature consists only of the method name and the parameter list; it does not include the return type. Therefore, two methods with identical names and parameter lists but different return types cause a compile-time error because the compiler cannot determine which method to invoke."
+        },
+        {
+          "id": "qb_f92fecca",
+          "question": "What is the primary operational advantage of 4D-Var data assimilation over 3D-Var in Numerical Weather Prediction & Radar Data Assimilation?",
+          "subjectId": "sub_gen_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Incorporates the forecast model physics equations directly within the assimilation time window",
+            "Completely bypasses background error covariance matrices",
+            "Eliminates the requirement for satellite radiance bias correction",
+            "Restricts observations exclusively to synoptic surface barometers"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "explanation": "4D-Var propagates observational innovations dynamically through time using tangent linear and adjoint model operators.",
+          "createdBy": "u_trainee_1",
+          "createdByEmail": null,
+          "createdByName": null,
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T04:08:10.038Z"
+        },
+        {
+          "id": "qb_a197da6f",
+          "question": "What is the primary operational advantage of 4D-Var data assimilation over 3D-Var in Numerical Weather Prediction & Radar Data Assimilation?",
+          "subjectId": "sub_gen_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Incorporates the forecast model physics equations directly within the assimilation time window",
+            "Completely bypasses background error covariance matrices",
+            "Eliminates the requirement for satellite radiance bias correction",
+            "Restricts observations exclusively to synoptic surface barometers"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "explanation": "4D-Var propagates observational innovations dynamically through time using tangent linear and adjoint model operators.",
+          "createdBy": "u_trainee_1",
+          "createdByEmail": null,
+          "createdByName": null,
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T04:08:09.853Z"
+        },
+        {
+          "id": "qb_6aad475b",
+          "question": "Consider a Java class for atmospheric data processing containing two overloaded methods: 'void analyze(int gridPoints)' and 'void analyze(double gridPoints)'. If the call 'analyze(100)' is executed, which method will be invoked?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "analyze(double gridPoints), because integer values are automatically converted to double first.",
+            "analyze(int gridPoints), because it provides an exact match for the integer literal parameter.",
+            "Both methods are executed sequentially.",
+            "A compile-time error occurs due to method ambiguity."
+          ],
+          "correctAnswer": 1,
+          "explanation": "When resolving overloaded methods, Java's compiler first searches for an exact match for the provided argument types. Since '100' is an integer literal, it matches 'analyze(int gridPoints)' directly without requiring type promotion to double."
+        },
+        {
+          "id": "qb_cfb45549",
+          "question": "What operational signature in satellite EIR imagery indicates rapid intensification during Numerical Weather Prediction & Radar Data Assimilation?",
+          "subjectId": "sub_gen_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Sharp warming of the eye surrounded by a symmetric ring of very cold cloud-top temperatures (CDO)",
+            "Asymmetric elongation of the cirrus outflow canopy into dry air",
+            "Gradual erosion of the eyewall into fractional stratocumulus",
+            "Expansion of positive sea-level pressure anomalies at the core"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "explanation": "Enhanced convective symmetry with very cold cloud tops around a warm eye signifies strong central pressure drops.",
+          "createdBy": "u_trainee_1",
+          "createdByEmail": null,
+          "createdByName": null,
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T04:08:10.067Z"
+        },
+        {
+          "id": "qb_20f65ee7",
+          "question": "When discretizing numerical equations for Numerical Weather Prediction (NWP) Dynamics in Subject 1: Governing Equations & Atmospheric Dynamics — Module 1: Navier-Stokes & Primitive Equation Systems, what is the essential stability constraint?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Subject 1: Governing Equations & Atmospheric Dynamics — Module 1: Navier-Stokes & Primitive Equation Systems",
+          "topic": "Numerical Weather Prediction (NWP) Dynamics",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
+            "Zero horizontal grid spacing across vertical sigma levels",
+            "Elimination of planetary boundary layer drag parameterization",
+            "Fixed time step independent of spatial mesh resolution"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
+          "acceptedAnswers": [],
+          "explanation": "Explicit integration schemes for Numerical Weather Prediction (NWP) Dynamics require adherence to the CFL condition to prevent non-linear computational instability.",
+          "createdBy": "u_trainer_1",
+          "createdByEmail": "amit.sengupta@imd.gov.in",
+          "createdByName": "Dr. Amit Sengupta",
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T03:49:24.034Z"
+        },
+        {
+          "id": "qb_dwr_101",
+          "subjectId": "sub_dwr_01",
+          "subjectName": "Subject 1: Radar Hardware & Base Products",
+          "module": "Module 1: Dual-Polarization Moments",
+          "question": "What physical hydrometeor property is directly quantified by Differential Reflectivity (ZDR = 10 * log10(Zh / Zv))?",
+          "options": [
+            "Total water vapor column density",
+            "Median shape eccentricity/oblateness of falling hydrometeors",
+            "Radial Doppler velocity toward the radar transmitter",
+            "Surface rainfall accumulation rate strictly in mm/hr"
+          ],
+          "correctAnswer": 1,
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "explanation": "Large raindrops flatten into oblate spheroids due to aerodynamic drag as they fall, causing Zh > Zv and producing positive ZDR values (e.g. +1 to +4 dB)."
+        }
+      ]
+    },
+    {
+      "id": "paper_custom_1789111249272",
+      "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology",
+      "subjectId": "all",
+      "subjectName": "Numerical Weather Prediction & Radar Data Assimilation",
+      "topicName": "",
+      "conceptName": "",
+      "trainerName": "AI Adaptive Engine",
+      "department": "India Meteorological Department",
+      "totalMarks": 29,
+      "passMarks": 15,
+      "durationMinutes": 20,
+      "scheduledStartTime": "2026-09-11T07:20:49.370Z",
+      "deadlineTime": "2026-09-18T07:20:49.372Z",
+      "status": "published",
+      "isKioskModeRequired": true,
+      "targetTraineeIds": [],
+      "blueprint": [],
+      "questions": [
+        {
+          "id": "qb_dec81924",
+          "question": "In Adaptive Atmospheric Dynamics & NWP Practice Paper (Numerical Weather Prediction & Radar Data Assimilation), how does coordinate transformation maintain numerical accuracy over complex terrain?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Terrain-following sigma coordinates normalize pressure surfaces to boundary topography",
+            "By neglecting vertical baroclinic gradients entirely",
+            "By converting Cartesian coordinates to purely horizontal isobaric slabs without surface alignment",
+            "By setting boundary layer friction coefficients to zero"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Sigma coordinates smoothly map irregular topographical heights to normalize governing momentum and thermodynamic equations."
+        },
+        {
+          "id": "qb_43bed1f0",
+          "question": "Which of the following statements correctly describes the relationship between return types and method overloading in Java?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Method overloading can be achieved solely by changing the return type of a method.",
+            "Changing only the return type without altering the parameter list causes a compile-time error.",
+            "Overloaded methods are required to return the exact same data type.",
+            "The return type of an overloaded method must always be void."
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Java, the method signature consists only of the method name and the parameter list; it does not include the return type. Therefore, two methods with identical names and parameter lists but different return types cause a compile-time error because the compiler cannot determine which method to invoke."
+        },
+        {
+          "id": "qb_nwp_104",
+          "subjectId": "sub_nwp_02",
+          "subjectName": "Subject 2: Data Assimilation & Radiance",
+          "module": "Module 1: Variational Assimilation",
+          "question": "In 4D-Var Data Assimilation, what is the core role of the Adjoint Model?",
+          "options": [
+            "To extrapolate infrared satellite brightness temperatures over desert surfaces",
+            "To integrate sensitivities of the cost function backwards in time to obtain gradient vectors with respect to initial state",
+            "To filter high-frequency tidal oscillations in the stratosphere",
+            "To perform horizontal bi-linear interpolation on irregular grids"
+          ],
+          "correctAnswer": 1,
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "explanation": "The adjoint model integrates backward through the assimilation window, computing exact gradients of the observation misfit cost function for minimization."
+        },
+        {
+          "id": "qb_84811bcf",
+          "question": "A raw binary data stream from an S-band Doppler Weather Radar is ingested into a Python pre-processor. Which standard Python data type provides an IMMUTABLE sequence of raw bytes (integers in range 0 <= x < 256)?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "bytearray",
+            "memoryview",
+            "bytes",
+            "str encoded in UTF-8"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The 'bytes' class in Python is an immutable sequence of single bytes (integers from 0 to 255). Conversely, 'bytearray' is a mutable byte sequence, and 'str' represents Unicode text."
+        },
+        {
+          "id": "qb_add300d6",
+          "question": "In a spectral atmospheric dynamics model using spherical harmonic expansion, wave coefficients require both real and imaginary components. Which native Python built-in data type natively handles numbers containing imaginary units?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "complex type, written using the syntax '3.5 + 2.1j' or instantiated via 'complex(3.5, 2.1)'.",
+            "fourier type, written using the syntax '3.5 + 2.1i' or instantiated via 'fourier(3.5, 2.1)'.",
+            "vector type, instantiated via 'vector(3.5, 2.1)'.",
+            "struct type, instantiated via 'struct(real=3.5, imag=2.1)'."
+          ],
+          "correctAnswer": 0,
+          "explanation": "Python has native built-in support for complex numbers via the 'complex' type. Complex literals use 'j' or 'J' as the imaginary indicator (e.g., 3.5 + 2.1j), and individual components can be accessed via '.real' and '.imag' attributes."
+        },
+        {
+          "id": "qb_6a0cf18e",
+          "question": "Under standard operational conditions in Numerical Weather Prediction (NWP) Dynamics, which formulation correctly describes the primary dynamical balance?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Subject 1: Governing Equations & Atmospheric Dynamics — Module 1: Navier-Stokes & Primitive Equation Systems",
+          "topic": "Numerical Weather Prediction (NWP) Dynamics",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Hydrostatic and quasi-geostrophic balance governing large-scale Numerical Weather Prediction (NWP) Dynamics",
+            "Purely ageostrophic flow with zero divergence across horizontal layers",
+            "Unconstrained non-hydrostatic acoustic wave dominance",
+            "Isothermal barotropic boundary layer equilibrium"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "Hydrostatic and quasi-geostrophic balance governing large-scale Numerical Weather Prediction (NWP) Dynamics",
+          "acceptedAnswers": [],
+          "explanation": "Large-scale dynamics in Numerical Weather Prediction (NWP) Dynamics maintain quasi-geostrophic equilibrium where horizontal pressure gradients balance Coriolis acceleration.",
+          "createdBy": "u_trainer_1",
+          "createdByEmail": "amit.sengupta@imd.gov.in",
+          "createdByName": "Dr. Amit Sengupta",
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T03:49:24.066Z"
+        },
+        {
+          "id": "qb_c54dabf6",
+          "question": "Which diagnostic polarimetric / observational moment provides the most reliable verification in Numerical Weather Prediction & Radar Data Assimilation?",
+          "subjectId": "sub_gen_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Differential Reflectivity (Z_DR) and Specific Differential Phase (K_DP)",
+            "Single-channel uncalibrated thermal infrared luminance",
+            "Linear depolarization ratio without range correction",
+            "Uncorrected velocity folding products"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "explanation": "Dual-polarization moments like Z_DR and K_DP provide microphysical particle classification critical for Numerical Weather Prediction & Radar Data Assimilation.",
+          "createdBy": "u_trainee_1",
+          "createdByEmail": null,
+          "createdByName": null,
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T04:08:10.078Z"
+        },
+        {
+          "id": "qb_nwp_103",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "module": "Module 2: Boundary Layer Physics",
+          "question": "What numerical stability condition dictates maximum permissible time step Δt in explicit advection schemes?",
+          "options": [
+            "Boussinesq Incompressibility Criterion",
+            "Courant-Friedrichs-Lewy (CFL) Condition: C = u * Δt / Δx ≤ 1",
+            "Navier-Stokes Reynolds Limit: Re ≤ 2000",
+            "Planck Radiative Equilibrium Balance: F = σT^4"
+          ],
+          "correctAnswer": 1,
+          "marks": 2,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "explanation": "The CFL condition requires that the numerical domain of dependence completely contains the physical domain of dependence (C ≤ 1 for explicit stability)."
+        },
+        {
+          "id": "qb_8905d7e4",
+          "question": "When diagnosticating severe thunderstorm potential over northern India using upper-air sounding data, forecasters compute the Equivalent Potential Temperature (theta-e). Which MetPy function correctly performs this calculation using exact moist thermodynamics?",
+          "subjectId": "sub_nwp_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "metpy.calc.theta_e(pressure, temperature, dewpoint)",
+            "metpy.calc.equivalent_potential_temperature(pressure, temperature, dewpoint)",
+            "metpy.calc.potential_temperature_equivalent(pressure, temperature, dewpoint)",
+            "metpy.calc.compute_theta_e(pressure, temperature, dewpoint)"
+          ],
+          "correctAnswer": 1,
+          "explanation": "In MetPy, 'metpy.calc.equivalent_potential_temperature' is the designated function to compute equivalent potential temperature from pressure, temperature, and dewpoint using Bolton (1980) moist thermodynamic formulations."
+        },
+        {
+          "id": "qb_c3605157",
+          "question": "When discretizing numerical equations for Numerical Weather Prediction & Radar Data Assimilation in Module 1, what is the essential stability constraint?",
+          "subjectId": "sub_gen_01",
+          "subjectName": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "module": "Module 1",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation",
+          "concept": "",
+          "marks": 3,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
+            "Zero horizontal grid spacing across vertical sigma levels",
+            "Elimination of planetary boundary layer drag parameterization",
+            "Fixed time step independent of spatial mesh resolution"
+          ],
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "explanation": "Explicit integration schemes for Numerical Weather Prediction & Radar Data Assimilation require adherence to the CFL condition to prevent non-linear computational instability.",
+          "createdBy": "u_trainee_1",
+          "createdByEmail": null,
+          "createdByName": null,
+          "createdByRole": "trainer",
+          "createdAt": "2026-09-11T04:08:10.005Z"
+        }
+      ]
+    },
+    {
+      "id": "quiz_scheduled_live_1",
+      "title": "Operational Doppler Weather Radar & Severe Storm Diagnostics Exam",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology & NWP Modeling",
+      "subjectId": "sub_radar_01",
+      "subjectName": "Doppler Weather Radar Dual-Polarization Moments",
+      "trainerId": "u_trainer_1",
+      "trainerName": "Dr. Amit Sengupta",
+      "department": "Numerical Weather Prediction Division, New Delhi",
+      "totalMarks": 20,
+      "passMarks": 10,
+      "durationMinutes": 30,
+      "scheduledStartTime": "2026-09-11T03:00:00.000Z",
+      "deadlineTime": "2026-09-15T18:30:00.000Z",
+      "status": "published",
+      "resultsPublished": false,
+      "isKioskModeRequired": true,
+      "isPractice": false,
+      "targetTraineeIds": [],
+      "questions": [
+        {
+          "id": "q_live_01",
+          "question": "In dual-polarization Doppler weather radar, which polarimetric parameter is most effective for discriminating water-coated hail from heavy rain?",
+          "subjectName": "Doppler Weather Radar Dual-Polarization Moments",
+          "topic": "Doppler Weather Radar Dual-Polarization Moments",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Differential Reflectivity (ZDR) and Copolar Correlation Coefficient (ρhv)",
+            "Radial velocity spectrum width (W) only",
+            "Total uncalibrated power return (dBZ) alone",
+            "Antenna elevation angle alone"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Differential Reflectivity (ZDR) drops near 0 dB or negative while Correlation Coefficient (ρhv) drops below 0.95 in the presence of irregular tumbling hail stones, contrasting with rain where ZDR is positive and ρhv is > 0.98."
+        },
+        {
+          "id": "q_live_02",
+          "question": "What is the primary operational consequence of Doppler velocity aliasing (Nyquist velocity folding)?",
+          "subjectName": "Doppler Weather Radar Dual-Polarization Moments",
+          "topic": "Doppler Weather Radar Dual-Polarization Moments",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "options": [
+            "True high velocities exceeding Vmax appear with reversed sign (opposite direction)",
+            "The radar beam gets completely absorbed by hydrometeors",
+            "Reflectivity values are multiplied by two",
+            "The antenna ceases rotation due to pulse repetition overload"
+          ],
+          "correctAnswer": 0,
+          "explanation": "When radial velocity exceeds the Nyquist interval ±Vmax = λ × PRF / 4, the observed phase shift wraps around, causing outbound velocities to appear inbound or vice-versa."
+        },
+        {
+          "id": "q_live_03",
+          "question": "Specific Differential Phase (KDP) is directly proportional to which characteristic of the hydrometeor population?",
+          "subjectName": "Doppler Weather Radar Dual-Polarization Moments",
+          "topic": "Doppler Weather Radar Dual-Polarization Moments",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Liquid water content and raindrop oblateness along the propagation path",
+            "Dielectric constant of dry ice alone",
+            "The radar transmitter peak wattage",
+            "The ambient ground station barometric pressure"
+          ],
+          "correctAnswer": 0,
+          "explanation": "KDP represents the range derivative of differential phase shift and is immune to attenuation, making it ideal for rain rate (QPE) estimation in heavy precipitation."
+        },
+        {
+          "id": "q_live_04",
+          "question": "In nowcasting severe convective supercells, a Bounded Weak Echo Region (BWER) on radar signifies:",
+          "subjectName": "Doppler Weather Radar Dual-Polarization Moments",
+          "topic": "Doppler Weather Radar Dual-Polarization Moments",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "An intense, rapidly ascending updraft preventing hydrometeors from growing at mid-levels",
+            "A region of total atmospheric dissipation and clear skies",
+            "Ground clutter interference from nearby terrain",
+            "Melting snow band near the 0°C isotherm"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The BWER (or vault) indicates an extremely powerful convective updraft so swift that precipitation particles are carried aloft before they can grow large enough to produce strong radar return."
+        },
+        {
+          "id": "q_live_05",
+          "question": "The Velocity Azimuth Display (VAD) technique is operationally utilized in IMD radars to retrieve:",
+          "subjectName": "Doppler Weather Radar Dual-Polarization Moments",
+          "topic": "Doppler Weather Radar Dual-Polarization Moments",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Vertical wind profiles (horizontal wind speed and direction at successive altitudes)",
+            "Sea surface temperature anomalies",
+            "Soil moisture saturation indices",
+            "Upper-air ozone concentrations"
+          ],
+          "correctAnswer": 0,
+          "explanation": "VAD analyzes radial velocities along a 360-degree azimuthal circle at fixed elevation angles to derive the mean horizontal wind vector and divergence at each altitude."
+        }
+      ]
+    },
+    {
+      "id": "quiz_scheduled_upcoming_1",
+      "title": "Numerical Weather Prediction & WRF Ensemble Assimilation Examination",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology & NWP Modeling",
+      "subjectId": "sub_nwp_01",
+      "subjectName": "Atmospheric Dynamics & Primitive Equations",
+      "trainerId": "u_trainer_1",
+      "trainerName": "Dr. Amit Sengupta",
+      "department": "Numerical Weather Prediction Division, New Delhi",
+      "totalMarks": 20,
+      "passMarks": 10,
+      "durationMinutes": 40,
+      "scheduledStartTime": "2026-09-14T09:00:00.000Z",
+      "deadlineTime": "2026-09-18T18:00:00.000Z",
+      "status": "published",
+      "resultsPublished": false,
+      "isKioskModeRequired": true,
+      "isPractice": false,
+      "targetTraineeIds": [],
+      "questions": [
+        {
+          "id": "q_up_01",
+          "question": "Which time-integration scheme is widely implemented in modern operational dynamical cores to prevent fast acoustic waves from restricting the advective time step?",
+          "subjectName": "Atmospheric Dynamics & Primitive Equations",
+          "topic": "Atmospheric Dynamics & Primitive Equations",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Split-explicit / semi-implicit time integration",
+            "Forward Euler explicit integration",
+            "Backward leapfrog without Robert-Asselin filtering",
+            "Pure Runge-Kutta 1st order"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Split-explicit and semi-implicit schemes treat high-frequency acoustic modes on a smaller sub-step or implicitly, maintaining CFL stability without requiring an impractically small main advection time step."
+        },
+        {
+          "id": "q_up_02",
+          "question": "In ensemble forecasting, the Spread-Skill Relationship indicates:",
+          "subjectName": "Atmospheric Dynamics & Primitive Equations",
+          "topic": "Atmospheric Dynamics & Primitive Equations",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "Ensemble spread should ideally match the root-mean-square error (RMSE) of the ensemble mean",
+            "Ensemble spread must always be zero for deterministic accuracy",
+            "Ensemble spread is inversely proportional to forecast lead time",
+            "Ensemble spread only measures instrumentation noise"
+          ],
+          "correctAnswer": 0,
+          "explanation": "A well-calibrated ensemble system exhibits a 1:1 relationship between ensemble standard deviation (spread) and the RMSE of the ensemble mean forecast."
+        },
+        {
+          "id": "q_up_03",
+          "question": "Which atmospheric boundary layer parameterization in WRF is based on a non-local turbulent closure formulation?",
+          "subjectName": "Atmospheric Dynamics & Primitive Equations",
+          "topic": "Atmospheric Dynamics & Primitive Equations",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "options": [
+            "Yonsei University (YSU) Scheme",
+            "Mellor-Yamada-Janjic (MYJ) 1.5-order local scheme",
+            "Bougeault-Lacarrere (BouLac) TKE scheme",
+            "Laminar Molecular Viscosity Model"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The YSU scheme uses non-local turbulent mixing with an explicit counter-gradient term to represent large eddy circulations in the convective boundary layer."
+        },
+        {
+          "id": "q_up_04",
+          "question": "What is the primary role of the Background Error Covariance Matrix (B-matrix) in variational data assimilation (3D-Var / 4D-Var)?",
+          "subjectName": "Atmospheric Dynamics & Primitive Equations",
+          "topic": "Atmospheric Dynamics & Primitive Equations",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "It spreads observational information spatially and balances unobserved physical variables dynamically",
+            "It inverts matrix coordinates for GPU rendering",
+            "It deletes corrupt sensor telemetry records",
+            "It sets surface boundary conditions to zero"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The B-matrix controls how observation increments are weighted, filtered, and spread horizontally and vertically, while enforcing geostrophic and hydrostatic balance."
+        },
+        {
+          "id": "q_up_05",
+          "question": "The Arakawa C-grid staggering used in WRF and GFS models evaluates:",
+          "subjectName": "Atmospheric Dynamics & Primitive Equations",
+          "topic": "Atmospheric Dynamics & Primitive Equations",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "Mass/thermodynamic variables at cell centers and normal velocity components at cell faces",
+            "All variables at cell vertices identically",
+            "Wind velocities at polar boundaries only",
+            "Pressure and temperature at staggered vertical interfaces exclusively"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The C-grid staggers u-wind on East-West faces, v-wind on North-South faces, and mass/scalars (T, q, p) at cell centers, providing optimal dispersion properties for gravity-inertia waves."
+        }
+      ]
+    },
+    {
+      "id": "quiz_scheduled_completed_1",
+      "title": "Satellite Meteorology & Tropical Cyclogenesis Protocol Assessment",
+      "courseId": "crs_nwp_101",
+      "courseName": "MoES Operational Meteorology & NWP Modeling",
+      "subjectId": "sub_sat_01",
+      "subjectName": "Tropical Meteorology & Severe Weather",
+      "trainerId": "u_trainer_1",
+      "trainerName": "Dr. Amit Sengupta",
+      "department": "Numerical Weather Prediction Division, New Delhi",
+      "totalMarks": 20,
+      "passMarks": 10,
+      "durationMinutes": 25,
+      "scheduledStartTime": "2026-09-06T09:00:00.000Z",
+      "deadlineTime": "2026-09-10T18:00:00.000Z",
+      "status": "published",
+      "resultsPublished": false,
+      "isKioskModeRequired": true,
+      "isPractice": false,
+      "targetTraineeIds": [],
+      "questions": [
+        {
+          "id": "q_comp_01",
+          "question": "According to the Dvorak Tropical Cyclone intensity estimation technique, an Embedded Center Pattern occurs when:",
+          "subjectName": "Tropical Meteorology & Severe Weather",
+          "topic": "Tropical Meteorology & Severe Weather",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "The eye or central convective peak is surrounded by a dense, unbroken ring of cold overcast cloud tops",
+            "The storm center is completely cloud-free with no banding",
+            "The cirrus canopy has sheared away leaving an exposed low-level circulation",
+            "The central pressure drops below 900 hPa"
+          ],
+          "correctAnswer": 0,
+          "explanation": "In Dvorak classification, the embedded center pattern evaluates the distance the center is embedded into the dense overcast cloud shield."
+        },
+        {
+          "id": "q_comp_02",
+          "question": "Which water vapor absorption band channel on INSAT-3DR is critical for identifying upper-tropospheric jet dynamics and dry air intrusions?",
+          "subjectName": "Tropical Meteorology & Severe Weather",
+          "topic": "Tropical Meteorology & Severe Weather",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "6.7 - 7.1 μm Water Vapour Channel",
+            "0.65 μm Visible Channel",
+            "10.8 μm Clean Thermal Infrared Channel",
+            "3.9 μm Shortwave Infrared Channel"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The 6.7–7.1 μm water vapor channel responds to moisture in the 300–600 hPa layer, highlighting dry intrusions, PV anomalies, and jet streaks."
+        },
+        {
+          "id": "q_comp_03",
+          "question": "Under the RSMC New Delhi cyclone classification, a Super Cyclonic Storm corresponds to 3-minute sustained surface wind speeds of:",
+          "subjectName": "Tropical Meteorology & Severe Weather",
+          "topic": "Tropical Meteorology & Severe Weather",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Easy",
+          "options": [
+            "120 knots (222 km/h) or higher",
+            "64 - 89 knots (119 - 165 km/h)",
+            "48 - 63 knots (89 - 117 km/h)",
+            "34 - 47 knots (62 - 88 km/h)"
+          ],
+          "correctAnswer": 0,
+          "explanation": "IMD classifies tropical cyclones with 3-minute sustained surface wind speeds of 120 knots (222 km/h) and above as Super Cyclonic Storms."
+        },
+        {
+          "id": "q_comp_04",
+          "question": "Ocean Heat Content (OHC) exceeding which threshold is recognized as highly favorable for rapid tropical cyclone intensification in the Bay of Bengal?",
+          "subjectName": "Tropical Meteorology & Severe Weather",
+          "topic": "Tropical Meteorology & Severe Weather",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Hard",
+          "options": [
+            "50 kJ/cm² (or 500 MJ/m²)",
+            "5 kJ/cm²",
+            "1000 J/m²",
+            "0.5 kJ/cm²"
+          ],
+          "correctAnswer": 0,
+          "explanation": "An OHC (relative to the 26°C isotherm) greater than 50 kJ/cm² supplies ample thermal energy and prevents cold water upwelling from weakening the cyclone."
+        },
+        {
+          "id": "q_comp_05",
+          "question": "In the Northern Hemisphere, why does maximum storm surge typically manifest in the right-forward quadrant of a landfalling cyclone?",
+          "subjectName": "Tropical Meteorology & Severe Weather",
+          "topic": "Tropical Meteorology & Severe Weather",
+          "marks": 4,
+          "type": "MCQ",
+          "difficulty": "Medium",
+          "options": [
+            "The storm's translation velocity adds vectorially to the counter-clockwise rotational wind field",
+            "Coriolis force deflects storm surge waters directly westward",
+            "Atmospheric pressure is highest in the right quadrant",
+            "The eye wall completely collapses upon coastline contact"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Because cyclonic winds rotate counter-clockwise in the Northern Hemisphere, winds in the right-front quadrant blow in the direction of storm motion, creating peak wind stress piling water onshore."
+        }
+      ]
+    },
     {
       "id": "paper_custom_1789100478380",
       "title": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
@@ -4814,6 +5838,337 @@
   ],
   "quizSubmissions": [
     {
+      "id": "subm_d1a55328",
+      "quizId": "paper_custom_1789111249272",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 29,
+      "percentage": 0,
+      "passed": false,
+      "isDisqualified": false,
+      "integrityStatus": "clean",
+      "disqualificationReason": "",
+      "timeTakenSeconds": 28,
+      "tabSwitchCount": 0,
+      "submittedAt": "2026-09-11T07:21:30.455Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "pending_publish",
+      "trainerFeedback": "",
+      "certificateGenerated": false,
+      "certificateId": null,
+      "adaptiveTrajectory": [
+        "Moderate",
+        "Moderate",
+        "Moderate",
+        "Moderate",
+        "Moderate",
+        "Moderate",
+        "Easy"
+      ],
+      "difficultyHistory": [
+        {
+          "questionNumber": 1,
+          "difficulty": "Moderate",
+          "questionId": "qb_84811bcf",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper"
+        },
+        {
+          "questionNumber": 2,
+          "difficulty": "Moderate",
+          "questionId": "qb_add300d6",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper"
+        },
+        {
+          "questionNumber": 3,
+          "difficulty": "Moderate",
+          "questionId": "qb_add300d6",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper"
+        },
+        {
+          "questionNumber": 4,
+          "difficulty": "Moderate",
+          "questionId": "qb_c54dabf6",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper"
+        },
+        {
+          "questionNumber": 5,
+          "difficulty": "Easy",
+          "questionId": "qb_43bed1f0",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper"
+        }
+      ],
+      "questionAnalysis": [
+        {
+          "questionId": "qb_dec81924",
+          "questionNumber": 1,
+          "question": "In Adaptive Atmospheric Dynamics & NWP Practice Paper (Numerical Weather Prediction & Radar Data Assimilation), how does coordinate transformation maintain numerical accuracy over complex terrain?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 18,
+          "timeSpentText": "18 sec",
+          "attempts": 1,
+          "selectedAnswer": 2,
+          "correctAnswer": 0,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Terrain-following sigma coordinates normalize pressure surfaces to boundary topography",
+            "By neglecting vertical baroclinic gradients entirely",
+            "By converting Cartesian coordinates to purely horizontal isobaric slabs without surface alignment",
+            "By setting boundary layer friction coefficients to zero"
+          ],
+          "explanation": "Sigma coordinates smoothly map irregular topographical heights to normalize governing momentum and thermodynamic equations."
+        },
+        {
+          "questionId": "qb_84811bcf",
+          "questionNumber": 2,
+          "question": "A raw binary data stream from an S-band Doppler Weather Radar is ingested into a Python pre-processor. Which standard Python data type provides an IMMUTABLE sequence of raw bytes (integers in range 0 <= x < 256)?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 1,
+          "selectedAnswer": 1,
+          "correctAnswer": 2,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "bytearray",
+            "memoryview",
+            "bytes",
+            "str encoded in UTF-8"
+          ],
+          "explanation": "The 'bytes' class in Python is an immutable sequence of single bytes (integers from 0 to 255). Conversely, 'bytearray' is a mutable byte sequence, and 'str' represents Unicode text."
+        },
+        {
+          "questionId": "qb_add300d6",
+          "questionNumber": 3,
+          "question": "In a spectral atmospheric dynamics model using spherical harmonic expansion, wave coefficients require both real and imaginary components. Which native Python built-in data type natively handles numbers containing imaginary units?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 1,
+          "selectedAnswer": 0,
+          "correctAnswer": 0,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": true,
+          "result": "Correct",
+          "marksObtained": 3,
+          "totalMarks": 3,
+          "options": [
+            "complex type, written using the syntax '3.5 + 2.1j' or instantiated via 'complex(3.5, 2.1)'.",
+            "fourier type, written using the syntax '3.5 + 2.1i' or instantiated via 'fourier(3.5, 2.1)'.",
+            "vector type, instantiated via 'vector(3.5, 2.1)'.",
+            "struct type, instantiated via 'struct(real=3.5, imag=2.1)'."
+          ],
+          "explanation": "Python has native built-in support for complex numbers via the 'complex' type. Complex literals use 'j' or 'J' as the imaginary indicator (e.g., 3.5 + 2.1j), and individual components can be accessed via '.real' and '.imag' attributes."
+        },
+        {
+          "questionId": "qb_c54dabf6",
+          "questionNumber": 4,
+          "question": "Which diagnostic polarimetric / observational moment provides the most reliable verification in Numerical Weather Prediction & Radar Data Assimilation?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 1,
+          "timeSpentText": "1 sec",
+          "attempts": 1,
+          "selectedAnswer": 2,
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Differential Reflectivity (Z_DR) and Specific Differential Phase (K_DP)",
+            "Single-channel uncalibrated thermal infrared luminance",
+            "Linear depolarization ratio without range correction",
+            "Uncorrected velocity folding products"
+          ],
+          "explanation": "Dual-polarization moments like Z_DR and K_DP provide microphysical particle classification critical for Numerical Weather Prediction & Radar Data Assimilation."
+        },
+        {
+          "questionId": "qb_43bed1f0",
+          "questionNumber": 5,
+          "question": "Which of the following statements correctly describes the relationship between return types and method overloading in Java?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Easy",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 1,
+          "selectedAnswer": 1,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": true,
+          "result": "Correct",
+          "marksObtained": 2,
+          "totalMarks": 2,
+          "options": [
+            "Method overloading can be achieved solely by changing the return type of a method.",
+            "Changing only the return type without altering the parameter list causes a compile-time error.",
+            "Overloaded methods are required to return the exact same data type.",
+            "The return type of an overloaded method must always be void."
+          ],
+          "explanation": "In Java, the method signature consists only of the method name and the parameter list; it does not include the return type. Therefore, two methods with identical names and parameter lists but different return types cause a compile-time error because the compiler cannot determine which method to invoke."
+        },
+        {
+          "questionId": "qb_6a0cf18e",
+          "questionNumber": 6,
+          "question": "Under standard operational conditions in Numerical Weather Prediction (NWP) Dynamics, which formulation correctly describes the primary dynamical balance?",
+          "type": "MCQ",
+          "topic": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "difficulty": "Moderate",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "Hydrostatic and quasi-geostrophic balance governing large-scale Numerical Weather Prediction (NWP) Dynamics",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Hydrostatic and quasi-geostrophic balance governing large-scale Numerical Weather Prediction (NWP) Dynamics",
+            "Purely ageostrophic flow with zero divergence across horizontal layers",
+            "Unconstrained non-hydrostatic acoustic wave dominance",
+            "Isothermal barotropic boundary layer equilibrium"
+          ],
+          "explanation": "Large-scale dynamics in Numerical Weather Prediction (NWP) Dynamics maintain quasi-geostrophic equilibrium where horizontal pressure gradients balance Coriolis acceleration."
+        },
+        {
+          "questionId": "qb_nwp_104",
+          "questionNumber": 7,
+          "question": "In 4D-Var Data Assimilation, what is the core role of the Adjoint Model?",
+          "type": "MCQ",
+          "topic": "Subject 2: Data Assimilation & Radiance",
+          "difficulty": "Hard",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 4,
+          "options": [
+            "To extrapolate infrared satellite brightness temperatures over desert surfaces",
+            "To integrate sensitivities of the cost function backwards in time to obtain gradient vectors with respect to initial state",
+            "To filter high-frequency tidal oscillations in the stratosphere",
+            "To perform horizontal bi-linear interpolation on irregular grids"
+          ],
+          "explanation": "The adjoint model integrates backward through the assimilation window, computing exact gradients of the observation misfit cost function for minimization."
+        },
+        {
+          "questionId": "qb_nwp_103",
+          "questionNumber": 8,
+          "question": "What numerical stability condition dictates maximum permissible time step Δt in explicit advection schemes?",
+          "type": "MCQ",
+          "topic": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "difficulty": "Easy",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 2,
+          "options": [
+            "Boussinesq Incompressibility Criterion",
+            "Courant-Friedrichs-Lewy (CFL) Condition: C = u * Δt / Δx ≤ 1",
+            "Navier-Stokes Reynolds Limit: Re ≤ 2000",
+            "Planck Radiative Equilibrium Balance: F = σT^4"
+          ],
+          "explanation": "The CFL condition requires that the numerical domain of dependence completely contains the physical domain of dependence (C ≤ 1 for explicit stability)."
+        },
+        {
+          "questionId": "qb_8905d7e4",
+          "questionNumber": 9,
+          "question": "When diagnosticating severe thunderstorm potential over northern India using upper-air sounding data, forecasters compute the Equivalent Potential Temperature (theta-e). Which MetPy function correctly performs this calculation using exact moist thermodynamics?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "metpy.calc.theta_e(pressure, temperature, dewpoint)",
+            "metpy.calc.equivalent_potential_temperature(pressure, temperature, dewpoint)",
+            "metpy.calc.potential_temperature_equivalent(pressure, temperature, dewpoint)",
+            "metpy.calc.compute_theta_e(pressure, temperature, dewpoint)"
+          ],
+          "explanation": "In MetPy, 'metpy.calc.equivalent_potential_temperature' is the designated function to compute equivalent potential temperature from pressure, temperature, and dewpoint using Bolton (1980) moist thermodynamic formulations."
+        },
+        {
+          "questionId": "qb_c3605157",
+          "questionNumber": 10,
+          "question": "When discretizing numerical equations for Numerical Weather Prediction & Radar Data Assimilation in Module 1, what is the essential stability constraint?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 3,
+          "timeSpentText": "3 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
+            "Zero horizontal grid spacing across vertical sigma levels",
+            "Elimination of planetary boundary layer drag parameterization",
+            "Fixed time step independent of spatial mesh resolution"
+          ],
+          "explanation": "Explicit integration schemes for Numerical Weather Prediction & Radar Data Assimilation require adherence to the CFL condition to prevent non-linear computational instability."
+        }
+      ]
+    },
+    {
       "id": "subm_2d7f49f6",
       "quizId": "paper_custom_1789100478380",
       "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
@@ -5132,310 +6487,6 @@
             "Converting both sequences to set types and executing req_ids - ret_ids or req_ids.difference(ret_ids)."
           ],
           "explanation": "Python's set data structure supports mathematical set operations such as difference (-), intersection (&), and union (|) optimized via hash table lookups, providing linear average time complexity."
-        }
-      ]
-    },
-    {
-      "id": "subm_54354103",
-      "quizId": "paper_custom_1789099689775",
-      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-      "courseId": "crs_nwp_101",
-      "traineeId": "u_trainee_1",
-      "traineeName": "Rahul Sharma",
-      "answers": {},
-      "score": 0,
-      "totalMarks": 30,
-      "percentage": 0,
-      "passed": false,
-      "isDisqualified": true,
-      "integrityStatus": "disqualified",
-      "disqualificationReason": "Assessment context exited repeatedly",
-      "timeTakenSeconds": 23,
-      "tabSwitchCount": 2,
-      "submittedAt": "2026-09-11T04:08:40.560Z",
-      "gradedBy": "auto",
-      "resultsPublished": false,
-      "evaluationStatus": "disqualified",
-      "trainerFeedback": "Attempt Disqualified due to repeated context exit violations (Security Rule).",
-      "certificateGenerated": false,
-      "certificateId": null,
-      "adaptiveTrajectory": [
-        "Moderate",
-        "Moderate"
-      ],
-      "difficultyHistory": [
-        {
-          "questionNumber": 1,
-          "difficulty": "Moderate",
-          "topic": "Numerical Weather Prediction & Radar Data Assimilation"
-        },
-        {
-          "questionNumber": 2,
-          "difficulty": "Moderate",
-          "questionId": "ai_q_8df0a63c",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper"
-        }
-      ],
-      "questionAnalysis": [
-        {
-          "questionId": "ai_q_ed6b9053",
-          "questionNumber": 1,
-          "question": "Under standard operational conditions in Numerical Weather Prediction & Radar Data Assimilation, which formulation correctly describes the primary dynamical balance?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 9,
-          "timeSpentText": "9 sec",
-          "attempts": 1,
-          "selectedAnswer": 1,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Hydrostatic and quasi-geostrophic balance governing large-scale Numerical Weather Prediction & Radar Data Assimilation",
-            "Purely ageostrophic flow with zero divergence across horizontal layers",
-            "Unconstrained non-hydrostatic acoustic wave dominance",
-            "Isothermal barotropic boundary layer equilibrium"
-          ],
-          "explanation": "Large-scale dynamics in Numerical Weather Prediction & Radar Data Assimilation maintain quasi-geostrophic equilibrium where horizontal pressure gradients balance Coriolis acceleration."
-        },
-        {
-          "questionId": "ai_q_77211e63",
-          "questionNumber": 2,
-          "question": "Which diagnostic polarimetric / observational moment provides the most reliable verification in Numerical Weather Prediction & Radar Data Assimilation?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 14,
-          "timeSpentText": "14 sec",
-          "attempts": 1,
-          "selectedAnswer": 2,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Differential Reflectivity (Z_DR) and Specific Differential Phase (K_DP)",
-            "Single-channel uncalibrated thermal infrared luminance",
-            "Linear depolarization ratio without range correction",
-            "Uncorrected velocity folding products"
-          ],
-          "explanation": "Dual-polarization moments like Z_DR and K_DP provide microphysical particle classification critical for Numerical Weather Prediction & Radar Data Assimilation."
-        },
-        {
-          "questionId": "ai_q_8df0a63c",
-          "questionNumber": 3,
-          "question": "What is the primary operational advantage of 4D-Var data assimilation over 3D-Var in Numerical Weather Prediction & Radar Data Assimilation?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Incorporates the forecast model physics equations directly within the assimilation time window",
-            "Completely bypasses background error covariance matrices",
-            "Eliminates the requirement for satellite radiance bias correction",
-            "Restricts observations exclusively to synoptic surface barometers"
-          ],
-          "explanation": "4D-Var propagates observational innovations dynamically through time using tangent linear and adjoint model operators."
-        },
-        {
-          "questionId": "ai_q_8a523d67",
-          "questionNumber": 4,
-          "question": "What operational signature in satellite EIR imagery indicates rapid intensification during Numerical Weather Prediction & Radar Data Assimilation?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Sharp warming of the eye surrounded by a symmetric ring of very cold cloud-top temperatures (CDO)",
-            "Asymmetric elongation of the cirrus outflow canopy into dry air",
-            "Gradual erosion of the eyewall into fractional stratocumulus",
-            "Expansion of positive sea-level pressure anomalies at the core"
-          ],
-          "explanation": "Enhanced convective symmetry with very cold cloud tops around a warm eye signifies strong central pressure drops."
-        },
-        {
-          "questionId": "ai_q_559b5da5",
-          "questionNumber": 5,
-          "question": "When discretizing numerical equations for Numerical Weather Prediction & Radar Data Assimilation in Module 1, what is the essential stability constraint?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
-            "Zero horizontal grid spacing across vertical sigma levels",
-            "Elimination of planetary boundary layer drag parameterization",
-            "Fixed time step independent of spatial mesh resolution"
-          ],
-          "explanation": "Explicit integration schemes for Numerical Weather Prediction & Radar Data Assimilation require adherence to the CFL condition to prevent non-linear computational instability."
-        },
-        {
-          "questionId": "ai_q_aebb1a76",
-          "questionNumber": 6,
-          "question": "In the context of Adaptive Atmospheric Dynamics & NWP Practice Paper (Numerical Weather Prediction & Radar Data Assimilation), how are boundary layer sub-grid scale turbulent fluxes parameterized?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Via non-local eddy diffusivity and mixing length turbulent closure schemes",
-            "By assuming laminar molecular viscosity everywhere above surface",
-            "Through hardcoded constant horizontal advection constants",
-            "By setting convective available potential energy (CAPE) to zero"
-          ],
-          "explanation": "Planetary boundary layer schemes parameterize vertical sub-grid turbulent fluxes using eddy diffusivity profiles and K-theory."
-        },
-        {
-          "questionId": "ai_q_fcac2ba7",
-          "questionNumber": 7,
-          "question": "Under standard operational conditions in Numerical Weather Prediction & Radar Data Assimilation, which formulation correctly describes the primary dynamical balance?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Hydrostatic and quasi-geostrophic balance governing large-scale Numerical Weather Prediction & Radar Data Assimilation",
-            "Purely ageostrophic flow with zero divergence across horizontal layers",
-            "Unconstrained non-hydrostatic acoustic wave dominance",
-            "Isothermal barotropic boundary layer equilibrium"
-          ],
-          "explanation": "Large-scale dynamics in Numerical Weather Prediction & Radar Data Assimilation maintain quasi-geostrophic equilibrium where horizontal pressure gradients balance Coriolis acceleration."
-        },
-        {
-          "questionId": "ai_q_2cf26cbd",
-          "questionNumber": 8,
-          "question": "Which diagnostic polarimetric / observational moment provides the most reliable verification in Numerical Weather Prediction & Radar Data Assimilation?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Differential Reflectivity (Z_DR) and Specific Differential Phase (K_DP)",
-            "Single-channel uncalibrated thermal infrared luminance",
-            "Linear depolarization ratio without range correction",
-            "Uncorrected velocity folding products"
-          ],
-          "explanation": "Dual-polarization moments like Z_DR and K_DP provide microphysical particle classification critical for Numerical Weather Prediction & Radar Data Assimilation."
-        },
-        {
-          "questionId": "ai_q_131a4f8f",
-          "questionNumber": 9,
-          "question": "What is the primary operational advantage of 4D-Var data assimilation over 3D-Var in Numerical Weather Prediction & Radar Data Assimilation?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Incorporates the forecast model physics equations directly within the assimilation time window",
-            "Completely bypasses background error covariance matrices",
-            "Eliminates the requirement for satellite radiance bias correction",
-            "Restricts observations exclusively to synoptic surface barometers"
-          ],
-          "explanation": "4D-Var propagates observational innovations dynamically through time using tangent linear and adjoint model operators."
-        },
-        {
-          "questionId": "ai_q_e112bba1",
-          "questionNumber": 10,
-          "question": "What operational signature in satellite EIR imagery indicates rapid intensification during Numerical Weather Prediction & Radar Data Assimilation?",
-          "type": "mcq",
-          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-          "difficulty": "Moderate",
-          "timeSpent": 2,
-          "timeSpentText": "2 sec",
-          "attempts": 0,
-          "selectedAnswer": null,
-          "correctAnswer": 0,
-          "acceptedAnswers": [],
-          "guidanceNote": "",
-          "isCorrect": false,
-          "result": "Incorrect",
-          "marksObtained": 0,
-          "totalMarks": 3,
-          "options": [
-            "Sharp warming of the eye surrounded by a symmetric ring of very cold cloud-top temperatures (CDO)",
-            "Asymmetric elongation of the cirrus outflow canopy into dry air",
-            "Gradual erosion of the eyewall into fractional stratocumulus",
-            "Expansion of positive sea-level pressure anomalies at the core"
-          ],
-          "explanation": "Enhanced convective symmetry with very cold cloud tops around a warm eye signifies strong central pressure drops."
         }
       ]
     },
@@ -6680,6 +7731,134 @@
       "submittedAt": "2026-09-07T11:34:34.777Z",
       "certificateGenerated": true,
       "certificateId": "MOES-IMD-CERT-2026-5427"
+    },
+    {
+      "id": "subm_sched_01",
+      "quizId": "quiz_scheduled_completed_1",
+      "quizTitle": "Satellite Meteorology & Tropical Cyclogenesis Protocol Assessment",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Ramesh Kumar",
+      "traineeEmail": "ramesh.k@imd.gov.in",
+      "cadreId": "MOES-MET-2026-0001",
+      "station": "National Weather Forecasting Centre, New Delhi",
+      "department": "Numerical Weather Prediction Division",
+      "designation": "Officer Trainee (Scientist 'B')",
+      "score": 20,
+      "totalMarks": 20,
+      "percentage": 100,
+      "passed": true,
+      "timeTakenSeconds": 760,
+      "tabSwitchCount": 0,
+      "isDisqualified": false,
+      "submittedAt": "2026-09-09T14:20:00.000Z",
+      "status": "Pending",
+      "gradedBy": "auto",
+      "certificateGenerated": true,
+      "certificateId": "MOES-IMD-CERT-2026-9041",
+      "trainerFeedback": "Flawless score on Dvorak technique and OHC thresholds.",
+      "answers": {
+        "q_comp_01": 0,
+        "q_comp_02": 0,
+        "q_comp_03": 0,
+        "q_comp_04": 0,
+        "q_comp_05": 0
+      }
+    },
+    {
+      "id": "subm_sched_02",
+      "quizId": "quiz_scheduled_completed_1",
+      "quizTitle": "Satellite Meteorology & Tropical Cyclogenesis Protocol Assessment",
+      "traineeId": "u_trainee_2",
+      "traineeName": "Priya Sharma",
+      "traineeEmail": "priya.s@imd.gov.in",
+      "cadreId": "MOES-MET-2026-0002",
+      "station": "Cyclone Warning Centre, Visakhapatnam",
+      "department": "Cyclone Warning Division",
+      "designation": "Scientific Assistant Grade-I",
+      "score": 16,
+      "totalMarks": 20,
+      "percentage": 80,
+      "passed": true,
+      "timeTakenSeconds": 855,
+      "tabSwitchCount": 0,
+      "isDisqualified": false,
+      "submittedAt": "2026-09-09T15:10:00.000Z",
+      "status": "Pending",
+      "gradedBy": "auto",
+      "certificateGenerated": true,
+      "certificateId": "MOES-IMD-CERT-2026-9042",
+      "trainerFeedback": "Strong grasp of surge physics; review OHC thermal thresholds.",
+      "answers": {
+        "q_comp_01": 0,
+        "q_comp_02": 0,
+        "q_comp_03": 0,
+        "q_comp_04": 1,
+        "q_comp_05": 0
+      }
+    },
+    {
+      "id": "subm_sched_03",
+      "quizId": "quiz_scheduled_completed_1",
+      "quizTitle": "Satellite Meteorology & Tropical Cyclogenesis Protocol Assessment",
+      "traineeId": "u_trainee_3",
+      "traineeName": "Amit Singh",
+      "traineeEmail": "amit.singh@imd.gov.in",
+      "cadreId": "MOES-MET-2026-0003",
+      "station": "Regional Meteorological Centre, Kolkata",
+      "department": "Marine & Severe Weather Forecasting",
+      "designation": "Meteorologist Grade-II",
+      "score": 16,
+      "totalMarks": 20,
+      "percentage": 80,
+      "passed": true,
+      "timeTakenSeconds": 930,
+      "tabSwitchCount": 0,
+      "isDisqualified": false,
+      "submittedAt": "2026-09-10T11:45:00.000Z",
+      "status": "Pending",
+      "gradedBy": "auto",
+      "certificateGenerated": true,
+      "certificateId": "MOES-IMD-CERT-2026-9043",
+      "trainerFeedback": "Good application of INSAT water vapor imagery.",
+      "answers": {
+        "q_comp_01": 0,
+        "q_comp_02": 0,
+        "q_comp_03": 0,
+        "q_comp_04": 0,
+        "q_comp_05": 1
+      }
+    },
+    {
+      "id": "subm_sched_04",
+      "quizId": "quiz_scheduled_completed_1",
+      "quizTitle": "Satellite Meteorology & Tropical Cyclogenesis Protocol Assessment",
+      "traineeId": "u_trainee_4",
+      "traineeName": "Sunita Roy",
+      "traineeEmail": "sunita.roy@imd.gov.in",
+      "cadreId": "MOES-MET-2026-0004",
+      "station": "Regional Meteorological Centre, Chennai",
+      "department": "Radar & Satellite Observation Section",
+      "designation": "Senior Scientific Officer",
+      "score": 16,
+      "totalMarks": 20,
+      "percentage": 80,
+      "passed": true,
+      "timeTakenSeconds": 790,
+      "tabSwitchCount": 0,
+      "isDisqualified": false,
+      "submittedAt": "2026-09-10T14:15:00.000Z",
+      "status": "Pending",
+      "gradedBy": "auto",
+      "certificateGenerated": true,
+      "certificateId": "MOES-IMD-CERT-2026-9044",
+      "trainerFeedback": "Excellent understanding of RSMC storm scales.",
+      "answers": {
+        "q_comp_01": 1,
+        "q_comp_02": 0,
+        "q_comp_03": 0,
+        "q_comp_04": 0,
+        "q_comp_05": 0
+      }
     }
   ],
   "competencyFramework": [
@@ -6814,6 +7993,14 @@
     }
   ],
   "announcements": [
+    {
+      "id": "ann_f1ecc351",
+      "title": "New Operational Course Launched: data science",
+      "category": "National Academy",
+      "date": "2026-09-11",
+      "urgent": false,
+      "author": "MoES Directorate"
+    },
     {
       "id": "ann_e857e163",
       "title": "New Operational Course Launched: Test Admin Manual Assigned Course",
@@ -7144,19 +8331,5 @@
       "topic": "Discretization & Spatial-Temporal Grid Staggering"
     }
   ],
-  "integrityAlerts": [
-    {
-      "id": "alert_eafa9bad",
-      "quizId": "paper_custom_1789099689775",
-      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-      "traineeId": "u_trainee_1",
-      "traineeName": "Rahul Sharma",
-      "status": "DISQUALIFIED",
-      "violations": 2,
-      "eventType": "context_switch",
-      "reason": "Assessment context exited repeatedly",
-      "timestamp": "2026-09-11T04:08:40.560Z",
-      "formattedTime": "Sep 11, 2026, 9:38 AM"
-    }
-  ]
+  "integrityAlerts": []
 }

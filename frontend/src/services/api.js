@@ -135,13 +135,6 @@ export const api = {
     return res.json();
   },
 
-  getTrainerEnrolledTrainees: async () => {
-    const res = await fetch(`${API_BASE_URL}/trainers/enrolled-trainees`, {
-      headers: authHeaders()
-    });
-    return res.json();
-  },
-
   generateBulkCertificates: async (courseId, templateData = {}) => {
     const res = await fetch(`${API_BASE_URL}/courses/${courseId}/bulk-certificates`, {
       method: "POST",
@@ -519,7 +512,7 @@ export const api = {
   // Competency Mapping
   getCompetencies: async () => {
     const res = await fetch(`${API_BASE_URL}/competencies`, {
-      headers: getHeaders()
+      headers: authHeaders()
     });
     return res.json();
   },

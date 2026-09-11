@@ -168,7 +168,10 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
     setLoading(true);
     try {
       const [tRes, cRes] = await Promise.all([
-        api.getTrainerEnrolledTrainees(currentUser?.name, currentUser?.id).catch(() => ({ success: false, trainees: [] })),
+        (isAdmin 
+          ? api.getTrainerEnrolledTrainees() 
+          : api.getTrainerEnrolledTrainees(currentUser?.name, currentUser?.id)
+        ).catch(() => ({ success: false, trainees: [] })),
         api.getCourses().catch(() => ({ success: false, courses: [] }))
       ]);
 

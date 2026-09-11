@@ -60,10 +60,33 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       ]);
 
       if (qRes.success && qRes.quizzes) {
-        // Additional client-side safety filter: only show quizzes from enrolled courses
-        const filteredQuizzes = enrolledIds.length > 0
-          ? qRes.quizzes.filter(q => !q.courseId || enrolledIds.includes(q.courseId))
-          : [];
+        const enrolledCoursesList = (coursesRes.courses || []).filter(c => (c.enrolledTraineeIds || []).includes(userId));
+        const enrolledCourseIdsSet = new Set(enrolledCoursesList.map(c => c.id));
+        const enrolledSubjectNamesSet = new Set(
+          enrolledCoursesList.flatMap(c => (c.subjects || []).map(s => (s.name || s.title || "").toLowerCase().trim()))
+        );
+        const enrolledSubjectIdsSet = new Set(
+          enrolledCoursesList.flatMap(c => (c.subjects || []).map(s => s.id))
+        );
+
+        // Additional client-side filter: official quizzes for enrolled courses, subjects, or open exams
+        const filteredQuizzes = qRes.quizzes.filter(q => {
+          if (q.isPractice === true) return false;
+          // Specifically targeted to some trainees: check membership
+          if (q.targetTraineeIds && Array.isArray(q.targetTraineeIds) && q.targetTraineeIds.length > 0) {
+            return q.targetTraineeIds.includes(userId);
+          }
+          // Empty targetTraineeIds [] = trainer published "All Enrolled Trainees" = open broadcast
+          if (Array.isArray(q.targetTraineeIds) && q.targetTraineeIds.length === 0) return true;
+          if (!q.courseId || q.isAllTrainees) return true;
+          if (enrolledIds.length === 0) return true;
+          if (enrolledCourseIdsSet.has(q.courseId)) return true;
+          if (q.courseName && enrolledCoursesList.some(c => c.title?.toLowerCase() === q.courseName?.toLowerCase())) return true;
+          if (q.subjectId && enrolledSubjectIdsSet.has(q.subjectId)) return true;
+          if (q.subjectName && enrolledSubjectNamesSet.has(q.subjectName.toLowerCase().trim())) return true;
+          return false;
+        });
+
         setAllQuizzes(filteredQuizzes);
       } else {
         setAllQuizzes([]);

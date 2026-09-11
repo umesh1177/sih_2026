@@ -109,29 +109,54 @@ export const getQuizzes = (req, res) => {
       );
     }
     if (traineeId) {
-      quizzes = quizzes.filter(q =>
-        !q.targetTraineeIds ||
-        q.targetTraineeIds.length === 0 ||
-        q.targetTraineeIds.includes(traineeId)
-      );
+      quizzes = quizzes.filter(q => {
+        // Skip practice papers for trainee-specific filtering
+        if (q.isPractice === true) return true; // Practice handled separately below
+        // Specifically targeted to certain trainees: check membership
+        if (q.targetTraineeIds && Array.isArray(q.targetTraineeIds) && q.targetTraineeIds.length > 0) {
+          return q.targetTraineeIds.includes(traineeId);
+        }
+        // Empty targetTraineeIds [] = trainer chose "All Enrolled Trainees" → broadcast to all
+        return true;
+      });
     }
 
-    // ENROLLMENT-BASED FILTERING: For trainee role, only return quizzes whose courseId
-    // matches one of the trainee's enrolled courses (official quizzes).
-    // Practice papers (isPractice=true) are filtered by createdBy when practiceOnly=true.
+    // ENROLLMENT-BASED FILTERING: For trainee role, return quizzes for enrolled courses, enrolled subjects, or open/general scheduled exams
     if (enrolledOnly === "true" && traineeId) {
       const traineeUser = db.findUserById(traineeId);
       const enrolledCourseIds = new Set();
+      const enrolledSubjectNames = new Set();
+      const enrolledSubjectIds = new Set();
       if (traineeUser) {
         db.getCourses().forEach(c => {
           if ((c.enrolledTraineeIds || []).includes(traineeId)) {
             enrolledCourseIds.add(c.id);
+            (c.subjects || []).forEach(s => {
+              if (s.id) enrolledSubjectIds.add(s.id);
+              if (s.name || s.title) enrolledSubjectNames.add((s.name || s.title).toLowerCase().trim());
+            });
           }
         });
       }
       quizzes = quizzes.filter(q => {
-        if (!q.courseId) return false;
-        return enrolledCourseIds.has(q.courseId);
+        if (q.isPractice === true) return false;
+        // Empty targetTraineeIds = trainer scheduled for "All Enrolled Trainees" = open broadcast
+        if (Array.isArray(q.targetTraineeIds) && q.targetTraineeIds.length === 0) return true;
+        // Explicitly open to all or no course restriction
+        if (!q.courseId || q.isAllTrainees) return true;
+        // No enrolled courses yet: show all available official quizzes
+        if (enrolledCourseIds.size === 0) return true;
+        // Match by enrolled course ID
+        if (enrolledCourseIds.has(q.courseId)) return true;
+        // Match by enrolled course name
+        if (q.courseName && Array.from(enrolledCourseIds).some(cid => {
+          const c = db.getCourseById(cid);
+          return c && c.title?.toLowerCase() === q.courseName?.toLowerCase();
+        })) return true;
+        // Match by enrolled subject ID or subject name
+        if (q.subjectId && enrolledSubjectIds.has(q.subjectId)) return true;
+        if (q.subjectName && enrolledSubjectNames.has(q.subjectName.toLowerCase().trim())) return true;
+        return false;
       });
     }
 

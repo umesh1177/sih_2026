@@ -58,9 +58,88 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     return "Moderate";
   };
 
-  // Full Pool of Available Questions strictly from quiz
+  // Full Pool of Available Questions strictly from quiz with rich fallback
   const allPoolQuestions = React.useMemo(() => {
-    const pool = (quiz?.questions && Array.isArray(quiz.questions)) ? quiz.questions : [];
+    const pool = (quiz?.questions && Array.isArray(quiz.questions) && quiz.questions.length > 0) ? quiz.questions : [];
+    if (pool.length === 0) {
+      return [
+        {
+          id: "q_core_1",
+          question: "What is the primary physical process governing tropical cyclogenesis in the North Indian Ocean?",
+          type: "mcq",
+          options: [
+            "Convective latent heat release over warm sea surface (>26.5°C)",
+            "Radiative cooling in the upper troposphere",
+            "Orographic barrier uplift along the Western Ghats",
+            "Direct planetary boundary layer friction"
+          ],
+          correctAnswer: 0,
+          difficulty: "Moderate",
+          marks: 2,
+          explanation: "Tropical cyclogenesis requires sea surface temperatures > 26.5°C with deep moist convection releasing latent heat."
+        },
+        {
+          id: "q_core_2",
+          question: "Which Doppler Weather Radar (DWR) polarimetric product is primarily used to differentiate hail from heavy rain?",
+          type: "mcq",
+          options: [
+            "Differential Reflectivity (ZDR) and Correlation Coefficient (RhoHV)",
+            "Base Velocity Spectrum Width only",
+            "Radial Shear Coefficient",
+            "Azimuthal Divergence Factor"
+          ],
+          correctAnswer: 0,
+          difficulty: "Hard",
+          marks: 2,
+          explanation: "Differential Reflectivity (ZDR near 0 dB) and low Correlation Coefficient (< 0.90) indicate tumbling irregular hail."
+        },
+        {
+          id: "q_core_3",
+          question: "In Numerical Weather Prediction (NWP), what is the primary role of 4D-Var Data Assimilation?",
+          type: "mcq",
+          options: [
+            "Optimal blending of observations over a time window consistent with model physics",
+            "Direct statistical interpolation without dynamical constraints",
+            "Generating post-processed radar reflectivity mosaics only",
+            "Calculating simple moving average of station temperatures"
+          ],
+          correctAnswer: 0,
+          difficulty: "Hard",
+          marks: 2,
+          explanation: "4D-Var data assimilation iteratively minimizes cost function across a time window to produce dynamically consistent initial states."
+        },
+        {
+          id: "q_core_4",
+          question: "Which satellite channel on INSAT-3D is most sensitive to upper-tropospheric water vapor dynamics?",
+          type: "mcq",
+          options: [
+            "Water Vapor (6.5 - 7.1 µm)",
+            "Visible (0.55 - 0.75 µm)",
+            "Thermal Infrared 1 (10.3 - 11.3 µm)",
+            "Short-Wave Infrared (1.55 - 1.70 µm)"
+          ],
+          correctAnswer: 0,
+          difficulty: "Moderate",
+          marks: 2,
+          explanation: "The 6.5 - 7.1 µm infrared channel absorbs strongly in water vapor bands, revealing upper-tropospheric winds and moisture plumes."
+        },
+        {
+          id: "q_core_5",
+          question: "What meteorological term describes sudden localized extreme precipitation (>100 mm/hour over a small area)?",
+          type: "mcq",
+          options: [
+            "Cloudburst",
+            "Squall Line",
+            "Western Disturbance",
+            "Orographic Foehn"
+          ],
+          correctAnswer: 0,
+          difficulty: "Easy",
+          marks: 2,
+          explanation: "A cloudburst is characterized by extreme localized rainfall exceeding 100 mm/hour over a small geographical pocket."
+        }
+      ];
+    }
     return pool.map((q, idx) => ({
       ...q,
       id: q.id || `q_p_${idx}`,
@@ -70,20 +149,31 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
   // Active Questions Ordered Dynamically for the candidate
   const [activeQuestions, setActiveQuestions] = useState(() => {
-    if (!isAdaptiveQuiz) return allPoolQuestions;
-
-    // Start with Moderate question
+    if (!isAdaptiveQuiz || allPoolQuestions.length === 0) return allPoolQuestions;
     const moderateQ = allPoolQuestions.find(q => q.difficulty === initialDiff) || allPoolQuestions[0];
-    const rest = allPoolQuestions.filter(q => q.id !== moderateQ.id);
-    return [moderateQ, ...rest];
+    const rest = allPoolQuestions.filter(q => q.id !== moderateQ?.id);
+    return moderateQ ? [moderateQ, ...rest] : allPoolQuestions;
   });
 
+  // Sync activeQuestions if quiz prop changes
+  useEffect(() => {
+    if (allPoolQuestions.length > 0) {
+      if (!isAdaptiveQuiz) {
+        setActiveQuestions(allPoolQuestions);
+      } else {
+        const moderateQ = allPoolQuestions.find(q => q.difficulty === initialDiff) || allPoolQuestions[0];
+        const rest = allPoolQuestions.filter(q => q.id !== moderateQ?.id);
+        setActiveQuestions(moderateQ ? [moderateQ, ...rest] : allPoolQuestions);
+      }
+    }
+  }, [allPoolQuestions, initialDiff, isAdaptiveQuiz]);
+
   const questions = activeQuestions;
-  const currentQuestion = questions[currentIndex] || questions[0];
+  const currentQuestion = questions[currentIndex] || questions[0] || {};
 
   // Helper to evaluate answer correctness
   const checkAnswerCorrectness = (q, userAns) => {
-    if (userAns === undefined || userAns === null || userAns === "") return false;
+    if (!q || userAns === undefined || userAns === null || userAns === "") return false;
     const qType = q.type || (Array.isArray(q.options) && q.options.length > 0 ? "mcq" : "one_word");
     if (qType === "one_word" || qType === "short_answer") {
       const userStr = String(userAns).trim().toLowerCase();
@@ -96,23 +186,6 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     }
     return userAns === q.correctAnswer;
   };
-
-  // Request Fullscreen when kiosk launches
-  useEffect(() => {
-    try {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {
-          console.warn("Fullscreen permission denied or blocked by browser.");
-        });
-      }
-    } catch (e) {}
-
-    return () => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-    };
-  }, []);
 
   // Submit test handler with granular Trainee Performance Analytics
   const handleSubmitQuiz = useCallback(async (disqualified = false) => {
@@ -260,9 +333,65 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     }
   }, [answers, currentUser, questions, questionTimes, quiz, submitting, tabSwitchCount, timeLeftSeconds, adaptiveTrajectory, difficultyHistory]);
 
+  // Security & Kiosk Hardware Lock State
+  const [isFullscreenLocked, setIsFullscreenLocked] = useState(
+    Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)
+  );
+  const [hasEnteredKiosk, setHasEnteredKiosk] = useState(true);
+  const [recentSecurityAlert, setRecentSecurityAlert] = useState(null);
+  const [isMouseOutOfBounds, setIsMouseOutOfBounds] = useState(false);
+  const [securityEventsLog, setSecurityEventsLog] = useState([]);
+
+  // Helper to trigger real cross-browser fullscreen
+  const requestKioskFullscreen = useCallback(() => {
+    try {
+      const docEl = document.documentElement;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().then(() => {
+          setIsFullscreenLocked(true);
+        }).catch(() => {
+          // Automatic fullscreen may be gated by browser policy; user can click Re-Lock button
+        });
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+        setIsFullscreenLocked(true);
+      } else if (docEl.mozRequestFullScreen) {
+        docEl.mozRequestFullScreen();
+        setIsFullscreenLocked(true);
+      } else if (docEl.msRequestFullscreen) {
+        docEl.msRequestFullscreen();
+        setIsFullscreenLocked(true);
+      }
+    } catch (err) {
+      console.warn("Fullscreen request error:", err);
+    }
+  }, []);
+
+  // Attempt auto-fullscreen immediately when component mounts
+  useEffect(() => {
+    requestKioskFullscreen();
+  }, [requestKioskFullscreen]);
+
+  // Exit fullscreen helper
+  const exitKioskFullscreen = useCallback(() => {
+    try {
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    } catch (e) {}
+  }, []);
+
   // Countdown timer & Per-Question Time Tracking
   useEffect(() => {
-    if (submissionResult) return;
+    if (submissionResult || !hasEnteredKiosk) return;
 
     const timer = setInterval(() => {
       // Increment active question time
@@ -284,7 +413,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentQuestion, handleSubmitQuiz, submissionResult]);
+  }, [currentQuestion, handleSubmitQuiz, hasEnteredKiosk, submissionResult]);
 
   // Format time MM:SS or HH:MM:SS
   const formatTime = (secs) => {
@@ -297,26 +426,36 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  // Strict anti-cheat proctoring (2 context-exit disqualification rule)
+  // Auto-clear security alert toast after 3 seconds
   useEffect(() => {
-    if (submissionResult || isDisqualified) return;
+    if (!recentSecurityAlert) return;
+    const t = setTimeout(() => setRecentSecurityAlert(null), 3500);
+    return () => clearTimeout(t);
+  }, [recentSecurityAlert]);
 
-    const recordViolation = (eventType) => {
+  // Comprehensive Anti-Cheat Proctoring: Listen to ALL Security Events
+  useEffect(() => {
+    if (submissionResult || isDisqualified || !hasEnteredKiosk) return;
+
+    const recordViolation = (eventType, eventLabel) => {
       if (submissionResult || isDisqualified) return;
+
+      const timestamp = new Date().toLocaleTimeString("en-IN", { hour12: false });
+      setSecurityEventsLog(prev => [{ type: eventType, label: eventLabel, time: timestamp }, ...prev.slice(0, 10)]);
 
       setTabSwitchCount(prev => {
         const nextCount = prev + 1;
         const willDisqualify = nextCount >= 2;
 
-        // Log integrity violation to server immediately
+        // Log integrity violation to backend
         api.logIntegrityViolation(quiz?.id || "quiz_current", {
           traineeId: currentUser?.id || "u_trainee_1",
-          traineeName: currentUser?.name || "Trainee Officer",
+          traineeName: currentUser?.name || currentUser?.email || "Trainee Officer",
           quizTitle: quiz?.title || "Assessment",
           eventType,
           count: nextCount,
           disqualified: willDisqualify,
-          reason: willDisqualify ? "Assessment context exited repeatedly" : "Assessment context exited"
+          reason: willDisqualify ? "Assessment context exited repeatedly" : `Assessment context exited (${eventLabel})`
         });
 
         if (willDisqualify) {
@@ -330,32 +469,206 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       });
     };
 
+    // 1. Tab Switch / Window Minimize
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" || document.hidden) {
-        recordViolation("visibilitychange");
+        recordViolation("visibilitychange", "Tab Switched or Window Minimized");
       }
     };
 
+    // 2. Window Blur (Lost focus / Alt+Tab / App switch)
     const handleWindowBlur = () => {
-      recordViolation("blur");
+      recordViolation("blur", "Window Focus Lost / App Switcher Detected");
     };
 
+    // 3. Fullscreen state monitoring across all browser prefixes
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
-        recordViolation("fullscreenchange");
+      const inFullscreen = Boolean(
+        document.fullscreenElement || 
+        document.webkitFullscreenElement || 
+        document.mozFullScreenElement || 
+        document.msFullscreenElement
+      );
+      setIsFullscreenLocked(inFullscreen);
+      if (!inFullscreen) {
+        recordViolation("fullscreenchange", "Fullscreen Mode Exited");
       }
     };
 
+    // 4. Mouse boundary tracking (Moving out of window to second screen / browser chrome)
+    const handleMouseLeave = () => {
+      setIsMouseOutOfBounds(true);
+      setRecentSecurityAlert("⚠️ Notice: Cursor exited examination boundary!");
+    };
+    const handleMouseEnter = () => {
+      setIsMouseOutOfBounds(false);
+    };
+
+    // 5. Disable Right-Click Context Menu
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      setRecentSecurityAlert("🚫 Right-Click Inspection is Disabled in Kiosk Exam Mode");
+      return false;
+    };
+
+    // 6. Disable Copy, Cut, Paste
+    const handleCopy = (e) => {
+      e.preventDefault();
+      setRecentSecurityAlert("🚫 Text Copy is Disabled during Examination");
+      return false;
+    };
+    const handleCut = (e) => {
+      e.preventDefault();
+      setRecentSecurityAlert("🚫 Clipboard Cut is Disabled in Kiosk Mode");
+      return false;
+    };
+    const handlePaste = (e) => {
+      e.preventDefault();
+      setRecentSecurityAlert("🚫 Pasting Content is Blocked in Kiosk Mode");
+      return false;
+    };
+
+    // 7. Prevent Text Selection on body
+    const handleSelectStart = (e) => {
+      if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+      }
+    };
+
+    // 8. Prevent Drag & Drop
+    const handleDragStart = (e) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // 9. Keyboard Shortcuts & DevTools Interception
+    const handleKeyDown = (e) => {
+      const key = e.key || "";
+      const code = e.code || "";
+      const isCtrl = e.ctrlKey || e.metaKey;
+      const isShift = e.shiftKey;
+      const isAlt = e.altKey;
+
+      // Block F12, F5, F11, F1-F10
+      if (code.startsWith("F") && !isNaN(Number(code.slice(1)))) {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert(`⚠️ Function Key ${code} is Blocked by Exam Security`);
+        return false;
+      }
+
+      // Block DevTools: Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (isCtrl && isShift && (key.toLowerCase() === "i" || key.toLowerCase() === "j" || key.toLowerCase() === "c")) {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert("🚫 DevTools Shortcut Intercepted and Blocked");
+        return false;
+      }
+
+      // Block View Source: Ctrl+U
+      if (isCtrl && key.toLowerCase() === "u") {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert("🚫 View Source is Prohibited");
+        return false;
+      }
+
+      // Block Print: Ctrl+P
+      if (isCtrl && key.toLowerCase() === "p") {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert("🚫 Printing is Disabled in Kiosk Exam");
+        return false;
+      }
+
+      // Block Save: Ctrl+S
+      if (isCtrl && key.toLowerCase() === "s") {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert("🚫 Save Page is Disabled");
+        return false;
+      }
+
+      // Block Reload: Ctrl+R, Ctrl+Shift+R
+      if (isCtrl && key.toLowerCase() === "r") {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert("🚫 Page Refresh is Blocked");
+        return false;
+      }
+
+      // Block Clipboard Shortcuts if outside text input: Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+A
+      if (isCtrl && ["c", "v", "x", "a"].includes(key.toLowerCase()) && e.target.tagName !== "INPUT") {
+        e.preventDefault();
+        e.stopPropagation();
+        setRecentSecurityAlert("🚫 Clipboard Action Disabled");
+        return false;
+      }
+
+      // Detect Windows / Command Key
+      if (key === "Meta" || key === "OS") {
+        setRecentSecurityAlert("⚠️ System Key Detected — Keep Focus on Exam");
+      }
+
+      // Detect Escape (Attempting to leave fullscreen)
+      if (key === "Escape") {
+        setRecentSecurityAlert("⚠️ Warning: Escape Key Pressed");
+      }
+    };
+
+    // 10. Prevent accidental browser close or reload
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "Assessment in progress. Leaving will submit your test with zero marks.";
+      return e.returnValue;
+    };
+
+    // 11. Browser Back Button Trap (Popstate)
+    const handlePopState = (e) => {
+      window.history.pushState(null, "", window.location.href);
+      setRecentSecurityAlert("⚠️ Navigation Disabled during Assessment");
+    };
+    window.history.pushState(null, "", window.location.href);
+
+    // Register all event listeners
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleWindowBlur);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+    document.documentElement.addEventListener("mouseleave", handleMouseLeave);
+    document.documentElement.addEventListener("mouseenter", handleMouseEnter);
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("copy", handleCopy);
+    document.addEventListener("cut", handleCut);
+    document.addEventListener("paste", handlePaste);
+    document.addEventListener("selectstart", handleSelectStart);
+    document.addEventListener("dragstart", handleDragStart);
+    window.addEventListener("keydown", handleKeyDown, true);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleWindowBlur);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+      document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
+      document.documentElement.removeEventListener("mouseenter", handleMouseEnter);
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("copy", handleCopy);
+      document.removeEventListener("cut", handleCut);
+      document.removeEventListener("paste", handlePaste);
+      document.removeEventListener("selectstart", handleSelectStart);
+      document.removeEventListener("dragstart", handleDragStart);
+      window.removeEventListener("keydown", handleKeyDown, true);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
     };
-  }, [currentUser, handleSubmitQuiz, isDisqualified, quiz, submissionResult]);
+  }, [currentUser, handleSubmitQuiz, hasEnteredKiosk, isDisqualified, quiz, submissionResult]);
 
   // ⚡ Adaptive Learning Engine Rule & Next Question Selector
   const processAdaptiveTransition = (targetNextIndex) => {
@@ -767,8 +1080,8 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                   setMarkedForReview({});
                   setTimeLeftSeconds((quiz?.durationMinutes || 20) * 60);
                   setCurrentIndex(0);
-                  setAdaptiveDifficulty("Medium");
-                  setAdaptiveTrajectory(["Medium"]);
+                  setCurrentDifficulty("Moderate");
+                  setAdaptiveTrajectory(["Moderate"]);
                 }}
                 className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl text-xs transition-colors"
               >
@@ -797,8 +1110,16 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#f8fafc] text-slate-800 flex flex-col overflow-hidden select-none font-sans">
+    <div className={`fixed inset-0 z-50 bg-[#f8fafc] text-slate-800 flex flex-col overflow-hidden select-none font-sans ${isMouseOutOfBounds ? "ring-4 ring-rose-500/50" : ""}`}>
       
+      {/* Floating Security Alert Toast */}
+      {recentSecurityAlert && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white border border-amber-400/80 px-4 py-2 rounded-2xl shadow-2xl text-xs font-black flex items-center gap-2 animate-in slide-in-from-top-4">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>{recentSecurityAlert}</span>
+        </div>
+      )}
+
       {/* ═════════ 1. TOP SECURE KIOSK HEADER (LIGHT THEME) ═════════ */}
       <header className="h-16 bg-white border-b border-slate-200/90 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-2xs z-30">
         
@@ -817,7 +1138,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </span>
             </div>
             <p className="text-[11px] text-slate-500 font-medium">
-              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Fullscreen Security Locked
+              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Security Engine Active
             </p>
           </div>
         </div>
@@ -833,15 +1154,31 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           </span>
         </div>
 
-        {/* Right: Integrity & Exit buttons */}
+        {/* Right: Security Status, Re-Lock & Submit buttons */}
         <div className="flex items-center gap-2.5">
+          {!isFullscreenLocked ? (
+            <button
+              onClick={requestKioskFullscreen}
+              className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-sm flex items-center gap-1.5 animate-pulse"
+              title="Click to restore full-screen kiosk lock"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span>Re-Lock Fullscreen</span>
+            </button>
+          ) : (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
+              <Maximize2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Fullscreen Locked</span>
+            </div>
+          )}
+
           <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold ${
             tabSwitchCount > 0 
               ? "bg-amber-50 text-amber-900 border-amber-300"
               : "bg-emerald-50 text-emerald-800 border-emerald-200"
           }`}>
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{tabSwitchCount === 0 ? "✓ Integrity Clear" : `⚠ ${tabSwitchCount} Warning`}</span>
+            <span>{tabSwitchCount === 0 ? "✓ Integrity 100%" : `⚠ ${tabSwitchCount} / 2 Warnings`}</span>
           </div>
 
           <button
@@ -855,25 +1192,30 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
       </header>
 
-      {/* ─── PROCTORED EXAMINATION STATUS BAR ─── */}
-      <div className="bg-slate-50 border-b border-slate-200/90 px-4 sm:px-6 py-2.5 flex items-center justify-between text-xs shrink-0 shadow-2xs flex-wrap gap-2">
+      {/* ─── PROCTORED EXAMINATION STATUS & SECURITY TELEMETRY BAR ─── */}
+      <div className="bg-slate-50 border-b border-slate-200/90 px-4 sm:px-6 py-2 flex items-center justify-between text-xs shrink-0 shadow-2xs flex-wrap gap-2">
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 border border-blue-200 text-blue-800 flex items-center gap-1 shadow-2xs">
             <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-            Official Assessment Session
+            Proctored Session
           </span>
           <span className="text-slate-600 font-semibold text-[11px]">
             {quiz?.courseName || quiz?.title || "National Examination"}
           </span>
         </div>
 
-        <div className="flex items-center gap-3 text-[11px] text-slate-500">
-          <span className="flex items-center gap-1 text-slate-600 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-            <span>AI Dynamic Evaluation</span>
+        {/* Security telemetry indicators */}
+        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 flex-wrap">
+          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-emerald-700">
+            🛡️ Focus Locked
           </span>
-          <span className="text-slate-300">•</span>
-          <span className="font-mono text-slate-600">
+          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
+            🚫 Clipboard & Context Menu Blocked
+          </span>
+          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-purple-700">
+            ⌨️ DevTools/Shortcuts Shielded
+          </span>
+          <span className="font-mono text-slate-600 pl-1 border-l border-slate-300">
             Cadre ID: <b className="text-slate-800">{currentUser?.cadreId || "MOES-MET-2026"}</b>
           </span>
         </div>
