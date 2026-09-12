@@ -176,151 +176,151 @@ export const TraineeDashboardView = ({
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
-      {/* ─── 1. OFFICER EXECUTIVE HEADER (LIGHT & MODERN) ─── */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="flex items-center gap-4 z-10">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 font-black text-xl shadow-xs shrink-0">
+      {/* ─── 1. OFFICER EXECUTIVE HEADER ─── */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+        <div className="flex items-center gap-3.5 z-10">
+          <div className="w-13 h-13 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475] font-semibold text-lg shrink-0">
             {currentUser?.name?.split(" ").map(n => n[0]).join("") || "TR"}
           </div>
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="space-y-0.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {currentUser?.cadreId && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200 uppercase">
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-800 border border-blue-200 uppercase">
                   {currentUser.cadreId}
                 </span>
               )}
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600" /> MoES Verified
               </span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
               Officer {currentUser?.name || currentUser?.email || "Officer Trainee"}
             </h1>
-            <p className="text-xs text-slate-500 font-medium">
+            <p className="text-xs text-slate-500 font-normal">
               {currentUser?.designation || "Trainee Cadre"} • {currentUser?.station || "Regional Training Center"}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0 z-10">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0 z-10">
           <button
             onClick={onOpenAiAdvisor}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-[#0B3475] border border-blue-200 font-medium rounded-lg text-xs transition-all"
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>AI Course Advisor</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Course Advisor</span>
           </button>
 
           <button
             onClick={() => onNavigateTab("courses")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs transition-all shadow-2xs"
           >
-            <BookOpen className="w-4 h-4 text-blue-200" />
+            <BookOpen className="w-3.5 h-3.5 text-blue-200" />
             <span>Browse Courses</span>
           </button>
 
           <button
             onClick={onOpenProfile}
-            className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold rounded-xl text-xs border border-slate-200 transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium rounded-lg text-xs border border-slate-200 transition-colors"
           >
-            <User className="w-4 h-4 text-blue-600" />
-            <span>View Dossier</span>
+            <User className="w-3.5 h-3.5 text-slate-500" />
+            <span>Officer Dossier</span>
           </button>
         </div>
       </div>
 
       {/* ─── 2. KPI METRICS CARDS ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
-        <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Enrolled Tracks</span>
-            <div className="text-2xl font-black text-slate-900">{enrolledCourses.length}</div>
-            <span className="text-[11px] text-blue-700 font-bold flex items-center gap-1">
+        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Enrolled Tracks</span>
+            <div className="text-2xl font-semibold text-slate-900">{enrolledCourses.length}</div>
+            <span className="text-[11px] text-blue-700 font-medium flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-blue-700" /> Active Programs
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
-            <GraduationCap className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475]">
+            <GraduationCap className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Assessments Cleared</span>
-            <div className="text-2xl font-black text-slate-900">{completedAssessmentsCount}</div>
-            <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Real-time Verified
+        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Assessments Cleared</span>
+            <div className="text-2xl font-semibold text-slate-900">{completedAssessmentsCount}</div>
+            <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified Submissions
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
-            <ClipboardList className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
+            <ClipboardList className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Average Score</span>
-            <div className="text-2xl font-black text-blue-700">{averageScorePercentage}%</div>
-            <span className="text-[11px] text-slate-500 font-medium">Performance Rating</span>
+        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Average Score</span>
+            <div className="text-2xl font-semibold text-[#0B3475]">{averageScorePercentage}%</div>
+            <span className="text-[11px] text-slate-500 font-normal">Performance Index</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700">
-            <BarChart3 className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475]">
+            <BarChart3 className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Certified Credentials</span>
-            <div className="text-2xl font-black text-slate-900">{certificatesCount}</div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Certificates</span>
+            <div className="text-2xl font-semibold text-slate-900">{certificatesCount}</div>
             <button 
               onClick={() => onNavigateTab("certificates")}
-              className="text-[11px] text-blue-700 font-bold hover:underline"
+              className="text-[11px] text-blue-700 font-medium hover:underline"
             >
-              View Certificates →
+              View Credentials →
             </button>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
-            <Award className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
+            <Award className="w-5 h-5" />
           </div>
         </div>
 
       </div>
 
-      {/* ─── 2.2 ACTIVE & UPCOMING SCHEDULED ASSESSMENTS (TRAINER SCHEDULED) ─── */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+      {/* ─── 2.2 ACTION CENTER: SCHEDULED ASSESSMENTS ─── */}
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-xs">
-              <Calendar className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B3475]">
+              <Calendar className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-                <span>Trainer-Scheduled Assessments &amp; Exams</span>
+              <h2 className="text-sm sm:text-base font-semibold text-slate-900 flex items-center gap-2">
+                <span>Action Center: Scheduled Assessments &amp; Exams</span>
                 {liveAssessments.length > 0 && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 animate-pulse">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                     {liveAssessments.length} Live Now
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-slate-500 font-medium">
-                Official evaluations scheduled by MoES trainers. Complete in fullscreen proctored mode.
+              <p className="text-xs text-slate-500 font-normal">
+                Scheduled evaluations. Complete in fullscreen proctored examination mode.
               </p>
             </div>
           </div>
 
           <button
             onClick={() => onNavigateTab("assessments")}
-            className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors self-start sm:self-center"
+            className="flex items-center gap-1.5 text-xs font-medium text-blue-700 hover:text-blue-900 transition-colors self-start sm:self-center"
           >
-            <span>View All Assessments ({officialQuizzes.length})</span>
+            <span>View All ({officialQuizzes.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Live & Upcoming Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {/* 1. Live Exams */}
           {liveAssessments.map(exam => {
             const deadlineFormatted = exam.deadlineTime 
@@ -331,45 +331,45 @@ export const TraineeDashboardView = ({
             return (
               <div
                 key={exam.id}
-                className="p-5 rounded-2xl bg-gradient-to-b from-emerald-50/60 to-white border-2 border-emerald-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 relative overflow-hidden group"
+                className="p-4.5 rounded-xl bg-white border border-emerald-300 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5 group"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white uppercase tracking-wider flex items-center gap-1 shadow-xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                      AVAILABLE • LIVE NOW
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-600 text-white uppercase tracking-wider flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                      LIVE NOW
                     </span>
-                    <span className="text-[11px] font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-lg border border-emerald-200">
+                    <span className="text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                       {exam.durationMinutes || 30} Mins
                     </span>
                   </div>
 
-                  <h3 className="font-black text-slate-900 text-sm leading-snug line-clamp-2">
+                  <h3 className="font-semibold text-slate-900 text-sm leading-snug line-clamp-2">
                     {exam.title}
                   </h3>
 
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                       {exam.subjectName || exam.courseName || "Core Subject"}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
                       {qCount} Questions • {exam.totalMarks || 20} Marks
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-slate-500 font-medium pt-1 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Deadline: <b className="text-slate-700">{deadlineFormatted}</b></span>
+                  <div className="text-[11px] text-slate-500 font-normal flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Deadline: <b className="text-slate-700 font-medium">{deadlineFormatted}</b></span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-emerald-100 flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-slate-400 font-bold">Trainer: {exam.trainerName || "MoES Faculty"}</span>
+                <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-slate-400">Trainer: {exam.trainerName || "Faculty"}</span>
                   <button
                     onClick={() => onStartExam && onStartExam(exam)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-sm transition-all transform hover:scale-105 active:scale-95 shrink-0"
+                    className="flex items-center gap-1 px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs transition-all cursor-pointer shadow-2xs"
                   >
-                    <PlayCircle className="w-4 h-4 text-emerald-100" />
+                    <PlayCircle className="w-3.5 h-3.5 text-blue-200" />
                     <span>Start Exam</span>
                   </button>
                 </div>
@@ -390,41 +390,41 @@ export const TraineeDashboardView = ({
             return (
               <div
                 key={exam.id}
-                className="p-5 rounded-2xl bg-gradient-to-b from-blue-50/40 to-white border border-blue-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                className="p-4.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-800 uppercase tracking-wider flex items-center gap-1 border border-blue-200">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-800 uppercase tracking-wider flex items-center gap-1 border border-blue-200">
                       <Clock className="w-3 h-3 text-blue-600" />
                       UPCOMING • {diffDays === 1 ? "In 1 Day" : `In ${diffDays} Days`}
                     </span>
-                    <span className="text-[11px] font-extrabold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-lg">
+                    <span className="text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
                       {exam.durationMinutes || 30} Mins
                     </span>
                   </div>
 
-                  <h3 className="font-black text-slate-900 text-sm leading-snug line-clamp-2">
+                  <h3 className="font-semibold text-slate-900 text-sm leading-snug line-clamp-2">
                     {exam.title}
                   </h3>
 
-                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                       {exam.subjectName || exam.courseName || "Core Subject"}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
                       {qCount} Questions • {exam.totalMarks || 20} Marks
                     </span>
                   </div>
 
-                  <div className="text-[11px] text-slate-500 font-medium pt-1 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Starts: <b className="text-slate-800">{startFormatted}</b></span>
+                  <div className="text-[11px] text-slate-500 font-normal flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Starts: <b className="text-slate-700 font-medium">{startFormatted}</b></span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-slate-400 font-bold">Trainer: {exam.trainerName || "MoES Faculty"}</span>
-                  <div className="flex items-center gap-1 text-slate-400 text-xs font-bold px-3 py-1.5 bg-slate-100 rounded-xl border border-slate-200">
+                <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-slate-400">Trainer: {exam.trainerName || "Faculty"}</span>
+                  <div className="flex items-center gap-1 text-slate-400 text-xs font-medium px-2.5 py-1 bg-slate-50 rounded-lg border border-slate-200">
                     <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
                     <span>Locked</span>
                   </div>
@@ -433,18 +433,18 @@ export const TraineeDashboardView = ({
             );
           })}
 
-          {/* Empty State if No Live or Upcoming */}
+          {/* Empty State */}
           {liveAssessments.length === 0 && upcomingAssessments.length === 0 && (
-            <div className="col-span-full p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
-              <Calendar className="w-8 h-8 text-slate-400 mx-auto" />
-              <h4 className="font-bold text-slate-800 text-sm">No Active or Upcoming Scheduled Assessments</h4>
+            <div className="col-span-full p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-1.5">
+              <Calendar className="w-6 h-6 text-slate-400 mx-auto" />
+              <h4 className="font-medium text-slate-800 text-xs">No Active or Upcoming Scheduled Assessments</h4>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
-                All assigned assessments are up to date. When trainers schedule new exams for your course tracks, they will appear right here with full proctored kiosk launch options.
+                All assigned assessments are up to date. When new exams are scheduled, they will appear here.
               </p>
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   onClick={() => onNavigateTab("assessments")}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-xs"
+                  className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs transition-colors shadow-2xs"
                 >
                   Go to Assessments Center
                 </button>
@@ -454,67 +454,67 @@ export const TraineeDashboardView = ({
         </div>
       </div>
 
-      {/* ─── 2.4 AUTOMATED LEARNING GAP DETECTION ALERT (RULE 10) ─── */}
-      <div className="bg-gradient-to-r from-rose-50 via-amber-50/70 to-indigo-50/70 rounded-3xl p-6 border border-rose-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
-        <div className="space-y-2 max-w-2xl z-10">
+      {/* ─── 2.4 AUTOMATED LEARNING GAP DETECTION ALERT ─── */}
+      <div className="bg-rose-50/80 rounded-2xl p-5 border border-rose-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
+            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-600 text-white uppercase tracking-wider flex items-center gap-1">
               <ShieldAlert className="w-3 h-3 text-white" />
               Learning Gap Detected
             </span>
-            <span className="text-xs font-bold text-rose-800">
+            <span className="text-xs font-medium text-rose-800">
               Radar Interpretation — Accuracy: 46% (Below 60% Cutoff)
             </span>
           </div>
 
-          <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+          <h3 className="text-sm sm:text-base font-semibold text-slate-900 tracking-tight">
             Cognitive Weakness Isolated in Dual-Pol Radar & Velocity De-aliasing
           </h3>
 
-          <p className="text-xs text-slate-600 leading-relaxed font-medium">
-            The adaptive engine has detected recurring errors on <b>Radar Interpretation</b>. System has generated targeted <b>AI Concept Summary</b>, assigned <b>Curriculum Lecture Materials</b>, and compiled an <b>Adaptive Practice Quiz</b> to close this gap.
+          <p className="text-xs text-slate-600 leading-relaxed font-normal">
+            The adaptive engine detected recurring errors in <b>Radar Interpretation</b>. Targeted concept summaries, lecture materials, and adaptive practice are prepared.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 z-10 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={() => onNavigateTab("learning-gaps")}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-black rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg text-xs shadow-2xs transition-all"
           >
-            <BrainCircuit className="w-4 h-4 text-amber-200" />
-            <span>Open Gap Remediation Hub →</span>
+            <BrainCircuit className="w-3.5 h-3.5 text-amber-200" />
+            <span>Remediation Hub →</span>
           </button>
         </div>
       </div>
 
-      {/* ─── 2.5 AI PRACTICE PAPERS & QUESTION BANK LAUNCHER BANNER ─── */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* ─── 2.5 PRACTICE STUDIO & QUESTION BANK BANNER ─── */}
+      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-500" /> AI POWERED
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-500" /> ASSESSMENT STUDIO
             </span>
-            <h3 className="text-base font-black text-slate-900">AI Practice Assessment Studio & Question Bank</h3>
+            <h3 className="text-sm sm:text-base font-semibold text-slate-900">Adaptive Practice Testing & Question Bank</h3>
           </div>
           <p className="text-xs text-slate-600 leading-relaxed font-normal">
-            Generate customized AI question papers for any subject or domain, test your skills, and create manual questions stored in your personal Question Bank.
+            Generate customized practice question papers for any subject or domain, and access the institutional Question Bank.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
           <button
             onClick={() => onNavigateTab("practice-papers")}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs shadow-2xs transition-all"
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>AI Practice Papers</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Practice Papers</span>
           </button>
 
           <button
             onClick={() => onNavigateTab("questions")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition-colors"
           >
-            <Layers className="w-4 h-4 text-slate-500" />
+            <Layers className="w-3.5 h-3.5 text-slate-500" />
             <span>Question Bank</span>
           </button>
         </div>

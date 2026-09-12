@@ -46,7 +46,7 @@ export const AiCourseAdvisorModal = ({
 }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [aiSource, setAiSource] = useState("Google Gemini AI");
+  const [aiSource, setAiSource] = useState("AI Course Advisor");
 
   // Normalized Profile Data
   const userSkills = useMemo(() => parseArray(currentUser?.skills), [currentUser]);
@@ -92,7 +92,7 @@ export const AiCourseAdvisorModal = ({
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200 font-sans">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
         
-        {/* Header (Clean Light Theme with Gemini Accent) */}
+        {/* Header (Clean Light Theme with AI Accent) */}
         <div className="p-6 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-purple-50/50 border-b border-slate-200 text-slate-900 flex items-start justify-between shrink-0">
           <div className="flex items-start gap-3.5">
             <div className="p-3 rounded-2xl bg-white border border-blue-200 text-blue-600 shadow-sm">

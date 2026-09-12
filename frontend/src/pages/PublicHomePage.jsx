@@ -169,7 +169,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col font-sans select-none antialiased">
       
       {/* ─── 1. TOP FLASH DIRECTIVE & FAST-ROLE BAR ─── */}
-      <div className="bg-[#0a2558] text-white px-4 lg:px-8 py-2 text-xs flex items-center justify-between border-b border-white/10 shrink-0">
+      <div className="bg-[] text-white px-4 lg:px-8 py-2 text-xs flex items-center justify-between border-b border-white/10 shrink-0">
         <div className="flex items-center gap-2.5 overflow-hidden max-w-4xl">
           <span className="px-2 py-0.5 rounded bg-rose-600 font-extrabold text-[10px] tracking-wider uppercase shrink-0 animate-pulse flex items-center gap-1">
             <Radio className="w-3 h-3" /> DIRECTIVE
@@ -189,7 +189,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                 switchAccount(acc);
                 onEnterPortal();
               }}
-              className="px-2.5 py-1 bg-white/10 hover:bg-white hover:text-[#0a2558] rounded-md text-[10px] font-bold text-white transition-all shadow-sm hover:scale-105"
+              className="px-2.5 py-1 bg-white/10 hover:bg-white hover:text-[] rounded-md text-[10px] font-bold text-white transition-all shadow-sm hover:scale-105"
             >
               {acc.role.toUpperCase()}
             </button>
@@ -201,29 +201,29 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
       <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
-          {/* Logo & National Emblem Identity */}
+          {/* Logo & National Identity */}
           <div className="flex items-center gap-3.5 shrink-0">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-2xl shadow-md border-2 border-blue-200">
-              Q
+            <div className="w-11 h-11 rounded-xl bg-[#0B3475] text-white flex items-center justify-center font-semibold text-base shadow-sm border border-blue-900">
+              CC
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                <span className="text-base sm:text-lg font-semibold text-slate-900 tracking-tight">
                   CAPACITY CONNECT
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-blue-100 text-blue-900 uppercase border border-blue-200">
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-medium bg-blue-50 text-blue-900 uppercase border border-blue-200">
                   MoES • IMD
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 font-medium hidden sm:block">
-                National Meteorological Capacity Building & Accreditation Portal
+              <p className="text-[11px] sm:text-xs text-slate-500 font-normal hidden sm:block">
+                Digital Capacity Building & LMS Portal
               </p>
             </div>
           </div>
 
           {/* Center Quick Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-600">
-            <a href="#curricula-section" className="hover:text-[#0a2558] transition-colors flex items-center gap-1.5">
+            <a href="#curricula-section" className="hover:text-[] transition-colors flex items-center gap-1.5">
               <BookOpen className="w-4 h-4 text-blue-600" />
               <span>Curricula Catalog</span>
             </a>
@@ -231,7 +231,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Verification Ledger</span>
             </a>
-            <a href="#features-section" className="hover:text-[#0a2558] transition-colors flex items-center gap-1.5">
+            <a href="#features-section" className="hover:text-[] transition-colors flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Pillars</span>
             </a>
@@ -470,7 +470,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
             <span className="px-3 py-1 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-900 uppercase border border-blue-200">
               MoES Operational Architecture
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#0a2558] tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-[] tracking-tight">
               Standardized Meteorological Capacity Building
             </h2>
             <p className="text-xs sm:text-sm text-slate-500">
@@ -540,7 +540,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
               </span>
               <span className="text-xs text-slate-500 font-semibold">• {filteredCourses.length} Programs Found</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#0a2558] tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-[] tracking-tight">
               Operational Meteorology Curricula & Tracks
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -905,18 +905,18 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                       <p className="text-[10px] font-black tracking-wider text-slate-800 uppercase">
                         Government of India
                       </p>
-                      <p className="text-xs font-black text-[#0a2558]">
+                      <p className="text-xs font-black text-[]">
                         Ministry of Earth Sciences (MoES)
                       </p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-[#0a2558] text-white flex items-center justify-center font-black text-lg shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[] text-white flex items-center justify-center font-black text-lg shadow-sm">
                       Q
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] font-black tracking-wider text-slate-800 uppercase">
                         IMD Central Training
                       </p>
-                      <p className="text-xs font-black text-[#0a2558]">
+                      <p className="text-xs font-black text-[]">
                         Directorate of Capacity
                       </p>
                     </div>
@@ -924,7 +924,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
 
                   {/* Certificate Title */}
                   <div>
-                    <h3 className="font-serif text-lg sm:text-xl font-black text-[#0a2558] tracking-wide uppercase">
+                    <h3 className="font-serif text-lg sm:text-xl font-black text-[] tracking-wide uppercase">
                       Certificate of Competency Mastery
                     </h3>
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
@@ -946,7 +946,7 @@ export const PublicHomePage = ({ onEnterPortal, onOpenCourse, onOpenLoginPage })
                   {/* Course Details */}
                   <div className="p-3 bg-white/80 rounded-2xl border border-slate-200 text-xs space-y-1">
                     <p className="text-slate-600">has successfully demonstrated operational competency in</p>
-                    <p className="font-black text-[#0a2558] text-sm">
+                    <p className="font-black text-[] text-sm">
                       {verifiedCert.courseTitle} ({verifiedCert.courseCode})
                     </p>
                     <p className="text-[11px] font-bold text-emerald-700 pt-0.5">

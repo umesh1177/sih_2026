@@ -21,7 +21,7 @@ export const callGeminiAI = async (promptText) => {
   if (!ai) throw new Error("Google Gemini API Key is missing in environment.");
 
   // Models to try in priority order
-  const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-3.6-flash", "gemini-3.8-flash"];
+  const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.8-flash"];
 
   for (const model of models) {
     try {

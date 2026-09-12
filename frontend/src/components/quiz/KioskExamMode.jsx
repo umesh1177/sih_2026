@@ -1122,34 +1122,34 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         </div>
       )}
 
-      {/* ═════════ 1. TOP SECURE KIOSK HEADER (LIGHT THEME) ═════════ */}
-      <header className="h-16 bg-white border-b border-slate-200/90 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-2xs z-30">
+      {/* ═════════ 1. TOP SECURE KIOSK HEADER ═════════ */}
+      <header className="h-14 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
         
         {/* Left: Exam Branding & Fullscreen Badge */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-2xs">
-            IMD
+          <div className="w-8 h-8 rounded-lg bg-[#0B3475] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            CC
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 font-black text-[10px] uppercase tracking-wider border border-blue-200">
+              <span className="px-2 py-0.5 rounded bg-blue-50 text-[#0B3475] font-bold text-[10px] uppercase tracking-wider border border-blue-200">
                 PROCTORED KIOSK
               </span>
-              <span className="text-xs font-extrabold text-slate-900 truncate max-w-xs sm:max-w-md">
+              <span className="text-xs font-bold text-slate-900 truncate max-w-xs sm:max-w-md">
                 {quiz?.title || "National Meteorological Assessment"}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">
-              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Security Engine Active
+            <p className="text-[11px] text-slate-500 font-normal">
+              Candidate: <b className="text-slate-800 font-medium">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Security Engine Active
             </p>
           </div>
         </div>
 
         {/* Center: Live Timer Banner */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl">
-          <Clock className={`w-4 h-4 ${timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-blue-600"}`} />
-          <span className="text-xs font-bold text-slate-600 hidden sm:inline">Remaining Time:</span>
-          <span className={`text-sm font-black font-mono tracking-wider ${
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+          <Clock className={`w-3.5 h-3.5 ${timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-[#0B3475]"}`} />
+          <span className="text-xs font-medium text-slate-600 hidden sm:inline">Remaining Time:</span>
+          <span className={`text-xs font-bold font-mono tracking-wider ${
             timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-slate-900"
           }`}>
             {formatTime(timeLeftSeconds)}
@@ -1157,24 +1157,24 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         </div>
 
         {/* Right: Security Status, Re-Lock & Submit buttons */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           {!isFullscreenLocked ? (
             <button
               onClick={requestKioskFullscreen}
-              className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-sm flex items-center gap-1.5 animate-pulse"
+              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 animate-pulse"
               title="Click to restore full-screen kiosk lock"
             >
               <Maximize2 className="w-3.5 h-3.5" />
               <span>Re-Lock Fullscreen</span>
             </button>
           ) : (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
-              <Maximize2 className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+              <Maximize2 className="w-3 h-3 text-emerald-600" />
               <span>Fullscreen Locked</span>
             </div>
           )}
 
-          <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold ${
+          <div className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${
             tabSwitchCount > 0 
               ? "bg-amber-50 text-amber-900 border-amber-300"
               : "bg-emerald-50 text-emerald-800 border-emerald-200"
@@ -1185,14 +1185,15 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
           <button
             onClick={() => setShowSubmitModal(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-102 flex items-center gap-1.5"
+            className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1.5"
           >
-            <CheckCircle2 className="w-4 h-4" />
+            <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Submit Test</span>
           </button>
         </div>
 
       </header>
+
 
       {/* ─── PROCTORED EXAMINATION STATUS & SECURITY TELEMETRY BAR ─── */}
       <div className="bg-slate-50 border-b border-slate-200/90 px-4 sm:px-6 py-2 flex items-center justify-between text-xs shrink-0 shadow-2xs flex-wrap gap-2">
@@ -1289,56 +1290,56 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         </aside>
 
         {/* ─── RIGHT / CENTER: QUESTION STAGE & OPTION PICKER ─── */}
-        <main className="flex-1 flex flex-col bg-[#f8fafc] overflow-y-auto p-4 sm:p-8 order-1 lg:order-2 justify-between">
+        <main className="flex-1 flex flex-col bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 order-1 lg:order-2 justify-between">
           
-          <div className="max-w-4xl w-full mx-auto space-y-6">
+          <div className="max-w-3xl w-full mx-auto space-y-4">
             
             {/* Top Question Info Banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-3 py-1 bg-blue-600 text-white rounded-xl text-xs font-black shadow-2xs">
+                <span className="px-2.5 py-1 bg-[#0B3475] text-white rounded-lg text-xs font-bold shadow-xs">
                   Question {currentIndex + 1} of {questions.length}
                 </span>
-                <span className="px-3 py-1 bg-white text-slate-700 rounded-xl text-xs font-bold border border-slate-200 shadow-2xs">
+                <span className="px-2.5 py-1 bg-white text-slate-700 rounded-lg text-xs font-medium border border-slate-200 shadow-xs">
                   {currentQuestion.subjectName || "Meteorological Physics"}
                 </span>
               </div>
 
-              <div className="text-xs font-mono font-bold text-slate-500">
+              <div className="text-xs font-mono font-medium text-slate-500">
                 Marks: <b className="text-emerald-700">+{currentQuestion.marks || 2}</b> / <b className="text-slate-400">-0</b>
               </div>
             </div>
 
             {/* Question Prompt Card */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm space-y-2">
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-900 leading-relaxed">
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2">
+              <h2 className="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed">
                 {currentQuestion.question}
               </h2>
             </div>
 
             {/* Question Response Section (MCQ or One-Word / Short Answer) */}
             {currentQuestion.type === "one_word" || currentQuestion.type === "short_answer" || (!currentQuestion.options || currentQuestion.options.length === 0) ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {currentQuestion.guidanceNote && (
-                  <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-2xl flex items-start gap-3 text-xs text-blue-950 font-medium">
-                    <HelpCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-xl flex items-start gap-2.5 text-xs text-blue-950 font-medium">
+                    <HelpCircle className="w-4 h-4 text-[#0B3475] shrink-0 mt-0.5" />
                     <div className="space-y-0.5 flex-1">
-                      <span className="font-black text-[10px] uppercase tracking-wider text-blue-700 block">
+                      <span className="font-bold text-[10px] uppercase tracking-wider text-[#0B3475] block">
                         Trainer Guidance Note
                       </span>
-                      <p className="text-xs text-blue-900 leading-relaxed font-semibold">
+                      <p className="text-xs text-blue-900 leading-relaxed">
                         {currentQuestion.guidanceNote}
                       </p>
                     </div>
                   </div>
                 )}
 
-                <div className="p-6 bg-white border border-slate-200 rounded-3xl shadow-sm space-y-3">
+                <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-800">
+                    <label className="text-xs font-semibold text-slate-800">
                       Type Your One-Word / Short Answer:
                     </label>
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium">
                       Case-Insensitive Match
                     </span>
                   </div>
@@ -1350,13 +1351,13 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                       const val = e.target.value;
                       setAnswers(prev => ({ ...prev, [currentQuestion.id]: val }));
                     }}
-                    placeholder="e.g. Bibliophile (Type exact word, case does not matter)..."
-                    className="w-full p-4 rounded-2xl border-2 border-blue-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-bold text-sm text-slate-900 focus:outline-none transition-all"
+                    placeholder="Type exact term or keyword..."
+                    className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#0B3475] focus:ring-1 focus:ring-[#0B3475] font-medium text-xs text-slate-900 focus:outline-none transition-colors"
                   />
 
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-                    <span>Capital and lower case letters are evaluated as equal. Trimmed of extra spaces.</span>
-                    <span className="font-mono font-bold text-blue-700">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                    <span>Capital and lower case letters are evaluated as equal.</span>
+                    <span className="font-mono font-bold text-[#0B3475]">
                       {(answers[currentQuestion.id] || "").length} chars
                     </span>
                   </div>
@@ -1364,7 +1365,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </div>
             ) : (
               /* MCQ Radio Options List */
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {(currentQuestion.options || []).map((opt, optIdx) => {
                   const isSelected = answers[currentQuestion.id] === optIdx;
 
@@ -1372,16 +1373,16 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                     <button
                       key={optIdx}
                       onClick={() => handleSelectOption(optIdx)}
-                      className={`w-full p-4 sm:p-5 rounded-2xl border text-left text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-4 group ${
+                      className={`w-full p-3.5 sm:p-4 rounded-xl border text-left text-xs font-medium transition-colors flex items-center justify-between gap-3 group ${
                         isSelected
-                          ? "bg-blue-50/90 border-2 border-blue-600 text-blue-950 font-bold shadow-xs"
-                          : "bg-white border-slate-200/90 text-slate-700 hover:border-blue-300 hover:bg-slate-50/80 shadow-2xs"
+                          ? "bg-blue-50/90 border-2 border-[#0B3475] text-[#0B3475] font-semibold shadow-xs"
+                          : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50/80 shadow-xs"
                       }`}
                     >
-                      <div className="flex items-center gap-3.5">
-                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 font-mono transition-colors ${
+                      <div className="flex items-center gap-3">
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-xs shrink-0 font-mono transition-colors ${
                           isSelected 
-                            ? "bg-blue-600 text-white shadow-2xs" 
+                            ? "bg-[#0B3475] text-white" 
                             : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
                         }`}>
                           {String.fromCharCode(65 + optIdx)}
@@ -1389,10 +1390,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                         <span className="leading-snug">{opt}</span>
                       </div>
 
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                        isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                        isSelected ? "border-[#0B3475] bg-[#0B3475] text-white" : "border-slate-300"
                       }`}>
-                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                        {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
                       </div>
                     </button>
                   );
@@ -1403,33 +1404,33 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           </div>
 
           {/* ═════════ 3. BOTTOM QUESTION CONTROL ACTIONS ═════════ */}
-          <div className="max-w-4xl w-full mx-auto pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 mt-8">
+          <div className="max-w-3xl w-full mx-auto pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2.5 mt-6">
             <div className="flex items-center gap-2">
               <button
                 disabled={currentIndex === 0}
                 onClick={() => goToQuestion(currentIndex - 1)}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-bold text-xs transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-semibold text-xs transition-colors"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Previous</span>
               </button>
 
               <button
                 onClick={toggleMarkForReview}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-colors ${
                   markedForReview[currentQuestion.id]
-                    ? "bg-blue-600 border-blue-600 text-white shadow-xs"
-                    : "bg-white border-slate-200 text-blue-900 hover:bg-blue-50/50"
+                    ? "bg-[#0B3475] border-[#0B3475] text-white shadow-xs"
+                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
               >
-                <Bookmark className="w-4 h-4" />
+                <Bookmark className="w-3.5 h-3.5" />
                 <span>{markedForReview[currentQuestion.id] ? "Marked for Review" : "Mark for Review"}</span>
               </button>
 
               {answers[currentQuestion.id] !== undefined && (
                 <button
                   onClick={handleClearAnswer}
-                  className="px-3 py-2 text-slate-500 hover:text-rose-600 text-xs font-bold transition-colors"
+                  className="px-2.5 py-1.5 text-slate-500 hover:text-rose-600 text-xs font-medium transition-colors"
                 >
                   Clear Response
                 </button>
@@ -1440,17 +1441,17 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={() => goToQuestion(currentIndex + 1)}
-                  className="flex items-center gap-1.5 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center gap-1.5 px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-lg text-xs shadow-xs transition-colors"
                 >
                   <span>Save & Next</span>
-                  <ChevronRight className="w-4 h-4 text-blue-200" />
+                  <ChevronRight className="w-3.5 h-3.5 text-blue-200" />
                 </button>
               ) : (
                 <button
                   onClick={() => setShowSubmitModal(true)}
-                  className="flex items-center gap-1.5 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105"
+                  className="flex items-center gap-1.5 px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs shadow-xs transition-colors"
                 >
-                  <FileCheck className="w-4 h-4" />
+                  <FileCheck className="w-3.5 h-3.5" />
                   <span>Finalize & Submit</span>
                 </button>
               )}
@@ -1458,6 +1459,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           </div>
 
         </main>
+
 
       </div>
 

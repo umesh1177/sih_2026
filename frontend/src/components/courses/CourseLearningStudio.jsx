@@ -840,7 +840,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
       const res = await api.generateMaterialSummary(payload);
       if (res.success && res.summary) {
         setAiSummary(res.summary);
-        setSummarySource(res.source || "Gemini 1.5 Flash");
+        setSummarySource(res.source || "AI Module Summary");
         // Cache locally
         const summaryKey = `moes_ai_sum_${course?.id || "c"}_${selectedMaterial?.id || "mat"}`;
         localStorage.setItem(summaryKey, JSON.stringify({ summary: res.summary, source: res.source }));
@@ -981,7 +981,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
       try {
         const parsed = JSON.parse(cached);
         setAiSummary(parsed.summary);
-        setSummarySource(parsed.source || "Gemini 1.5 Flash (Cached)");
+        setSummarySource(parsed.source || "AI Module Summary (Cached)");
       } catch (e) {
         setAiSummary(null);
       }
@@ -2231,7 +2231,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 font-bold text-[9px] uppercase tracking-wider">
-                      Gemini 1.5 Flash
+                      AI Module Summary
                     </span>
                     <h3 className="font-extrabold text-slate-900 text-sm mt-1">
                       AI Material Summary & Key Takeaways
@@ -2253,7 +2253,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                     <BrainCircuit className="w-10 h-10 text-blue-600 mx-auto" />
                     <h4 className="font-bold text-slate-800 text-sm">No Summary Generated Yet</h4>
                     <p className="text-slate-500 text-xs max-w-sm mx-auto">
-                      Click below to analyze this {selectedMaterial?.type?.toUpperCase()} with Gemini AI and generate key takeaways and governing equations.
+                      Click below to analyze this {selectedMaterial?.type?.toUpperCase()} with AI Module Summary and generate key takeaways and governing equations.
                     </p>
                     <button
                       onClick={handleGenerateAiSummary}
@@ -2348,7 +2348,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
                   <div>
                     <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 font-bold text-[9px] uppercase tracking-wider">
-                      Gemini Powered
+                      AI Question Engine
                     </span>
                     <h3 className="font-extrabold text-slate-900 text-sm mt-0.5">
                       Interactive Practice Quiz Engine
@@ -2417,7 +2417,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-sm transition-all flex items-center justify-center gap-2"
                     >
                       <Sparkles className="w-4 h-4 text-white" />
-                      <span>{generatingQuiz ? "Gemini is Synthesizing MCQs..." : `Generate AI Quiz for "${selectedMaterial?.title?.slice(0, 30)}..."`}</span>
+                      <span>{generatingQuiz ? "Synthesizing Practice Questions with AI..." : `Generate AI Quiz for "${selectedMaterial?.title?.slice(0, 30)}..."`}</span>
                     </button>
                   </div>
                 )}
@@ -2462,7 +2462,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                       className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center justify-center gap-2"
                     >
                       <Sparkles className="w-4 h-4 text-white" />
-                      <span>{generatingQuiz ? "Cloning Pattern with Gemini..." : "⚡ Generate Pattern Variants"}</span>
+                      <span>{generatingQuiz ? "Cloning Pattern with AI..." : "⚡ Generate Pattern Variants"}</span>
                     </button>
                   </div>
                 )}

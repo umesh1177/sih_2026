@@ -1,85 +1,102 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Bell, AlertTriangle, CheckCircle2, Building2, Sparkles } from "lucide-react";
+import { Bell, AlertTriangle, CheckCircle2, Building2, Sparkles, Menu } from "lucide-react";
 
-export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdvisor }) => {
+export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdvisor, onToggleMobileSidebar }) => {
   const { currentUser } = useAuth();
 
   const getBreadcrumbTitle = () => {
     switch (activeTab) {
-      case "dashboard": return "Executive Dashboard";
-      case "courses": return "Course Catalog & Curricula";
+      case "dashboard": return "Dashboard";
+      case "courses": return "Course Catalog";
       case "subjects": return "Subject Modules";
-      case "questions": return "Questions";
-      case "quizzes": return "Assessments & Quizzes";
+      case "questions": return "Question Bank";
+      case "quizzes": return "Assessments";
       case "schedule-assessment": return "Schedule Assessments";
-      case "content-library": return "Trainer Content Library";
-      case "trainee-quizzes": return "Scheduled Assessments";
-      case "practice-papers": return "AI Practice Papers & Adaptive Tests";
-      case "my-learning": return "Enrolled Programs";
-      case "certificates": return "Certified Credentials";
-      case "profile": return "Professional Officer Profile";
-      case "approvals": return "Officer Approvals Queue";
-      case "competency": return "Competency Mapping Matrix";
-      case "announcements": return "Directives & Circulars";
-      case "analytics": return "Performance Analytics";
+      case "content-library": return "Learning Resources";
+      case "trainee-quizzes": return "Assessments";
+      case "practice-papers": return "Practice";
+      case "my-learning": return "My Learning";
+      case "certificates": return "Certificates";
+      case "profile": return "Profile";
+      case "approvals": return "Officer Approvals";
+      case "competency": return "Competency Passport";
+      case "announcements": return "Communication";
+      case "analytics": return "Reports & Analytics";
+      case "trainer-matching": return "People & Workload";
+      case "trainee-performance": return "Learner Performance";
+      case "learning-gaps": return "Learning Gaps";
+      case "course-feedback": return "Governance & Quality";
       default: return "Portal";
     }
   };
 
   return (
-    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 flex items-center justify-between z-20 shrink-0 shadow-2xs relative select-none">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2.5 text-xs">
-        <div className="flex items-center gap-1.5 text-slate-400">
-          <Building2 className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-slate-500">MoES / IMD</span>
-          <span>/</span>
+    <header className="h-14 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between z-20 shrink-0 select-none">
+      {/* Left: Mobile Toggle & Breadcrumb */}
+      <div className="flex items-center gap-3">
+        {onToggleMobileSidebar && (
+          <button
+            onClick={onToggleMobileSidebar}
+            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+            title="Open Navigation Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+        <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Building2 className="w-4 h-4 text-blue-700" />
+            <span className="font-medium text-slate-500 hidden sm:inline">Capacity Connect</span>
+            <span className="hidden sm:inline">/</span>
+          </div>
+          <span className="font-semibold text-slate-800 text-sm tracking-tight">{getBreadcrumbTitle()}</span>
         </div>
-        <span className="font-extrabold text-slate-800 tracking-tight text-sm">{getBreadcrumbTitle()}</span>
       </div>
 
       {/* Right Controls: AI Course Advisor + Verified Officer Tag + Notification Icon */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Dynamic AI Course Advisor Trigger Button for Trainees */}
         {currentUser?.role === "trainee" && (
           <button
             onClick={onOpenAiCourseAdvisor}
-            title="Get Personalized AI Course Recommendations"
-            className="flex items-center gap-2 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-sm transition-all transform hover:scale-[1.02] active:scale-95 group border border-blue-500/30"
+            title="Get Smart Course Recommendations"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-lg text-xs font-medium transition-all"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse group-hover:rotate-12 transition-transform" />
-            <span className="tracking-wide">AI Course Advisor</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span className="hidden sm:inline">Course Advisor</span>
           </button>
         )}
 
         {/* Trainee Pending Approval Warning Pill */}
         {currentUser?.role === "trainee" && currentUser?.status === "pending" && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50 border border-blue-200 text-blue-900 rounded-full text-xs font-bold animate-pulse shadow-xs">
-            <AlertTriangle className="w-3.5 h-3.5 text-blue-600" />
-            <span>Profile In Administrative Review</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-xs font-medium">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+            <span className="hidden sm:inline">Under Review</span>
           </div>
         )}
 
         {/* Verified Officer Tag */}
         {currentUser?.status === "approved" && (
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-xs font-bold shadow-xs">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Verified Officer</span>
+          <div className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-xs font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="hidden md:inline">Verified</span>
           </div>
         )}
 
         {/* Announcements Trigger Notification Icon */}
         <button
           onClick={onOpenAnnouncements}
-          title="MoES Notifications"
-          className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition-colors relative border border-slate-200 shadow-2xs"
+          title="Directives & Circulars"
+          className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors relative border border-slate-200"
         >
           <Bell className="w-4 h-4" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
         </button>
       </div>
     </header>
   );
 };
+
 

@@ -86,6 +86,8 @@ const MainApp = () => {
   const [isCreateCourseModalOpen, setIsCreateCourseModalOpen] = useState(false);
   const [contentLibrarySubjectFilter, setContentLibrarySubjectFilter] = useState("all");
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   // Global Data
   const [courses, setCourses] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
@@ -173,6 +175,8 @@ const MainApp = () => {
           }}
           onOpenLoginPage={() => setViewMode("login")}
           onOpenHomePage={() => setViewMode("landing")}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
         <div className="flex-1 flex flex-col h-screen overflow-y-auto">
           <TrainerCurriculumStudio
@@ -206,6 +210,8 @@ const MainApp = () => {
           }}
           onOpenLoginPage={() => setViewMode("login")}
           onOpenHomePage={() => setViewMode("landing")}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <CourseLearningStudio
@@ -219,7 +225,7 @@ const MainApp = () => {
     );
   }
 
-  // If Course Overview Page (Matching shared photo) is selected -> Render Course Overview Page!
+  // If Course Overview Page is selected -> Render Course Overview Page!
   if (selectedOverviewCourse) {
     return (
       <div className="flex h-screen bg-white text-slate-800 font-sans overflow-hidden select-none">
@@ -231,6 +237,8 @@ const MainApp = () => {
           }}
           onOpenLoginPage={() => setViewMode("login")}
           onOpenHomePage={() => setViewMode("landing")}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
         <div className="flex-1 flex flex-col h-screen overflow-y-auto">
           <CourseOverviewPage
@@ -277,6 +285,8 @@ const MainApp = () => {
         onOpenLoginPage={() => setViewMode("login")}
         onOpenHomePage={() => setViewMode("landing")}
         onOpenAiAdvisor={() => setIsAiCourseAdvisorOpen(true)}
+        isOpenMobile={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
@@ -288,6 +298,7 @@ const MainApp = () => {
           onOpenAiCourseAdvisor={() => setIsAiCourseAdvisorOpen(true)}
           onOpenAiGenerator={() => setIsAiModalOpen(true)}
           onOpenLoginPage={() => setViewMode("login")}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
         />
 
         {/* Dynamic Tab Pane */}
@@ -594,7 +605,7 @@ const MainApp = () => {
         />
       )}
 
-      {/* Gemini AI Course Advisor Modal */}
+      {/* AI Course Advisor Modal */}
       <AiCourseAdvisorModal
         isOpen={isAiCourseAdvisorOpen}
         onClose={() => setIsAiCourseAdvisorOpen(false)}

@@ -146,7 +146,7 @@ export const TraineePracticePapersView = ({
 
       if (generateForm.source === "ai") {
         const requestedCount = Number(generateForm.questionCount) || 10;
-        // Generate with Gemini AI specifically tailored to the entered topic
+        // Generate with AI specifically tailored to the entered topic
         const res = await api.generateAiQuestions({
           topic: enteredTopic,
           difficulty: generateForm.initialDifficulty || "Medium",
@@ -203,7 +203,7 @@ export const TraineePracticePapersView = ({
             });
 
             if (matchedQuestions.length === 0) {
-              setTopicErrorMessage(`For this topic "${enteredTopic}", questions are not exists in question bank. Please try another topic keyword or choose "Google Gemini AI" to generate fresh questions for this topic.`);
+              setTopicErrorMessage(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate fresh questions.`);
               setGenerating(false);
               return;
             }
@@ -215,17 +215,18 @@ export const TraineePracticePapersView = ({
           pool = pool.sort(() => 0.5 - Math.random());
           generatedQuestions = pool.slice(0, Number(generateForm.questionCount) || 10);
         } else {
-          setTopicErrorMessage(`For this topic "${enteredTopic}", questions are not exists in question bank. Please try another topic keyword or choose "Google Gemini AI" to generate questions.`);
+          setTopicErrorMessage(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate questions.`);
           setGenerating(false);
           return;
         }
       }
 
       if (generatedQuestions.length === 0) {
-        setTopicErrorMessage(`For this topic "${enteredTopic}", questions are not exists in question bank. Please try another topic keyword or choose "Google Gemini AI" to generate questions.`);
+        setTopicErrorMessage(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate questions.`);
         setGenerating(false);
         return;
       }
+
 
       // Create new practice quiz object with complete metadata
       const calculatedTotalMarks = generatedQuestions.reduce((acc, q) => acc + (Number(q.marks) || 3), 0) || 30;
@@ -294,42 +295,42 @@ export const TraineePracticePapersView = ({
   });
 
   return (
-    <div className="p-6 sm:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in select-none">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in select-none font-sans text-slate-800">
       
       {/* ─── 1. HEADER SECTION ─── */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200/90">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-900 border border-blue-200 uppercase">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0B3475] border border-blue-200 uppercase">
               Trainee Practice Studio
             </span>
-            <span className="text-xs text-slate-500 font-semibold">• {practicePapers.length} Practice Papers Available</span>
+            <span className="text-xs text-slate-500 font-medium">• {practicePapers.length} Practice Papers Available</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0a2558] tracking-tight flex items-center gap-2.5">
-            <Sparkles className="w-7 h-7 text-amber-500" />
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
             <span>AI Practice Papers & Adaptive Assessment Studio</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-3xl">
-            Generate customized practice question papers with Google Gemini AI or from the MoES Question Bank. Features <b>Dynamic Adaptive Testing</b> with real-time competency calibration and instant performance analytics.
+          <p className="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+            Generate customized practice question papers with AI or from the MoES Question Bank. Features <b>Dynamic Adaptive Testing</b> with real-time competency calibration and instant performance analytics.
           </p>
         </div>
 
         {/* Top Actions */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setIsGenerateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-800 hover:from-blue-800 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Create New Practice Paper</span>
           </button>
 
           {onOpenQuestionBank && (
             <button
               onClick={onOpenQuestionBank}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs shadow-sm transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs shadow-xs transition-colors"
             >
-              <Layers className="w-4 h-4 text-blue-600" />
+              <Layers className="w-3.5 h-3.5 text-[#0B3475]" />
               <span>Browse Question Bank</span>
             </button>
           )}
@@ -337,12 +338,13 @@ export const TraineePracticePapersView = ({
           <button
             onClick={loadData}
             title="Refresh Papers"
-            className="p-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-xl transition-colors shadow-sm"
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-xl transition-colors shadow-xs"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
+
 
       {/* ─── 2. ADAPTIVE TESTING ENGINE EXPLANATION BANNER (LIGHT CARD) ─── */}
       <div className="p-6 bg-white text-slate-800 rounded-3xl border border-slate-200 shadow-2xs relative overflow-hidden">
@@ -589,12 +591,13 @@ export const TraineePracticePapersView = ({
                   <Sparkles className="w-5 h-5 text-amber-300" />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-slate-900">
+                  <h2 className="text-base font-bold text-slate-900">
                     Generate Practice Question Paper
                   </h2>
-                  <p className="text-[11px] text-slate-500 font-medium">
-                    Configure question parameters with Google Gemini AI or MoES Question Bank
+                  <p className="text-[11px] text-slate-500 font-normal">
+                    Configure question parameters with AI or MoES Question Bank
                   </p>
+
                 </div>
               </div>
 
@@ -628,14 +631,14 @@ export const TraineePracticePapersView = ({
               <div className="grid grid-cols-2 gap-3">
                 <div
                   onClick={() => setGenerateForm({ ...generateForm, source: "bank" })}
-                  className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${
                     generateForm.source === "bank"
-                      ? "bg-blue-50 border-blue-400 text-blue-950 ring-2 ring-blue-500/20 shadow-sm"
+                      ? "bg-blue-50 border-[#0B3475] text-[#0B3475] shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-black mb-1">
-                    <Layers className="w-4 h-4 text-blue-600" />
+                  <div className="flex items-center gap-2 font-bold mb-1">
+                    <Layers className="w-4 h-4 text-[#0B3475]" />
                     <span>MoES Question Bank</span>
                   </div>
                   <p className="text-[11px] text-slate-500">
@@ -645,15 +648,15 @@ export const TraineePracticePapersView = ({
 
                 <div
                   onClick={() => setGenerateForm({ ...generateForm, source: "ai" })}
-                  className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${
                     generateForm.source === "ai"
-                      ? "bg-indigo-50 border-indigo-400 text-indigo-950 ring-2 ring-indigo-500/20 shadow-sm"
+                      ? "bg-blue-50 border-[#0B3475] text-[#0B3475] shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-black mb-1">
+                  <div className="flex items-center gap-2 font-bold mb-1">
                     <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>Google Gemini AI</span>
+                    <span>AI Question Generator</span>
                   </div>
                   <p className="text-[11px] text-slate-500">
                     Live generate fresh domain-specific MCQs tailored to your topic.
@@ -675,20 +678,20 @@ export const TraineePracticePapersView = ({
                     if (topicErrorMessage) setTopicErrorMessage("");
                   }}
                   placeholder="e.g. Numerical Weather Prediction, Radar Polarimetry, Tropical Cyclones"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0B3475]"
                 />
               </div>
 
               {/* Topic Error / Not Found Alert Box */}
               {topicErrorMessage && (
-                <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl text-amber-950 space-y-2 animate-in fade-in">
-                  <div className="flex items-start gap-2.5">
-                    <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-xl text-amber-950 space-y-2 animate-in fade-in">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-extrabold text-xs text-amber-900">
+                      <h4 className="font-bold text-xs text-amber-900">
                         Topic Questions Not Found in Question Bank
                       </h4>
-                      <p className="text-[11px] text-amber-800 leading-relaxed mt-0.5 font-medium">
+                      <p className="text-[11px] text-amber-800 leading-relaxed mt-0.5 font-normal">
                         {topicErrorMessage}
                       </p>
                     </div>
@@ -701,22 +704,23 @@ export const TraineePracticePapersView = ({
                         setGenerateForm({ ...generateForm, source: "ai" });
                         setTopicErrorMessage("");
                       }}
-                      className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105"
+                      className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-lg text-xs shadow-xs flex items-center gap-1.5"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Switch to Google Gemini AI & Generate</span>
+                      <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                      <span>Switch to AI Generator & Generate</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setTopicErrorMessage("")}
-                      className="px-2.5 py-1.5 text-slate-500 hover:text-slate-800 font-bold text-xs"
+                      className="px-2.5 py-1.5 text-slate-500 hover:text-slate-800 font-medium text-xs"
                     >
                       Dismiss
                     </button>
                   </div>
                 </div>
               )}
+
 
               {/* Questions Count & Duration */}
               <div className="grid grid-cols-2 gap-3">

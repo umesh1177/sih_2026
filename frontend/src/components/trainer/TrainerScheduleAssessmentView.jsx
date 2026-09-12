@@ -371,7 +371,7 @@ export const TrainerScheduleAssessmentView = ({
     return { isValid: true, message: "" };
   };
 
-  // ─── AI QUESTION PAPER GENERATION (POWERED BY GOOGLE GEMINI) ───
+  // ─── AI QUESTION PAPER GENERATION (AI ENGINE) ───
   const handleGenerateAiPaper = async (e) => {
     if (e) e.preventDefault();
     
@@ -401,8 +401,9 @@ export const TrainerScheduleAssessmentView = ({
 
       if (res.success && questionsList?.length > 0) {
         setEditableAiPaper(questionsList);
-        showToast(`Google Gemini generated ${questionsList.length} customized assessment questions!`);
+        showToast(`AI Question Generator synthesized ${questionsList.length} customized assessment questions!`);
       } else {
+
         // Fallback default generated paper for meteorological modeling
         const fallbackPaper = [
           {
@@ -1733,9 +1734,10 @@ export const TrainerScheduleAssessmentView = ({
                     <span>Generate Topic-Specific Questions: {createForm.subjectName}</span>
                   </div>
                   <span className="text-[10px] font-extrabold bg-amber-200/70 text-amber-950 px-2.5 py-0.5 rounded-full">
-                    Gemini Domain AI
+                    AI Question Generator
                   </span>
                 </div>
+
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div className="space-y-1">

@@ -138,7 +138,7 @@ export const TrainerMatchingWorkloadHub = ({
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
       {/* ═════════ 1. HERO BANNER: RULES 17 & 18 TRAINER MATCHING ENGINE ═════════ */}
-      <div className="bg-gradient-to-r from-[#0a2558] via-indigo-900 to-[#071739] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#0B3475] via-[#0D3F8D] to-[#08285C] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2 z-10 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-3 py-1 rounded-full text-[10px] font-black bg-amber-400 text-slate-900 uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
@@ -272,7 +272,7 @@ export const TrainerMatchingWorkloadHub = ({
       <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#0a2558] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#0B3475] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
               Live Domain Matching Simulator
             </span>
             <h3 className="font-extrabold text-sm text-slate-900 mt-1 flex items-center gap-2">
@@ -287,7 +287,7 @@ export const TrainerMatchingWorkloadHub = ({
               value={simulatedSubject}
               onChange={(e) => handleSimulateSubjectChange(e.target.value)}
               placeholder="Type meteorology domain (e.g. Doppler Radar, NWP WRF, Cyclone)..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 focus:bg-white focus:border-[#0a2558] outline-none shadow-2xs"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 focus:bg-white focus:border-[#0B3475] outline-none shadow-2xs"
             />
           </div>
         </div>
@@ -301,7 +301,7 @@ export const TrainerMatchingWorkloadHub = ({
               onClick={() => handleSimulateSubjectChange(p)}
               className={`px-3 py-1.5 rounded-xl font-bold text-xs shrink-0 transition-all ${
                 simulatedSubject === p
-                  ? "bg-[#0a2558] text-white shadow-xs"
+                  ? "bg-[#0B3475] text-white shadow-xs"
                   : "bg-slate-100 hover:bg-slate-200 text-slate-700"
               }`}
             >
@@ -334,7 +334,7 @@ export const TrainerMatchingWorkloadHub = ({
               onClick={() => setActiveFilterTab(tab.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
                 activeFilterTab === tab.id
-                  ? "bg-[#0a2558] text-white shadow-xs"
+                  ? "bg-[#0B3475] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
@@ -351,7 +351,7 @@ export const TrainerMatchingWorkloadHub = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search faculty, skills, cadre..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:bg-white focus:border-[#0a2558]"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:bg-white focus:border-[#0B3475]"
           />
         </div>
       </div>
@@ -582,7 +582,7 @@ export const TrainerMatchingWorkloadHub = ({
                   className={`px-4 py-2 font-extrabold rounded-xl text-xs transition-all shadow-xs flex items-center gap-1.5 ${
                     t.recommendationTone === "warning"
                       ? "bg-amber-500 hover:bg-amber-600 text-slate-950"
-                      : "bg-[#0a2558] hover:bg-[#071c42] text-white"
+                      : "bg-[#0B3475] hover:bg-[#08285C] text-white"
                   }`}
                 >
                   <UserCheck className="w-3.5 h-3.5" />
@@ -605,7 +605,7 @@ export const TrainerMatchingWorkloadHub = ({
                 <img
                   src={selectedTrainerDossier.avatar}
                   alt={selectedTrainerDossier.trainerName}
-                  className="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#0a2558]/20 shadow-md"
+                  className="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#0B3475]/20 shadow-md"
                 />
                 <div>
                   <div className="flex items-center gap-2">
@@ -687,7 +687,7 @@ export const TrainerMatchingWorkloadHub = ({
                   handleAssignFaculty(selectedTrainerDossier);
                   setSelectedTrainerDossier(null);
                 }}
-                className="px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md"
+                className="px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs shadow-md"
               >
                 Designate as Faculty Lead
               </button>
@@ -703,7 +703,7 @@ export const TrainerMatchingWorkloadHub = ({
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 text-xs text-slate-800">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-[#0a2558]" />
+                <SlidersHorizontal className="w-4 h-4 text-[#0B3475]" />
                 <span>Workload & Cold-Start Rule Configuration</span>
               </h3>
               <button onClick={() => setShowConfigModal(false)} className="text-slate-400 hover:text-slate-700">
@@ -762,7 +762,7 @@ export const TrainerMatchingWorkloadHub = ({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
               <button
                 onClick={() => setShowConfigModal(false)}
-                className="px-4 py-2 bg-[#0a2558] text-white font-bold rounded-xl text-xs"
+                className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs"
               >
                 Save Thresholds
               </button>

@@ -18,16 +18,25 @@ import {
   TrendingUp,
   ShieldAlert,
   Star,
-  Users
+  Users,
+  X
 } from "lucide-react";
 
-export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePage, onOpenAiAdvisor }) => {
+export const Sidebar = ({ 
+  activeTab, 
+  setActiveTab, 
+  onOpenLoginPage, 
+  onOpenHomePage, 
+  onOpenAiAdvisor,
+  isOpenMobile,
+  onCloseMobile
+}) => {
   const { currentUser, logout } = useAuth();
 
   // Role based navigation links
   const getNavItems = () => {
     const baseItems = [
-      { id: "dashboard", label: "Executive Dashboard", icon: LayoutDashboard },
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
       { id: "courses", label: "Course Catalog", icon: BookOpen },
     ];
 
@@ -36,40 +45,40 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
         ...baseItems,
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
-        { id: "schedule-assessment", label: "Schedule Assessments", icon: ClipboardList },
+        { id: "schedule-assessment", label: "Assessments", icon: ClipboardList },
         { id: "questions", label: "Question Bank", icon: Layers },
-        { id: "content-library", label: "Content Library", icon: FolderKanban },
-        { id: "certificates", label: "Certified Credentials", icon: Award },
-        { id: "profile", label: "Officer Profile", icon: FileText },
+        { id: "content-library", label: "Learning Resources", icon: FolderKanban },
+        { id: "certificates", label: "Credentials", icon: Award },
+        { id: "profile", label: "Profile", icon: FileText },
       ];
     }
 
     if (currentUser?.role === "admin") {
       return [
         ...baseItems,
-        { id: "trainer-matching", label: "Faculty Matching & Workload", icon: Users },
-        { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
-        { id: "course-feedback", label: "Course Feedback & Quality", icon: Star },
-        { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
+        { id: "trainer-matching", label: "People & Workload", icon: Users },
+        { id: "trainee-performance", label: "Learning", icon: TrendingUp },
+        { id: "course-feedback", label: "Governance & Quality", icon: Star },
+        { id: "learning-gaps", label: "Competency & Gaps", icon: ShieldAlert },
         { id: "approvals", label: "Officer Approvals", icon: UserCheck },
-        { id: "announcements", label: "National Broadcasts", icon: BellRing },
-        { id: "analytics", label: "Platform Analytics", icon: BarChart3 },
-        { id: "profile", label: "Officer Profile", icon: FileText },
+        { id: "announcements", label: "Communication", icon: BellRing },
+        { id: "analytics", label: "Reports & Analytics", icon: BarChart3 },
+        { id: "profile", label: "Profile", icon: FileText },
       ];
     }
 
     // Trainee view
     return [
       ...baseItems,
-      { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
-      { id: "ai-course-advisor", label: "AI Course Advisor", icon: Sparkles, isModalTrigger: true },
-      { id: "my-learning", label: "My Enrolled Courses", icon: GraduationCap },
-      { id: "trainee-quizzes", label: "Scheduled Assessments", icon: ClipboardList },
-      { id: "practice-papers", label: "AI Practice Papers", icon: Sparkles },
+      { id: "learning-gaps", label: "Learning Gaps", icon: ShieldAlert },
+      { id: "ai-course-advisor", label: "Course Advisor", icon: Sparkles, isModalTrigger: true },
+      { id: "my-learning", label: "My Learning", icon: GraduationCap },
+      { id: "trainee-quizzes", label: "Assessments", icon: ClipboardList },
+      { id: "practice-papers", label: "Practice", icon: Sparkles },
       { id: "questions", label: "Question Bank", icon: Layers },
-      { id: "certificates", label: "Certified Credentials", icon: Award },
-      { id: "profile", label: "Officer Profile", icon: FileText },
-      { id: "analytics", label: "Competency Radar", icon: BarChart3 },
+      { id: "certificates", label: "Certificates", icon: Award },
+      { id: "profile", label: "Profile", icon: FileText },
+      { id: "analytics", label: "Competency Passport", icon: BarChart3 },
     ];
   };
 
@@ -80,33 +89,55 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
     if (onOpenLoginPage) onOpenLoginPage();
   };
 
-  return (
-    <aside className="w-64 bg-white text-slate-700 flex flex-col h-screen select-none shrink-0 shadow-sm relative z-30 border-r border-slate-200">
+  const handleItemClick = (item) => {
+    if (item.isModalTrigger && onOpenAiAdvisor) {
+      onOpenAiAdvisor();
+    } else {
+      setActiveTab(item.id);
+    }
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  const sidebarContent = (
+    <div className="w-64 bg-[#0B3475] text-slate-200 flex flex-col h-full select-none shrink-0 border-r border-[#123F82] shadow-sm">
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50/50">
-        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-sm tracking-wider shadow-sm shrink-0">
-          CC
-        </div>
-        <div className="overflow-hidden">
-          <div className="flex items-center gap-1.5">
-            <h1 className="font-extrabold text-sm tracking-tight text-slate-900 uppercase truncate">
+      <div className="p-4.5 border-b border-white/10 flex items-center justify-between bg-[#08285C]">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-semibold text-xs tracking-wider shadow-sm shrink-0">
+            CC
+          </div>
+          <div className="overflow-hidden">
+            <h1 className="font-semibold text-sm tracking-tight text-white uppercase truncate">
               CAPACITY CONNECT
             </h1>
+            <p className="text-[10px] text-blue-200/80 font-normal tracking-wide truncate">
+              Learning & Assessment Portal
+            </p>
           </div>
-          <p className="text-[10px] text-slate-500 font-medium tracking-wide truncate">
-            MoES / IMD LMS Portal
-          </p>
         </div>
+
+        {/* Mobile Close Button */}
+        {onCloseMobile && (
+          <button
+            onClick={onCloseMobile}
+            className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Nav List */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin">
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
         {onOpenHomePage && (
           <button
-            onClick={onOpenHomePage}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 border border-emerald-200 transition-all text-left mb-2 shadow-xs"
+            onClick={() => {
+              onOpenHomePage();
+              if (onCloseMobile) onCloseMobile();
+            }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-xs bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/20 transition-all text-left mb-2"
           >
-            <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="truncate">Public Portal & Verify</span>
           </button>
         )}
@@ -118,25 +149,19 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
           return (
             <button
               key={item.id}
-              onClick={() => {
-                if (item.isModalTrigger && onOpenAiAdvisor) {
-                  onOpenAiAdvisor();
-                } else {
-                  setActiveTab(item.id);
-                }
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-left ${
+              onClick={() => handleItemClick(item)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-150 text-left ${
                 isActive
-                  ? "bg-blue-50 text-blue-700 font-bold border-l-4 border-blue-600 shadow-xs"
+                  ? "bg-white/15 text-white font-semibold border-l-3 border-blue-400 shadow-2xs"
                   : isAdvisor
-                  ? "bg-amber-50/80 text-amber-900 hover:bg-amber-100/80 border border-amber-200/80 font-bold"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  ? "bg-amber-500/15 text-amber-200 hover:bg-amber-500/25 border border-amber-400/20"
+                  : "text-slate-200 hover:bg-white/8 hover:text-white"
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-blue-600" : isAdvisor ? "text-amber-600" : "text-slate-500"}`} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-blue-300" : isAdvisor ? "text-amber-300" : "text-slate-300"}`} />
               <span className="truncate">{item.label}</span>
               {isAdvisor && (
-                <span className="ml-auto px-1.5 py-0.5 rounded-md bg-amber-200/60 text-amber-800 text-[9px] font-black uppercase tracking-wider">
+                <span className="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[9px] font-medium uppercase tracking-wider">
                   AI
                 </span>
               )}
@@ -146,24 +171,27 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
       </nav>
 
       {/* User Footer Profile Card & Sign Out */}
-      <div className="border-t border-slate-200 bg-slate-50/70 p-3 space-y-2">
+      <div className="border-t border-white/10 bg-[#07214A] p-3 space-y-2">
         <button
           type="button"
-          onClick={() => setActiveTab("profile")}
-          title="Click to view and edit Officer Profile"
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-white hover:bg-blue-50/60 border border-slate-200 hover:border-blue-300 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
+          onClick={() => {
+            setActiveTab("profile");
+            if (onCloseMobile) onCloseMobile();
+          }}
+          title="Click to view Profile"
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
         >
           <img
             src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
             alt="User"
-            className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs group-hover:ring-blue-400 transition-all"
+            className="w-8 h-8 rounded-lg object-cover ring-1 ring-white/20 shrink-0"
           />
           <div className="overflow-hidden flex-1">
-            <p className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-700 transition-colors">
-              {currentUser?.name || "Institute Officer"}
+            <p className="text-xs font-medium text-white truncate group-hover:text-blue-200 transition-colors">
+              {currentUser?.name || "Officer"}
             </p>
-            <p className="text-[10px] text-slate-500 truncate capitalize font-medium">
-              {currentUser?.designation || currentUser?.department || currentUser?.email || "IMD Officer"}
+            <p className="text-[10px] text-slate-300 truncate capitalize">
+              {currentUser?.designation || currentUser?.department || currentUser?.role || "Cadre Member"}
             </p>
           </div>
         </button>
@@ -171,12 +199,35 @@ export const Sidebar = ({ activeTab, setActiveTab, onOpenLoginPage, onOpenHomePa
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 hover:text-red-800 rounded-xl text-xs font-bold transition-all shadow-2xs active:scale-98 cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/20 text-rose-200 rounded-lg text-xs font-medium transition-all cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
         </button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sticky Sidebar */}
+      <aside className="hidden lg:flex flex-col h-screen shrink-0 z-30">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer Backdrop and Drawer */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={onCloseMobile}
+          />
+          <div className="relative z-50 h-full animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
+

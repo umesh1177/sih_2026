@@ -175,28 +175,28 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+      <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
         
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0a2558] to-indigo-600 flex items-center justify-center text-white shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-[#0B3475] flex items-center justify-center text-white shadow-xs">
               <Sparkles className="w-5 h-5 text-amber-300" />
             </div>
             <div>
-              <h2 className="text-base font-black text-slate-900">
-                MoES Domain AI Question Generator
+              <h2 className="text-sm font-bold text-slate-900">
+                AI Question Generator
               </h2>
               <p className="text-[11px] text-slate-500">
-                Auto-generate high-quality technical MCQs or One-Word questions tailored to your assigned modules and topics.
+                Generate high-quality technical MCQs or One-Word questions tailored to assigned modules and topics.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -212,19 +212,19 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
               <button
                 type="button"
                 onClick={() => setQuestionType("mcq")}
-                className={`p-3 rounded-2xl border flex items-center gap-2.5 font-bold transition-all text-left ${
+                className={`p-3 rounded-xl border flex items-center gap-2.5 font-semibold transition-colors text-left ${
                   questionType === "mcq"
-                    ? "bg-indigo-50/80 border-indigo-500 text-indigo-950 ring-2 ring-indigo-200 shadow-2xs"
+                    ? "bg-blue-50/80 border-[#0B3475] text-[#0B3475] shadow-xs"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs ${
-                  questionType === "mcq" ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700"
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+                  questionType === "mcq" ? "bg-[#0B3475] text-white" : "bg-slate-200 text-slate-700"
                 }`}>
                   A
                 </div>
                 <div>
-                  <p className="text-xs font-black">Multiple Choice (MCQ)</p>
+                  <p className="text-xs font-bold">Multiple Choice (MCQ)</p>
                   <p className="text-[10px] text-slate-500 font-normal">4 options with 1 verified correct choice</p>
                 </div>
               </button>
@@ -232,24 +232,25 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
               <button
                 type="button"
                 onClick={() => setQuestionType("one_word")}
-                className={`p-3 rounded-2xl border flex items-center gap-2.5 font-bold transition-all text-left ${
+                className={`p-3 rounded-xl border flex items-center gap-2.5 font-semibold transition-colors text-left ${
                   questionType === "one_word"
-                    ? "bg-indigo-50/80 border-indigo-500 text-indigo-950 ring-2 ring-indigo-200 shadow-2xs"
+                    ? "bg-blue-50/80 border-[#0B3475] text-[#0B3475] shadow-xs"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs ${
-                  questionType === "one_word" ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700"
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+                  questionType === "one_word" ? "bg-[#0B3475] text-white" : "bg-slate-200 text-slate-700"
                 }`}>
                   1
                 </div>
                 <div>
-                  <p className="text-xs font-black">One Word / Short Answer</p>
+                  <p className="text-xs font-bold">One Word / Short Answer</p>
                   <p className="text-[10px] text-slate-500 font-normal">Single scientific term, acronym, or metric</p>
                 </div>
               </button>
             </div>
           </div>
+
 
           {/* Module Dropdown (Populated from assigned subjects) */}
           <div className="space-y-1">
@@ -366,12 +367,12 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
             <button
               type="submit"
               disabled={generating}
-              className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-blue-900 text-white rounded-2xl font-black shadow-sm transition-all transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white rounded-xl font-semibold shadow-xs transition-colors disabled:opacity-50"
             >
               {generating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
-                  <span>Synthesizing Domain Questions with AI...</span>
+                  <span>Synthesizing Questions...</span>
                 </>
               ) : (
                 <>
@@ -388,7 +389,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           <div className="mt-4 pt-4 border-t border-slate-100 space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Generated Questions Preview ({generatedList.length})</span>
                 </h3>
@@ -406,53 +407,53 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                   });
                   setSelectedToAdd(selMap);
                 }}
-                className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
+                className="text-xs font-semibold text-[#0B3475] hover:underline"
               >
                 {Object.values(selectedToAdd).filter(Boolean).length === generatedList.length ? "Deselect All" : "Select All"}
               </button>
             </div>
 
-            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
               {generatedList.map((q, idx) => (
                 <div
                   key={q.id || idx}
-                  className={`p-4 rounded-2xl border text-xs transition-colors ${
+                  className={`p-3.5 rounded-xl border text-xs transition-colors ${
                     selectedToAdd[q.id]
-                      ? "bg-indigo-50/40 border-indigo-300"
+                      ? "bg-blue-50/40 border-blue-200"
                       : "bg-slate-50 border-slate-200 opacity-60"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-2.5">
                     <input
                       type="checkbox"
                       checked={!!selectedToAdd[q.id]}
                       onChange={() =>
                         setSelectedToAdd(prev => ({ ...prev, [q.id]: !prev[q.id] }))
                       }
-                      className="mt-1 w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                      className="mt-0.5 w-4 h-4 text-[#0B3475] rounded focus:ring-[#0B3475]"
                     />
-                    <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                          (q.type || "").includes("word") ? "bg-amber-100 text-amber-900" : "bg-[#0a2558] text-white"
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          (q.type || "").includes("word") ? "bg-amber-100 text-amber-900" : "bg-[#0B3475] text-white"
                         }`}>
                           {(q.type || "").includes("word") ? "One Word" : "MCQ"}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-100 text-indigo-800">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-[#0B3475]">
                           {q.difficulty}
                         </span>
-                        <span className="text-[11px] font-semibold text-slate-500">
+                        <span className="text-[11px] font-medium text-slate-500">
                           {q.marks} Marks
                         </span>
                       </div>
 
-                      <p className="font-bold text-slate-900">{q.question}</p>
+                      <p className="font-semibold text-slate-900">{q.question}</p>
 
                       {/* Display based on format */}
                       {(q.type || "").includes("word") || q.expectedAnswer ? (
-                        <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1 text-slate-800">
+                        <div className="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200 space-y-1 text-slate-800">
                           <p className="font-bold text-amber-950">
-                            🔑 Expected Answer: <span className="font-mono text-emerald-700">{q.expectedAnswer}</span>
+                            Expected Answer: <span className="font-mono text-emerald-700">{q.expectedAnswer}</span>
                           </p>
                           {q.acceptedAnswers && q.acceptedAnswers.length > 1 && (
                             <p className="text-[10px] text-slate-500">
@@ -465,9 +466,9 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                           {(q.options || []).map((opt, optIdx) => (
                             <div
                               key={optIdx}
-                              className={`p-2 rounded-xl text-xs ${
+                              className={`p-2 rounded-lg text-xs ${
                                 q.correctAnswer === optIdx
-                                  ? "bg-emerald-100 text-emerald-950 font-bold border border-emerald-300"
+                                  ? "bg-emerald-50 text-emerald-950 font-semibold border border-emerald-300"
                                   : "bg-white border border-slate-200"
                               }`}
                             >
@@ -478,8 +479,8 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                       )}
 
                       {q.explanation && (
-                        <p className="text-[11px] text-indigo-900 bg-white p-2.5 rounded-xl border border-indigo-100">
-                          💡 <b>Key Domain Concept:</b> {q.explanation}
+                        <p className="text-[11px] text-slate-700 bg-white p-2 rounded-lg border border-slate-200">
+                          <b>Explanation:</b> {q.explanation}
                         </p>
                       )}
                     </div>
@@ -489,14 +490,14 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
             </div>
 
             <div className="pt-3 flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500">
+              <span className="text-xs font-medium text-slate-500">
                 {Object.values(selectedToAdd).filter(Boolean).length} of {generatedList.length} questions selected
               </span>
               <button
                 type="button"
                 onClick={handleAddSelectedToBank}
                 disabled={importing || Object.values(selectedToAdd).filter(Boolean).length === 0}
-                className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-black shadow-md transition-transform hover:scale-105 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
               >
                 {importing ? (
                   <>
@@ -513,6 +514,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
             </div>
           </div>
         )}
+
       </div>
     </div>
   );

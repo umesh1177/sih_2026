@@ -2036,7 +2036,7 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
                 </div>
               )}
 
-              {/* ─── 4. GEMINI AI SUMMARY NOTES DRAWER ─── */}
+              {/* ─── 4. AI SUMMARY NOTES DRAWER ─── */}
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50/60 rounded-2xl p-4 sm:p-5 border border-blue-200 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -2059,7 +2059,7 @@ export const ContentLibraryView = ({ currentUser, onOpenStudio, initialSubjectFi
                   </div>
                 ) : (
                   <p className="text-[11px] text-slate-600">
-                    Click "Generate AI Summary" to automatically extract conceptual highlights, key equations, and meteorological pointers with Gemini AI.
+                    Click "Generate AI Summary" to automatically extract conceptual highlights, key equations, and meteorological pointers with AI Module Summary.
                   </p>
                 )}
               </div>

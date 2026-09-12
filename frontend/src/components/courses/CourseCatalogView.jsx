@@ -129,7 +129,7 @@ export const CourseCatalogView = ({
       <div className="bg-white rounded-3xl p-6 sm:p-8 text-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-200/90 relative overflow-hidden">
         <div className="space-y-1.5 max-w-2xl z-10">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0a2558] text-[10px] font-black uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0B3475] text-[10px] font-black uppercase tracking-wider">
               {isMyLearningMode ? "Enrolled Officer Programs" : "MoES / IMD National Curricula"}
             </span>
             <span className="text-xs text-slate-400 font-medium">
@@ -153,7 +153,7 @@ export const CourseCatalogView = ({
               setCourseToEdit(null);
               setIsCreateModalOpen(true);
             }}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95 shrink-0 z-10"
+            className="flex items-center gap-2 px-5 py-3 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-2xl text-xs shadow-md transition-all shrink-0 z-10"
           >
             <Plus className="w-4 h-4 text-blue-200" />
             <span>+ Publish New Operational Course</span>
@@ -163,7 +163,7 @@ export const CourseCatalogView = ({
         {isMyLearningMode && onNavigateCourses && (
           <button
             onClick={onNavigateCourses}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-md transition-all transform hover:scale-105 active:scale-95 shrink-0 z-10"
+            className="flex items-center gap-2 px-5 py-3 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-2xl text-xs shadow-md transition-all shrink-0 z-10"
           >
             <BookOpen className="w-4 h-4 text-blue-200" />
             <span>Browse Full Catalog</span>
@@ -284,7 +284,7 @@ export const CourseCatalogView = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0a2558]/90 text-white shadow backdrop-blur-sm">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0B3475]/90 text-white shadow backdrop-blur-sm">
                       {course.code}
                     </span>
                     {currentUser?.role === "trainee" ? (
@@ -389,7 +389,7 @@ export const CourseCatalogView = ({
                         if (onEnrollClick) onEnrollClick(course);
                         else onSelectCourse(course);
                       }}
-                      className="px-4 py-2 bg-[#1967d2] hover:bg-[#1557b0] text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-1 transform hover:scale-105"
+                      className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-1"
                     >
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
                       <span>Enroll in Course</span>
@@ -413,7 +413,7 @@ export const CourseCatalogView = ({
                         e.stopPropagation();
                         setCourseToManage(course);
                       }}
-                      className="px-3.5 py-1.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow transition-all flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs shadow transition-all flex items-center gap-1.5"
                     >
                       <Settings className="w-3.5 h-3.5 text-blue-200" />
                       <span>Manage</span>
@@ -425,7 +425,7 @@ export const CourseCatalogView = ({
                       e.stopPropagation();
                       onSelectCourse(course);
                     }}
-                    className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-1"
+                    className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-1"
                   >
                     <span>View Curricula</span>
                     <ChevronRight className="w-3.5 h-3.5" />

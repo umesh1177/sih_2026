@@ -276,7 +276,7 @@ export const TrainerCurriculumStudio = ({
     setIsQuizModalOpen(true);
   };
 
-  // ─── GENERATE QUIZ QUESTIONS WITH GEMINI AI ───
+  // ─── GENERATE QUIZ QUESTIONS WITH AI QUESTION GENERATOR ───
   const handleGenerateAiQuizQuestions = async () => {
     if (generatingAiQuestions) return;
     setGeneratingAiQuestions(true);
@@ -298,7 +298,7 @@ export const TrainerCurriculumStudio = ({
           explanation: q.explanation || "Scientifically verified operational response."
         }));
         setStagedQuestions(mapped);
-        showToast(`✨ Generated ${mapped.length} technical MCQs with Gemini AI!`);
+        showToast(`✨ Generated ${mapped.length} technical MCQs with AI Question Generator!`);
       } else {
         showToast(res.message || "Failed to generate AI questions", "error");
       }
@@ -959,13 +959,13 @@ export const TrainerCurriculumStudio = ({
                 </div>
               </div>
 
-              {/* MODE 1: GEMINI AI GENERATOR */}
+              {/* MODE 1: AI QUESTION GENERATOR */}
               {quizCreationMode === "ai" && (
                 <div className="p-4 bg-indigo-50/70 rounded-2xl border border-indigo-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-indigo-950 text-xs flex items-center gap-1.5">
                       <Sparkles className="w-4 h-4 text-indigo-600" />
-                      <span>Gemini 1.5 Flash MCQ Synthesizer</span>
+                      <span>AI Question Generator</span>
                     </span>
                     <span className="text-[10px] font-mono text-indigo-700 font-bold bg-white px-2 py-0.5 rounded border border-indigo-200">
                       SOP Validated
@@ -1032,7 +1032,7 @@ export const TrainerCurriculumStudio = ({
                     className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-sm flex items-center justify-center gap-2 transition-transform hover:scale-[1.01]"
                   >
                     <Sparkles className={`w-4 h-4 ${generatingAiQuestions ? "animate-spin" : ""}`} />
-                    <span>{generatingAiQuestions ? "Gemini is Synthesizing Questions..." : "✨ Synthesize Questions with AI"}</span>
+                    <span>{generatingAiQuestions ? "Synthesizing Questions with AI..." : "✨ Synthesize Questions with AI"}</span>
                   </button>
                 </div>
               )}
