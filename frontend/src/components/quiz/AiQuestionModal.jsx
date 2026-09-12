@@ -175,16 +175,16 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+      <div className="bg-white rounded-[var(--radius)] max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
         
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0B3475] flex items-center justify-center text-white shadow-xs">
+            <div className="w-10 h-10 rounded-[var(--radius)] bg-[#0B3475] flex items-center justify-center text-white shadow-xs">
               <Sparkles className="w-5 h-5 text-amber-300" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900">
                 AI Question Generator
               </h2>
               <p className="text-[11px] text-slate-500">
@@ -194,7 +194,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-[var(--radius)] text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -205,26 +205,26 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           
           {/* Question Format Selector (MCQ vs One Word) */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-slate-700">
+            <label className="block font-medium text-slate-700">
               Select Question Format *
             </label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setQuestionType("mcq")}
-                className={`p-3 rounded-xl border flex items-center gap-2.5 font-semibold transition-colors text-left ${
+                className={`p-3 rounded-[var(--radius)] border flex items-center gap-2.5 font-semibold transition-colors text-left ${
                   questionType === "mcq"
                     ? "bg-blue-50/80 border-[#0B3475] text-[#0B3475] shadow-xs"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+                <div className={`w-7 h-7 rounded-[var(--radius)] flex items-center justify-center font-medium text-xs ${
                   questionType === "mcq" ? "bg-[#0B3475] text-white" : "bg-slate-200 text-slate-700"
                 }`}>
                   A
                 </div>
                 <div>
-                  <p className="text-xs font-bold">Multiple Choice (MCQ)</p>
+                  <p className="text-xs font-medium">Multiple Choice (MCQ)</p>
                   <p className="text-[10px] text-slate-500 font-normal">4 options with 1 verified correct choice</p>
                 </div>
               </button>
@@ -232,19 +232,19 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
               <button
                 type="button"
                 onClick={() => setQuestionType("one_word")}
-                className={`p-3 rounded-xl border flex items-center gap-2.5 font-semibold transition-colors text-left ${
+                className={`p-3 rounded-[var(--radius)] border flex items-center gap-2.5 font-semibold transition-colors text-left ${
                   questionType === "one_word"
                     ? "bg-blue-50/80 border-[#0B3475] text-[#0B3475] shadow-xs"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+                <div className={`w-7 h-7 rounded-[var(--radius)] flex items-center justify-center font-medium text-xs ${
                   questionType === "one_word" ? "bg-[#0B3475] text-white" : "bg-slate-200 text-slate-700"
                 }`}>
                   1
                 </div>
                 <div>
-                  <p className="text-xs font-bold">One Word / Short Answer</p>
+                  <p className="text-xs font-medium">One Word / Short Answer</p>
                   <p className="text-[10px] text-slate-500 font-normal">Single scientific term, acronym, or metric</p>
                 </div>
               </button>
@@ -254,13 +254,13 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
 
           {/* Module Dropdown (Populated from assigned subjects) */}
           <div className="space-y-1">
-            <label className="block font-bold text-slate-700">
+            <label className="block font-medium text-slate-700">
               Assigned Course Module *
             </label>
             <select
               value={selectedModule}
               onChange={(e) => handleModuleSelectChange(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
             >
               {availableModules.length > 0 ? (
                 <>
@@ -285,7 +285,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           {/* Custom Module Input if selected */}
           {selectedModule === "custom" && (
             <div className="space-y-1 animate-in fade-in duration-150">
-              <label className="block font-bold text-slate-700">
+              <label className="block font-medium text-slate-700">
                 Custom Module Name *
               </label>
               <input
@@ -294,7 +294,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                 onChange={(e) => setCustomModule(e.target.value)}
                 placeholder="e.g. Module 4: Numerical Boundary Layer Schemes"
                 required
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               />
             </div>
           )}
@@ -302,7 +302,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           {/* Subject & Topic Text Inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="block font-bold text-slate-700">
+              <label className="block font-medium text-slate-700">
                 Subject Name *
               </label>
               <input
@@ -311,12 +311,12 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                 onChange={(e) => setSubjectName(e.target.value)}
                 placeholder="e.g. Governing Equations & Dynamics"
                 required
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="block font-bold text-slate-700">
+              <label className="block font-medium text-slate-700">
                 Specific Topic / Prompt *
               </label>
               <input
@@ -325,7 +325,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g. CFL Numerical Stability Criterion, 4D-Var Assimilation"
                 required
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               />
             </div>
           </div>
@@ -333,13 +333,13 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           {/* Target Difficulty & Question Count */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="block font-bold text-slate-700">
+              <label className="block font-medium text-slate-700">
                 Target Difficulty
               </label>
               <select
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-800"
               >
                 <option value="Easy">Easy (Conceptual / 2 Marks)</option>
                 <option value="Medium">Medium (Analytical / 3 Marks)</option>
@@ -348,7 +348,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
             </div>
 
             <div className="space-y-1">
-              <label className="block font-bold text-slate-700">
+              <label className="block font-medium text-slate-700">
                 Number of Questions to Generate
               </label>
               <input
@@ -357,7 +357,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                 max={25}
                 value={count}
                 onChange={(e) => setCount(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-bold text-slate-900"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none font-medium text-slate-900"
               />
             </div>
           </div>
@@ -367,7 +367,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
             <button
               type="submit"
               disabled={generating}
-              className="flex items-center gap-2 px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white rounded-xl font-semibold shadow-xs transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white rounded-[var(--radius)] font-semibold shadow-xs transition-colors disabled:opacity-50"
             >
               {generating ? (
                 <>
@@ -389,7 +389,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
           <div className="mt-4 pt-4 border-t border-slate-100 space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Generated Questions Preview ({generatedList.length})</span>
                 </h3>
@@ -417,7 +417,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
               {generatedList.map((q, idx) => (
                 <div
                   key={q.id || idx}
-                  className={`p-3.5 rounded-xl border text-xs transition-colors ${
+                  className={`p-3.5 rounded-[var(--radius)] border text-xs transition-colors ${
                     selectedToAdd[q.id]
                       ? "bg-blue-50/40 border-blue-200"
                       : "bg-slate-50 border-slate-200 opacity-60"
@@ -434,7 +434,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                     />
                     <div className="flex-1 space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase ${
                           (q.type || "").includes("word") ? "bg-amber-100 text-amber-900" : "bg-[#0B3475] text-white"
                         }`}>
                           {(q.type || "").includes("word") ? "One Word" : "MCQ"}
@@ -451,8 +451,8 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
 
                       {/* Display based on format */}
                       {(q.type || "").includes("word") || q.expectedAnswer ? (
-                        <div className="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200 space-y-1 text-slate-800">
-                          <p className="font-bold text-amber-950">
+                        <div className="p-2.5 rounded-[var(--radius)] bg-amber-50/80 border border-amber-200 space-y-1 text-slate-800">
+                          <p className="font-medium text-amber-950">
                             Expected Answer: <span className="font-mono text-emerald-700">{q.expectedAnswer}</span>
                           </p>
                           {q.acceptedAnswers && q.acceptedAnswers.length > 1 && (
@@ -466,7 +466,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                           {(q.options || []).map((opt, optIdx) => (
                             <div
                               key={optIdx}
-                              className={`p-2 rounded-lg text-xs ${
+                              className={`p-2 rounded-[var(--radius)] text-xs ${
                                 q.correctAnswer === optIdx
                                   ? "bg-emerald-50 text-emerald-950 font-semibold border border-emerald-300"
                                   : "bg-white border border-slate-200"
@@ -479,7 +479,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                       )}
 
                       {q.explanation && (
-                        <p className="text-[11px] text-slate-700 bg-white p-2 rounded-lg border border-slate-200">
+                        <p className="text-[11px] text-slate-700 bg-white p-2 rounded-[var(--radius)] border border-slate-200">
                           <b>Explanation:</b> {q.explanation}
                         </p>
                       )}
@@ -497,7 +497,7 @@ export const AiQuestionModal = ({ isOpen, onClose, onQuestionsGenerated, current
                 type="button"
                 onClick={handleAddSelectedToBank}
                 disabled={importing || Object.values(selectedToAdd).filter(Boolean).length === 0}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-[var(--radius)] text-xs font-semibold shadow-xs transition-colors disabled:opacity-50"
               >
                 {importing ? (
                   <>

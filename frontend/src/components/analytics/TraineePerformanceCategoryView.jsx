@@ -432,20 +432,20 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       
       {/* ─── TOAST NOTIFICATION ─── */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-[var(--radius)] bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
           <div className={`w-2.5 h-2.5 rounded-full ${toastMessage.type === "error" ? "bg-red-400" : "bg-emerald-400"}`} />
-          <span className="text-xs font-bold">{toastMessage.message}</span>
+          <span className="text-xs font-medium">{toastMessage.message}</span>
         </div>
       )}
 
       {/* ═════════ 1. HEADER & CONFIGURATION ACTION BAR ═════════ */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[var(--radius)] p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-50 border border-indigo-200 text-indigo-700 uppercase tracking-wider">
               {isAdmin ? "Admin Institutional Intelligence" : "Trainer Assessment Analytics"}
             </span>
-            <span className="text-xs font-bold text-slate-400">
+            <span className="text-xs font-medium text-slate-400">
               Multi-Metric Performance Categorization
             </span>
           </div>
@@ -465,7 +465,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
               setTempWeights(weights);
               setIsConfigModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-950 font-black rounded-2xl text-xs border border-indigo-200 shadow-sm transition-all hover:scale-105"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-950 font-black rounded-[var(--radius)] text-xs border border-indigo-200 shadow-sm transition-all hover:scale-105"
           >
             <Sliders className="w-4 h-4 text-indigo-600" />
             <span>Configure Weights & Cutoffs</span>
@@ -488,7 +488,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
               document.body.removeChild(link);
               showToast("✓ Exported Performance Classification Report (CSV)");
             }}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs border border-slate-200 shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs border border-slate-200 shadow-sm"
           >
             <Download className="w-4 h-4 text-slate-600" />
             <span>Export Classification CSV</span>
@@ -498,10 +498,10 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
       {/* ═════════ 2. ADMIN CROSS-ORGANIZATIONAL TABS (Admin Only) ═════════ */}
       {isAdmin && (
-        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 overflow-x-auto">
+        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-[var(--radius)] border border-slate-200 overflow-x-auto">
           <button
             onClick={() => setActiveAdminTab("learners")}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-[var(--radius)] text-xs font-black transition-all flex items-center gap-2 ${
               activeAdminTab === "learners" 
                 ? "bg-white text-indigo-900 shadow-sm" 
                 : "text-slate-600 hover:text-slate-900"
@@ -513,7 +513,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
           <button
             onClick={() => setActiveAdminTab("departments")}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-[var(--radius)] text-xs font-black transition-all flex items-center gap-2 ${
               activeAdminTab === "departments" 
                 ? "bg-white text-indigo-900 shadow-sm" 
                 : "text-slate-600 hover:text-slate-900"
@@ -525,7 +525,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
           <button
             onClick={() => setActiveAdminTab("courses")}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-[var(--radius)] text-xs font-black transition-all flex items-center gap-2 ${
               activeAdminTab === "courses" 
                 ? "bg-white text-indigo-900 shadow-sm" 
                 : "text-slate-600 hover:text-slate-900"
@@ -538,13 +538,13 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       )}
 
       {loading ? (
-        <div className="py-20 text-center space-y-3 bg-white rounded-3xl border border-slate-200 shadow-sm">
+        <div className="py-20 text-center space-y-3 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
           <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-xs font-semibold text-slate-500">Loading learner performance telemetry...</p>
         </div>
       ) : processedTrainees.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-14 text-center space-y-4 shadow-sm animate-in fade-in">
-          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-14 text-center space-y-4 shadow-sm animate-in fade-in">
+          <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-[var(--radius)] flex items-center justify-center mx-auto">
             <Users className="w-8 h-8" />
           </div>
           <div className="space-y-1.5">
@@ -559,7 +559,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       ) : (
       <>
       {/* ═════════ 3. PERFORMANCE CATEGORY PILLS & FILTER BAR ═════════ */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-white rounded-[var(--radius)] p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
         
         {/* Category Quick Filter Pills */}
         <div className="flex items-center justify-between gap-3 flex-wrap pb-3 border-b border-slate-100">
@@ -577,7 +577,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 <button
                   key={catKey}
                   onClick={() => setSelectedCategoryFilter(catKey)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-xs ${
+                  className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-black transition-all flex items-center gap-1.5 shadow-xs ${
                     isSelected
                       ? catKey === "All" 
                         ? "bg-[#0a2558] text-white shadow-md ring-2 ring-blue-300"
@@ -587,7 +587,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 >
                   {catConf?.icon && <span>{catConf.icon}</span>}
                   <span>{catKey}</span>
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-medium ${
                     isSelected ? "bg-white/20 text-white" : "bg-slate-200 text-slate-700"
                   }`}>
                     {count}
@@ -599,7 +599,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
           <button
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors ml-auto"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius)] bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium transition-colors ml-auto"
           >
             <Filter className="w-3.5 h-3.5 text-slate-500" />
             <span>{showAdvancedFilters ? "Hide Filter Options" : "Advanced Filters & Sliders"}</span>
@@ -616,7 +616,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search officer name, cadre, station..."
-              className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600"
+              className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600"
             />
           </div>
 
@@ -625,7 +625,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-600"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-600"
             >
               <option value="all">All Departments / Groups</option>
               {uniqueDepartments.map(d => (
@@ -639,7 +639,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             <select
               value={selectedCompetency}
               onChange={(e) => setSelectedCompetency(e.target.value)}
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-600"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-600"
             >
               <option value="all">All Subject Competencies</option>
               {uniqueCompetencies.map(c => (
@@ -661,7 +661,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 setCompletionRange({ min: 0, max: 100 });
                 showToast("Filters reset to default.");
               }}
-              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200"
+              className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs transition-colors flex items-center justify-center gap-1.5 border border-slate-200"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Reset All Filters</span>
@@ -671,10 +671,10 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
         {/* Advanced Filter Drawer (Sliders for Score & Completion) */}
         {showAdvancedFilters && (
-          <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-150">
+          <div className="p-4 bg-slate-50/80 rounded-[var(--radius)] border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-150">
             {/* Score Range */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs font-bold">
+              <div className="flex items-center justify-between text-xs font-medium">
                 <span className="text-slate-700">Minimum Overall Score:</span>
                 <span className="font-mono text-indigo-700">{scoreRange.min}% - {scoreRange.max}%</span>
               </div>
@@ -690,7 +690,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
             {/* Course Completion Range */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs font-bold">
+              <div className="flex items-center justify-between text-xs font-medium">
                 <span className="text-slate-700">Minimum Course Completion:</span>
                 <span className="font-mono text-indigo-700">{completionRange.min}% - {completionRange.max}%</span>
               </div>
@@ -711,7 +711,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       {/* ═════════ 4. MAIN CONTENT VIEW (LEARNERS CARDS vs ADMIN CROSS-DEPARTMENT / COURSES) ═════════ */}
       {isAdmin && activeAdminTab === "departments" ? (
         /* ─── ADMIN VIEW: CROSS-DEPARTMENT BENCHMARKING ─── */
-        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div className="bg-white rounded-[var(--radius)] p-6 border border-slate-200 shadow-sm space-y-6">
           <div>
             <h3 className="font-extrabold text-base text-slate-900">
               Departmental Performance & Category Distribution
@@ -723,7 +723,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {departmentAggregates.map(dept => (
-              <div key={dept.department} className="p-5 rounded-3xl border border-slate-200 bg-slate-50/70 space-y-3 shadow-xs">
+              <div key={dept.department} className="p-5 rounded-[var(--radius)] border border-slate-200 bg-slate-50/70 space-y-3 shadow-xs">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-5 h-5 text-indigo-600 shrink-0" />
@@ -758,7 +758,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
         </div>
       ) : isAdmin && activeAdminTab === "courses" ? (
         /* ─── ADMIN VIEW: COURSE & SUBJECT-WISE LEARNER PERFORMANCE ─── */
-        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div className="bg-white rounded-[var(--radius)] p-6 border border-slate-200 shadow-sm space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h3 className="font-extrabold text-base text-slate-900">
@@ -768,7 +768,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 Institutional overview of enrolled trainees, course progress, and detailed subject-wise diagnostic scores.
               </p>
             </div>
-            <span className="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-black rounded-xl">
+            <span className="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-black rounded-[var(--radius)]">
               {courses.length} Active Courses
             </span>
           </div>
@@ -777,19 +777,19 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             {courseAggregates.map(course => {
               const isExpanded = expandedCourseId === course.id;
               return (
-                <div key={course.id} className="border border-slate-200 rounded-3xl overflow-hidden bg-slate-50/50 transition-all">
+                <div key={course.id} className="border border-slate-200 rounded-[var(--radius)] overflow-hidden bg-slate-50/50 transition-all">
                   {/* Course Summary Header */}
                   <div 
                     onClick={() => setExpandedCourseId(isExpanded ? null : course.id)}
                     className="p-5 bg-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/80 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-[#0a2558] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                      <div className="w-11 h-11 rounded-[var(--radius)] bg-[#0a2558] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                         <BookOpen className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-mono font-bold text-[10px] border border-indigo-200">
+                          <span className="px-2 py-0.5 rounded-[var(--radius)] bg-indigo-50 text-indigo-700 font-mono font-medium text-[10px] border border-indigo-200">
                             {course.code || course.id}
                           </span>
                           <span className="text-xs text-slate-500 font-medium">
@@ -802,20 +802,20 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
                     <div className="flex items-center gap-6 self-stretch md:self-auto justify-between md:justify-end">
                       <div className="text-left md:text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enrolled Trainees</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Enrolled Trainees</p>
                         <p className="text-sm font-black text-slate-800">{course.enrolledCount} Officers</p>
                       </div>
                       <div className="text-left md:text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Performance</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Avg Performance</p>
                         <p className={`text-sm font-black font-mono ${course.avgScore >= 75 ? "text-emerald-600" : course.avgScore >= 60 ? "text-blue-600" : "text-amber-600"}`}>
                           {course.avgScore}%
                         </p>
                       </div>
                       <div className="text-left md:text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Completion</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Avg Completion</p>
                         <p className="text-sm font-black font-mono text-indigo-700">{course.avgCompletion}%</p>
                       </div>
-                      <button className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
+                      <button className="p-2 rounded-[var(--radius)] bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
                         {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       </button>
                     </div>
@@ -839,19 +839,19 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {course.subjects.map((subj, sIdx) => (
-                            <div key={subj.id || sIdx} className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
+                            <div key={subj.id || sIdx} className="p-4 rounded-[var(--radius)] bg-white border border-slate-200 shadow-2xs space-y-3">
                               <div className="flex items-start justify-between gap-2">
                                 <div>
-                                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-medium">
                                     Unit {sIdx + 1} • {subj.modulesCount} Modules
                                   </span>
                                   <h6 className="font-black text-slate-900 text-sm mt-1">{subj.name}</h6>
                                   <p className="text-xs text-slate-500 mt-0.5">
-                                    Assigned Trainer: <span className="font-bold text-indigo-900">{subj.trainer}</span>
+                                    Assigned Trainer: <span className="font-medium text-indigo-900">{subj.trainer}</span>
                                   </p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                  <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-black bg-indigo-50 text-indigo-900 border border-indigo-200">
+                                  <span className="px-2.5 py-1 rounded-[var(--radius)] text-xs font-mono font-black bg-indigo-50 text-indigo-900 border border-indigo-200">
                                     Score: {subj.avgScore}%
                                   </span>
                                 </div>
@@ -859,7 +859,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
                               {/* Trainee list under this subject */}
                               <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
                                   Enrolled Trainees ({subj.trainees?.length || 0})
                                 </p>
                                 <div className="max-h-36 overflow-y-auto space-y-1 pr-1">
@@ -867,16 +867,16 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                                     <p className="text-xs text-slate-400 italic py-1">No enrolled trainees.</p>
                                   ) : (
                                     (subj.trainees || []).map(t => (
-                                      <div key={t.id} className="flex items-center justify-between text-xs p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100">
+                                      <div key={t.id} className="flex items-center justify-between text-xs p-1.5 rounded-[var(--radius)] bg-slate-50 hover:bg-slate-100">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-5 h-5 rounded-full bg-[#0a2558] text-white text-[9px] font-bold flex items-center justify-center">
+                                          <div className="w-5 h-5 rounded-full bg-[#0a2558] text-white text-[9px] font-medium flex items-center justify-center">
                                             {t.name.charAt(0)}
                                           </div>
-                                          <span className="font-bold text-slate-800">{t.name}</span>
+                                          <span className="font-medium text-slate-800">{t.name}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                           <span className="text-[10px] text-slate-500 font-mono">{t.avgScore}%</span>
-                                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
+                                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-800">
                                             {t.category}
                                           </span>
                                         </div>
@@ -899,15 +899,15 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       ) : (
         /* ─── TRAINER & ADMIN PRIMARY VIEW: TRAINEE PERFORMANCE CARDS ─── */
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-1 text-xs text-slate-500 font-bold">
+          <div className="flex items-center justify-between px-1 text-xs text-slate-500 font-medium">
             <span>Showing {filteredTrainees.length} of {processedTrainees.length} Trainees</span>
             <span>Category Formula: ({weights.assessmentWeight}% Assess + {weights.courseCompletionWeight}% Comp + {weights.practiceWeight}% Prac + {weights.consistencyWeight}% Cons)</span>
           </div>
 
           {processedTrainees.length === 0 ? (
-            <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-3">
+            <div className="p-12 text-center bg-white rounded-[var(--radius)] border border-dashed border-slate-300 space-y-3">
               <Users className="w-12 h-12 text-slate-400 mx-auto" />
-              <h3 className="font-bold text-slate-800 text-sm">
+              <h3 className="font-semibold text-slate-800 text-sm">
                 {!isAdmin ? "No Enrolled Learners Found for Your Assigned Subjects" : "No Enrolled Trainees Found"}
               </h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
@@ -917,9 +917,9 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
               </p>
             </div>
           ) : filteredTrainees.length === 0 ? (
-            <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-3">
+            <div className="p-12 text-center bg-white rounded-[var(--radius)] border border-dashed border-slate-300 space-y-3">
               <Users className="w-12 h-12 text-slate-400 mx-auto" />
-              <h3 className="font-bold text-slate-800 text-sm">No Trainees Match Selected Filter Criteria</h3>
+              <h3 className="font-semibold text-slate-800 text-sm">No Trainees Match Selected Filter Criteria</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 Try widening your score/completion ranges or clearing category filters.
               </p>
@@ -932,7 +932,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 return (
                   <div
                     key={trainee.id || trainee.traineeId}
-                    className={`bg-white rounded-3xl border ${catConf.cardBorder} shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 cursor-pointer`}
+                    className={`bg-white rounded-[var(--radius)] border ${catConf.cardBorder} shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 cursor-pointer`}
                     onClick={() => {
                       setSelectedTrainee(trainee);
                       setCurrentRemarksInput(trainee.remarks || "");
@@ -941,7 +941,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                     {/* Top Row: Officer Identity & Category Pill */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-[#0a2558] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
+                        <div className="w-10 h-10 rounded-[var(--radius)] bg-[#0a2558] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
                           {trainee.name.split(" ").map(n => n[0]).join("")}
                         </div>
                         <div>
@@ -953,7 +953,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
                       {/* Performance Category Badge */}
                       <div className="text-right shrink-0">
-                        <span className={`px-2.5 py-1 rounded-xl text-xs font-extrabold inline-flex items-center gap-1 border shadow-2xs ${catConf.badge}`}>
+                        <span className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-extrabold inline-flex items-center gap-1 border shadow-2xs ${catConf.badge}`}>
                           <span>{catConf.icon}</span>
                           <span>{trainee.category}</span>
                         </span>
@@ -964,7 +964,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                     </div>
 
                     {/* 4-Pillar Metric Bars */}
-                    <div className="space-y-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-100 text-[11px]">
+                    <div className="space-y-1.5 p-3 rounded-[var(--radius)] bg-slate-50 border border-slate-100 text-[11px]">
                       <div className="flex items-center justify-between text-slate-600">
                         <span>Assessment Score ({weights.assessmentWeight}%):</span>
                         <b className="font-mono text-slate-900">{trainee.assessmentScore}%</b>
@@ -987,11 +987,11 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                     <div className="space-y-1 text-xs">
                       {/* Strengths */}
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-0.5">
+                        <span className="text-[10px] font-medium text-emerald-800 uppercase tracking-wider flex items-center gap-0.5">
                           <Check className="w-3 h-3 text-emerald-600" /> Strengths:
                         </span>
                         {(trainee.strengths || []).slice(0, 2).map((s, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-900 text-[10px] font-semibold border border-emerald-200">
+                          <span key={idx} className="px-2 py-0.5 rounded-[var(--radius)] bg-emerald-50 text-emerald-900 text-[10px] font-semibold border border-emerald-200">
                             {s}
                           </span>
                         ))}
@@ -999,11 +999,11 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
                       {/* Needs Improvement */}
                       <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                        <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider flex items-center gap-0.5">
+                        <span className="text-[10px] font-medium text-amber-800 uppercase tracking-wider flex items-center gap-0.5">
                           <AlertTriangle className="w-3 h-3 text-amber-600" /> Focus:
                         </span>
                         {(trainee.needsImprovement || []).slice(0, 2).map((n, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-900 text-[10px] font-semibold border border-amber-200">
+                          <span key={idx} className="px-2 py-0.5 rounded-[var(--radius)] bg-amber-50 text-amber-900 text-[10px] font-semibold border border-amber-200">
                             {n}
                           </span>
                         ))}
@@ -1034,12 +1034,12 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       {/* ═════════ 5. TRAINEE PERFORMANCE DOSSIER & DIAGNOSTIC MODAL ═════════ */}
       {selectedTrainee && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-150 overflow-y-auto font-sans">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 my-auto max-h-[92vh] overflow-y-auto">
+          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 my-auto max-h-[92vh] overflow-y-auto">
             
             {/* Modal Header */}
             <div className="flex items-start justify-between border-b border-slate-200 pb-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-[#0a2558] text-white flex items-center justify-center font-black text-sm shadow-md">
+                <div className="w-12 h-12 rounded-[var(--radius)] bg-[#0a2558] text-white flex items-center justify-center font-black text-sm shadow-md">
                   {selectedTrainee.name.split(" ").map(n => n[0]).join("")}
                 </div>
                 <div>
@@ -1060,7 +1060,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
               <button
                 onClick={() => setSelectedTrainee(null)}
-                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-800"
+                className="p-1.5 rounded-[var(--radius)] hover:bg-slate-100 text-slate-400 hover:text-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1068,23 +1068,23 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
             {/* 4 Weighted Pillars Breakdown Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Assessment ({weights.assessmentWeight}%)</span>
+              <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-center space-y-1">
+                <span className="text-[10px] font-medium text-slate-500 uppercase">Assessment ({weights.assessmentWeight}%)</span>
                 <p className="font-mono font-black text-base text-slate-900">{selectedTrainee.assessmentScore}%</p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Completion ({weights.courseCompletionWeight}%)</span>
+              <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-center space-y-1">
+                <span className="text-[10px] font-medium text-slate-500 uppercase">Completion ({weights.courseCompletionWeight}%)</span>
                 <p className="font-mono font-black text-base text-slate-900">{selectedTrainee.completionPercentage}%</p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Practice Quiz ({weights.practiceWeight}%)</span>
+              <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-center space-y-1">
+                <span className="text-[10px] font-medium text-slate-500 uppercase">Practice Quiz ({weights.practiceWeight}%)</span>
                 <p className="font-mono font-black text-base text-slate-900">{selectedTrainee.practiceScore}%</p>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Consistency ({weights.consistencyWeight}%)</span>
+              <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-center space-y-1">
+                <span className="text-[10px] font-medium text-slate-500 uppercase">Consistency ({weights.consistencyWeight}%)</span>
                 <p className="font-mono font-black text-base text-slate-900">{selectedTrainee.consistencyScore}%</p>
               </div>
             </div>
@@ -1092,7 +1092,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             {/* Detailed Diagnostic Strengths & Needs Improvement Breakdown */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Identified Strengths */}
-              <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2.5">
+              <div className="p-4 rounded-[var(--radius)] bg-emerald-50/70 border border-emerald-200 space-y-2.5">
                 <h4 className="font-black text-xs text-emerald-950 flex items-center gap-1.5 uppercase tracking-wider">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Demonstrated Strengths (Mastery):</span>
@@ -1108,7 +1108,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
               </div>
 
               {/* Needs Improvement Areas */}
-              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2.5">
+              <div className="p-4 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200 space-y-2.5">
                 <h4 className="font-black text-xs text-amber-950 flex items-center gap-1.5 uppercase tracking-wider">
                   <AlertTriangle className="w-4 h-4 text-amber-600" />
                   <span>Target Improvement Focus:</span>
@@ -1125,7 +1125,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             </div>
 
             {/* Trainer Qualitative Feedback & Notes */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-2.5">
               <div className="flex items-center justify-between">
                 <h4 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
                   <MessageSquare className="w-4 h-4 text-indigo-600" />
@@ -1139,13 +1139,13 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 value={currentRemarksInput}
                 onChange={(e) => setCurrentRemarksInput(e.target.value)}
                 placeholder="Enter customized faculty feedback (e.g. 'Good understanding of sigma dynamics; recommend 2 additional practical runs on WRF boundary layers before certification')..."
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                className="w-full p-2.5 rounded-[var(--radius)] border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600"
               />
 
               <div className="flex justify-end">
                 <button
                   onClick={() => handleSaveRemarks(selectedTrainee.id || selectedTrainee.traineeId)}
-                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-[var(--radius)] text-xs flex items-center gap-1.5 shadow-sm"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>Save Faculty Remarks</span>
@@ -1157,7 +1157,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
               <button
                 onClick={() => setSelectedTrainee(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
               >
                 Close Dossier
               </button>
@@ -1166,7 +1166,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 onClick={() => {
                   showToast(`Assigned remedial practice quiz on "${selectedTrainee.needsImprovement?.[0] || 'Radar Meteorology'}" to ${selectedTrainee.name}`);
                 }}
-                className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-sm flex items-center gap-1.5"
+                className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-sm flex items-center gap-1.5"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Assign Targeted Practice Assessment</span>
@@ -1180,11 +1180,11 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
       {/* ═════════ 6. ADMIN/TRAINER CONFIGURATION MODAL (THRESHOLDS & WEIGHTS) ═════════ */}
       {isConfigModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[var(--radius)] max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
             
             <div className="flex items-start justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-[var(--radius)] bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center font-medium">
                   <Sliders className="w-5 h-5" />
                 </div>
                 <div>
@@ -1199,7 +1199,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
 
               <button
                 onClick={() => setIsConfigModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+                className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-700"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1211,9 +1211,9 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 1. Performance Category Thresholds (Min %):
               </label>
 
-              <div className="space-y-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs">
+              <div className="space-y-2.5 bg-slate-50 p-3.5 rounded-[var(--radius)] border border-slate-200 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-emerald-800 flex items-center gap-1">
+                  <span className="font-medium text-emerald-800 flex items-center gap-1">
                     🌟 Excellent Cutoff (≥ %):
                   </span>
                   <input
@@ -1222,12 +1222,12 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                     max={100}
                     value={tempThresholds.excellent}
                     onChange={(e) => setTempThresholds({ ...tempThresholds, excellent: Number(e.target.value) })}
-                    className="w-16 p-1.5 bg-white border border-slate-200 rounded-lg text-center font-mono font-bold text-slate-900"
+                    className="w-16 p-1.5 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium text-slate-900"
                   />
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-blue-800 flex items-center gap-1">
+                  <span className="font-medium text-blue-800 flex items-center gap-1">
                     👍 Good Cutoff (% Range):
                   </span>
                   <div className="flex items-center gap-1 font-mono text-slate-500">
@@ -1237,14 +1237,14 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                       max={90}
                       value={tempThresholds.good}
                       onChange={(e) => setTempThresholds({ ...tempThresholds, good: Number(e.target.value) })}
-                      className="w-16 p-1.5 bg-white border border-slate-200 rounded-lg text-center font-mono font-bold text-slate-900"
+                      className="w-16 p-1.5 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium text-slate-900"
                     />
                     <span>to {tempThresholds.excellent - 1}%</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-800 flex items-center gap-1">
+                  <span className="font-medium text-amber-800 flex items-center gap-1">
                     ⚠️ Needs Improvement Cutoff (% Range):
                   </span>
                   <div className="flex items-center gap-1 font-mono text-slate-500">
@@ -1254,7 +1254,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                       max={70}
                       value={tempThresholds.needsImprovement}
                       onChange={(e) => setTempThresholds({ ...tempThresholds, needsImprovement: Number(e.target.value) })}
-                      className="w-16 p-1.5 bg-white border border-slate-200 rounded-lg text-center font-mono font-bold text-slate-900"
+                      className="w-16 p-1.5 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium text-slate-900"
                     />
                     <span>to {tempThresholds.good - 1}%</span>
                   </div>
@@ -1281,44 +1281,44 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs">
+              <div className="grid grid-cols-2 gap-2.5 bg-slate-50 p-3.5 rounded-[var(--radius)] border border-slate-200 text-xs">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">Assessments %</label>
+                  <label className="block text-[10px] font-medium text-slate-600 uppercase mb-1">Assessments %</label>
                   <input
                     type="number"
                     value={tempWeights.assessmentWeight}
                     onChange={(e) => setTempWeights({ ...tempWeights, assessmentWeight: Number(e.target.value) })}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-xl text-center font-mono font-bold"
+                    className="w-full p-2 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">Course Completion %</label>
+                  <label className="block text-[10px] font-medium text-slate-600 uppercase mb-1">Course Completion %</label>
                   <input
                     type="number"
                     value={tempWeights.courseCompletionWeight}
                     onChange={(e) => setTempWeights({ ...tempWeights, courseCompletionWeight: Number(e.target.value) })}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-xl text-center font-mono font-bold"
+                    className="w-full p-2 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">Practice Quizzes %</label>
+                  <label className="block text-[10px] font-medium text-slate-600 uppercase mb-1">Practice Quizzes %</label>
                   <input
                     type="number"
                     value={tempWeights.practiceWeight}
                     onChange={(e) => setTempWeights({ ...tempWeights, practiceWeight: Number(e.target.value) })}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-xl text-center font-mono font-bold"
+                    className="w-full p-2 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">Consistency / Streak %</label>
+                  <label className="block text-[10px] font-medium text-slate-600 uppercase mb-1">Consistency / Streak %</label>
                   <input
                     type="number"
                     value={tempWeights.consistencyWeight}
                     onChange={(e) => setTempWeights({ ...tempWeights, consistencyWeight: Number(e.target.value) })}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-xl text-center font-mono font-bold"
+                    className="w-full p-2 bg-white border border-slate-200 rounded-[var(--radius)] text-center font-mono font-medium"
                   />
                 </div>
               </div>
@@ -1332,7 +1332,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                   setTempThresholds(DEFAULT_THRESHOLDS);
                   setTempWeights(DEFAULT_WEIGHTS);
                 }}
-                className="text-xs font-bold text-slate-500 hover:text-slate-800"
+                className="text-xs font-medium text-slate-500 hover:text-slate-800"
               >
                 Reset Defaults
               </button>
@@ -1341,14 +1341,14 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 <button
                   type="button"
                   onClick={() => setIsConfigModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveConfig}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-[var(--radius)] text-xs shadow-sm"
                 >
                   Save & Apply Cutoffs
                 </button>

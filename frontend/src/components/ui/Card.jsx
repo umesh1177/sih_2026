@@ -7,7 +7,9 @@ import PropTypes from 'prop-types';
  * Accepts optional `className` to extend styling.
  */
 const Card = ({ children, className, ...rest }) => {
-  const classes = ['card', className].filter(Boolean).join(' ');
+  // Combine base card with optional glass‑morphism style
+  const classes = ['card', 'card-glass', className].filter(Boolean).join(' ');
+
   return (
     <div className={classes} {...rest}>
       {children}

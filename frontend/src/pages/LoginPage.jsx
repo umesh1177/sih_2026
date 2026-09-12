@@ -140,7 +140,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
       <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-2xs sticky top-0 z-30">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors group border border-slate-200"
+          className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-[var(--radius)] hover:bg-slate-100 transition-colors group border border-slate-200"
         >
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform text-blue-700" />
           <span>Back to Homepage</span>
@@ -189,10 +189,10 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                 <button
                   key={idx}
                   onClick={() => handleDemoLogin(acc)}
-                  className={`bg-white p-3.5 rounded-xl border ${conf.cardBorder} shadow-2xs hover:shadow-sm transition-all text-left flex flex-col justify-between group cursor-pointer`}
+                  className={`bg-white p-3.5 rounded-[var(--radius)] border ${conf.cardBorder} shadow-2xs hover:shadow-sm transition-all text-left flex flex-col justify-between group cursor-pointer`}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${conf.badge}`}>
+                    <div className={`w-8 h-8 rounded-[var(--radius)] flex items-center justify-center ${conf.badge}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <span className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded border ${conf.badge}`}>
@@ -220,13 +220,13 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
         </div>
 
         {/* 2. Main Sign In / Registration Card */}
-        <div className="w-full bg-white rounded-2xl shadow-2xs border border-slate-200 overflow-hidden">
+        <div className="w-full bg-white rounded-[var(--radius)] shadow-2xs border border-slate-200 overflow-hidden">
           
           {/* Mode Switcher Tabs */}
           <div className="flex border-b border-slate-200 bg-slate-50/80 p-1 gap-1">
             <button
               onClick={() => { setMode("login"); setError(""); setSuccess(""); }}
-              className={`flex-1 py-2 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`flex-1 py-2 text-xs font-medium rounded-[var(--radius)] flex items-center justify-center gap-1.5 transition-all ${
                 mode === "login"
                   ? "bg-white text-blue-800 shadow-2xs font-semibold border border-slate-200"
                   : "text-slate-600 hover:text-slate-900"
@@ -238,7 +238,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
             
             <button
               onClick={() => { setMode("register"); setError(""); setSuccess(""); }}
-              className={`flex-1 py-2 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`flex-1 py-2 text-xs font-medium rounded-[var(--radius)] flex items-center justify-center gap-1.5 transition-all ${
                 mode === "register"
                   ? "bg-white text-blue-800 shadow-2xs font-semibold border border-slate-200"
                   : "text-slate-600 hover:text-slate-900"
@@ -265,7 +265,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                       key={role}
                       type="button"
                       onClick={() => setSelectedRole(role)}
-                      className={`p-2 rounded-lg border text-center transition-all flex flex-col items-center gap-1 ${
+                      className={`p-2 rounded-[var(--radius)] border text-center transition-all flex flex-col items-center gap-1 ${
                         isSelected
                           ? "border-blue-600 bg-blue-50/80 text-blue-900 font-medium"
                           : "border-slate-200 hover:border-slate-300 bg-white text-slate-700 font-normal"
@@ -291,7 +291,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                     value={form.name}
                     onChange={e => update("name", e.target.value)}
                     placeholder="e.g., Dr. Rajesh Kumar"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 transition-all"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 transition-all"
                   />
                 </div>
               )}
@@ -304,7 +304,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                   value={form.email}
                   onChange={e => update("email", e.target.value)}
                   placeholder="e.g., officer@imd.gov.in"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 transition-all"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 transition-all"
                 />
               </div>
 
@@ -318,7 +318,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                     value={form.password}
                     onChange={e => update("password", e.target.value)}
                     placeholder={mode === "login" ? "Enter password or leave blank" : "Create password"}
-                    className="w-full px-3 py-2 pr-10 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 transition-all"
+                    className="w-full px-3 py-2 pr-10 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600 transition-all"
                   />
                   <button
                     type="button"
@@ -339,7 +339,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                       value={form.confirmPassword}
                       onChange={e => update("confirmPassword", e.target.value)}
                       placeholder="Re-enter password"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
@@ -351,7 +351,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                         value={form.department}
                         onChange={e => update("department", e.target.value)}
                         placeholder="e.g., NWP Division"
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600"
                       />
                     </div>
                     <div>
@@ -361,7 +361,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
                         value={form.designation}
                         onChange={e => update("designation", e.target.value)}
                         placeholder="e.g., Scientist 'B'"
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600"
                       />
                     </div>
                   </div>
@@ -370,14 +370,14 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
 
               {/* Feedback Alerts */}
               {error && (
-                <div className="flex items-start gap-2 p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 animate-in fade-in">
+                <div className="flex items-start gap-2 p-2.5 bg-rose-50 border border-rose-200 rounded-[var(--radius)] text-xs text-rose-800 animate-in fade-in">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
                   <span>{error}</span>
                 </div>
               )}
               
               {success && (
-                <div className="flex items-start gap-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 animate-in fade-in">
+                <div className="flex items-start gap-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-[var(--radius)] text-xs text-emerald-800 animate-in fade-in">
                   <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
                   <span>{success}</span>
                 </div>
@@ -387,7 +387,7 @@ export const LoginPage = ({ onLoginSuccess, onBack }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-2.5 rounded-lg text-xs font-semibold shadow-xs flex items-center justify-center gap-2 transition-all ${roleConf.activeBtn} disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer`}
+                className={`w-full py-2.5 rounded-[var(--radius)] text-xs font-semibold shadow-xs flex items-center justify-center gap-2 transition-all ${roleConf.activeBtn} disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer`}
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

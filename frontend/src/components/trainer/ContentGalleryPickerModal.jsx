@@ -167,27 +167,27 @@ export const ContentGalleryPickerModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-4xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in modal-fullscreen">
+      <div className="bg-white rounded-[var(--radius)] max-w-4xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Modal Header */}
         <div className="bg-white border-b border-slate-200 p-5 sm:p-6 text-slate-900 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center font-black">
+            <div className="w-10 h-10 rounded-[var(--radius)] bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center font-black">
               <FolderKanban className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold tracking-tight text-slate-900">
+              <h3 className="text-base font-semibold tracking-tight text-slate-900">
                 Select Materials from Content Library
               </h3>
               <p className="text-xs text-slate-500">
-                Attaching to: <b>{subject?.name || "Assigned Subject"}</b> &rsaquo; <span className="text-blue-700 font-bold">{activeModule?.title || "Target Module"}</span>
+                Attaching to: <b>{subject?.name || "Assigned Subject"}</b> &rsaquo; <span className="text-blue-700 font-medium">{activeModule?.title || "Target Module"}</span>
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-900 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+            className="text-slate-500 hover:text-slate-900 p-1.5 rounded-[var(--radius)] hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -203,7 +203,7 @@ export const ContentGalleryPickerModal = ({
                 placeholder="Search repository by material title, topic, or subject..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0a2558]"
+                className="w-full pl-9 pr-4 py-2 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#0a2558]"
               />
             </div>
 
@@ -211,7 +211,7 @@ export const ContentGalleryPickerModal = ({
             <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto">
               {[
                 { id: "all", label: "All Formats" },
-                { id: "video", label: "🎥 Videos" },
+                { id: "video", label: "Videos" },
                 { id: "ppt", label: "📊 PPT Decks" },
                 { id: "pdf", label: "📑 PDFs" },
                 { id: "manual", label: "🧪 Manuals" }
@@ -219,7 +219,7 @@ export const ContentGalleryPickerModal = ({
                 <button
                   key={type.id}
                   onClick={() => setSelectedType(type.id)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-all ${
                     selectedType === type.id
                       ? "bg-blue-600 text-white shadow-xs"
                       : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
@@ -232,7 +232,7 @@ export const ContentGalleryPickerModal = ({
           </div>
 
           {feedback && (
-            <div className={`p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${
+            <div className={`p-2.5 rounded-[var(--radius)] text-xs font-medium flex items-center gap-2 ${
               feedback.type === "success" 
                 ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
                 : "bg-red-50 text-red-800 border border-red-200"
@@ -248,13 +248,13 @@ export const ContentGalleryPickerModal = ({
           {loading ? (
             <div className="py-16 text-center space-y-2">
               <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-bold text-slate-500">Loading Content Library...</p>
+              <p className="text-xs font-medium text-slate-500">Loading Content Library...</p>
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="py-16 text-center space-y-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <div className="py-16 text-center space-y-3 bg-slate-50 rounded-[var(--radius)] border border-dashed border-slate-200">
               <FolderKanban className="w-10 h-10 text-slate-300 mx-auto" />
               <div>
-                <h4 className="text-xs font-bold text-slate-700">No matching materials in Content Library</h4>
+                <h4 className="text-xs font-medium text-slate-700">No matching materials in Content Library</h4>
                 <p className="text-[11px] text-slate-400 mt-0.5">
                   Try clearing your search or add new materials in the Content Library tab.
                 </p>
@@ -268,7 +268,7 @@ export const ContentGalleryPickerModal = ({
                   <div
                     key={item.id}
                     onClick={() => toggleSelect(item.id)}
-                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 relative ${
+                    className={`p-3.5 rounded-[var(--radius)] border transition-all cursor-pointer flex flex-col justify-between space-y-3 relative ${
                       isSelected
                         ? "bg-blue-50/70 border-blue-600 ring-2 ring-blue-600/20 shadow-sm"
                         : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
@@ -277,7 +277,7 @@ export const ContentGalleryPickerModal = ({
                     {/* Top Row: Format badge, Checkbox & Preview button */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-slate-100 border border-slate-200">
+                        <div className="p-1.5 rounded-[var(--radius)] bg-slate-100 border border-slate-200">
                           {getTypeIcon(item.type)}
                         </div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
@@ -290,13 +290,13 @@ export const ContentGalleryPickerModal = ({
                           <button
                             type="button"
                             onClick={() => onOpenPreview(item)}
-                            className="p-1.5 bg-slate-100 hover:bg-blue-600 text-slate-600 hover:text-white rounded-lg text-xs transition-colors"
+                            className="p-1.5 bg-slate-100 hover:bg-blue-600 text-slate-600 hover:text-white rounded-[var(--radius)] text-xs transition-colors"
                             title="Preview Material"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                         )}
-                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
+                        <div className={`w-5 h-5 rounded-[var(--radius)] border flex items-center justify-center transition-colors ${
                           isSelected ? "bg-blue-600 border-blue-600 text-white" : "border-slate-300 bg-white"
                         }`}>
                           {isSelected && <Check className="w-3.5 h-3.5" />}
@@ -306,7 +306,7 @@ export const ContentGalleryPickerModal = ({
 
                     {/* Title & Topic */}
                     <div className="space-y-1">
-                      <h4 className="font-bold text-xs text-slate-900 line-clamp-2 leading-snug">
+                      <h4 className="font-medium text-xs text-slate-900 line-clamp-2 leading-snug">
                         {item.title}
                       </h4>
                       <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
@@ -348,7 +348,7 @@ export const ContentGalleryPickerModal = ({
 
         {/* Modal Footer Bar */}
         <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
-          <div className="text-xs text-slate-600 font-bold">
+          <div className="text-xs text-slate-600 font-medium">
             {selectedItemIds.length === 0 ? (
               <span className="text-slate-400">No items selected</span>
             ) : (
@@ -362,7 +362,7 @@ export const ContentGalleryPickerModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs border border-slate-200"
+              className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-semibold rounded-[var(--radius)] text-xs border border-slate-200"
             >
               Cancel
             </button>
@@ -370,7 +370,7 @@ export const ContentGalleryPickerModal = ({
               type="button"
               onClick={handleAttachSubmit}
               disabled={selectedItemIds.length === 0 || attaching}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-md disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[var(--radius)] text-xs shadow-md disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               {attaching ? "Attaching to Module..." : `Attach & Upload to ${activeModule?.title?.split(":")[0] || "Module"}`}
             </button>

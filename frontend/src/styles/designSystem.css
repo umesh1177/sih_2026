@@ -11,7 +11,15 @@
   --color-success: #10B981; /* Emerald */
   --color-warning: #F59E0B; /* Amber */
   --color-danger: #EF4444; /* Red */
+  --radius: 0.5rem; /* Standard radius */
+  /* Modal Full‑Screen Utility */
+  @media (min-width: 768px) {
+    .modal-fullscreen {
+      @apply w-full h-full max-w-none rounded-none; /* full‑screen on md+ */
+    }
+  }
 }
+
 
 /* Global resets */
 body {
@@ -36,7 +44,7 @@ body {
 
 /* Card */
 .card {
-  @apply bg-surface border border-border rounded-[12px] shadow-sm p-4 md:p-6;
+  @apply bg-surface border border-border rounded-[var(--radius)] shadow-sm p-4 md:p-6;
 }
 
 /* Buttons */
@@ -69,4 +77,27 @@ body {
 }
 .filter-toolbar .filter-select {
   @apply border border-border rounded-[8px] px-2 py-1.5 text-body focus:outline-none focus:ring-2 focus:ring-primary;
+}
+/* Dark mode support */
+[data-theme="dark"] {
+  --color-bg: #0F172A; /* slate-900 */
+  --color-surface: #1E293B; /* slate-800 */
+  --color-text: #F1F5F9; /* slate-100 */
+  --color-border: #334155; /* slate-700 */
+}
+
+/* Global transition for interactive elements */
+.transition-all {
+  @apply transition-colors transition-transform duration-200 ease-in-out;
+}
+
+/* Focus-visible outline for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Glass‑morphism card style */
+.card-glass {
+  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-[var(--radius)] shadow-xl p-4 md:p-6;
 }

@@ -67,13 +67,13 @@ export const TraineeCourseFeedbackModal = ({
   const renderStarSelector = (key, label, desc) => {
     const val = ratings[key];
     return (
-      <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+      <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-2">
         <div className="flex items-center justify-between">
           <div>
             <span className="font-extrabold text-xs text-slate-900 block">{label}</span>
             <span className="text-[10px] text-slate-500">{desc}</span>
           </div>
-          <span className="font-mono font-black text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
+          <span className="font-mono font-black text-xs text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-[var(--radius)] border border-indigo-200">
             {val} / 5
           </span>
         </div>
@@ -100,12 +100,12 @@ export const TraineeCourseFeedbackModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 font-sans animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 overflow-hidden">
+      <div className="bg-white rounded-[var(--radius)] max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 overflow-hidden">
         
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center font-bold text-amber-600">
+            <div className="w-10 h-10 rounded-[var(--radius)] bg-amber-50 border border-amber-200 flex items-center justify-center font-medium text-amber-600">
               <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
             </div>
             <div>
@@ -118,7 +118,7 @@ export const TraineeCourseFeedbackModal = ({
             </div>
           </div>
 
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl">
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-700 rounded-[var(--radius)]">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -157,14 +157,14 @@ export const TraineeCourseFeedbackModal = ({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share specific suggestions (e.g. clarify quiz wording, add more equation walkthroughs)..."
                 rows={3}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600"
               />
             </div>
 
             {/* Overall Score preview & Submit */}
             <div className="flex items-center justify-between pt-2 border-t border-slate-100">
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-slate-600">Overall Rating:</span>
+                <span className="font-medium text-slate-600">Overall Rating:</span>
                 <span className="font-black text-sm text-amber-800">{overallRating} / 5.0 ⭐</span>
               </div>
 
@@ -172,13 +172,13 @@ export const TraineeCourseFeedbackModal = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-[var(--radius)] text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black rounded-xl text-xs shadow-md flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black rounded-[var(--radius)] text-xs shadow-md flex items-center gap-1.5"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Submit Feedback</span>

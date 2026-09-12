@@ -38,7 +38,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
         {onToggleMobileSidebar && (
           <button
             onClick={onToggleMobileSidebar}
-            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+            className="lg:hidden p-1.5 rounded-[var(--radius)] text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
             title="Open Navigation Menu"
           >
             <Menu className="w-5 h-5" />
@@ -62,7 +62,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
           <button
             onClick={onOpenAiCourseAdvisor}
             title="Get Smart Course Recommendations"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-lg text-xs font-medium transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-[var(--radius)] text-xs font-semibold transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span className="hidden sm:inline">Course Advisor</span>
@@ -71,7 +71,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
 
         {/* Trainee Pending Approval Warning Pill */}
         {currentUser?.role === "trainee" && currentUser?.status === "pending" && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-xs font-medium">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-[var(--radius)] text-xs font-medium">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
             <span className="hidden sm:inline">Under Review</span>
           </div>
@@ -79,7 +79,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
 
         {/* Verified Officer Tag */}
         {currentUser?.status === "approved" && (
-          <div className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-xs font-medium">
+          <div className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-[var(--radius)] text-xs font-medium">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             <span className="hidden md:inline">Verified</span>
           </div>
@@ -89,7 +89,7 @@ export const TopNavbar = ({ activeTab, onOpenAnnouncements, onOpenAiCourseAdviso
         <button
           onClick={onOpenAnnouncements}
           title="Directives & Circulars"
-          className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors relative border border-slate-200"
+          className="p-2 rounded-[var(--radius)] text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors relative border border-slate-200"
         >
           <Bell className="w-4 h-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>

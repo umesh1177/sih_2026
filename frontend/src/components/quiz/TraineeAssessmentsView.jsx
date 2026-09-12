@@ -230,9 +230,9 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
     <div className="p-4 sm:p-6 lg:p-8 space-y-5 max-w-7xl mx-auto font-sans text-slate-800">
       
       {/* ═════════ TOP HEADER BANNER ═════════ */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[var(--radius)] p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">
             My Scheduled Assessments &amp; Exams
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-normal">
@@ -241,10 +241,10 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
         </div>
 
         {/* 3 Main Navigation Sub-Tabs */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-[var(--radius)] border border-slate-200 shrink-0">
           <button
             onClick={() => setActiveSubTab("available")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors ${
               activeSubTab === "available"
                 ? "bg-[#0B3475] text-white shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
@@ -255,7 +255,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
 
           <button
             onClick={() => setActiveSubTab("upcoming")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors ${
               activeSubTab === "upcoming"
                 ? "bg-[#0B3475] text-white shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
@@ -266,7 +266,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
 
           <button
             onClick={() => setActiveSubTab("completed")}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-[var(--radius)] text-xs font-semibold transition-colors ${
               activeSubTab === "completed"
                 ? "bg-[#0B3475] text-white shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
@@ -280,14 +280,14 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
 
       {/* ═════════ NOT ENROLLED EMPTY STATE ═════════ */}
       {!loading && enrolledCourseIds.length === 0 && (
-        <div className="bg-white rounded-3xl border border-slate-200 p-14 text-center space-y-4 shadow-2xs">
-          <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-14 text-center space-y-4 shadow-2xs">
+          <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-[var(--radius)] flex items-center justify-center mx-auto">
             <Layers className="w-8 h-8" />
           </div>
           <h3 className="font-black text-slate-900 text-lg">No Assessments Available</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
             You are not enrolled in any course yet. Assessments appear here only for courses you are enrolled in.
-            Browse the <span className="font-bold text-blue-600">Courses</span> tab to enroll in a program.
+            Browse the <span className="font-medium text-blue-600">Courses</span> tab to enroll in a program.
           </p>
         </div>
       )}
@@ -296,11 +296,11 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       {enrolledCourseIds.length > 0 && activeSubTab === "available" && (
         <div className="space-y-4">
           {filteredAvailable.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+            <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-12 text-center space-y-3">
+              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-[var(--radius)] flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-900 text-base">No Available Assessments</h3>
+              <h3 className="font-semibold text-slate-900 text-base">No Available Assessments</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 You have completed all active assessments, or no new assessments are currently in session.
               </p>
@@ -310,12 +310,12 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
               {filteredAvailable.map((quiz) => (
                 <div
                   key={quiz.id}
-                  className="bg-white rounded-3xl border border-slate-200 shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between group"
+                  className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between group"
                 >
                   <div className="p-6 space-y-4">
                     <div className="flex items-start justify-between gap-2">
                       <div className="space-y-0.5">
-                        <h3 className="font-bold text-base text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
+                        <h3 className="font-semibold text-base text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
                           {quiz.title}
                         </h3>
                         <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
@@ -325,12 +325,12 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                       </div>
 
                       {quiz.isDisqualified ? (
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 border border-red-200 rounded-full text-[11px] font-bold shrink-0">
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 border border-red-200 rounded-full text-[11px] font-medium shrink-0">
                           <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                           <span>Disqualified</span>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[11px] font-bold shrink-0">
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-[11px] font-medium shrink-0">
                           <Clock className="w-3.5 h-3.5 text-blue-600" />
                           <span>Live Now</span>
                         </div>
@@ -338,7 +338,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                     </div>
 
                     {quiz.isDisqualified && (
-                      <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-[11px] text-red-900 space-y-1">
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-[var(--radius)] text-[11px] text-red-900 space-y-1">
                         <div className="font-extrabold flex items-center gap-1 text-red-800">
                           <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                           <span>Security Violation: Disqualified</span>
@@ -351,24 +351,24 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
 
                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
                       <div className="space-y-0.5">
-                        <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <div className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-slate-400">
                           <Calendar className="w-3 h-3 text-slate-400" />
                           <span>STARTS</span>
                         </div>
-                        <p className="font-bold text-slate-900 text-xs">{quiz.startsDate}</p>
+                        <p className="font-medium text-slate-900 text-xs">{quiz.startsDate}</p>
                       </div>
 
                       <div className="space-y-0.5">
-                        <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <div className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-slate-400">
                           <Calendar className="w-3 h-3 text-slate-400" />
                           <span>ENDS</span>
                         </div>
-                        <p className="font-bold text-slate-900 text-xs">{quiz.endsDate}</p>
+                        <p className="font-medium text-slate-900 text-xs">{quiz.endsDate}</p>
                       </div>
                     </div>
 
                     <div className="space-y-1.5 pt-2">
-                      <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <div className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-slate-400">
                         <Layers className="w-3 h-3" />
                         <span>SUBJECTS</span>
                       </div>
@@ -376,7 +376,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                         {quiz.subjects.map((sub, sIdx) => (
                           <span
                             key={sIdx}
-                            className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                            className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200"
                           >
                             {sub}
                           </span>
@@ -386,7 +386,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                   </div>
 
                   <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-700">
+                    <div className="flex items-center gap-4 text-xs font-medium text-slate-700">
                       <span className="flex items-center gap-1 text-slate-600">
                         <Clock className="w-3.5 h-3.5 text-slate-500" />
                         <span>{quiz.durationMinutes || 30} mins</span>
@@ -400,7 +400,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                     {quiz.isDisqualified ? (
                       <button
                         disabled
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 font-semibold rounded-lg text-xs cursor-not-allowed opacity-90"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 font-semibold rounded-[var(--radius)] text-xs cursor-not-allowed opacity-90"
                         title="Disqualified: Trainee cannot enter this assessment without trainer second chance permission."
                       >
                         <AlertCircle className="w-3.5 h-3.5 text-red-600" />
@@ -409,7 +409,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                     ) : (
                       <button
                         onClick={() => onStartExam(quiz)}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-lg text-xs shadow-xs transition-colors"
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
                       >
                         <PlayCircle className="w-3.5 h-3.5" />
                         <span>Start</span>
@@ -427,11 +427,11 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
       {enrolledCourseIds.length > 0 && activeSubTab === "upcoming" && (
         <div className="space-y-4">
           {filteredUpcoming.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-10 text-center space-y-2">
-              <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mx-auto">
+            <div className="bg-white rounded-[var(--radius)] border border-slate-200/90 p-10 text-center space-y-2">
+              <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-[var(--radius)] flex items-center justify-center mx-auto">
                 <Clock className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-slate-900 text-sm">No Upcoming Assessments</h3>
+              <h3 className="font-semibold text-slate-900 text-sm">No Upcoming Assessments</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 There are currently no scheduled future assessments assigned to your active tracks.
               </p>
@@ -441,12 +441,12 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
               {filteredUpcoming.map((quiz) => (
                 <div
                   key={quiz.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between"
+                  className="bg-white rounded-[var(--radius)] border border-slate-200/90 shadow-xs overflow-hidden flex flex-col justify-between"
                 >
                   <div className="p-5 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="space-y-0.5">
-                        <h3 className="font-bold text-sm text-slate-900 leading-tight">
+                        <h3 className="font-semibold text-sm text-slate-900 leading-tight">
                           {quiz.title}
                         </h3>
                         <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
@@ -461,7 +461,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                       </div>
                     </div>
 
-                    <div className="bg-amber-50/60 border border-amber-200/60 rounded-xl p-2.5 space-y-1">
+                    <div className="bg-amber-50/60 border border-amber-200/60 rounded-[var(--radius)] p-2.5 space-y-1">
                       <div className="flex items-center justify-between text-[11px] font-semibold text-amber-950">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 text-amber-600" />
@@ -503,7 +503,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                       </span>
                     </div>
 
-                    <span className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-500 font-semibold rounded-lg text-xs">
+                    <span className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-500 font-semibold rounded-[var(--radius)] text-xs">
                       <Clock className="w-3.5 h-3.5 text-amber-500" />
                       <span>Locked</span>
                     </span>
@@ -517,7 +517,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
 
       {/* ═════════ SUB-TAB 3: COMPLETED EXAMS TABLE VIEW ═════════ */}
       {enrolledCourseIds.length > 0 && activeSubTab === "completed" && (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden space-y-4 p-5 animate-in fade-in duration-150">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200/90 shadow-xs overflow-hidden space-y-4 p-5 animate-in fade-in duration-150">
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
             <div className="relative w-full sm:w-72">
@@ -527,7 +527,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                 placeholder="Search completed assessments..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:ring-1 focus:ring-[#0B3475] focus:outline-none font-medium"
+                className="w-full pl-9 pr-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs focus:ring-1 focus:ring-[#0B3475] focus:outline-none font-medium"
               />
             </div>
 
@@ -540,10 +540,10 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
 
           {filteredCompleted.length === 0 ? (
             <div className="py-10 text-center space-y-2">
-              <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center mx-auto">
+              <div className="w-10 h-10 bg-slate-100 text-slate-500 rounded-[var(--radius)] flex items-center justify-center mx-auto">
                 <FileText className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-slate-900 text-sm">No Completed Assessments</h3>
+              <h3 className="font-semibold text-slate-900 text-sm">No Completed Assessments</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
                 You have not completed any assessments yet. Take an available assessment to view performance analysis and results.
               </p>
@@ -565,7 +565,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                   {filteredCompleted.map((row) => (
                     <tr key={row.id} className="hover:bg-slate-50/80 transition-colors group">
                       <td className="py-3 px-3 space-y-1">
-                        <div className="font-bold text-slate-900 text-xs group-hover:text-[#0B3475] transition-colors">
+                        <div className="font-medium text-slate-900 text-xs group-hover:text-[#0B3475] transition-colors">
                           {row.title}
                         </div>
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -586,7 +586,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                             Evaluation Pending
                           </span>
                         ) : (
-                          <span className="text-slate-900 font-bold">
+                          <span className="text-slate-900 font-medium">
                             {row.score}
                           </span>
                         )}
@@ -621,7 +621,7 @@ export const TraineeAssessmentsView = ({ quizzes = [], currentUser, onStartExam 
                       <td className="py-3 px-3 text-right">
                         <button
                           onClick={() => setSelectedExamForAnalytics(row)}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0B3475] font-semibold text-xs transition-colors border border-blue-200"
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-[var(--radius)] bg-blue-50 hover:bg-blue-100 text-[#0B3475] font-semibold text-xs transition-colors border border-blue-200"
                         >
                           <BarChart3 className="w-3.5 h-3.5" />
                           <span>View Analytics</span>

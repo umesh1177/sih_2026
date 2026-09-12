@@ -103,7 +103,7 @@ export const Sidebar = ({
       {/* Brand Header */}
       <div className="p-4.5 border-b border-white/10 flex items-center justify-between bg-[#08285C]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-semibold text-xs tracking-wider shadow-sm shrink-0">
+          <div className="w-9 h-9 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-semibold text-xs tracking-wider shadow-sm shrink-0">
             CC
           </div>
           <div className="overflow-hidden">
@@ -120,7 +120,7 @@ export const Sidebar = ({
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+            className="lg:hidden p-1.5 rounded-[var(--radius)] text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -135,7 +135,7 @@ export const Sidebar = ({
               onOpenHomePage();
               if (onCloseMobile) onCloseMobile();
             }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-xs bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/20 transition-all text-left mb-2"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius)] font-medium text-xs bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/20 transition-all text-left mb-2"
           >
             <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="truncate">Public Portal & Verify</span>
@@ -150,7 +150,7 @@ export const Sidebar = ({
             <button
               key={item.id}
               onClick={() => handleItemClick(item)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all duration-150 text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all duration-150 text-left ${
                 isActive
                   ? "bg-white/15 text-white font-semibold border-l-3 border-blue-400 shadow-2xs"
                   : isAdvisor
@@ -179,12 +179,12 @@ export const Sidebar = ({
             if (onCloseMobile) onCloseMobile();
           }}
           title="Click to view Profile"
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[var(--radius)] bg-white/5 hover:bg-white/10 border border-white/10 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
         >
           <img
             src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
             alt="User"
-            className="w-8 h-8 rounded-lg object-cover ring-1 ring-white/20 shrink-0"
+            className="w-8 h-8 rounded-[var(--radius)] object-cover ring-1 ring-white/20 shrink-0"
           />
           <div className="overflow-hidden flex-1">
             <p className="text-xs font-medium text-white truncate group-hover:text-blue-200 transition-colors">
@@ -199,7 +199,7 @@ export const Sidebar = ({
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/20 text-rose-200 rounded-lg text-xs font-medium transition-all cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/20 text-rose-200 rounded-[var(--radius)] text-xs font-semibold transition-all cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>

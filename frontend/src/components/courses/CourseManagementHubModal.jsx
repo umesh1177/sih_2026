@@ -150,7 +150,7 @@ export const CourseManagementHubModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 font-sans text-slate-800">
+      <div className="bg-white rounded-[var(--radius)] max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 font-sans text-slate-800">
         
         {/* ═════════ MODAL HEADER ═════════ */}
         <div className="bg-gradient-to-r from-[#0a2558] via-blue-900 to-indigo-950 p-6 sm:p-7 text-white rounded-t-3xl relative overflow-hidden">
@@ -163,14 +163,14 @@ export const CourseManagementHubModal = ({
                   e.target.onerror = null;
                   e.target.src = "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&q=80&w=800";
                 }}
-                className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white/20 shadow-md shrink-0"
+                className="w-16 h-16 rounded-[var(--radius)] object-cover ring-2 ring-white/20 shadow-md shrink-0"
               />
               <div>
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-[#0a2558] uppercase">
                     Admin Operations Hub
                   </span>
-                  <span className="text-xs font-mono font-bold text-blue-200">{course.code}</span>
+                  <span className="text-xs font-mono font-medium text-blue-200">{course.code}</span>
                   <span className="text-xs text-blue-300">• {course.level || "Intermediate"}</span>
                 </div>
                 <h2 className="text-lg sm:text-xl font-black tracking-tight text-white line-clamp-1">
@@ -189,7 +189,7 @@ export const CourseManagementHubModal = ({
                     onClose();
                     onOpenEditCourse(course);
                   }}
-                  className="px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-[var(--radius)] text-xs font-medium transition-all flex items-center gap-1.5"
                   title="Edit Course Configuration"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
@@ -220,7 +220,7 @@ export const CourseManagementHubModal = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 border-b-2 font-bold text-xs whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-xs whitespace-nowrap transition-all ${
                   isActive
                     ? "border-[#0a2558] text-[#0a2558] bg-white rounded-t-xl shadow-sm"
                     : "border-transparent text-slate-500 hover:text-slate-900"
@@ -238,9 +238,9 @@ export const CourseManagementHubModal = ({
           <div className="p-6 space-y-6 animate-in fade-in">
             
             {/* Capacity Control Strip */}
-            <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div className="bg-slate-50 rounded-[var(--radius)] p-5 border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
               <div className="space-y-1.5 flex-1">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                <div className="flex items-center justify-between text-xs font-medium text-slate-700">
                   <span>Batch Capacity Utilization:</span>
                   <span className="text-[#0a2558] font-black">{enrolledCount} / {maxCapacity} Seats ({capacityPercentage}%)</span>
                 </div>
@@ -260,20 +260,20 @@ export const CourseManagementHubModal = ({
               {/* Set Max Capacity */}
               <div className="flex items-center gap-2 shrink-0">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Max Capacity Limit</label>
+                  <label className="block text-[10px] font-medium text-slate-500 uppercase">Max Capacity Limit</label>
                   <input
                     type="number"
                     min="1"
                     max="500"
                     value={maxEnrollmentInput}
                     onChange={(e) => setMaxEnrollmentInput(e.target.value)}
-                    className="w-24 px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 mt-0.5"
+                    className="w-24 px-3 py-1.5 bg-white border border-slate-300 rounded-[var(--radius)] text-xs font-medium text-slate-800 outline-none focus:border-blue-500 mt-0.5"
                   />
                 </div>
                 <button
                   onClick={handleUpdateCapacity}
                   disabled={isUpdatingCapacity}
-                  className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 self-end"
+                  className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-semibold rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 self-end"
                 >
                   {isUpdatingCapacity ? "Saving..." : "Update Limit"}
                 </button>
@@ -295,15 +295,15 @@ export const CourseManagementHubModal = ({
                     value={traineeSearch}
                     onChange={(e) => setTraineeSearch(e.target.value)}
                     placeholder="Search enrolled cadets..."
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Cadets Table */}
-              <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <div className="border border-slate-200 rounded-[var(--radius)] overflow-hidden shadow-sm">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                  <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
                     <tr>
                       <th className="py-3 px-4">Officer Name & Cadre ID</th>
                       <th className="py-3 px-3">Station & Department</th>
@@ -327,10 +327,10 @@ export const CourseManagementHubModal = ({
                               <img
                                 src={trainee.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
                                 alt={trainee.name}
-                                className="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200"
+                                className="w-8 h-8 rounded-[var(--radius)] object-cover ring-1 ring-slate-200"
                               />
                               <div>
-                                <p className="font-bold text-slate-900">{trainee.name}</p>
+                                <p className="font-medium text-slate-900">{trainee.name}</p>
                                 <p className="text-[10px] text-slate-400 font-mono">{trainee.cadreId || `MOES-CADRE-${1000 + idx}`}</p>
                               </div>
                             </div>
@@ -349,12 +349,12 @@ export const CourseManagementHubModal = ({
                                   style={{ width: `${trainee.progressPercentage !== undefined ? trainee.progressPercentage : 0}%` }} 
                                 />
                               </div>
-                              <span className="font-bold text-slate-700 text-[11px]">{trainee.progressPercentage !== undefined ? trainee.progressPercentage : 0}%</span>
+                              <span className="font-medium text-slate-700 text-[11px]">{trainee.progressPercentage !== undefined ? trainee.progressPercentage : 0}%</span>
                             </div>
                           </td>
 
                           <td className="py-3.5 px-3">
-                            <span className="px-2.5 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded-full font-bold text-[10px]">
+                            <span className="px-2.5 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded-full font-medium text-[10px]">
                               {trainee.averageScore !== undefined ? `${trainee.averageScore}%` : (trainee.avgQuizScore !== undefined ? `${trainee.avgQuizScore}%` : "—")}
                             </span>
                           </td>
@@ -362,7 +362,7 @@ export const CourseManagementHubModal = ({
                           <td className="py-3.5 px-4 text-right">
                             <button
                               onClick={() => handleRemoveTrainee(trainee.traineeId || trainee.id, trainee.name)}
-                              className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs transition-colors flex items-center gap-1 ml-auto"
+                              className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium rounded-[var(--radius)] text-xs transition-colors flex items-center gap-1 ml-auto"
                               title="Remove officer from this course"
                             >
                               <UserX className="w-3.5 h-3.5" />
@@ -395,7 +395,7 @@ export const CourseManagementHubModal = ({
                     onClose();
                     onOpenStudio(course);
                   }}
-                  className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-1.5"
+                  className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-1.5"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>Launch Learning Studio</span>
@@ -405,19 +405,19 @@ export const CourseManagementHubModal = ({
 
             <div className="space-y-4">
               {(course.subjects || []).map((subject, sIdx) => (
-                <div key={subject.id || sIdx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div key={subject.id || sIdx} className="p-5 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="px-2.5 py-0.5 bg-blue-100 text-blue-900 rounded-md text-[10px] font-bold">
+                      <span className="px-2.5 py-0.5 bg-blue-100 text-blue-900 rounded-[var(--radius)] text-[10px] font-medium">
                         Subject {sIdx + 1}
                       </span>
-                      <h4 className="font-bold text-slate-900 text-sm mt-1">{subject.title || subject.name}</h4>
+                      <h4 className="font-medium text-slate-900 text-sm mt-1">{subject.title || subject.name}</h4>
                       <p className="text-xs text-slate-500 mt-0.5">{subject.description || "Core domain subject curriculum."}</p>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[10px] text-slate-400 font-bold block">Assigned Faculty</span>
-                      <span className="text-xs font-bold text-purple-900">
+                      <span className="text-[10px] text-slate-400 font-medium block">Assigned Faculty</span>
+                      <span className="text-xs font-medium text-purple-900">
                         {subject.assignedTrainerName || course.leadTrainerName || "Dr. Amit Sengupta"}
                       </span>
                     </div>
@@ -426,7 +426,7 @@ export const CourseManagementHubModal = ({
                   {/* Modules list */}
                   <div className="pt-2 border-t border-slate-200/60 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {(subject.modules || []).map((mod, mIdx) => (
-                      <div key={mod.id || mIdx} className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs flex items-center justify-between">
+                      <div key={mod.id || mIdx} className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 text-xs flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span className="font-semibold text-slate-800">{mod.title || mod.name}</span>
@@ -450,26 +450,26 @@ export const CourseManagementHubModal = ({
             
             {/* KPI Analytics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200">
-                <span className="text-[10px] font-bold text-blue-700 uppercase">Class Average</span>
+              <div className="p-4 rounded-[var(--radius)] bg-blue-50/70 border border-blue-200">
+                <span className="text-[10px] font-medium text-blue-700 uppercase">Class Average</span>
                 <p className="text-2xl font-black text-blue-950 mt-1">86.4%</p>
                 <span className="text-[10px] text-emerald-700 font-semibold">↑ 4.2% higher than benchmark</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase">Passing Rate</span>
+              <div className="p-4 rounded-[var(--radius)] bg-emerald-50/70 border border-emerald-200">
+                <span className="text-[10px] font-medium text-emerald-700 uppercase">Passing Rate</span>
                 <p className="text-2xl font-black text-emerald-950 mt-1">94.2%</p>
                 <span className="text-[10px] text-slate-500 font-medium">Threshold: 70% minimum</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200">
-                <span className="text-[10px] font-bold text-purple-700 uppercase">Course Completion</span>
+              <div className="p-4 rounded-[var(--radius)] bg-purple-50/70 border border-purple-200">
+                <span className="text-[10px] font-medium text-purple-700 uppercase">Course Completion</span>
                 <p className="text-2xl font-black text-purple-950 mt-1">78.5%</p>
                 <span className="text-[10px] text-slate-500 font-medium">Active Cadets in track</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
-                <span className="text-[10px] font-bold text-amber-800 uppercase">Linked Assessments</span>
+              <div className="p-4 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200">
+                <span className="text-[10px] font-medium text-amber-800 uppercase">Linked Assessments</span>
                 <p className="text-2xl font-black text-amber-950 mt-1">{quizzes.length || 2}</p>
                 <span className="text-[10px] text-slate-500 font-medium">MCQ Evaluations</span>
               </div>
@@ -483,14 +483,14 @@ export const CourseManagementHubModal = ({
                   { id: "q1", title: `${course.title} - Mid-Term Diagnostic Evaluation`, durationMinutes: 30, passMarks: 14, totalMarks: 20 },
                   { id: "q2", title: `${course.title} - Final Operational Kiosk Exam`, durationMinutes: 45, passMarks: 28, totalMarks: 40 }
                 ]).map((quiz, qIdx) => (
-                  <div key={quiz.id || qIdx} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between text-xs">
+                  <div key={quiz.id || qIdx} className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 flex items-center justify-between text-xs">
                     <div>
-                      <h4 className="font-bold text-slate-900">{quiz.title}</h4>
+                      <h4 className="font-medium text-slate-900">{quiz.title}</h4>
                       <p className="text-[11px] text-slate-500 mt-0.5">
                         Duration: {quiz.durationMinutes} Mins • Pass Mark: {quiz.passMarks}/{quiz.totalMarks} Marks
                       </p>
                     </div>
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-medium text-[10px]">
                       Average Score: 88%
                     </span>
                   </div>
@@ -505,9 +505,9 @@ export const CourseManagementHubModal = ({
         {activeTab === "certificates" && (
           <div className="p-6 space-y-6 animate-in fade-in">
             
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 space-y-3">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-[var(--radius)] p-6 space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md">
+                <div className="w-10 h-10 rounded-[var(--radius)] bg-amber-500 text-white flex items-center justify-center font-medium shadow-md">
                   <Award className="w-6 h-6" />
                 </div>
                 <div>
@@ -521,11 +521,11 @@ export const CourseManagementHubModal = ({
               {/* Template Configuration */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-amber-200/60 text-xs">
                 <div>
-                  <label className="block font-bold text-amber-950 mb-1">Select Certificate Template Format</label>
+                  <label className="block font-medium text-amber-950 mb-1">Select Certificate Template Format</label>
                   <select
                     value={certificateTemplate}
                     onChange={(e) => setCertificateTemplate(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-amber-300 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-400"
+                    className="w-full p-2.5 bg-white border border-amber-300 rounded-[var(--radius)] text-xs font-semibold outline-none focus:ring-2 focus:ring-amber-400"
                   >
                     <option value="MoES Official Gold Standard">MoES Official Gold Standard (QR Authenticated)</option>
                     <option value="WMO Competency Class-I Certification">WMO Competency Standard Class-I/II</option>
@@ -536,7 +536,7 @@ export const CourseManagementHubModal = ({
 
                 {/* Custom File Upload if selected */}
                 <div>
-                  <label className="block font-bold text-amber-950 mb-1">
+                  <label className="block font-medium text-amber-950 mb-1">
                     Upload Custom Template Layout (.pdf, .docx)
                   </label>
                   <div className="flex items-center gap-2">
@@ -544,11 +544,11 @@ export const CourseManagementHubModal = ({
                       type="file"
                       accept=".pdf,.docx,.doc"
                       onChange={(e) => setCustomFile(e.target.files?.[0] || null)}
-                      className="text-xs file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-200 file:text-amber-900 hover:file:bg-amber-300 text-slate-600"
+                      className="text-xs file:mr-3 file:py-2 file:px-3 file:rounded-[var(--radius)] file:border-0 file:text-xs file:font-medium file:bg-amber-200 file:text-amber-900 hover:file:bg-amber-300 text-slate-600"
                     />
                   </div>
                   {customFile && (
-                    <span className="text-[10px] text-emerald-700 font-bold block mt-1">
+                    <span className="text-[10px] text-emerald-700 font-medium block mt-1">
                       ✓ Loaded template: {customFile.name}
                     </span>
                   )}
@@ -556,8 +556,8 @@ export const CourseManagementHubModal = ({
               </div>
 
               {/* Auto-filled Preview Notice */}
-              <div className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/80 text-[11px] text-slate-700 space-y-1">
-                <p className="font-bold text-amber-900 flex items-center gap-1.5">
+              <div className="p-3.5 bg-white/90 rounded-[var(--radius)] border border-amber-200/80 text-[11px] text-slate-700 space-y-1">
+                <p className="font-medium text-amber-900 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                   <span>Automated System Fields Mapped to Template:</span>
                 </p>
@@ -577,7 +577,7 @@ export const CourseManagementHubModal = ({
               <button
                 onClick={handleGenerateBulkCertificates}
                 disabled={isGeneratingCertificates}
-                className="w-full py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-2xl text-xs shadow-lg transition-transform hover:scale-102 flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-[var(--radius)] text-xs shadow-lg transition-transform hover:scale-102 flex items-center justify-center gap-2"
               >
                 {isGeneratingCertificates ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -600,14 +600,14 @@ export const CourseManagementHubModal = ({
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Issued Credentials Portfolio ({generatedCertificates.length})</span>
                   </h4>
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                  <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                     Registry Synced ✓
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {generatedCertificates.map((cert, cIdx) => (
-                    <div key={cert.id || cIdx} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 flex flex-col justify-between">
+                    <div key={cert.id || cIdx} className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-2 flex flex-col justify-between">
                       <div>
                         <div className="flex items-start justify-between">
                           <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
@@ -615,21 +615,21 @@ export const CourseManagementHubModal = ({
                           }`}>
                             {cert.recipientType}
                           </span>
-                          <span className="text-[10px] font-mono text-slate-400 font-bold">{cert.credentialId}</span>
+                          <span className="text-[10px] font-mono text-slate-400 font-medium">{cert.credentialId}</span>
                         </div>
-                        <h5 className="font-bold text-slate-900 text-xs mt-1">{cert.recipientName}</h5>
+                        <h5 className="font-medium text-slate-900 text-xs mt-1">{cert.recipientName}</h5>
                         <p className="text-[11px] text-slate-500 font-medium">{cert.title}</p>
                       </div>
 
                       <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs">
-                        <span className="text-[10px] text-emerald-700 font-bold">{cert.grade}</span>
+                        <span className="text-[10px] text-emerald-700 font-medium">{cert.grade}</span>
                         <button
                           onClick={() => onOpenCertificate && onOpenCertificate(
                             { score: 20, totalMarks: 20, percentage: 100 },
                             cert.title,
                             cert.recipientName
                           )}
-                          className="text-[11px] text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1"
+                          className="text-[11px] text-blue-700 hover:text-blue-900 font-medium flex items-center gap-1"
                         >
                           <ExternalLink className="w-3 h-3" />
                           <span>View Credential</span>

@@ -121,19 +121,19 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+      <div className="bg-white rounded-[var(--radius)] max-w-4xl w-full p-6 shadow-2xl border border-slate-200 my-8">
         {/* Header */}
         <div className="flex items-start justify-between pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800">
                 {course.code}
               </span>
               <span className="text-xs font-semibold text-slate-500">
                 {course.department}
               </span>
             </div>
-            <h2 className="text-lg font-bold text-slate-900 leading-snug">
+            <h2 className="text-lg font-semibold text-slate-900 leading-snug">
               {course.title}
             </h2>
             <p className="text-xs text-slate-500 mt-1">
@@ -146,12 +146,12 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
               <button
                 onClick={handleEnroll}
                 disabled={isEnrolling}
-                className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl text-xs font-bold shadow-md transition-all transform hover:scale-105"
+                className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-[var(--radius)] text-xs font-semibold shadow-md transition-all transform hover:scale-105"
               >
                 {isEnrolling ? "Enrolling..." : "Enroll in Course"}
               </button>
             )}
-            <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+            <button onClick={onClose} className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -195,15 +195,15 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
             {/* Subjects and Modules List */}
             <div className="space-y-4 mt-3">
               {course.subjects && course.subjects.map(subject => (
-                <div key={subject.id} className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200">
-                  <h3 className="font-bold text-sm text-[#0a2558] mb-3 flex items-center gap-2">
+                <div key={subject.id} className="p-4 bg-slate-50/80 rounded-[var(--radius)] border border-slate-200">
+                  <h3 className="font-semibold text-sm text-[#0a2558] mb-3 flex items-center gap-2">
                     <Layers className="w-4 h-4 text-blue-700" />
                     <span>{subject.name}</span>
                   </h3>
 
                   <div className="space-y-2.5 pl-2">
                     {subject.modules && subject.modules.map(mod => (
-                      <div key={mod.id} className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
+                      <div key={mod.id} className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-semibold text-slate-800">{mod.title}</span>
                           <span className="text-[10px] text-slate-400">{mod.duration}</span>
@@ -214,7 +214,7 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                           {mod.materials && mod.materials.map(mat => (
                             <div
                               key={mat.id}
-                              className="p-2 bg-slate-50 hover:bg-blue-50/50 rounded-lg flex items-center justify-between transition-colors"
+                              className="p-2 bg-slate-50 hover:bg-blue-50/50 rounded-[var(--radius)] flex items-center justify-between transition-colors"
                             >
                               <div className="flex items-center gap-2">
                                 {mat.type === "video" ? (
@@ -229,14 +229,14 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                                 {mat.type === "video" ? (
                                   <button
                                     onClick={() => setActiveMaterial(mat)}
-                                    className="px-2.5 py-1 bg-rose-50 text-rose-700 font-bold rounded text-[10px] hover:bg-rose-100"
+                                    className="px-2.5 py-1 bg-rose-50 text-rose-700 font-medium rounded text-[10px] hover:bg-rose-100"
                                   >
                                     Watch Video
                                   </button>
                                 ) : mat.allowDownload ? (
                                   <button
                                     onClick={() => alert("Downloading: " + mat.title)}
-                                    className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 font-bold rounded text-[10px] hover:bg-blue-100"
+                                    className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 font-medium rounded text-[10px] hover:bg-blue-100"
                                   >
                                     <Download className="w-3 h-3" />
                                     <span>Download PDF</span>
@@ -264,9 +264,9 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
         {activeTab === "feedback" && (
           <div className="py-2 text-xs">
             {feedbackSubmitted ? (
-              <div className="p-8 text-center bg-emerald-50 rounded-2xl border border-emerald-200">
+              <div className="p-8 text-center bg-emerald-50 rounded-[var(--radius)] border border-emerald-200">
                 <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-                <h3 className="text-base font-bold text-emerald-900">Thank you for your feedback!</h3>
+                <h3 className="text-base font-semibold text-emerald-900">Thank you for your feedback!</h3>
                 <p className="text-emerald-700 text-[11px] mt-1">
                   Your review has been submitted to the MoES Academic Oversight Committee.
                 </p>
@@ -274,12 +274,12 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
             ) : (
               <form onSubmit={handleSendFeedback} className="space-y-4 max-w-lg mx-auto">
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                     <label className="block font-semibold text-slate-700 mb-1">Trainer Delivery</label>
                     <select
                       value={feedbackForm.trainerRating}
                       onChange={(e) => setFeedbackForm({ ...feedbackForm, trainerRating: Number(e.target.value) })}
-                      className="w-full p-1.5 bg-white border border-slate-200 rounded font-bold text-center"
+                      className="w-full p-1.5 bg-white border border-slate-200 rounded font-medium text-center"
                     >
                       <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option>
                       <option value={4}>⭐⭐⭐⭐ (4/5)</option>
@@ -287,12 +287,12 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                     </select>
                   </div>
 
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                     <label className="block font-semibold text-slate-700 mb-1">Content Quality</label>
                     <select
                       value={feedbackForm.contentRating}
                       onChange={(e) => setFeedbackForm({ ...feedbackForm, contentRating: Number(e.target.value) })}
-                      className="w-full p-1.5 bg-white border border-slate-200 rounded font-bold text-center"
+                      className="w-full p-1.5 bg-white border border-slate-200 rounded font-medium text-center"
                     >
                       <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option>
                       <option value={4}>⭐⭐⭐⭐ (4/5)</option>
@@ -300,12 +300,12 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                     </select>
                   </div>
 
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                     <label className="block font-semibold text-slate-700 mb-1">IMD Relevance</label>
                     <select
                       value={feedbackForm.relevanceRating}
                       onChange={(e) => setFeedbackForm({ ...feedbackForm, relevanceRating: Number(e.target.value) })}
-                      className="w-full p-1.5 bg-white border border-slate-200 rounded font-bold text-center"
+                      className="w-full p-1.5 bg-white border border-slate-200 rounded font-medium text-center"
                     >
                       <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option>
                       <option value={4}>⭐⭐⭐⭐ (4/5)</option>
@@ -322,14 +322,14 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                     value={feedbackForm.comment}
                     onChange={(e) => setFeedbackForm({ ...feedbackForm, comment: e.target.value })}
                     placeholder="Share how this training directly impacted your operational shift duties at IMD..."
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
                   />
                 </div>
 
                 <div className="text-right">
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md"
+                    className="px-6 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-[var(--radius)] font-semibold shadow-md"
                   >
                     Submit Official Feedback
                   </button>
@@ -348,7 +348,7 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                 <select
                   value={uploadForm.subjectId}
                   onChange={(e) => setUploadForm({ ...uploadForm, subjectId: e.target.value })}
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
                 >
                   {course.subjects && course.subjects.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
@@ -361,7 +361,7 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                 <select
                   value={uploadForm.type}
                   onChange={(e) => setUploadForm({ ...uploadForm, type: e.target.value })}
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
                 >
                   <option value="pdf">PDF Study Document</option>
                   <option value="presentation">PPT Presentation</option>
@@ -378,14 +378,14 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
                 value={uploadForm.title}
                 onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
                 placeholder="e.g. Masterclass: Dual-Pol Hydrometeor Classification Deck"
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
               />
             </div>
 
             {/* Download permission toggle */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+            <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
               <div>
-                <p className="font-bold text-slate-800">Allow Trainees to Download</p>
+                <p className="font-medium text-slate-800">Allow Trainees to Download</p>
                 <p className="text-[11px] text-slate-500">If disabled, file will be restricted to in-portal view only</p>
               </div>
               <input
@@ -399,7 +399,7 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
             <div className="text-right">
               <button
                 type="submit"
-                className="px-6 py-2 bg-[#0a2558] text-white rounded-xl font-bold shadow-md"
+                className="px-6 py-2 bg-[#0a2558] text-white rounded-[var(--radius)] font-semibold shadow-md"
               >
                 Upload to Module
               </button>
@@ -410,14 +410,14 @@ export const CourseDetailModal = ({ course, isOpen, onClose, currentUser, onEnro
         {/* Video Player Modal */}
         {activeMaterial && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-white/10 text-white">
+            <div className="bg-slate-900 rounded-[var(--radius)] max-w-2xl w-full p-6 shadow-2xl border border-white/10 text-white">
               <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
-                <h3 className="font-bold text-sm">{activeMaterial.title}</h3>
+                <h3 className="font-semibold text-sm">{activeMaterial.title}</h3>
                 <button onClick={() => setActiveMaterial(null)} className="text-white/60 hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="aspect-video bg-black rounded-xl overflow-hidden flex items-center justify-center">
+              <div className="aspect-video bg-black rounded-[var(--radius)] overflow-hidden flex items-center justify-center">
                 <iframe
                   className="w-full h-full"
                   src={formatVideoEmbedUrl(activeMaterial?.url)}

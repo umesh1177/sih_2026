@@ -276,7 +276,7 @@ export const TraineePracticePapersView = ({
       setIsGenerateModalOpen(false);
       setTopicErrorMessage("");
 
-      alert(`✅ Practice Paper "${newPaper.title}" successfully created with ${generatedQuestions.length} questions on topic "${enteredTopic || "General"}"!`);
+      alert(`Practice Paper "${newPaper.title}" successfully created with ${generatedQuestions.length} questions on topic "${enteredTopic || "General"}"!`);
     } catch (err) {
       setTopicErrorMessage("Failed generating practice paper: " + err.message);
     } finally {
@@ -301,12 +301,12 @@ export const TraineePracticePapersView = ({
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200/90">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0B3475] border border-blue-200 uppercase">
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-[#0B3475] border border-blue-200 uppercase">
               Trainee Practice Studio
             </span>
             <span className="text-xs text-slate-500 font-medium">• {practicePapers.length} Practice Papers Available</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
             <span>AI Practice Papers & Adaptive Assessment Studio</span>
           </h1>
@@ -319,7 +319,7 @@ export const TraineePracticePapersView = ({
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setIsGenerateModalOpen(true)}
-            className="flex items-center gap-2 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Create New Practice Paper</span>
@@ -328,7 +328,7 @@ export const TraineePracticePapersView = ({
           {onOpenQuestionBank && (
             <button
               onClick={onOpenQuestionBank}
-              className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs shadow-xs transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
             >
               <Layers className="w-3.5 h-3.5 text-[#0B3475]" />
               <span>Browse Question Bank</span>
@@ -338,7 +338,7 @@ export const TraineePracticePapersView = ({
           <button
             onClick={loadData}
             title="Refresh Papers"
-            className="p-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-xl transition-colors shadow-xs"
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-[var(--radius)] transition-colors shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -347,7 +347,7 @@ export const TraineePracticePapersView = ({
 
 
       {/* ─── 2. ADAPTIVE TESTING ENGINE EXPLANATION BANNER (LIGHT CARD) ─── */}
-      <div className="p-6 bg-white text-slate-800 rounded-3xl border border-slate-200 shadow-2xs relative overflow-hidden">
+      <div className="p-6 bg-white text-slate-800 rounded-[var(--radius)] border border-slate-200 shadow-2xs relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-extrabold uppercase tracking-wider">
@@ -362,7 +362,7 @@ export const TraineePracticePapersView = ({
             </p>
           </div>
 
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-center space-y-2 shrink-0 w-full lg:w-64">
+          <div className="bg-slate-50 rounded-[var(--radius)] p-4 border border-slate-200 text-center space-y-2 shrink-0 w-full lg:w-64">
             <Brain className="w-8 h-8 text-blue-600 mx-auto" />
             <p className="font-black text-slate-900 text-xs">1-Click Fast Drill</p>
             <p className="text-[11px] text-slate-500">
@@ -375,7 +375,7 @@ export const TraineePracticePapersView = ({
                 }
               }}
               disabled={practicePapers.length === 0}
-              className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-xl text-xs shadow-xs transition-all active:scale-95"
+              className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-[var(--radius)] text-xs shadow-xs transition-all active:scale-95"
             >
               Launch Quick Drill ⚡
             </button>
@@ -404,20 +404,20 @@ export const TraineePracticePapersView = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search paper title..."
-              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             />
           </div>
         </div>
 
         {/* Papers Grid */}
         {filteredPapers.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-3">
+          <div className="p-12 text-center bg-white rounded-[var(--radius)] border border-dashed border-slate-300 space-y-3">
             <BookOpen className="w-10 h-10 text-slate-300 mx-auto" />
-            <h4 className="font-bold text-slate-800 text-sm">No practice papers matching search</h4>
+            <h4 className="font-medium text-slate-800 text-sm">No practice papers matching search</h4>
             <p className="text-xs text-slate-500">Click "Create New Practice Paper" to generate one with AI!</p>
             <button
               onClick={() => setIsGenerateModalOpen(true)}
-              className="px-4 py-2 bg-[#0a2558] text-white rounded-xl text-xs font-bold shadow-sm"
+              className="px-4 py-2 bg-[#0a2558] text-white rounded-[var(--radius)] text-xs font-medium shadow-sm"
             >
               Generate AI Question Paper
             </button>
@@ -427,7 +427,7 @@ export const TraineePracticePapersView = ({
             {filteredPapers.map((paper, idx) => (
               <div
                 key={paper.id || idx}
-                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
+                className="bg-white rounded-[var(--radius)] border border-slate-200 p-6 shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
               >
                 {/* Adaptive Indicator Pill */}
                 <div className="flex items-center justify-between mb-3">
@@ -435,14 +435,14 @@ export const TraineePracticePapersView = ({
                     <Sparkles className="w-3 h-3 text-amber-500" />
                     {paper.isAdaptive ? "ADAPTIVE ENGINE" : "STANDARD"}
                   </span>
-                  <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                  <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
                     {paper.durationMinutes || 20} mins
                   </span>
                 </div>
 
                 <div className="space-y-2 mb-4">
-                  <h3 className="font-bold text-slate-900 text-sm leading-snug group-hover:text-blue-700 transition-colors line-clamp-2">
+                  <h3 className="font-semibold text-slate-900 text-sm leading-snug group-hover:text-blue-700 transition-colors line-clamp-2">
                     {paper.title}
                   </h3>
                   <p className="text-xs text-slate-500 line-clamp-2">
@@ -469,7 +469,7 @@ export const TraineePracticePapersView = ({
                 {/* Launch Button */}
                 <button
                   onClick={() => onStartExam && onStartExam(paper)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs transition-all shadow-md group-hover:scale-102 active:scale-95"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-medium rounded-[var(--radius)] text-xs transition-all shadow-md group-hover:scale-102 active:scale-95"
                 >
                   <PlayCircle className="w-4 h-4 text-emerald-400" />
                   <span>Start Practice Exam</span>
@@ -495,7 +495,7 @@ export const TraineePracticePapersView = ({
           <span className="text-xs font-semibold text-slate-500">{scoreHistory.length} attempts recorded</span>
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-700">
               <thead className="bg-slate-50 text-[11px] font-extrabold text-slate-500 uppercase border-b border-slate-200">
@@ -521,10 +521,10 @@ export const TraineePracticePapersView = ({
                     const isPassed = hist.percentage >= 50;
                     return (
                       <tr key={hist.id || i} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="px-6 py-4 font-bold text-slate-900 max-w-xs truncate">
+                        <td className="px-6 py-4 font-medium text-slate-900 max-w-xs truncate">
                           {hist.quizTitle || "Adaptive Practice Paper"}
                         </td>
-                        <td className="px-4 py-4 font-mono font-bold text-slate-800">
+                        <td className="px-4 py-4 font-mono font-medium text-slate-800">
                           {hist.score} / {hist.totalMarks || 30}
                         </td>
                         <td className="px-4 py-4">
@@ -553,7 +553,7 @@ export const TraineePracticePapersView = ({
                                 paper: matchingPaper
                               });
                             }}
-                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 font-extrabold rounded-lg text-xs transition-colors border border-blue-200 inline-flex items-center gap-1"
+                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 font-extrabold rounded-[var(--radius)] text-xs transition-colors border border-blue-200 inline-flex items-center gap-1"
                           >
                             <BarChart3 className="w-3 h-3 text-blue-700" />
                             <span>Analytics & Responses</span>
@@ -564,7 +564,7 @@ export const TraineePracticePapersView = ({
                               const matchingPaper = practicePapers.find(p => p.title === hist.quizTitle || p.id === hist.quizId) || practicePapers[0];
                               if (matchingPaper && onStartExam) onStartExam(matchingPaper);
                             }}
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs transition-colors"
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
                           >
                             Retake 🔄
                           </button>
@@ -582,16 +582,16 @@ export const TraineePracticePapersView = ({
       {/* ═════════ CREATE PRACTICE PAPER MODAL ═════════ */}
       {isGenerateModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-800 relative my-8">
+          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-800 relative my-8">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 rounded-[var(--radius)] bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center shadow-md">
                   <Sparkles className="w-5 h-5 text-amber-300" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">
+                  <h2 className="text-base font-semibold text-slate-900">
                     Generate Practice Question Paper
                   </h2>
                   <p className="text-[11px] text-slate-500 font-normal">
@@ -603,7 +603,7 @@ export const TraineePracticePapersView = ({
 
               <button
                 onClick={() => setIsGenerateModalOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                className="p-1.5 rounded-[var(--radius)] hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -614,7 +614,7 @@ export const TraineePracticePapersView = ({
               
               {/* Paper Title */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-medium text-slate-700 mb-1">
                   Question Paper Title:
                 </label>
                 <input
@@ -623,7 +623,7 @@ export const TraineePracticePapersView = ({
                   value={generateForm.title}
                   onChange={(e) => setGenerateForm({ ...generateForm, title: e.target.value })}
                   placeholder="e.g. Adaptive NWP 4D-Var & Radar Assimilation Test"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -631,13 +631,13 @@ export const TraineePracticePapersView = ({
               <div className="grid grid-cols-2 gap-3">
                 <div
                   onClick={() => setGenerateForm({ ...generateForm, source: "bank" })}
-                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${
+                  className={`p-3 rounded-[var(--radius)] border cursor-pointer transition-colors ${
                     generateForm.source === "bank"
                       ? "bg-blue-50 border-[#0B3475] text-[#0B3475] shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-bold mb-1">
+                  <div className="flex items-center gap-2 font-medium mb-1">
                     <Layers className="w-4 h-4 text-[#0B3475]" />
                     <span>MoES Question Bank</span>
                   </div>
@@ -648,13 +648,13 @@ export const TraineePracticePapersView = ({
 
                 <div
                   onClick={() => setGenerateForm({ ...generateForm, source: "ai" })}
-                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${
+                  className={`p-3 rounded-[var(--radius)] border cursor-pointer transition-colors ${
                     generateForm.source === "ai"
                       ? "bg-blue-50 border-[#0B3475] text-[#0B3475] shadow-xs"
                       : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-bold mb-1">
+                  <div className="flex items-center gap-2 font-medium mb-1">
                     <Sparkles className="w-4 h-4 text-amber-500" />
                     <span>AI Question Generator</span>
                   </div>
@@ -666,7 +666,7 @@ export const TraineePracticePapersView = ({
 
               {/* Domain / Topic */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-medium text-slate-700 mb-1">
                   Topic / Domain Focus:
                 </label>
                 <input
@@ -678,17 +678,17 @@ export const TraineePracticePapersView = ({
                     if (topicErrorMessage) setTopicErrorMessage("");
                   }}
                   placeholder="e.g. Numerical Weather Prediction, Radar Polarimetry, Tropical Cyclones"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0B3475]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0B3475]"
                 />
               </div>
 
               {/* Topic Error / Not Found Alert Box */}
               {topicErrorMessage && (
-                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-xl text-amber-950 space-y-2 animate-in fade-in">
+                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-[var(--radius)] text-amber-950 space-y-2 animate-in fade-in">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-bold text-xs text-amber-900">
+                      <h4 className="font-medium text-xs text-amber-900">
                         Topic Questions Not Found in Question Bank
                       </h4>
                       <p className="text-[11px] text-amber-800 leading-relaxed mt-0.5 font-normal">
@@ -704,7 +704,7 @@ export const TraineePracticePapersView = ({
                         setGenerateForm({ ...generateForm, source: "ai" });
                         setTopicErrorMessage("");
                       }}
-                      className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-lg text-xs shadow-xs flex items-center gap-1.5"
+                      className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs flex items-center gap-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
                       <span>Switch to AI Generator & Generate</span>
@@ -725,13 +725,13 @@ export const TraineePracticePapersView = ({
               {/* Questions Count & Duration */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">
+                  <label className="block font-medium text-slate-700 mb-1">
                     Number of Questions:
                   </label>
                   <select
                     value={generateForm.questionCount}
                     onChange={(e) => setGenerateForm({ ...generateForm, questionCount: Number(e.target.value) })}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value={5}>5 Questions (Speed Drill)</option>
                     <option value={10}>10 Questions (Standard Drill)</option>
@@ -741,13 +741,13 @@ export const TraineePracticePapersView = ({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">
+                  <label className="block font-medium text-slate-700 mb-1">
                     Duration (Minutes):
                   </label>
                   <select
                     value={generateForm.durationMinutes}
                     onChange={(e) => setGenerateForm({ ...generateForm, durationMinutes: Number(e.target.value) })}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value={10}>10 Minutes</option>
                     <option value={20}>20 Minutes</option>
@@ -758,7 +758,7 @@ export const TraineePracticePapersView = ({
               </div>
 
               {/* Initial Difficulty & Adaptive Toggle */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+              <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
@@ -778,7 +778,7 @@ export const TraineePracticePapersView = ({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">
+                  <label className="block font-medium text-slate-700 mb-1 text-[11px]">
                     Starting Difficulty Level:
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -787,7 +787,7 @@ export const TraineePracticePapersView = ({
                         type="button"
                         key={lvl}
                         onClick={() => setGenerateForm({ ...generateForm, initialDifficulty: lvl })}
-                        className={`py-1.5 rounded-xl font-bold text-xs border transition-colors ${
+                        className={`py-1.5 rounded-[var(--radius)] font-medium text-xs border transition-colors ${
                           generateForm.initialDifficulty === lvl
                             ? "bg-[#0a2558] text-white border-[#0a2558]"
                             : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
@@ -805,14 +805,14 @@ export const TraineePracticePapersView = ({
                 <button
                   type="button"
                   onClick={() => setIsGenerateModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 border border-slate-300 text-slate-600 font-medium rounded-[var(--radius)] text-xs hover:bg-slate-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={generating}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-black rounded-xl text-xs shadow-md transition-all disabled:opacity-60"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-all disabled:opacity-60"
                 >
                   {generating ? (
                     <>
@@ -837,7 +837,7 @@ export const TraineePracticePapersView = ({
       {/* ═════════ 5. PRACTICE ATTEMPT ANALYTICS & QUESTION RESPONSES MODAL ═════════ */}
       {selectedAttemptForAnalytics && (
         <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-150 font-sans">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto text-xs">
+          <div className="bg-white rounded-[var(--radius)] shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto text-xs">
             
             {/* Modal Header */}
             <div className="p-6 bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
@@ -857,7 +857,7 @@ export const TraineePracticePapersView = ({
 
               <button
                 onClick={() => setSelectedAttemptForAnalytics(null)}
-                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white self-end sm:self-auto shrink-0"
+                className="w-9 h-9 rounded-[var(--radius)] bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white self-end sm:self-auto shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -866,56 +866,56 @@ export const TraineePracticePapersView = ({
             {/* Performance Metric Cards (Trainee View) */}
             <div className="p-5 bg-slate-50 border-b border-slate-200 shrink-0 space-y-3">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[9px] block">SCORE</span>
                   <p className="text-xl font-black text-blue-700 font-mono">
                     {selectedAttemptForAnalytics.score} / {selectedAttemptForAnalytics.totalMarks || 20}
                   </p>
-                  <span className="text-slate-500 font-bold text-[10px]">Points Earned ({selectedAttemptForAnalytics.percentage}%)</span>
+                  <span className="text-slate-500 font-medium text-[10px]">Points Earned ({selectedAttemptForAnalytics.percentage}%)</span>
                 </div>
 
-                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ACCURACY</span>
                   <p className="text-xl font-black text-emerald-600">
                     {selectedAttemptForAnalytics.accuracy || selectedAttemptForAnalytics.percentage}%
                   </p>
-                  <span className="text-emerald-700 font-bold text-[10px]">
+                  <span className="text-emerald-700 font-medium text-[10px]">
                     {selectedAttemptForAnalytics.percentage >= 50 ? "Passing Grade Achieved" : "Remediation Suggested"}
                   </span>
                 </div>
 
-                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL TIME</span>
                   <p className="text-xl font-black text-slate-900 font-mono">
                     {selectedAttemptForAnalytics.totalTimeText || `${Math.floor((selectedAttemptForAnalytics.timeTakenSeconds || 600) / 60)}m ${((selectedAttemptForAnalytics.timeTakenSeconds || 600) % 60)}s`}
                   </p>
-                  <span className="text-slate-500 font-bold text-[10px]">Pacing: Well Paced</span>
+                  <span className="text-slate-500 font-medium text-[10px]">Pacing: Well Paced</span>
                 </div>
 
-                <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-1">
+                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
                   <span className="text-slate-400 font-extrabold uppercase text-[9px] block">AVERAGE TIME</span>
                   <p className="text-xl font-black text-indigo-700">
                     {selectedAttemptForAnalytics.averageTimeText || `${Math.round((selectedAttemptForAnalytics.timeTakenSeconds || 600) / Math.max(1, (selectedAttemptForAnalytics.paper?.questions || []).length || 10))} sec/question`}
                   </p>
-                  <span className="text-indigo-600 font-bold text-[10px]">Speed per Question</span>
+                  <span className="text-indigo-600 font-medium text-[10px]">Speed per Question</span>
                 </div>
               </div>
 
               {/* Secondary Breakdown Summary */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-600">
-                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Questions:</span>
                   <b className="text-slate-900">{selectedAttemptForAnalytics.paper?.questions?.length || 10} Total</b>
                 </div>
-                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Correct Answers:</span>
-                  <b className="text-emerald-700 font-bold">{selectedAttemptForAnalytics.correctCount !== undefined ? selectedAttemptForAnalytics.correctCount : Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10))}</b>
+                  <b className="text-emerald-700 font-medium">{selectedAttemptForAnalytics.correctCount !== undefined ? selectedAttemptForAnalytics.correctCount : Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10))}</b>
                 </div>
-                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Incorrect Answers:</span>
-                  <b className="text-rose-700 font-bold">{selectedAttemptForAnalytics.incorrectCount !== undefined ? selectedAttemptForAnalytics.incorrectCount : Math.max(0, (selectedAttemptForAnalytics.paper?.questions?.length || 10) - Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10)))}</b>
+                  <b className="text-rose-700 font-medium">{selectedAttemptForAnalytics.incorrectCount !== undefined ? selectedAttemptForAnalytics.incorrectCount : Math.max(0, (selectedAttemptForAnalytics.paper?.questions?.length || 10) - Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10)))}</b>
                 </div>
-                <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Adaptive Path:</span>
                   <b className="text-purple-700 truncate">{selectedAttemptForAnalytics.adaptiveTrajectory ? (Array.isArray(selectedAttemptForAnalytics.adaptiveTrajectory) ? selectedAttemptForAnalytics.adaptiveTrajectory.join(" ➔ ") : selectedAttemptForAnalytics.adaptiveTrajectory) : "Moderate ➔ Hard"}</b>
                 </div>
@@ -923,13 +923,13 @@ export const TraineePracticePapersView = ({
 
               {/* ⚡ Chronological Difficulty Transitions Trail ⚡ */}
               {selectedAttemptForAnalytics.difficultyHistory && selectedAttemptForAnalytics.difficultyHistory.length > 0 && (
-                <div className="p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-purple-50/70 rounded-2xl border border-blue-200 space-y-2">
+                <div className="p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-purple-50/70 rounded-[var(--radius)] border border-blue-200 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-black text-blue-950 text-xs flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                       <span>Adaptive Difficulty Progression Trail</span>
                     </span>
-                    <span className="text-[10px] font-bold text-slate-500">
+                    <span className="text-[10px] font-medium text-slate-500">
                       Rule: 3 Correct ➔ ↑ Level | 3 Wrong ➔ ↓ Level
                     </span>
                   </div>
@@ -943,7 +943,7 @@ export const TraineePracticePapersView = ({
                       return (
                         <div
                           key={idx}
-                          className={`p-2 rounded-xl border flex items-center justify-between font-bold ${
+                          className={`p-2 rounded-[var(--radius)] border flex items-center justify-between font-medium ${
                             isHard 
                               ? "bg-purple-100/90 border-purple-300 text-purple-900"
                               : isMod 
@@ -970,7 +970,7 @@ export const TraineePracticePapersView = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setAnalyticsFilter("all")}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors ${
                     analyticsFilter === "all" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
@@ -978,7 +978,7 @@ export const TraineePracticePapersView = ({
                 </button>
                 <button
                   onClick={() => setAnalyticsFilter("correct")}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors ${
                     analyticsFilter === "correct" ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
@@ -986,7 +986,7 @@ export const TraineePracticePapersView = ({
                 </button>
                 <button
                   onClick={() => setAnalyticsFilter("incorrect")}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors ${
                     analyticsFilter === "incorrect" ? "bg-rose-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
@@ -1030,15 +1030,15 @@ export const TraineePracticePapersView = ({
                   return (
                     <div
                       key={q.id || idx}
-                      className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4 hover:border-blue-300 transition-all"
+                      className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-4 hover:border-blue-300 transition-all"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200 text-xs">
+                            <span className="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-[var(--radius)] border border-slate-200 text-xs">
                               Question {idx + 1}
                             </span>
-                            <span className="font-bold text-slate-700 text-xs">
+                            <span className="font-medium text-slate-700 text-xs">
                               Topic: <b className="text-slate-900">{qTopic}</b>
                             </span>
                           </div>
@@ -1052,14 +1052,14 @@ export const TraineePracticePapersView = ({
                       </div>
 
                       {/* Question Metadata Bar matching specification */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-700">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200/80 text-[11px] text-slate-700">
                         <div><b>Topic:</b> {qTopic}</div>
                         <div><b>Difficulty:</b> <span className="font-semibold">{qDiff}</span></div>
                         <div><b>Time Spent:</b> <span className="font-mono font-semibold">{qTimeSpent} sec</span></div>
-                        <div><b>Result:</b> <span className={`font-bold ${isCorrect ? "text-emerald-700" : "text-rose-700"}`}>{isCorrect ? "Correct" : "Incorrect"}</span></div>
+                        <div><b>Result:</b> <span className={`font-medium ${isCorrect ? "text-emerald-700" : "text-rose-700"}`}>{isCorrect ? "Correct" : "Incorrect"}</span></div>
                       </div>
 
-                      <p className="text-slate-900 font-bold text-xs sm:text-sm leading-relaxed">
+                      <p className="text-slate-900 font-medium text-xs sm:text-sm leading-relaxed">
                         {q.question}
                       </p>
 
@@ -1070,7 +1070,7 @@ export const TraineePracticePapersView = ({
 
                           let optStyle = "bg-slate-50 border-slate-200 text-slate-700";
                           if (isOptionCorrect) {
-                            optStyle = "bg-emerald-50 border-emerald-400 text-emerald-950 font-bold ring-1 ring-emerald-400";
+                            optStyle = "bg-emerald-50 border-emerald-400 text-emerald-950 font-medium ring-1 ring-emerald-400";
                           } else if (isOptionChosen && !isOptionCorrect) {
                             optStyle = "bg-rose-50 border-rose-300 text-rose-900 font-semibold";
                           }
@@ -1078,10 +1078,10 @@ export const TraineePracticePapersView = ({
                           return (
                             <div
                               key={oIdx}
-                              className={`p-3 rounded-2xl border text-xs flex items-center justify-between gap-3 ${optStyle}`}
+                              className={`p-3 rounded-[var(--radius)] border text-xs flex items-center justify-between gap-3 ${optStyle}`}
                             >
                               <div className="flex items-center gap-2">
-                                <span className={`w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center shrink-0 ${
+                                <span className={`w-6 h-6 rounded-[var(--radius)] text-xs font-mono font-medium flex items-center justify-center shrink-0 ${
                                   isOptionCorrect ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-700"
                                 }`}>
                                   {String.fromCharCode(65 + oIdx)}
@@ -1107,7 +1107,7 @@ export const TraineePracticePapersView = ({
                       </div>
 
                       {q.explanation && (
-                        <div className="p-3 bg-blue-50/60 rounded-2xl border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
+                        <div className="p-3 bg-blue-50/60 rounded-[var(--radius)] border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
                           <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                           <div>
                             <b className="font-black text-slate-900">Meteorological Science Explanation:</b> {q.explanation}
@@ -1128,7 +1128,7 @@ export const TraineePracticePapersView = ({
 
               <button
                 onClick={() => setSelectedAttemptForAnalytics(null)}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs transition-colors shadow-sm"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-[var(--radius)] text-xs transition-colors shadow-sm"
               >
                 Close Audit
               </button>

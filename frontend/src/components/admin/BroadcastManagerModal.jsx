@@ -33,14 +33,14 @@ export const BroadcastManagerModal = ({ isOpen, onClose, onPublished }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-      <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200">
+      <div className="bg-white rounded-[var(--radius)] max-w-xl w-full p-6 shadow-2xl border border-slate-200">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-100 text-[#0a2558] flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-[var(--radius)] bg-blue-100 text-[#0a2558] flex items-center justify-center font-medium">
               <BellRing className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Publish MoES Directive / Broadcast</h2>
+              <h2 className="text-base font-semibold text-slate-900">Publish MoES Directive / Broadcast</h2>
               <p className="text-[11px] text-slate-500">Live feed across all regional meteorological centres</p>
             </div>
           </div>
@@ -58,7 +58,7 @@ export const BroadcastManagerModal = ({ isOpen, onClose, onPublished }) => {
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g. Mandatory Dual-Pol Radar Certification for All East Coast Forecasters"
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none font-medium"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium"
             />
           </div>
 
@@ -68,7 +68,7 @@ export const BroadcastManagerModal = ({ isOpen, onClose, onPublished }) => {
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
               >
                 <option value="National Directive">National Directive</option>
                 <option value="Training Cohort">Training Cohort</option>
@@ -83,7 +83,7 @@ export const BroadcastManagerModal = ({ isOpen, onClose, onPublished }) => {
                 type="text"
                 value={form.author}
                 onChange={(e) => setForm({ ...form, author: e.target.value })}
-                className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
               />
             </div>
           </div>
@@ -96,11 +96,11 @@ export const BroadcastManagerModal = ({ isOpen, onClose, onPublished }) => {
               value={form.content}
               onChange={(e) => setForm({ ...form, content: e.target.value })}
               placeholder="Enter full circular or capacity building advisory details..."
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
             />
           </div>
 
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+          <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
             <span className="font-semibold text-slate-800">Mark as High Priority / Flash Alert</span>
             <input
               type="checkbox"
@@ -111,13 +111,13 @@ export const BroadcastManagerModal = ({ isOpen, onClose, onPublished }) => {
           </div>
 
           <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-100 rounded-lg font-semibold">
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-100 rounded-[var(--radius)] font-semibold">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-1.5 px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md"
+              className="flex items-center gap-1.5 px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-[var(--radius)] font-semibold shadow-md"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{loading ? "Broadcasting..." : "Publish Broadcast"}</span>

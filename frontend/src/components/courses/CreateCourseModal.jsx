@@ -460,12 +460,12 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 font-sans text-slate-800">
+      <div className="bg-white rounded-[var(--radius)] max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 font-sans text-slate-800">
         
         {/* ═════════ HEADER ═════════ */}
         <div className="bg-gradient-to-r from-[#0a2558] via-blue-900 to-indigo-950 p-6 sm:p-7 text-white rounded-t-3xl relative overflow-hidden flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-bold text-white shadow-md">
+            <div className="w-12 h-12 rounded-[var(--radius)] bg-white/10 backdrop-blur-md flex items-center justify-center font-medium text-white shadow-md">
               {isEditMode ? <Edit3 className="w-6 h-6 text-amber-300" /> : <BookOpen className="w-6 h-6 text-blue-200" />}
             </div>
             <div>
@@ -499,7 +499,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
             <button
               key={s.num}
               onClick={() => setStep(s.num)}
-              className={`font-bold flex items-center gap-2 transition-colors ${
+              className={`font-medium flex items-center gap-2 transition-colors ${
                 step === s.num
                   ? "text-[#0a2558] font-black"
                   : step > s.num
@@ -507,7 +507,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                   : "text-slate-400"
               }`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                 step === s.num
                   ? "bg-[#0a2558] text-white"
                   : step > s.num
@@ -527,7 +527,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-medium text-slate-800 mb-1">
                   Course Title <span className="text-rose-600">*</span>
                 </label>
                 <input
@@ -535,12 +535,12 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                   value={form.title}
                   onChange={(e) => updateForm("title", e.target.value)}
                   placeholder="e.g., Polarimetric Doppler Weather Radar Interpretation & Severe Nowcasting"
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold focus:border-blue-500 focus:bg-white outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-medium text-slate-800 mb-1">
                   Course Code <span className="text-rose-600">*</span>
                 </label>
                 <input
@@ -548,47 +548,47 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                   value={form.code}
                   onChange={(e) => updateForm("code", e.target.value)}
                   placeholder="MOES-IMD-401"
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-mono font-medium focus:border-blue-500 focus:bg-white outline-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Category / Domain</label>
+                <label className="block font-medium text-slate-800 mb-1">Category / Domain</label>
                 <select
                   value={form.category}
                   onChange={(e) => updateForm("category", e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:border-blue-500 focus:bg-white outline-none"
                 >
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Competency Level</label>
+                <label className="block font-medium text-slate-800 mb-1">Competency Level</label>
                 <select
                   value={form.level}
                   onChange={(e) => updateForm("level", e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:border-blue-500 focus:bg-white outline-none"
                 >
                   {LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Duration</label>
+                <label className="block font-medium text-slate-800 mb-1">Duration</label>
                 <input
                   type="text"
                   value={form.duration}
                   onChange={(e) => updateForm("duration", e.target.value)}
                   placeholder="4 Weeks / 60 Hours"
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:border-blue-500 focus:bg-white outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-medium text-slate-800 mb-1">
                   Max Cadets Capacity <span className="text-blue-600">({form.maxEnrollment})</span>
                 </label>
                 <input
@@ -597,42 +597,42 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                   max="500"
                   value={form.maxEnrollment}
                   onChange={(e) => updateForm("maxEnrollment", e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-blue-900 focus:border-blue-500 focus:bg-white outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-blue-900 focus:border-blue-500 focus:bg-white outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-1">Course Overview & Operational Synopsis</label>
+              <label className="block font-medium text-slate-800 mb-1">Course Overview & Operational Synopsis</label>
               <textarea
                 rows={3}
                 value={form.description}
                 onChange={(e) => updateForm("description", e.target.value)}
                 placeholder="Comprehensive description of the operational training program and expected skill outcomes..."
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs leading-relaxed focus:border-blue-500 focus:bg-white outline-none"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs leading-relaxed focus:border-blue-500 focus:bg-white outline-none"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-1">Mandatory Prerequisites (comma separated)</label>
+              <label className="block font-medium text-slate-800 mb-1">Mandatory Prerequisites (comma separated)</label>
               <input
                 type="text"
                 value={form.prerequisites}
                 onChange={(e) => updateForm("prerequisites", e.target.value)}
                 placeholder="Basic Atmospheric Sciences, Synoptic Observations, Python in Meteorology"
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:border-blue-500 focus:bg-white outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:border-blue-500 focus:bg-white outline-none"
               />
             </div>
 
             {/* Thumbnail selector */}
             <div>
-              <label className="block font-bold text-slate-800 mb-1.5">Select Header Cover Visual</label>
+              <label className="block font-medium text-slate-800 mb-1.5">Select Header Cover Visual</label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                 {THUMBNAILS.map((thumb, idx) => (
                   <div
                     key={idx}
                     onClick={() => updateForm("thumbnail", thumb)}
-                    className={`h-20 rounded-2xl overflow-hidden cursor-pointer border-2 transition-all ${
+                    className={`h-20 rounded-[var(--radius)] overflow-hidden cursor-pointer border-2 transition-all ${
                       form.thumbnail === thumb ? "border-blue-600 ring-2 ring-blue-300 scale-102" : "border-slate-200 hover:border-blue-300 opacity-80"
                     }`}
                   >
@@ -663,7 +663,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
               <button
                 type="button"
                 onClick={addSubject}
-                className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-1.5 shrink-0"
+                className="px-4 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white font-semibold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-1.5 shrink-0"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Subject</span>
@@ -677,12 +677,12 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                 const isExpanded = expandedSubject === subject.id;
 
                 return (
-                  <div key={subject.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                  <div key={subject.id} className="p-5 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-4">
                     
                     {/* Subject Header Row */}
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 flex-1">
-                        <span className="px-2.5 py-0.5 bg-blue-100 text-blue-900 rounded-md font-bold text-[10px]">
+                        <span className="px-2.5 py-0.5 bg-blue-100 text-blue-900 rounded-[var(--radius)] font-medium text-[10px]">
                           Subject {sIdx + 1}
                         </span>
                         <input
@@ -690,7 +690,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                           value={subject.name}
                           onChange={(e) => updateSubject(subject.id, "name", e.target.value)}
                           placeholder="Subject Title..."
-                          className="font-bold text-slate-900 text-xs bg-transparent border-b border-slate-300 focus:border-blue-600 outline-none flex-1 p-1"
+                          className="font-medium text-slate-900 text-xs bg-transparent border-b border-slate-300 focus:border-blue-600 outline-none flex-1 p-1"
                         />
                       </div>
 
@@ -698,7 +698,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                         <button
                           type="button"
                           onClick={() => setExpandedSubject(isExpanded ? null : subject.id)}
-                          className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-lg text-xs"
+                          className="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
                         >
                           {isExpanded ? "Collapse ▲" : "Configure Faculty & Modules ▼"}
                         </button>
@@ -706,7 +706,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                           <button
                             type="button"
                             onClick={() => removeSubject(subject.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-[var(--radius)]"
                             title="Remove Subject"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -716,7 +716,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                     </div>
 
                     {/* Competency Matrix Faculty Suggester with Workload & Manual Selection */}
-                    <div className="p-4 bg-white rounded-2xl border border-blue-100 space-y-3.5">
+                    <div className="p-4 bg-white rounded-[var(--radius)] border border-blue-100 space-y-3.5">
                       
                       {/* Top Bar: Assignment Status & Actions */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
@@ -735,7 +735,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                         {subject.assignedTrainerName && (
                           <div className="flex items-center gap-2">
                             <span className="text-[11px] text-slate-600 font-medium">
-                              Assigned: <b className="text-purple-900 font-bold">{subject.assignedTrainerName}</b>
+                              Assigned: <b className="text-purple-900 font-medium">{subject.assignedTrainerName}</b>
                             </span>
                             <button
                               type="button"
@@ -750,7 +750,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                   } : s)
                                 }));
                               }}
-                              className="text-[10px] text-rose-600 hover:text-rose-800 font-bold underline"
+                              className="text-[10px] text-rose-600 hover:text-rose-800 font-medium underline"
                             >
                               Clear
                             </button>
@@ -759,7 +759,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                       </div>
 
                       {/* ─── MANUAL TRAINER SELECTION DROPDOWN (ADMIN CONTROLS) ─── */}
-                      <div className="p-3 bg-gradient-to-r from-blue-50/70 to-indigo-50/70 rounded-xl border border-blue-200/80 space-y-1.5">
+                      <div className="p-3 bg-gradient-to-r from-blue-50/70 to-indigo-50/70 rounded-[var(--radius)] border border-blue-200/80 space-y-1.5">
                         <div className="flex items-center justify-between">
                           <label className="text-[11px] font-extrabold text-[#0a2558] flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5 text-blue-600" />
@@ -799,7 +799,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                               }
                             }
                           }}
-                          className="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none shadow-sm cursor-pointer"
+                          className="w-full p-2.5 bg-white border border-slate-300 rounded-[var(--radius)] text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none shadow-sm cursor-pointer"
                         >
                           <option value="">-- Choose / Assign Any Faculty from Complete List --</option>
                           {trainersWorkload.map(tw => (
@@ -812,8 +812,8 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                       {/* Guidance notice when no domain match */}
                       {suggestedTrainers[0]?.matchScore === 0 && (
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">
-                          <span className="text-amber-500 font-bold">💡</span>
+                        <div className="p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-[11px] text-slate-600 flex items-center gap-2">
+                          <span className="text-amber-500 font-medium">💡</span>
                           <span>
                             Type any subject title, skill, or certificate keyword (e.g. <b>Python, Radar, WRF, Cyclone, GIS, Agrometeorology</b>). Faculty profiles will be dynamically ranked across their <b>skills, certificates, expertise, qualifications, and role</b>.
                           </span>
@@ -822,13 +822,13 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                       {/* Top AI Suggested Faculty Grid */}
                       <div>
-                        <div className="text-[11px] font-bold text-slate-700 mb-2 flex items-center justify-between">
+                        <div className="text-[11px] font-medium text-slate-700 mb-2 flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                             <span>AI Dynamic Faculty Recommendations (Ranked by Competency & Workload):</span>
                           </div>
                           {suggestedTrainers[0]?.matchScore > 0 && (
-                            <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            <span className="text-[10px] text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                               Top Match: {suggestedTrainers[0]?.matchScore}% ({suggestedTrainers[0]?.trainerName})
                             </span>
                           )}
@@ -851,7 +851,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                     } : s)
                                   }));
                                 }}
-                                className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-2 ${
+                                className={`p-3 rounded-[var(--radius)] border cursor-pointer transition-all flex flex-col justify-between gap-2 ${
                                   isAssigned 
                                     ? "bg-purple-50/90 border-purple-400 ring-2 ring-purple-300 shadow-sm" 
                                     : tw.matchScore >= 80
@@ -868,11 +868,11 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                     <img
                                       src={tw.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
                                       alt={tw.trainerName}
-                                      className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
+                                      className="w-10 h-10 rounded-[var(--radius)] object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
                                     />
                                     <div>
                                       <div className="flex items-center gap-1.5 flex-wrap">
-                                        <p className="font-bold text-slate-900 text-xs">{tw.trainerName}</p>
+                                        <p className="font-medium text-slate-900 text-xs">{tw.trainerName}</p>
                                         <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold border ${
                                           tw.matchScore >= 80 
                                             ? "bg-emerald-100 text-emerald-900 border-emerald-300 shadow-2xs" 
@@ -893,7 +893,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                                   <button
                                     type="button"
-                                    className={`px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 transition-all ${
+                                    className={`px-2.5 py-1 rounded-[var(--radius)] text-[10px] font-medium shrink-0 transition-all ${
                                       isAssigned ? "bg-purple-700 text-white shadow-xs" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"
                                     }`}
                                   >
@@ -905,7 +905,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                                 {tw.matchedPills && tw.matchedPills.length > 0 && (
                                   <div className="flex items-center gap-1 flex-wrap pt-0.5">
                                     {tw.matchedPills.map((pill, pIdx) => (
-                                      <span key={pIdx} className="px-1.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-200/90 text-indigo-950 text-[9px] font-bold">
+                                      <span key={pIdx} className="px-1.5 py-0.5 rounded-[var(--radius)] bg-indigo-50 border border-indigo-200/90 text-indigo-950 text-[9px] font-medium">
                                         ✦ {pill}
                                       </span>
                                     ))}
@@ -936,10 +936,10 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                     {/* Expandable Module Builder */}
                     {isExpanded && (
-                      <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-4 pt-3">
+                      <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 space-y-4 pt-3">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2 border-b border-slate-100">
                           <div>
-                            <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                            <label className="block font-medium text-slate-700 text-[11px] mb-1">
                               Subject Competencies & Keywords (Matches Faculty Skills & Certs):
                             </label>
                             <input
@@ -947,11 +947,11 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                               value={subject.requiredSkills || ""}
                               onChange={(e) => updateSubject(subject.id, "requiredSkills", e.target.value)}
                               placeholder="e.g. Python, WRF Modeling, Radar, GIS, Agrometeorology..."
-                              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:border-blue-500 outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                            <label className="block font-medium text-slate-700 text-[11px] mb-1">
                               Subject Syllabus Description:
                             </label>
                             <input
@@ -959,17 +959,17 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                               value={subject.description || ""}
                               onChange={(e) => updateSubject(subject.id, "description", e.target.value)}
                               placeholder="Operational syllabus overview and learning outcomes..."
-                              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                              className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:border-blue-500 outline-none"
                             />
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-800 text-xs">Curriculum Lesson Modules ({subject.modules?.length || 0}):</span>
+                          <span className="font-medium text-slate-800 text-xs">Curriculum Lesson Modules ({subject.modules?.length || 0}):</span>
                           <button
                             type="button"
                             onClick={() => addModule(subject.id)}
-                            className="text-xs text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1"
+                            className="text-xs text-blue-700 hover:text-blue-900 font-medium flex items-center gap-1"
                           >
                             <Plus className="w-3.5 h-3.5" />
                             <span>Add Lesson Module</span>
@@ -978,8 +978,8 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                         <div className="space-y-2">
                           {(subject.modules || []).map((mod, mIdx) => (
-                            <div key={mod.id || mIdx} className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200">
-                              <span className="text-[10px] font-bold text-slate-400 font-mono w-6">M{mIdx + 1}</span>
+                            <div key={mod.id || mIdx} className="flex items-center gap-2 p-2 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
+                              <span className="text-[10px] font-medium text-slate-400 font-mono w-6">M{mIdx + 1}</span>
                               <input
                                 type="text"
                                 value={mod.title || mod.name}
@@ -1014,15 +1014,15 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
         {step === 3 && (
           <div className="p-6 sm:p-8 space-y-6 animate-in fade-in text-xs">
             
-            <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200 space-y-4">
+            <div className="bg-slate-50 rounded-[var(--radius)] p-6 border border-slate-200 space-y-4">
               <div className="flex items-start gap-4">
                 <img
                   src={form.thumbnail}
                   alt={form.title}
-                  className="w-20 h-20 rounded-2xl object-cover ring-2 ring-slate-300 shrink-0"
+                  className="w-20 h-20 rounded-[var(--radius)] object-cover ring-2 ring-slate-300 shrink-0"
                 />
                 <div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0a2558] text-white">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#0a2558] text-white">
                     {form.code} • {form.level}
                   </span>
                   <h3 className="font-black text-slate-900 text-base mt-1.5">{form.title || "Untitled Course"}</h3>
@@ -1032,19 +1032,19 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200 text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Department</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase">Department</span>
                   <p className="font-semibold text-slate-800">{form.department}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Credit Hours</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase">Credit Hours</span>
                   <p className="font-semibold text-slate-800">{form.creditHours} Credits</p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Subjects Count</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase">Subjects Count</span>
                   <p className="font-semibold text-slate-800">{form.subjects.length} Subjects</p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Total Modules</span>
+                  <span className="text-[10px] text-slate-400 font-medium uppercase">Total Modules</span>
                   <p className="font-semibold text-slate-800">
                     {form.subjects.reduce((acc, s) => acc + (s.modules?.length || 0), 0)} Modules
                   </p>
@@ -1060,13 +1060,13 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
                 <div className="space-y-2">
                   {form.subjects.map((sub, idx) => (
-                    <div key={sub.id || idx} className="p-3 bg-white rounded-2xl border border-slate-200 flex items-center justify-between gap-3">
+                    <div key={sub.id || idx} className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-blue-600 text-white font-black text-[10px] flex items-center justify-center">
+                          <span className="w-5 h-5 rounded-[var(--radius)] bg-blue-600 text-white font-black text-[10px] flex items-center justify-center">
                             S{idx + 1}
                           </span>
-                          <span className="font-bold text-slate-900 text-xs">{sub.name}</span>
+                          <span className="font-medium text-slate-900 text-xs">{sub.name}</span>
                         </div>
                         <p className="text-[11px] text-slate-500 mt-0.5">
                           {sub.modules?.length || 0} Lesson Modules
@@ -1074,8 +1074,8 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">Faculty:</span>
-                        <span className={`px-2.5 py-1 rounded-xl text-xs font-bold ${
+                        <span className="text-[10px] text-slate-400 font-medium uppercase">Faculty:</span>
+                        <span className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium ${
                           sub.assignedTrainerName 
                             ? "bg-purple-100 text-purple-900 border border-purple-200" 
                             : "bg-amber-100 text-amber-900 border border-amber-200"
@@ -1089,7 +1089,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
               </div>
 
               {/* Broadcast Notice Info Box */}
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 text-blue-950 space-y-1">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-[var(--radius)] border border-blue-200 text-blue-950 space-y-1">
                 <div className="flex items-center gap-2 font-black text-blue-900">
                   <Send className="w-4 h-4" />
                   <span>Automated Ministry Broadcast Announcement:</span>
@@ -1108,7 +1108,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+            className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-[var(--radius)] text-xs transition-colors"
           >
             Cancel
           </button>
@@ -1118,7 +1118,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
-                className="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs"
+                className="px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
               >
                 Back
               </button>
@@ -1128,7 +1128,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
               <button
                 type="button"
                 onClick={() => setStep(step + 1)}
-                className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-xl text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-1.5"
+                className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-1.5"
               >
                 <span>Continue to Next Step</span>
                 <ChevronRight className="w-4 h-4" />
@@ -1138,7 +1138,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                 type="button"
                 onClick={handleSubmit}
                 disabled={saving}
-                className="px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+                className="px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
               >
                 {saving ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />

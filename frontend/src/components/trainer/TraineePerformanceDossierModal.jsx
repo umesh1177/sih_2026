@@ -57,13 +57,13 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto">
+      <div className="bg-white rounded-[var(--radius)] shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto">
         
         {/* ═════════ HEADER: CADET PROFILE CARD (LIGHT THEME) ═════════ */}
         <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shrink-0">
           
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black text-2xl shadow-xs shrink-0">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[var(--radius)] bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black text-2xl shadow-xs shrink-0">
               {trainee.name?.split(" ").map(n => n[0]).join("") || "TR"}
             </div>
 
@@ -100,14 +100,14 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
           </div>
 
           <div className="flex items-center gap-3 self-end md:self-center">
-            <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 text-center shrink-0">
+            <div className="bg-slate-50 rounded-[var(--radius)] p-3 border border-slate-200 text-center shrink-0">
               <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider block">AVERAGE SCORE</span>
               <span className="text-xl font-black text-blue-700">{avgQuizScore}%</span>
             </div>
 
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-[var(--radius)] bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -162,7 +162,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
             <div className="space-y-6 animate-in fade-in duration-150">
               
               {/* Enrolled Course Highlight Card */}
-              <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+              <div className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <span className="text-[10px] font-black uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-full">
@@ -172,13 +172,13 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                       {trainee.courseTitle || "Specialized Training Track"}
                     </h3>
                     <p className="text-slate-500 text-xs font-medium">
-                      Course Code: <span className="font-mono font-bold text-slate-700">{trainee.courseCode || "MOES-TR-01"}</span> • Enrolled Date: {trainee.enrolledDate || "Current Term"}
+                      Course Code: <span className="font-mono font-medium text-slate-700">{trainee.courseCode || "MOES-TR-01"}</span> • Enrolled Date: {trainee.enrolledDate || "Current Term"}
                     </p>
                   </div>
 
                   <div className="text-right shrink-0">
                     <span className="text-2xl font-black text-blue-700">{progressPercentage}%</span>
-                    <p className="text-[11px] font-bold text-slate-400">Overall Completion</p>
+                    <p className="text-[11px] font-medium text-slate-400">Overall Completion</p>
                   </div>
                 </div>
 
@@ -190,7 +190,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
+                  <div className="flex items-center justify-between text-[11px] font-medium text-slate-500">
                     <span>Modules Cleared: {trainee.completedModulesCount || 0} of {trainee.totalModulesCount || 0}</span>
                     <span>Status: {trainee.status || "In Progress"}</span>
                   </div>
@@ -199,29 +199,29 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
 
               {/* 4 Metric Summary Tiles */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                   <span className="text-[10px] font-black uppercase text-slate-400">QUIZZES TAKEN</span>
                   <p className="text-xl font-black text-slate-900 mt-1">{submissions.length}</p>
                 </div>
 
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                   <span className="text-[10px] font-black uppercase text-slate-400">ACCURACY RATE</span>
                   <p className="text-xl font-black text-emerald-600 mt-1">{avgQuizScore}%</p>
                 </div>
 
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                   <span className="text-[10px] font-black uppercase text-slate-400">TRAINING STATUS</span>
                   <p className="text-xl font-black text-blue-700 mt-1">{trainee.status || "Active"}</p>
                 </div>
 
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                   <span className="text-[10px] font-black uppercase text-slate-400">VERIFIED SKILLS</span>
                   <p className="text-xl font-black text-purple-700 mt-1">{trainee.skills?.length || 0} Units</p>
                 </div>
               </div>
 
               {/* Trainer Notes & Qualitative Audit */}
-              <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
+              <div className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-3">
                 <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-blue-600" />
                   <span>Lead Trainer Evaluation Notes & Remarks</span>
@@ -232,7 +232,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                 ) : (
                   <div className="space-y-2">
                     {savedNotes.map((note, idx) => (
-                      <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-2.5">
+                      <div key={idx} className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-100 flex items-start gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                         <p className="text-slate-700 font-medium">{note}</p>
                       </div>
@@ -247,11 +247,11 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                     value={trainerNote}
                     onChange={(e) => setTrainerNote(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddNote())}
-                    className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                    className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
                   />
                   <button
                     onClick={handleAddNote}
-                    className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors"
+                    className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[var(--radius)] text-xs transition-colors"
                   >
                     Add Remark
                   </button>
@@ -265,15 +265,15 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
           {activeDossierTab === "quizzes" && (
             <div className="space-y-4 animate-in fade-in duration-150">
               {submissions.length === 0 ? (
-                <div className="py-12 bg-white rounded-2xl border border-slate-200 text-center space-y-2">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                <div className="py-12 bg-white rounded-[var(--radius)] border border-slate-200 text-center space-y-2">
+                  <div className="w-10 h-10 rounded-[var(--radius)] bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
                     <FileQuestion className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-slate-800 text-sm">No Assessment Submissions Logged</h4>
+                  <h4 className="font-medium text-slate-800 text-sm">No Assessment Submissions Logged</h4>
                   <p className="text-xs text-slate-500">This trainee has not yet completed any scheduled assessments.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto bg-white rounded-3xl border border-slate-200 shadow-sm">
+                <div className="overflow-x-auto bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50 text-[11px] font-black uppercase text-slate-400 border-b border-slate-100">
                       <tr>
@@ -288,13 +288,13 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                     <tbody className="divide-y divide-slate-100">
                       {submissions.map((sub) => (
                         <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="py-3.5 px-4 font-bold text-slate-900">
+                          <td className="py-3.5 px-4 font-medium text-slate-900">
                             {sub.title || sub.quizTitle || "Assessment"}
                           </td>
                           <td className="py-3.5 px-4 font-black text-slate-900">
                             {sub.score}/{sub.totalMarks} ({sub.percentage}%)
                           </td>
-                          <td className="py-3.5 px-4 font-bold text-slate-700">
+                          <td className="py-3.5 px-4 font-medium text-slate-700">
                             {sub.accuracy || sub.percentage}%
                           </td>
                           <td className="py-3.5 px-4 text-slate-600 font-medium">
@@ -326,14 +326,14 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
           {/* TAB 3: COMPETENCIES & BIO */}
           {activeDossierTab === "competencies" && (
             <div className="space-y-6 animate-in fade-in duration-150">
-              <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+              <div className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-4">
                 <h4 className="font-extrabold text-slate-900 text-sm">Verified Skills & Knowledge Areas</h4>
                 {(!trainee.skills || trainee.skills.length === 0) ? (
                   <p className="text-slate-400 text-xs">No specific skill tags mapped yet.</p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {trainee.skills.map((s, idx) => (
-                      <span key={idx} className="px-3 py-1 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl font-bold text-xs">
+                      <span key={idx} className="px-3 py-1 bg-blue-50 border border-blue-200 text-blue-800 rounded-[var(--radius)] font-medium text-xs">
                         {s}
                       </span>
                     ))}
@@ -341,7 +341,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                 )}
 
                 <div className="pt-4 border-t border-slate-100 space-y-2">
-                  <h5 className="font-bold text-slate-800 text-xs">Officer Biography / Background</h5>
+                  <h5 className="font-medium text-slate-800 text-xs">Officer Biography / Background</h5>
                   <p className="text-slate-600 text-xs leading-relaxed">
                     {trainee.bio || "Enrolled in central capacity building program under MoES."}
                   </p>
@@ -359,7 +359,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
           </p>
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors"
+            className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-[var(--radius)] text-xs transition-colors"
           >
             Close Dossier
           </button>

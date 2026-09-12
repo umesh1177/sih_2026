@@ -55,6 +55,10 @@ import {
 
 const MainApp = () => {
   const { currentUser, switchAccount, demoAccounts } = useAuth();
+  useEffect(() => {
+    // Reset activeTab to default when user changes (login/logout)
+    setActiveTab("dashboard");
+  }, [currentUser]);
   
   // Navigation & Page views: Defaults to Home Page ("landing")
   const [viewMode, setViewMode] = useState(() => {
@@ -409,9 +413,9 @@ const MainApp = () => {
               />
             ) : (
               <div className="p-6 space-y-6">
-                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="bg-white rounded-[var(--radius)] p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                    <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
                       Assessment Operations & Kiosk Scheduling
                     </h1>
                     <p className="text-xs text-slate-500 mt-0.5">
@@ -420,7 +424,7 @@ const MainApp = () => {
                   </div>
                   <button
                     onClick={() => setIsScheduleModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-bold rounded-2xl text-xs shadow-lg transition-transform hover:scale-105"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-medium rounded-[var(--radius)] text-xs shadow-lg transition-transform hover:scale-105"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Schedule New Assessment</span>
@@ -430,17 +434,17 @@ const MainApp = () => {
                 {/* Trainer / Admin Quizzes List */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {quizzes.map(quiz => (
-                    <div key={quiz.id} className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div key={quiz.id} className="bg-white rounded-[var(--radius)] border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <span className="px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-bold">
+                          <span className="px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-medium">
                             {quiz.courseName || "Meteorology Assessment"}
                           </span>
-                          <span className="text-xs font-bold text-slate-500">
+                          <span className="text-xs font-medium text-slate-500">
                             {quiz.durationMinutes} Mins • {quiz.questions?.length || 10} MCQs
                           </span>
                         </div>
-                        <h3 className="font-bold text-slate-900 text-base mb-2">{quiz.title}</h3>
+                        <h3 className="font-semibold text-slate-900 text-base mb-2">{quiz.title}</h3>
                         <div className="text-xs text-slate-500 space-y-1 mb-4">
                           <p>Trainer: <b>{quiz.trainerName}</b></p>
                           <p>Passing Threshold: <b>{quiz.passMarks}/{quiz.totalMarks} Marks ({Math.round((quiz.passMarks/quiz.totalMarks)*100)}%)</b></p>
@@ -453,7 +457,7 @@ const MainApp = () => {
                         </span>
                         <button
                           onClick={() => setSelectedQuizAnalyticsId(quiz.id)}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
                         >
                           <BarChart3 className="w-4 h-4 text-[#0a2558]" />
                           <span>Inspect Class Performance</span>
@@ -670,18 +674,18 @@ const MainApp = () => {
       {/* Announcements Modal */}
       {showAnnouncementsModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-[var(--radius)] max-w-xl w-full p-6 shadow-2xl border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <h2 className="text-base font-bold text-slate-900">Active MoES Directives & Circulars</h2>
+              <h2 className="text-base font-semibold text-slate-900">Active MoES Directives & Circulars</h2>
               <button onClick={() => setShowAnnouncementsModal(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1 text-xs">
               {announcements.map((a, i) => (
-                <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                <div key={i} className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-slate-900">{a.title}</span>
+                    <span className="font-medium text-slate-900">{a.title}</span>
                     <span className="text-[10px] text-slate-400">{a.date}</span>
                   </div>
                   <p className="text-slate-600 leading-relaxed">{a.content}</p>

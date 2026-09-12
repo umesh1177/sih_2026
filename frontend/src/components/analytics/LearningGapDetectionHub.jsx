@@ -614,14 +614,14 @@ export const LearningGapDetectionHub = ({
       
       {/* ─── TOAST NOTIFICATION ─── */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-[var(--radius)] bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
           <div className={`w-2.5 h-2.5 rounded-full ${toastMessage.type === "error" ? "bg-red-400" : "bg-emerald-400"}`} />
-          <span className="text-xs font-bold">{toastMessage.text}</span>
+          <span className="text-xs font-medium">{toastMessage.text}</span>
         </div>
       )}
 
       {/* ═════════ 1. HEADER & CLOSED LOOP BANNER ═════════ */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden space-y-4">
+      <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden space-y-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
             <div className="flex items-center gap-2 flex-wrap">
@@ -629,7 +629,7 @@ export const LearningGapDetectionHub = ({
                 <ShieldAlert className="w-3 h-3 text-rose-600" />
                 Adaptive Recommendation Engine
               </span>
-              <span className="text-xs font-bold text-slate-400">
+              <span className="text-xs font-medium text-slate-400">
                 Rule 10: Topic Accuracy &lt; {gapThreshold}% Trigger
               </span>
             </div>
@@ -646,7 +646,7 @@ export const LearningGapDetectionHub = ({
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
               onClick={() => setActiveModal("config")}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl text-xs border border-slate-200 shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs border border-slate-200 shadow-xs transition-colors"
             >
               <Sliders className="w-4 h-4 text-slate-600" />
               <span>Config Cutoff ({gapThreshold}%)</span>
@@ -658,7 +658,7 @@ export const LearningGapDetectionHub = ({
                 localStorage.removeItem("moes_retested_topics");
                 showToast("All topic gap telemetry reset to live evaluation baselines.");
               }}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold rounded-2xl text-xs border border-slate-200"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold rounded-[var(--radius)] text-xs border border-slate-200"
             >
               <RotateCcw className="w-4 h-4 text-slate-500" />
               <span>Reset State</span>
@@ -671,9 +671,9 @@ export const LearningGapDetectionHub = ({
           <div className="flex flex-wrap items-center gap-3">
             
             {/* 1. Course Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
+            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs">
               <BookOpen className="w-4 h-4 text-blue-600 shrink-0" />
-              <span className="font-bold text-slate-500">Course:</span>
+              <span className="font-medium text-slate-500">Course:</span>
               <select
                 value={selectedCourseId}
                 onChange={(e) => setSelectedCourseId(e.target.value)}
@@ -687,9 +687,9 @@ export const LearningGapDetectionHub = ({
             </div>
 
             {/* 2. Individual Trainee Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
+            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs">
               <Users className="w-4 h-4 text-purple-600 shrink-0" />
-              <span className="font-bold text-slate-500">Learner:</span>
+              <span className="font-medium text-slate-500">Learner:</span>
               <select
                 value={selectedTraineeId}
                 onChange={(e) => setSelectedTraineeId(e.target.value)}
@@ -710,16 +710,16 @@ export const LearningGapDetectionHub = ({
                   setSelectedCourseId("all");
                   setSelectedTraineeId("all");
                 }}
-                className="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 underline"
+                className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 underline"
               >
                 Clear Filters
               </button>
             )}
           </div>
 
-          <div className="text-xs font-bold text-slate-500 flex items-center gap-2">
+          <div className="text-xs font-medium text-slate-500 flex items-center gap-2">
             <span>Diagnostic Scope:</span>
-            <span className="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-900 font-extrabold">
+            <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-blue-100 text-blue-900 font-extrabold">
               {selectedTraineeObj ? `Officer: ${selectedTraineeObj.name}` : (selectedCourseId !== "all" ? "Single Course" : "National Organization Cohort")}
             </span>
           </div>
@@ -727,15 +727,15 @@ export const LearningGapDetectionHub = ({
 
         {/* ─── INDIVIDUAL TRAINEE DOSSIER BANNER (WHEN SPECIFIC TRAINEE SELECTED) ─── */}
         {selectedTraineeObj && (
-          <div className="bg-purple-50/80 border border-purple-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
+          <div className="bg-purple-50/80 border border-purple-200 rounded-[var(--radius)] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-purple-600 text-white font-black text-base flex items-center justify-center shadow-sm shrink-0">
+              <div className="w-12 h-12 rounded-[var(--radius)] bg-purple-600 text-white font-black text-base flex items-center justify-center shadow-sm shrink-0">
                 {selectedTraineeObj.name.charAt(0)}
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-slate-900 text-sm">{selectedTraineeObj.name}</h3>
-                  <span className="px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900 font-bold text-[10px]">
+                  <span className="px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900 font-medium text-[10px]">
                     {selectedTraineeObj.cadreId || "Officer Trainee"}
                   </span>
                 </div>
@@ -746,12 +746,12 @@ export const LearningGapDetectionHub = ({
             </div>
 
             <div className="flex items-center gap-3 shrink-0">
-              <div className="text-right px-3 py-1 bg-white rounded-xl border border-purple-200">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Avg Score</span>
+              <div className="text-right px-3 py-1 bg-white rounded-[var(--radius)] border border-purple-200">
+                <span className="text-[10px] text-slate-400 font-medium uppercase block">Avg Score</span>
                 <b className="text-sm font-black text-purple-900">{selectedTraineeObj.assessmentScore || selectedTraineeObj.avgQuizScore || 78}%</b>
               </div>
-              <div className="text-right px-3 py-1 bg-white rounded-xl border border-purple-200">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Syllabus Progress</span>
+              <div className="text-right px-3 py-1 bg-white rounded-[var(--radius)] border border-purple-200">
+                <span className="text-[10px] text-slate-400 font-medium uppercase block">Syllabus Progress</span>
                 <b className="text-sm font-black text-emerald-700">{selectedTraineeObj.completionPercentage || 65}%</b>
               </div>
             </div>
@@ -759,46 +759,46 @@ export const LearningGapDetectionHub = ({
         )}
 
         {/* ─── 5-STEP CLOSED-LOOP VISUAL CYCLE ─── */}
-        <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 p-4 sm:p-5 rounded-2xl border border-indigo-100 space-y-3">
+        <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 p-4 sm:p-5 rounded-[var(--radius)] border border-indigo-100 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase text-indigo-900 tracking-wider flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
               Continuous Closed-Loop Remediation Cycle
             </span>
-            <span className="text-[11px] font-bold text-indigo-700">
+            <span className="text-[11px] font-medium text-indigo-700">
               Active Gaps: <b className="text-rose-600">{criticalGapsCount + moderateGapsCount}</b> | Mastered: <b className="text-emerald-700">{masteredCount}</b>
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 text-center">
-            <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs space-y-1">
+            <div className="bg-white p-3 rounded-[var(--radius)] border border-indigo-100 shadow-2xs space-y-1">
               <div className="w-6 h-6 mx-auto rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center">1</div>
               <p className="font-extrabold text-xs text-slate-900">ASSESS</p>
               <p className="text-[10px] text-slate-500">Timed MCQs & Practice</p>
             </div>
 
-            <div className="bg-white p-3 rounded-xl border border-rose-200 shadow-2xs space-y-1 ring-1 ring-rose-200">
+            <div className="bg-white p-3 rounded-[var(--radius)] border border-rose-200 shadow-2xs space-y-1 ring-1 ring-rose-200">
               <div className="w-6 h-6 mx-auto rounded-full bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center">2</div>
               <p className="font-extrabold text-xs text-rose-900">IDENTIFY GAP</p>
-              <p className="text-[10px] text-rose-600 font-bold">Accuracy &lt; {gapThreshold}%</p>
+              <p className="text-[10px] text-rose-600 font-medium">Accuracy &lt; {gapThreshold}%</p>
             </div>
 
-            <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs space-y-1">
+            <div className="bg-white p-3 rounded-[var(--radius)] border border-indigo-100 shadow-2xs space-y-1">
               <div className="w-6 h-6 mx-auto rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center">3</div>
               <p className="font-extrabold text-xs text-slate-900">LEARN</p>
               <p className="text-[10px] text-slate-500">AI Summary & Notes</p>
             </div>
 
-            <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-2xs space-y-1">
+            <div className="bg-white p-3 rounded-[var(--radius)] border border-indigo-100 shadow-2xs space-y-1">
               <div className="w-6 h-6 mx-auto rounded-full bg-amber-100 text-amber-800 font-black text-xs flex items-center justify-center">4</div>
               <p className="font-extrabold text-xs text-slate-900">PRACTICE</p>
               <p className="text-[10px] text-slate-500">Targeted Adaptive Quiz</p>
             </div>
 
-            <div className="bg-white p-3 rounded-xl border border-emerald-200 shadow-2xs space-y-1 col-span-2 sm:col-span-1">
+            <div className="bg-white p-3 rounded-[var(--radius)] border border-emerald-200 shadow-2xs space-y-1 col-span-2 sm:col-span-1">
               <div className="w-6 h-6 mx-auto rounded-full bg-emerald-100 text-emerald-800 font-black text-xs flex items-center justify-center">5</div>
               <p className="font-extrabold text-xs text-emerald-900">IMPROVE</p>
-              <p className="text-[10px] text-emerald-700 font-bold">Gap Closed (≥65%)</p>
+              <p className="text-[10px] text-emerald-700 font-medium">Gap Closed (≥65%)</p>
             </div>
           </div>
         </div>
@@ -814,7 +814,7 @@ export const LearningGapDetectionHub = ({
               <Compass className="w-4 h-4 text-indigo-600" />
               <span>Diagnosed Topic Deficits</span>
             </h3>
-            <span className="text-xs font-bold text-slate-400">
+            <span className="text-xs font-medium text-slate-400">
               {detectedGaps.length} Subject Topics
             </span>
           </div>
@@ -830,7 +830,7 @@ export const LearningGapDetectionHub = ({
                 <div
                   key={item.key}
                   onClick={() => setSelectedTopicKey(item.key)}
-                  className={`p-5 rounded-3xl border transition-all cursor-pointer space-y-3 ${
+                  className={`p-5 rounded-[var(--radius)] border transition-all cursor-pointer space-y-3 ${
                     isSelected
                       ? "bg-white border-indigo-500 ring-2 ring-indigo-200 shadow-md"
                       : "bg-white border-slate-200 hover:border-slate-300 shadow-xs"
@@ -847,7 +847,7 @@ export const LearningGapDetectionHub = ({
                       <p className="text-[11px] text-slate-400 font-medium pl-4.5">{item.subject}</p>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-xl text-xs font-black shrink-0 ${
+                    <span className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-black shrink-0 ${
                       isCritical
                         ? "bg-rose-100 text-rose-800 border border-rose-200"
                         : isModerate
@@ -872,12 +872,12 @@ export const LearningGapDetectionHub = ({
                     <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-medium">
                       <span>Threshold: {gapThreshold}%</span>
                       {item.isGap ? (
-                        <span className="text-rose-700 font-bold flex items-center gap-1">
+                        <span className="text-rose-700 font-medium flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3 text-rose-600" />
                           Learning Gap Detected
                         </span>
                       ) : (
-                        <span className="text-emerald-700 font-bold flex items-center gap-1">
+                        <span className="text-emerald-700 font-medium flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                           Mastery Satisfied
                         </span>
@@ -890,7 +890,7 @@ export const LearningGapDetectionHub = ({
                     <span className="text-slate-400 text-[11px]">
                       {item.wrongQuestions} of {item.totalQuestions} Questions Incorrect
                     </span>
-                    <span className="font-bold text-indigo-700 flex items-center gap-1 hover:underline">
+                    <span className="font-medium text-indigo-700 flex items-center gap-1 hover:underline">
                       Inspect Remediation →
                     </span>
                   </div>
@@ -901,7 +901,7 @@ export const LearningGapDetectionHub = ({
         </div>
 
         {/* ─── RIGHT COLUMN: REMEDIATION ACTION WORKBENCH (7 COLUMNS) ─── */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 sticky top-6">
+        <div className="lg:col-span-7 bg-white rounded-[var(--radius)] border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 sticky top-6">
           
           {/* Header of Active Selected Topic */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
@@ -914,7 +914,7 @@ export const LearningGapDetectionHub = ({
                 }`}>
                   {(retestedScores[selectedTopicKey] || currentTopic.baselineAccuracy) < gapThreshold ? "🔴 Learning Gap Detected" : "🟢 Mastery Achieved"}
                 </span>
-                <span className="text-xs text-slate-400 font-bold">
+                <span className="text-xs text-slate-400 font-medium">
                   {currentTopic.subject}
                 </span>
               </div>
@@ -925,8 +925,8 @@ export const LearningGapDetectionHub = ({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <div className="text-right bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Topic Accuracy</span>
+              <div className="text-right bg-slate-50 px-4 py-2 rounded-[var(--radius)] border border-slate-200">
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Topic Accuracy</span>
                 <span className={`text-2xl font-black ${
                   (retestedScores[selectedTopicKey] || currentTopic.baselineAccuracy) < gapThreshold
                     ? "text-rose-600"
@@ -939,7 +939,7 @@ export const LearningGapDetectionHub = ({
               {isTrainer && (
                 <button
                   onClick={() => handleAssignRemediation(currentTopic.topic)}
-                  className="px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl text-xs shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95"
+                  className="px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Assign Remediation</span>
@@ -955,10 +955,10 @@ export const LearningGapDetectionHub = ({
             </h4>
 
             {/* Pillar 1: AI Module Summary */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+            <div className="p-4 sm:p-5 rounded-[var(--radius)] bg-indigo-50/70 border border-indigo-200 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-xs">
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-indigo-600 text-white flex items-center justify-center font-medium shadow-xs">
                     <Sparkles className="w-5 h-5 text-amber-300" />
                   </div>
                   <div>
@@ -976,14 +976,14 @@ export const LearningGapDetectionHub = ({
                     setFlashcardSelectedOption(null);
                     setActiveModal("ai_summary");
                   }}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
                 >
                   Read AI Summary
                 </button>
               </div>
 
-              <div className="bg-white/80 p-3 rounded-xl border border-indigo-100 text-xs text-slate-700 space-y-1">
-                <p className="font-bold text-slate-900">Summary Highlights:</p>
+              <div className="bg-white/80 p-3 rounded-[var(--radius)] border border-indigo-100 text-xs text-slate-700 space-y-1">
+                <p className="font-medium text-slate-900">Summary Highlights:</p>
                 <p className="text-[11px] leading-relaxed line-clamp-2">
                   {currentTopic.summary?.headline}
                 </p>
@@ -991,10 +991,10 @@ export const LearningGapDetectionHub = ({
             </div>
 
             {/* Pillar 2: Learning Material */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-3">
+            <div className="p-4 sm:p-5 rounded-[var(--radius)] bg-blue-50/70 border border-blue-200 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-medium shadow-xs">
                     <BookOpen className="w-5 h-5 text-blue-100" />
                   </div>
                   <div>
@@ -1014,23 +1014,23 @@ export const LearningGapDetectionHub = ({
                       onNavigateTab("courses");
                     }
                   }}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
                 >
                   Open Study Material
                 </button>
               </div>
 
-              <div className="bg-white/80 p-3 rounded-xl border border-blue-100 text-xs text-slate-600 flex items-center justify-between">
+              <div className="bg-white/80 p-3 rounded-[var(--radius)] border border-blue-100 text-xs text-slate-600 flex items-center justify-between">
                 <span>Direct module link: <b>{currentTopic.subject}</b></span>
                 <span className="text-[10px] text-blue-600 font-extrabold uppercase">Available Online</span>
               </div>
             </div>
 
             {/* Pillar 3: Targeted Practice Quiz */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
+            <div className="p-4 sm:p-5 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold shadow-xs">
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-amber-600 text-white flex items-center justify-center font-medium shadow-xs">
                     <Flame className="w-5 h-5 text-amber-200" />
                   </div>
                   <div>
@@ -1043,16 +1043,16 @@ export const LearningGapDetectionHub = ({
 
                 <button
                   onClick={() => handleLaunchTargetedQuiz(selectedTopicKey)}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 flex items-center gap-1.5"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 flex items-center gap-1.5"
                 >
                   <PlayCircle className="w-4 h-4" />
                   <span>Start Practice</span>
                 </button>
               </div>
 
-              <div className="bg-white/80 p-3 rounded-xl border border-amber-100 text-xs flex items-center justify-between">
+              <div className="bg-white/80 p-3 rounded-[var(--radius)] border border-amber-100 text-xs flex items-center justify-between">
                 <span className="text-slate-700">Adaptive Format: <b>5-10 High-Yield Questions</b></span>
-                <span className="text-amber-800 font-bold">15 Mins • Kiosk Mode Proctored</span>
+                <span className="text-amber-800 font-medium">15 Mins • Kiosk Mode Proctored</span>
               </div>
             </div>
           </div>
@@ -1065,7 +1065,7 @@ export const LearningGapDetectionHub = ({
 
             <button
               onClick={() => handleSimulateRetestImprovement(selectedTopicKey)}
-              className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Simulate Verified Retest (88%)</span>
@@ -1079,7 +1079,7 @@ export const LearningGapDetectionHub = ({
       {/* ═════════ 3. MODALS: AI SUMMARY & HIGH-YIELD FLASHCARD WORKBENCH ═════════ */}
       {activeModal === "ai_summary" && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in select-text font-sans">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 my-8">
+          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 my-8">
             
             <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
               <div className="space-y-1">
@@ -1087,7 +1087,7 @@ export const LearningGapDetectionHub = ({
                   <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-black text-[10px] uppercase">
                     AI Remedial Knowledge Capsule
                   </span>
-                  <span className="text-xs text-slate-400 font-bold">{currentTopic.subject}</span>
+                  <span className="text-xs text-slate-400 font-medium">{currentTopic.subject}</span>
                 </div>
                 <h3 className="text-xl font-black text-slate-900 tracking-tight">
                   {currentTopic.topic}
@@ -1095,7 +1095,7 @@ export const LearningGapDetectionHub = ({
               </div>
               <button
                 onClick={() => setActiveModal(null)}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+                className="p-2 rounded-[var(--radius)] bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1104,7 +1104,7 @@ export const LearningGapDetectionHub = ({
             {/* AI Summary Content */}
             <div className="space-y-5 text-xs text-slate-700 max-h-[60vh] overflow-y-auto pr-2">
               
-              <div className="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 space-y-1.5">
+              <div className="bg-indigo-50/70 p-4 rounded-[var(--radius)] border border-indigo-100 space-y-1.5">
                 <h4 className="font-extrabold text-indigo-950 text-sm flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-indigo-600" />
                   <span>Executive Topic Diagnostic</span>
@@ -1121,7 +1121,7 @@ export const LearningGapDetectionHub = ({
                 </h4>
                 <ul className="space-y-2">
                   {(currentTopic.summary?.keyPrinciples || []).map((p, idx) => (
-                    <li key={idx} className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <li key={idx} className="flex items-start gap-2 bg-slate-50 p-3 rounded-[var(--radius)] border border-slate-100">
                       <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
@@ -1136,7 +1136,7 @@ export const LearningGapDetectionHub = ({
                 <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-rose-800">
                   Common Cognitive Traps & Operational Pitfalls
                 </h4>
-                <div className="bg-rose-50/60 p-4 rounded-2xl border border-rose-200 space-y-2">
+                <div className="bg-rose-50/60 p-4 rounded-[var(--radius)] border border-rose-200 space-y-2">
                   {(currentTopic.summary?.commonPitfalls || []).map((pf, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-rose-950">
                       <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
@@ -1154,9 +1154,9 @@ export const LearningGapDetectionHub = ({
                   </h4>
                   <div className="grid grid-cols-1 gap-2">
                     {currentTopic.summary.keyFormulas.map((f, idx) => (
-                      <div key={idx} className="p-3 bg-slate-900 text-white rounded-xl font-mono text-xs flex items-center justify-between">
+                      <div key={idx} className="p-3 bg-slate-900 text-white rounded-[var(--radius)] font-mono text-xs flex items-center justify-between">
                         <span className="text-slate-400 font-sans">{f.label}:</span>
-                        <code className="text-amber-300 font-bold">{f.formula}</code>
+                        <code className="text-amber-300 font-medium">{f.formula}</code>
                       </div>
                     ))}
                   </div>
@@ -1165,13 +1165,13 @@ export const LearningGapDetectionHub = ({
 
               {/* Interactive Sample Question Drill */}
               {(currentTopic.sampleQuestions || []).length > 0 && (
-                <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
+                <div className="p-4 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-black text-xs text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
                       <Flame className="w-4 h-4 text-amber-600" />
                       Concept Check: Instant Self-Test
                     </span>
-                    <span className="text-[10px] text-amber-800 font-bold">
+                    <span className="text-[10px] text-amber-800 font-medium">
                       Question {activeFlashcardIndex + 1} of {currentTopic.sampleQuestions.length}
                     </span>
                   </div>
@@ -1179,8 +1179,8 @@ export const LearningGapDetectionHub = ({
                   {(() => {
                     const q = currentTopic.sampleQuestions[activeFlashcardIndex] || currentTopic.sampleQuestions[0];
                     return (
-                      <div className="space-y-3 bg-white p-4 rounded-xl border border-amber-100">
-                        <p className="font-bold text-slate-900 text-xs">{q.question}</p>
+                      <div className="space-y-3 bg-white p-4 rounded-[var(--radius)] border border-amber-100">
+                        <p className="font-medium text-slate-900 text-xs">{q.question}</p>
                         
                         <div className="space-y-1.5">
                           {q.options.map((opt, oIdx) => {
@@ -1189,10 +1189,10 @@ export const LearningGapDetectionHub = ({
                             let btnStyle = "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100";
                             
                             if (flashcardSubmitted) {
-                              if (isCorrect) btnStyle = "bg-emerald-100 border-emerald-300 text-emerald-950 font-bold";
+                              if (isCorrect) btnStyle = "bg-emerald-100 border-emerald-300 text-emerald-950 font-medium";
                               else if (isSelected) btnStyle = "bg-rose-100 border-rose-300 text-rose-950";
                             } else if (isSelected) {
-                              btnStyle = "bg-blue-100 border-blue-300 text-blue-950 font-bold";
+                              btnStyle = "bg-blue-100 border-blue-300 text-blue-950 font-medium";
                             }
 
                             return (
@@ -1200,9 +1200,9 @@ export const LearningGapDetectionHub = ({
                                 key={oIdx}
                                 disabled={flashcardSubmitted}
                                 onClick={() => setFlashcardSelectedOption(oIdx)}
-                                className={`w-full text-left p-2.5 rounded-xl border text-xs transition-colors flex items-center gap-2 ${btnStyle}`}
+                                className={`w-full text-left p-2.5 rounded-[var(--radius)] border text-xs transition-colors flex items-center gap-2 ${btnStyle}`}
                               >
-                                <span className="w-5 h-5 rounded-full bg-white border font-bold text-[10px] flex items-center justify-center shrink-0">
+                                <span className="w-5 h-5 rounded-full bg-white border font-medium text-[10px] flex items-center justify-center shrink-0">
                                   {String.fromCharCode(65 + oIdx)}
                                 </span>
                                 <span>{opt}</span>
@@ -1212,8 +1212,8 @@ export const LearningGapDetectionHub = ({
                         </div>
 
                         {flashcardSubmitted && (
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs text-slate-700">
-                            <span className="font-bold text-slate-900">💡 Explanation:</span>
+                          <div className="p-3 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-1 text-xs text-slate-700">
+                            <span className="font-medium text-slate-900">💡 Explanation:</span>
                             <p>{q.explanation}</p>
                           </div>
                         )}
@@ -1223,7 +1223,7 @@ export const LearningGapDetectionHub = ({
                             <button
                               disabled={flashcardSelectedOption === null}
                               onClick={() => setFlashcardSubmitted(true)}
-                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold rounded-xl text-xs transition-colors"
+                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium rounded-[var(--radius)] text-xs transition-colors"
                             >
                               Check Answer
                             </button>
@@ -1234,7 +1234,7 @@ export const LearningGapDetectionHub = ({
                                 setFlashcardSelectedOption(null);
                                 setActiveFlashcardIndex((prev) => (prev + 1) % currentTopic.sampleQuestions.length);
                               }}
-                              className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition-colors"
+                              className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-[var(--radius)] text-xs transition-colors"
                             >
                               Next Question →
                             </button>
@@ -1251,7 +1251,7 @@ export const LearningGapDetectionHub = ({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs"
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
               >
                 Close Summary
               </button>
@@ -1261,7 +1261,7 @@ export const LearningGapDetectionHub = ({
                   setActiveModal(null);
                   handleLaunchTargetedQuiz(selectedTopicKey);
                 }}
-                className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold rounded-2xl text-xs shadow-md flex items-center gap-1.5"
+                className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-md flex items-center gap-1.5"
               >
                 <PlayCircle className="w-4 h-4" />
                 <span>Launch Targeted Quiz</span>
@@ -1275,13 +1275,13 @@ export const LearningGapDetectionHub = ({
       {/* ═════════ 4. CONFIG THRESHOLD CUTOFF MODAL ═════════ */}
       {activeModal === "config" && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in font-sans select-none">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-200 animate-in zoom-in-95">
+          <div className="bg-white rounded-[var(--radius)] max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-200 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Sliders className="w-5 h-5 text-indigo-600" />
                 <h3 className="text-lg font-black text-slate-900">Configure Learning Gap Cutoff</h3>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+              <button onClick={() => setActiveModal(null)} className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1290,9 +1290,9 @@ export const LearningGapDetectionHub = ({
               Any subject topic where candidate assessment accuracy drops below this percentage will be automatically classified as an active <b>Learning Gap</b> and trigger automated remedial recommendations.
             </p>
 
-            <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+            <div className="space-y-4 bg-slate-50 p-4 rounded-[var(--radius)] border border-slate-200">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Trigger Threshold:</span>
+                <span className="text-xs font-medium text-slate-700">Trigger Threshold:</span>
                 <span className="text-xl font-black text-indigo-600">{gapThreshold}%</span>
               </div>
 
@@ -1303,10 +1303,10 @@ export const LearningGapDetectionHub = ({
                 step="5"
                 value={gapThreshold}
                 onChange={(e) => setGapThreshold(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                className="w-full h-2 bg-slate-200 rounded-[var(--radius)] appearance-none cursor-pointer accent-indigo-600"
               />
 
-              <div className="flex justify-between text-[10px] text-slate-400 font-bold">
+              <div className="flex justify-between text-[10px] text-slate-400 font-medium">
                 <span>40% (Permissive)</span>
                 <span>60% (MoES Standard)</span>
                 <span>80% (Strict)</span>
@@ -1321,7 +1321,7 @@ export const LearningGapDetectionHub = ({
                   setActiveModal(null);
                   showToast(`Threshold reset to default ${DEFAULT_GAP_THRESHOLD}%.`);
                 }}
-                className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+                className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-700"
               >
                 Reset Default
               </button>
@@ -1332,7 +1332,7 @@ export const LearningGapDetectionHub = ({
                   setActiveModal(null);
                   showToast(`Saved gap detection threshold at ${gapThreshold}%.`);
                 }}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl text-xs shadow-sm"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm"
               >
                 Save Cutoff
               </button>

@@ -177,9 +177,9 @@ export const TraineeDashboardView = ({
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
       {/* ─── 1. OFFICER EXECUTIVE HEADER ─── */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+      <div className="bg-white rounded-[var(--radius)] p-5 sm:p-6 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
         <div className="flex items-center gap-3.5 z-10">
-          <div className="w-13 h-13 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475] font-semibold text-lg shrink-0">
+          <div className="w-13 h-13 rounded-[var(--radius)] bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475] font-semibold text-lg shrink-0">
             {currentUser?.name?.split(" ").map(n => n[0]).join("") || "TR"}
           </div>
           <div className="space-y-0.5">
@@ -205,7 +205,7 @@ export const TraineeDashboardView = ({
         <div className="flex flex-wrap items-center gap-2.5 shrink-0 z-10">
           <button
             onClick={onOpenAiAdvisor}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-[#0B3475] border border-blue-200 font-medium rounded-lg text-xs transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-[#0B3475] border border-blue-200 font-semibold rounded-[var(--radius)] text-xs transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Course Advisor</span>
@@ -213,7 +213,7 @@ export const TraineeDashboardView = ({
 
           <button
             onClick={() => onNavigateTab("courses")}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs transition-all shadow-2xs"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs transition-all shadow-2xs"
           >
             <BookOpen className="w-3.5 h-3.5 text-blue-200" />
             <span>Browse Courses</span>
@@ -221,7 +221,7 @@ export const TraineeDashboardView = ({
 
           <button
             onClick={onOpenProfile}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium rounded-lg text-xs border border-slate-200 transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-[var(--radius)] text-xs border border-slate-200 transition-colors"
           >
             <User className="w-3.5 h-3.5 text-slate-500" />
             <span>Officer Dossier</span>
@@ -232,7 +232,7 @@ export const TraineeDashboardView = ({
       {/* ─── 2. KPI METRICS CARDS ─── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
-        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
           <div className="space-y-0.5">
             <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Enrolled Tracks</span>
             <div className="text-2xl font-semibold text-slate-900">{enrolledCourses.length}</div>
@@ -240,12 +240,12 @@ export const TraineeDashboardView = ({
               <CheckCircle2 className="w-3 h-3 text-blue-700" /> Active Programs
             </span>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475]">
+          <div className="w-10 h-10 rounded-[var(--radius)] bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475]">
             <GraduationCap className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
           <div className="space-y-0.5">
             <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Assessments Cleared</span>
             <div className="text-2xl font-semibold text-slate-900">{completedAssessmentsCount}</div>
@@ -253,23 +253,23 @@ export const TraineeDashboardView = ({
               <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified Submissions
             </span>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
+          <div className="w-10 h-10 rounded-[var(--radius)] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700">
             <ClipboardList className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
           <div className="space-y-0.5">
             <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Average Score</span>
             <div className="text-2xl font-semibold text-[#0B3475]">{averageScorePercentage}%</div>
             <span className="text-[11px] text-slate-500 font-normal">Performance Index</span>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475]">
+          <div className="w-10 h-10 rounded-[var(--radius)] bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0B3475]">
             <BarChart3 className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4.5 shadow-2xs hover:shadow-sm transition-all flex items-center justify-between">
           <div className="space-y-0.5">
             <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Certificates</span>
             <div className="text-2xl font-semibold text-slate-900">{certificatesCount}</div>
@@ -280,7 +280,7 @@ export const TraineeDashboardView = ({
               View Credentials →
             </button>
           </div>
-          <div className="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
+          <div className="w-10 h-10 rounded-[var(--radius)] bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700">
             <Award className="w-5 h-5" />
           </div>
         </div>
@@ -288,10 +288,10 @@ export const TraineeDashboardView = ({
       </div>
 
       {/* ─── 2.2 ACTION CENTER: SCHEDULED ASSESSMENTS ─── */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-4">
+      <div className="bg-white rounded-[var(--radius)] p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B3475]">
+            <div className="w-8 h-8 rounded-[var(--radius)] bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0B3475]">
               <Calendar className="w-4 h-4" />
             </div>
             <div>
@@ -331,7 +331,7 @@ export const TraineeDashboardView = ({
             return (
               <div
                 key={exam.id}
-                className="p-4.5 rounded-xl bg-white border border-emerald-300 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5 group"
+                className="p-4.5 rounded-[var(--radius)] bg-white border border-emerald-300 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5 group"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
@@ -367,7 +367,7 @@ export const TraineeDashboardView = ({
                   <span className="text-[10px] text-slate-400">Trainer: {exam.trainerName || "Faculty"}</span>
                   <button
                     onClick={() => onStartExam && onStartExam(exam)}
-                    className="flex items-center gap-1 px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs transition-all cursor-pointer shadow-2xs"
+                    className="flex items-center gap-1 px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs transition-all cursor-pointer shadow-2xs"
                   >
                     <PlayCircle className="w-3.5 h-3.5 text-blue-200" />
                     <span>Start Exam</span>
@@ -390,7 +390,7 @@ export const TraineeDashboardView = ({
             return (
               <div
                 key={exam.id}
-                className="p-4.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5"
+                className="p-4.5 rounded-[var(--radius)] bg-white border border-slate-200 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3.5"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
@@ -424,7 +424,7 @@ export const TraineeDashboardView = ({
 
                 <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
                   <span className="text-[10px] text-slate-400">Trainer: {exam.trainerName || "Faculty"}</span>
-                  <div className="flex items-center gap-1 text-slate-400 text-xs font-medium px-2.5 py-1 bg-slate-50 rounded-lg border border-slate-200">
+                  <div className="flex items-center gap-1 text-slate-400 text-xs font-medium px-2.5 py-1 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                     <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
                     <span>Locked</span>
                   </div>
@@ -435,7 +435,7 @@ export const TraineeDashboardView = ({
 
           {/* Empty State */}
           {liveAssessments.length === 0 && upcomingAssessments.length === 0 && (
-            <div className="col-span-full p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-1.5">
+            <div className="col-span-full p-6 text-center bg-slate-50 rounded-[var(--radius)] border border-dashed border-slate-200 space-y-1.5">
               <Calendar className="w-6 h-6 text-slate-400 mx-auto" />
               <h4 className="font-medium text-slate-800 text-xs">No Active or Upcoming Scheduled Assessments</h4>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
@@ -444,7 +444,7 @@ export const TraineeDashboardView = ({
               <div className="pt-1">
                 <button
                   onClick={() => onNavigateTab("assessments")}
-                  className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs transition-colors shadow-2xs"
+                  className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs transition-colors shadow-2xs"
                 >
                   Go to Assessments Center
                 </button>
@@ -455,7 +455,7 @@ export const TraineeDashboardView = ({
       </div>
 
       {/* ─── 2.4 AUTOMATED LEARNING GAP DETECTION ALERT ─── */}
-      <div className="bg-rose-50/80 rounded-2xl p-5 border border-rose-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-rose-50/80 rounded-[var(--radius)] p-5 border border-rose-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-600 text-white uppercase tracking-wider flex items-center gap-1">
@@ -479,7 +479,7 @@ export const TraineeDashboardView = ({
         <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={() => onNavigateTab("learning-gaps")}
-            className="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg text-xs shadow-2xs transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-2xs transition-all"
           >
             <BrainCircuit className="w-3.5 h-3.5 text-amber-200" />
             <span>Remediation Hub →</span>
@@ -488,7 +488,7 @@ export const TraineeDashboardView = ({
       </div>
 
       {/* ─── 2.5 PRACTICE STUDIO & QUESTION BANK BANNER ─── */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[var(--radius)] p-5 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1 max-w-2xl">
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
@@ -504,7 +504,7 @@ export const TraineeDashboardView = ({
         <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
           <button
             onClick={() => onNavigateTab("practice-papers")}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-lg text-xs shadow-2xs transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs shadow-2xs transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Practice Papers</span>
@@ -512,7 +512,7 @@ export const TraineeDashboardView = ({
 
           <button
             onClick={() => onNavigateTab("questions")}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs transition-colors"
           >
             <Layers className="w-3.5 h-3.5 text-slate-500" />
             <span>Question Bank</span>
@@ -524,13 +524,13 @@ export const TraineeDashboardView = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Left: Active Enrolled Courses */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div className="lg:col-span-7 bg-white rounded-[var(--radius)] border border-slate-200 p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">Your Enrolled Training Programs</h3>
+              <h3 className="font-semibold text-slate-900 text-sm">Your Enrolled Training Programs</h3>
               <p className="text-xs text-slate-400">Continue specialized lectures, labs, and interactive modules</p>
             </div>
-            <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-100">
+            <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-[var(--radius)] border border-blue-100">
               {enrolledCourses.length} Enrolled
             </span>
           </div>
@@ -552,16 +552,16 @@ export const TraineeDashboardView = ({
               return (
                 <div 
                   key={course.id}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-blue-300 transition-all space-y-3"
+                  className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 hover:border-blue-300 transition-all space-y-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white">
+                      <span className="px-2 py-0.5 rounded-[var(--radius)] text-[10px] font-medium bg-blue-600 text-white">
                         {course.code || "CRS"}
                       </span>
-                      <h4 className="font-bold text-slate-900 text-xs sm:text-sm">{course.title}</h4>
+                      <h4 className="font-medium text-slate-900 text-xs sm:text-sm">{course.title}</h4>
                     </div>
-                    <span className="text-xs font-bold text-blue-700">{pct}% Completed</span>
+                    <span className="text-xs font-medium text-blue-700">{pct}% Completed</span>
                   </div>
 
                   {/* Progress Bar */}
@@ -588,10 +588,10 @@ export const TraineeDashboardView = ({
                           const isUpcoming = subQuiz && subQuiz.scheduledStartTime && new Date(subQuiz.scheduledStartTime) > now && !submissionQuizIds.has(subQuiz.id);
 
                           return (
-                            <div key={sub.id || sIdx} className="p-2.5 rounded-xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div key={sub.id || sIdx} className="p-2.5 rounded-[var(--radius)] bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
                               <div className="flex items-center gap-2 min-w-[140px]">
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>
-                                <span className="font-bold text-slate-800 text-[11px] truncate max-w-[220px]">
+                                <span className="font-medium text-slate-800 text-[11px] truncate max-w-[220px]">
                                   {sub.name || sub.title}
                                 </span>
                               </div>
@@ -599,20 +599,20 @@ export const TraineeDashboardView = ({
                               {subQuiz ? (
                                 isLive ? (
                                   <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                                    <span className="px-2 py-0.5 rounded-[var(--radius)] text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
                                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
                                       Exam Available Now
                                     </span>
                                     <button
                                       onClick={() => onStartExam && onStartExam(subQuiz)}
-                                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] shadow-2xs transition-all flex items-center gap-1"
+                                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-[10px] shadow-2xs transition-all flex items-center gap-1"
                                     >
                                       <PlayCircle className="w-3 h-3 text-emerald-100" />
                                       <span>Start Exam</span>
                                     </button>
                                   </div>
                                 ) : isUpcoming ? (
-                                  <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                                  <span className="px-2 py-0.5 rounded-[var(--radius)] text-[9px] font-medium bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
                                     <Clock className="w-3 h-3 text-blue-500" />
                                     Exam Starts {new Date(subQuiz.scheduledStartTime).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                                   </span>
@@ -639,7 +639,7 @@ export const TraineeDashboardView = ({
                     </span>
                     <button
                       onClick={() => onOpenCourse(course)}
-                      className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-xs transition-all"
+                      className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs flex items-center gap-1 shadow-xs transition-all"
                     >
                       <span>{pct > 0 ? "Resume Learning" : "Start Course"}</span>
                       <ChevronRight className="w-3 h-3 text-blue-100" />
@@ -658,15 +658,15 @@ export const TraineeDashboardView = ({
         </div>
 
         {/* Right: Competency Radar */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="lg:col-span-5 bg-white rounded-[var(--radius)] border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
           <div className="pb-3 border-b border-slate-100">
-            <h3 className="font-bold text-slate-900 text-sm">Competency Radar Telemetry</h3>
+            <h3 className="font-semibold text-slate-900 text-sm">Competency Radar Telemetry</h3>
             <p className="text-xs text-slate-400">Subject proficiency ratings mapped dynamically</p>
           </div>
 
           {radarData.length === 0 ? (
             <div className="py-16 text-center text-slate-400 text-xs space-y-1">
-              <p className="font-bold text-slate-600">No competency telemetry recorded yet.</p>
+              <p className="font-medium text-slate-600">No competency telemetry recorded yet.</p>
               <p className="text-[11px]">Complete courses and assessments to generate your skill radar.</p>
             </div>
           ) : (
@@ -682,9 +682,9 @@ export const TraineeDashboardView = ({
             </div>
           )}
 
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700">
+          <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-100 flex items-center justify-between text-xs font-medium text-slate-700">
             <span>Overall Readiness:</span>
-            <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">
+            <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded-[var(--radius)] border border-blue-200">
               {averageScorePercentage > 0 ? `${averageScorePercentage}% Active` : "Awaiting Data"}
             </span>
           </div>

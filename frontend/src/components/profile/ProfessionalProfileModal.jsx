@@ -86,19 +86,19 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+      <div className="bg-white rounded-[var(--radius)] max-w-3xl w-full p-6 shadow-2xl border border-slate-200 my-8">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-[#0a2558] text-white flex items-center justify-center font-bold shadow-md">
+            <div className="w-10 h-10 rounded-[var(--radius)] bg-[#0a2558] text-white flex items-center justify-center font-medium shadow-md">
               <User className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-slate-900">
+                <h2 className="text-base font-semibold text-slate-900">
                   Officer Professional Capacity Profile
                 </h2>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ${
                   currentUser?.status === "approved"
                     ? "bg-emerald-100 text-emerald-800"
                     : currentUser?.status === "rejected"
@@ -113,7 +113,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-600">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -122,11 +122,11 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
         <div className="py-4 space-y-4 text-xs">
           {/* Rejection Alert Banner */}
           {currentUser?.status === "rejected" && (
-            <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-2xl flex items-start gap-3 text-rose-950">
+            <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-[var(--radius)] flex items-start gap-3 text-rose-950">
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
               <div className="space-y-1 flex-1">
-                <p className="font-bold text-rose-900">Profile Verification Rejected by Administrator</p>
-                <div className="bg-white/90 p-2.5 rounded-xl border border-rose-200 text-xs font-medium text-rose-950">
+                <p className="font-medium text-rose-900">Profile Verification Rejected by Administrator</p>
+                <div className="bg-white/90 p-2.5 rounded-[var(--radius)] border border-rose-200 text-xs font-medium text-rose-950">
                   <b>Reason:</b> {currentUser.rejectionReason || currentUser.approvalNotes || "Incomplete credentials or document verification failure."}
                 </div>
                 <p className="text-[11px] text-slate-500">
@@ -138,10 +138,10 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
 
           {/* Pending Banner */}
           {currentUser?.status === "pending" && (
-            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-900">
+            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-[var(--radius)] flex items-center gap-3 text-amber-900">
               <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
               <div>
-                <p className="font-bold">Profile Pending Administrative Approval</p>
+                <p className="font-medium">Profile Pending Administrative Approval</p>
                 <p className="text-[11px] text-amber-700">
                   Your officer registration dossier is currently under review by the MoES Central Administration. Course enrollments will unlock once approved.
                 </p>
@@ -156,7 +156,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -166,7 +166,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
                 type="text"
                 value={form.department}
                 onChange={(e) => setForm({ ...form, department: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
               />
             </div>
           </div>
@@ -178,7 +178,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
                 type="text"
                 value={form.designation}
                 onChange={(e) => setForm({ ...form, designation: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -191,7 +191,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
                 value={form.skills}
                 onChange={(e) => setForm({ ...form, skills: e.target.value })}
                 placeholder="e.g. NWP Modeling, Radar Data Interpretation, Python, QGIS"
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
               />
             </div>
           </div>
@@ -203,7 +203,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
               value={form.qualifications}
               onChange={(e) => setForm({ ...form, qualifications: e.target.value })}
               placeholder="e.g. M.Sc. Meteorology (Pune University), Advanced Diploma in Operational Weather Forecasting"
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
             />
           </div>
 
@@ -214,20 +214,20 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
               value={form.experience}
               onChange={(e) => setForm({ ...form, experience: e.target.value })}
               placeholder="e.g. 2 years at Cyclone Warning Centre Visakhapatnam, Radar shift operations"
-              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
             />
           </div>
 
           {/* Certificates Section */}
           <div className="pt-2 border-t border-slate-100">
-            <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-1.5">
+            <h3 className="font-semibold text-slate-800 mb-2 flex items-center gap-1.5">
               <Award className="w-4 h-4 text-[#0a2558]" />
               <span>Prior Certifications & Credentials</span>
             </h3>
 
             <div className="space-y-2 mb-3">
               {form.certificates.map((cert, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)]">
                   <div>
                     <p className="font-semibold text-slate-800">{cert.title}</p>
                     <p className="text-[11px] text-slate-500">{cert.issuer} • {cert.year}</p>
@@ -250,26 +250,26 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
                 placeholder="Certificate Title"
                 value={newCert.title}
                 onChange={(e) => setNewCert({ ...newCert, title: e.target.value })}
-                className="flex-1 min-w-[180px] p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                className="flex-1 min-w-[180px] p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
               />
               <input
                 type="text"
                 placeholder="Issuing Authority (e.g. IMD / WMO)"
                 value={newCert.issuer}
                 onChange={(e) => setNewCert({ ...newCert, issuer: e.target.value })}
-                className="w-44 p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-44 p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
               />
               <input
                 type="text"
                 placeholder="Year"
                 value={newCert.year}
                 onChange={(e) => setNewCert({ ...newCert, year: e.target.value })}
-                className="w-20 p-2 bg-slate-50 border border-slate-200 rounded-lg"
+                className="w-20 p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)]"
               />
               <button
                 type="button"
                 onClick={handleAddCertificate}
-                className="flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg"
+                className="flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-[var(--radius)]"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add</span>
@@ -283,7 +283,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold"
+            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-[var(--radius)] font-semibold"
           >
             Close
           </button>
@@ -293,7 +293,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
               type="button"
               disabled={loading}
               onClick={() => handleSaveProfile(false)}
-              className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-semibold"
+              className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-[var(--radius)] font-semibold"
             >
               Save Draft
             </button>
@@ -301,7 +301,7 @@ export const ProfessionalProfileModal = ({ isOpen, onClose }) => {
               type="button"
               disabled={loading}
               onClick={() => handleSaveProfile(true)}
-              className="flex items-center gap-2 px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-xl font-bold shadow-md transition-all transform hover:scale-105"
+              className="flex items-center gap-2 px-5 py-2 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-[var(--radius)] font-medium shadow-md transition-all transform hover:scale-105"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-300" />
               <span>Submit for Admin Approval</span>

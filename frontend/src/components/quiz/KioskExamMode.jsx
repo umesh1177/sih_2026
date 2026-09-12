@@ -825,9 +825,9 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
     return (
       <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm text-slate-800 flex items-center justify-center p-4 overflow-y-auto select-none font-sans">
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-2xl w-full text-center space-y-6 shadow-2xl animate-in zoom-in-95 duration-200 my-8">
+        <div className="bg-white border border-slate-200 rounded-[var(--radius)] p-6 sm:p-8 max-w-2xl w-full text-center space-y-6 shadow-2xl animate-in zoom-in-95 duration-200 my-8">
           
-          <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-md ${
+          <div className={`w-16 h-16 rounded-[var(--radius)] mx-auto flex items-center justify-center shadow-md ${
             isDisq 
               ? "bg-rose-50 border border-rose-200 text-rose-600"
               : isPassed
@@ -865,13 +865,13 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
           {/* Assessment Integrity Alert Box when Disqualified */}
           {isDisq ? (
-            <div className="p-5 bg-rose-50 border border-rose-200 rounded-2xl text-left space-y-3 text-xs">
+            <div className="p-5 bg-rose-50 border border-rose-200 rounded-[var(--radius)] text-left space-y-3 text-xs">
               <div className="flex items-center justify-between border-b border-rose-200 pb-2">
                 <span className="font-black text-rose-900 flex items-center gap-1.5 uppercase tracking-wide">
                   <ShieldAlert className="w-4 h-4 text-rose-600" />
                   Assessment Integrity Alert
                 </span>
-                <span className="px-2 py-0.5 rounded bg-rose-200 text-rose-900 font-bold text-[10px]">
+                <span className="px-2 py-0.5 rounded bg-rose-200 text-rose-900 font-medium text-[10px]">
                   Rule: Max 1 Warning
                 </span>
               </div>
@@ -879,7 +879,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                 <div><b>Trainee:</b> {currentUser?.name || "Demo Trainee"}</div>
                 <div><b>Assessment:</b> {submissionResult.quizTitle || quiz?.title || "Assessment"}</div>
                 <div><b>Status:</b> <span className="font-black text-rose-700">DISQUALIFIED</span></div>
-                <div><b>Violations:</b> <span className="font-bold text-rose-700">{submissionResult.tabSwitchCount || 2} Detected</span></div>
+                <div><b>Violations:</b> <span className="font-medium text-rose-700">{submissionResult.tabSwitchCount || 2} Detected</span></div>
                 <div className="sm:col-span-2"><b>Reason:</b> Assessment context exited repeatedly</div>
                 <div className="sm:col-span-2"><b>Time:</b> {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "numeric", hour12: true })}</div>
               </div>
@@ -890,38 +890,38 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           ) : (
             /* Standard Detailed Performance Score Card (Trainee View) */
             <div className="space-y-4">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-center">
-                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Score</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-xs text-center">
+                <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-medium block text-[10px] uppercase">Score</span>
                   <b className="text-base font-black text-blue-700 font-mono">{submissionResult.score} / {submissionResult.totalMarks}</b>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Accuracy</span>
+                <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-medium block text-[10px] uppercase">Accuracy</span>
                   <b className={`text-base font-black ${isPassed ? "text-emerald-600" : "text-amber-600"}`}>{submissionResult.accuracy || submissionResult.percentage}%</b>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Total Time</span>
+                <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-medium block text-[10px] uppercase">Total Time</span>
                   <b className="text-base font-black text-slate-900 font-mono">{submissionResult.totalTimeText || "12m 42s"}</b>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                  <span className="text-slate-400 font-bold block text-[10px] uppercase">Average Time</span>
+                <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs">
+                  <span className="text-slate-400 font-medium block text-[10px] uppercase">Average Time</span>
                   <b className="text-base font-black text-indigo-700">{submissionResult.averageTimeText || "38 sec/question"}</b>
                 </div>
               </div>
 
               {/* Secondary Metrics Bar */}
               <div className="grid grid-cols-3 gap-2 px-1 text-[11px] text-slate-600">
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Questions:</span>
-                  <b className="text-slate-900 font-bold">{questions.length} ({submissionResult.correctCount || answeredCount} Correct, {submissionResult.incorrectCount || 0} Incorrect)</b>
+                  <b className="text-slate-900 font-medium">{questions.length} ({submissionResult.correctCount || answeredCount} Correct, {submissionResult.incorrectCount || 0} Incorrect)</b>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Percentage:</span>
-                  <b className="text-emerald-700 font-bold">{submissionResult.percentage}%</b>
+                  <b className="text-emerald-700 font-medium">{submissionResult.percentage}%</b>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Proctoring:</span>
-                  <b className="text-emerald-700 font-bold">
+                  <b className="text-emerald-700 font-medium">
                     {submissionResult.tabSwitchCount === 1 ? "1 Warning" : "Clear (0 Exits)"}
                   </b>
                 </div>
@@ -931,7 +931,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
           {/* ⚡ Performance-Based Adaptive Difficulty Progression Trail ⚡ */}
           {!isDisq && (
-            <div className="p-4 bg-gradient-to-br from-blue-50/90 via-indigo-50/60 to-purple-50/60 rounded-3xl border border-blue-200 text-left space-y-3 text-xs shadow-xs">
+            <div className="p-4 bg-gradient-to-br from-blue-50/90 via-indigo-50/60 to-purple-50/60 rounded-[var(--radius)] border border-blue-200 text-left space-y-3 text-xs shadow-xs">
               <div className="flex items-center justify-between">
                 <span className="font-black text-blue-950 flex items-center gap-1.5 text-xs">
                   <Sparkles className="w-4 h-4 text-amber-500" />
@@ -943,8 +943,8 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </div>
 
               {/* Sequential Badges Trail */}
-              <div className="p-3 bg-white/90 rounded-2xl border border-blue-100 space-y-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="p-3 bg-white/90 rounded-[var(--radius)] border border-blue-100 space-y-2">
+                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider block">
                   Chronological Question Transitions (Performance History):
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-[11px]">
@@ -960,7 +960,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                     return (
                       <div
                         key={idx}
-                        className={`p-2 rounded-xl border flex items-center justify-between font-bold ${
+                        className={`p-2 rounded-[var(--radius)] border flex items-center justify-between font-medium ${
                           isHard 
                             ? "bg-purple-50 border-purple-200 text-purple-900"
                             : isMod
@@ -978,7 +978,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
               <div className="flex items-center justify-between text-[11px] text-slate-600 pt-1">
                 <span>Rule: 3 consecutive correct ➔ ↑ Difficulty | 3 consecutive incorrect ➔ ↓ Difficulty</span>
-                <span className="font-bold text-indigo-900 font-mono">
+                <span className="font-medium text-indigo-900 font-mono">
                   Final Level: {currentDifficulty}
                 </span>
               </div>
@@ -990,7 +990,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             <div className="text-left space-y-3">
               <button
                 onClick={() => setReviewMode(!reviewMode)}
-                className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center justify-between transition-colors"
+                className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs flex items-center justify-between transition-colors"
               >
                 <span>{reviewMode ? "Hide Detailed Question Breakdown" : "Review Question Answers & Performance Breakdown 📋"}</span>
                 <span>{reviewMode ? "▲" : "▼"}</span>
@@ -999,7 +999,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {reviewMode && (
                 <div className="space-y-3 max-h-72 overflow-y-auto p-1 pr-2">
                   {submissionResult.questionAnalysis.map((qa, qIdx) => (
-                    <div key={qa.questionId || qIdx} className={`p-4 rounded-2xl border text-xs space-y-2.5 ${
+                    <div key={qa.questionId || qIdx} className={`p-4 rounded-[var(--radius)] border text-xs space-y-2.5 ${
                       qa.isCorrect ? "bg-emerald-50/60 border-emerald-200" : "bg-rose-50/60 border-rose-200"
                     }`}>
                       <div className="flex items-start justify-between gap-2">
@@ -1008,11 +1008,11 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                             <span className="font-mono font-black text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 text-[11px]">
                               Question {qa.questionNumber || qIdx + 1}
                             </span>
-                            <span className="text-slate-600 font-bold text-[11px]">
+                            <span className="text-slate-600 font-medium text-[11px]">
                               Topic: {qa.topic || "Atmospheric Dynamics"}
                             </span>
                           </div>
-                          <p className="font-bold text-slate-900 text-xs sm:text-[13px] leading-relaxed">
+                          <p className="font-medium text-slate-900 text-xs sm:text-[13px] leading-relaxed">
                             {qa.question}
                           </p>
                         </div>
@@ -1039,7 +1039,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                             <p className="text-slate-700">
                               Your Answer: <b>{qa.selectedAnswer ? `"${qa.selectedAnswer}"` : "Unanswered"}</b>
                             </p>
-                            <p className="text-emerald-800 font-bold">
+                            <p className="text-emerald-800 font-medium">
                               Expected Answer: "{qa.expectedAnswer || qa.correctAnswer || "Exact match"}" <span className="text-[10px] text-emerald-600 font-medium">(Case-insensitive trimmed match)</span>
                             </p>
                             {Array.isArray(qa.acceptedAnswers) && qa.acceptedAnswers.length > 0 && (
@@ -1053,13 +1053,13 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                             <p className="text-slate-700">
                               Your Answer: <b>{qa.selectedAnswer !== null && qa.selectedAnswer !== undefined ? `Option ${String.fromCharCode(65 + qa.selectedAnswer)}` : "Unanswered"}</b>
                             </p>
-                            <p className="text-emerald-800 font-bold">
+                            <p className="text-emerald-800 font-medium">
                               Correct Answer: Option {String.fromCharCode(65 + (typeof qa.correctAnswer === "number" ? qa.correctAnswer : 0))}
                             </p>
                           </>
                         )}
                         {qa.explanation && (
-                          <p className="text-slate-600 bg-white/80 p-2.5 rounded-xl border border-slate-200/60 mt-1">
+                          <p className="text-slate-600 bg-white/80 p-2.5 rounded-[var(--radius)] border border-slate-200/60 mt-1">
                             💡 <b>Explanation:</b> {qa.explanation}
                           </p>
                         )}
@@ -1085,7 +1085,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                   setCurrentDifficulty("Moderate");
                   setAdaptiveTrajectory(["Moderate"]);
                 }}
-                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl text-xs transition-colors"
+                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
               >
                 Retake Practice Paper 🔄
               </button>
@@ -1098,7 +1098,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                 }
                 onFinish ? onFinish() : onClose();
               }}
-              className={`flex-1 py-3 text-white font-extrabold rounded-2xl text-xs shadow-md transition-transform hover:scale-102 ${
+              className={`flex-1 py-3 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-102 ${
                 isDisq ? "bg-slate-800 hover:bg-slate-900" : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
@@ -1116,7 +1116,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       
       {/* Floating Security Alert Toast */}
       {recentSecurityAlert && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white border border-amber-400/80 px-4 py-2 rounded-2xl shadow-2xl text-xs font-black flex items-center gap-2 animate-in slide-in-from-top-4">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white border border-amber-400/80 px-4 py-2 rounded-[var(--radius)] shadow-2xl text-xs font-black flex items-center gap-2 animate-in slide-in-from-top-4">
           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{recentSecurityAlert}</span>
         </div>
@@ -1127,15 +1127,15 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         
         {/* Left: Exam Branding & Fullscreen Badge */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#0B3475] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+          <div className="w-8 h-8 rounded-[var(--radius)] bg-[#0B3475] text-white flex items-center justify-center font-medium text-xs shadow-xs">
             CC
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-blue-50 text-[#0B3475] font-bold text-[10px] uppercase tracking-wider border border-blue-200">
+              <span className="px-2 py-0.5 rounded bg-blue-50 text-[#0B3475] font-medium text-[10px] uppercase tracking-wider border border-blue-200">
                 PROCTORED KIOSK
               </span>
-              <span className="text-xs font-bold text-slate-900 truncate max-w-xs sm:max-w-md">
+              <span className="text-xs font-medium text-slate-900 truncate max-w-xs sm:max-w-md">
                 {quiz?.title || "National Meteorological Assessment"}
               </span>
             </div>
@@ -1146,10 +1146,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         </div>
 
         {/* Center: Live Timer Banner */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)]">
           <Clock className={`w-3.5 h-3.5 ${timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-[#0B3475]"}`} />
           <span className="text-xs font-medium text-slate-600 hidden sm:inline">Remaining Time:</span>
-          <span className={`text-xs font-bold font-mono tracking-wider ${
+          <span className={`text-xs font-medium font-mono tracking-wider ${
             timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-slate-900"
           }`}>
             {formatTime(timeLeftSeconds)}
@@ -1161,20 +1161,20 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           {!isFullscreenLocked ? (
             <button
               onClick={requestKioskFullscreen}
-              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 animate-pulse"
+              className="px-3 py-1.5 rounded-[var(--radius)] bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 animate-pulse"
               title="Click to restore full-screen kiosk lock"
             >
               <Maximize2 className="w-3.5 h-3.5" />
               <span>Re-Lock Fullscreen</span>
             </button>
           ) : (
-            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
+            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
               <Maximize2 className="w-3 h-3 text-emerald-600" />
               <span>Fullscreen Locked</span>
             </div>
           )}
 
-          <div className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${
+          <div className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] border text-[11px] font-semibold ${
             tabSwitchCount > 0 
               ? "bg-amber-50 text-amber-900 border-amber-300"
               : "bg-emerald-50 text-emerald-800 border-emerald-200"
@@ -1185,7 +1185,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
           <button
             onClick={() => setShowSubmitModal(true)}
-            className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors flex items-center gap-1.5"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Submit Test</span>
@@ -1208,7 +1208,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         </div>
 
         {/* Security telemetry indicators */}
-        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 flex-wrap">
+        <div className="flex items-center gap-2 text-[10px] font-medium text-slate-500 flex-wrap">
           <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-emerald-700">
             🛡️ Focus Locked
           </span>
@@ -1235,20 +1235,20 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           </h3>
 
           {/* Palette Status Badges */}
-          <div className="grid grid-cols-2 gap-2 mb-4 text-[11px] font-bold">
-            <div className="flex items-center gap-2 p-2 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800">
+          <div className="grid grid-cols-2 gap-2 mb-4 text-[11px] font-medium">
+            <div className="flex items-center gap-2 p-2 bg-emerald-50 rounded-[var(--radius)] border border-emerald-200 text-emerald-800">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
               <span>Answered ({answeredCount})</span>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-xl border border-blue-200 text-blue-800">
+            <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-[var(--radius)] border border-blue-200 text-blue-800">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
               <span>Review ({markedReviewCount})</span>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 text-slate-600">
+            <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-600">
               <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
               <span>Not Answered ({notAnsweredCount})</span>
             </div>
-            <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 text-slate-600">
+            <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-600">
               <span className="w-2.5 h-2.5 rounded-full bg-slate-200 border border-slate-400"></span>
               <span>Total ({questions.length})</span>
             </div>
@@ -1276,7 +1276,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                 <button
                   key={q.id || idx}
                   onClick={() => goToQuestion(idx)}
-                  className={`h-9 rounded-xl text-xs font-bold font-mono transition-all flex items-center justify-center ${bgStyle}`}
+                  className={`h-9 rounded-[var(--radius)] text-xs font-medium font-mono transition-all flex items-center justify-center ${bgStyle}`}
                 >
                   {idx + 1}
                 </button>
@@ -1297,10 +1297,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             {/* Top Question Info Banner */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-1 bg-[#0B3475] text-white rounded-lg text-xs font-bold shadow-xs">
+                <span className="px-2.5 py-1 bg-[#0B3475] text-white rounded-[var(--radius)] text-xs font-medium shadow-xs">
                   Question {currentIndex + 1} of {questions.length}
                 </span>
-                <span className="px-2.5 py-1 bg-white text-slate-700 rounded-lg text-xs font-medium border border-slate-200 shadow-xs">
+                <span className="px-2.5 py-1 bg-white text-slate-700 rounded-[var(--radius)] text-xs font-medium border border-slate-200 shadow-xs">
                   {currentQuestion.subjectName || "Meteorological Physics"}
                 </span>
               </div>
@@ -1311,7 +1311,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             </div>
 
             {/* Question Prompt Card */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/90 shadow-xs space-y-2">
+            <div className="p-5 sm:p-6 rounded-[var(--radius)] bg-white border border-slate-200/90 shadow-xs space-y-2">
               <h2 className="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed">
                 {currentQuestion.question}
               </h2>
@@ -1321,10 +1321,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             {currentQuestion.type === "one_word" || currentQuestion.type === "short_answer" || (!currentQuestion.options || currentQuestion.options.length === 0) ? (
               <div className="space-y-3">
                 {currentQuestion.guidanceNote && (
-                  <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-xl flex items-start gap-2.5 text-xs text-blue-950 font-medium">
+                  <div className="p-3.5 bg-blue-50/80 border border-blue-200 rounded-[var(--radius)] flex items-start gap-2.5 text-xs text-blue-950 font-medium">
                     <HelpCircle className="w-4 h-4 text-[#0B3475] shrink-0 mt-0.5" />
                     <div className="space-y-0.5 flex-1">
-                      <span className="font-bold text-[10px] uppercase tracking-wider text-[#0B3475] block">
+                      <span className="font-medium text-[10px] uppercase tracking-wider text-[#0B3475] block">
                         Trainer Guidance Note
                       </span>
                       <p className="text-xs text-blue-900 leading-relaxed">
@@ -1334,7 +1334,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                   </div>
                 )}
 
-                <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-2.5">
+                <div className="p-5 bg-white border border-slate-200 rounded-[var(--radius)] shadow-xs space-y-2.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-slate-800">
                       Type Your One-Word / Short Answer:
@@ -1352,12 +1352,12 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                       setAnswers(prev => ({ ...prev, [currentQuestion.id]: val }));
                     }}
                     placeholder="Type exact term or keyword..."
-                    className="w-full p-3 rounded-xl border border-slate-300 focus:border-[#0B3475] focus:ring-1 focus:ring-[#0B3475] font-medium text-xs text-slate-900 focus:outline-none transition-colors"
+                    className="w-full p-3 rounded-[var(--radius)] border border-slate-300 focus:border-[#0B3475] focus:ring-1 focus:ring-[#0B3475] font-medium text-xs text-slate-900 focus:outline-none transition-colors"
                   />
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
                     <span>Capital and lower case letters are evaluated as equal.</span>
-                    <span className="font-mono font-bold text-[#0B3475]">
+                    <span className="font-mono font-medium text-[#0B3475]">
                       {(answers[currentQuestion.id] || "").length} chars
                     </span>
                   </div>
@@ -1373,14 +1373,14 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                     <button
                       key={optIdx}
                       onClick={() => handleSelectOption(optIdx)}
-                      className={`w-full p-3.5 sm:p-4 rounded-xl border text-left text-xs font-medium transition-colors flex items-center justify-between gap-3 group ${
+                      className={`w-full p-3.5 sm:p-4 rounded-[var(--radius)] border text-left text-xs font-medium transition-colors flex items-center justify-between gap-3 group ${
                         isSelected
                           ? "bg-blue-50/90 border-2 border-[#0B3475] text-[#0B3475] font-semibold shadow-xs"
                           : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50/80 shadow-xs"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-xs shrink-0 font-mono transition-colors ${
+                        <div className={`w-6 h-6 rounded-[var(--radius)] flex items-center justify-center font-medium text-xs shrink-0 font-mono transition-colors ${
                           isSelected 
                             ? "bg-[#0B3475] text-white" 
                             : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
@@ -1409,7 +1409,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               <button
                 disabled={currentIndex === 0}
                 onClick={() => goToQuestion(currentIndex - 1)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-semibold text-xs transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius)] bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-semibold text-xs transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Previous</span>
@@ -1417,7 +1417,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
 
               <button
                 onClick={toggleMarkForReview}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[var(--radius)] border text-xs font-semibold transition-colors ${
                   markedForReview[currentQuestion.id]
                     ? "bg-[#0B3475] border-[#0B3475] text-white shadow-xs"
                     : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
@@ -1430,7 +1430,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {answers[currentQuestion.id] !== undefined && (
                 <button
                   onClick={handleClearAnswer}
-                  className="px-2.5 py-1.5 text-slate-500 hover:text-rose-600 text-xs font-medium transition-colors"
+                  className="px-2.5 py-1.5 text-slate-500 hover:text-rose-600 text-xs font-semibold transition-colors"
                 >
                   Clear Response
                 </button>
@@ -1441,7 +1441,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={() => goToQuestion(currentIndex + 1)}
-                  className="flex items-center gap-1.5 px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-lg text-xs shadow-xs transition-colors"
+                  className="flex items-center gap-1.5 px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
                 >
                   <span>Save & Next</span>
                   <ChevronRight className="w-3.5 h-3.5 text-blue-200" />
@@ -1449,7 +1449,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               ) : (
                 <button
                   onClick={() => setShowSubmitModal(true)}
-                  className="flex items-center gap-1.5 px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs shadow-xs transition-colors"
+                  className="flex items-center gap-1.5 px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
                 >
                   <FileCheck className="w-3.5 h-3.5" />
                   <span>Finalize & Submit</span>
@@ -1466,7 +1466,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       {/* ═════════ TAB-SWITCH ANTI-CHEAT WARNING MODAL (LIGHT THEME) ═════════ */}
       {showWarningModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 select-none">
-          <div className="bg-white border-2 border-amber-500 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl animate-in zoom-in-95">
+          <div className="bg-white border-2 border-amber-500 rounded-[var(--radius)] p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl animate-in zoom-in-95">
             <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto animate-bounce">
               <AlertOctagon className="w-8 h-8" />
             </div>
@@ -1481,7 +1481,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </p>
             </div>
 
-            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 font-bold">
+            <div className="p-3 bg-amber-50 rounded-[var(--radius)] border border-amber-200 text-xs text-amber-900 font-medium">
               ⚠️ Warning 1/2: An assessment integrity event has been recorded server-side. Next exit will disqualify attempt.
             </div>
 
@@ -1492,7 +1492,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
                   document.documentElement.requestFullscreen().catch(() => {});
                 }
               }}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs shadow-md transition-all"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-all"
             >
               I Understand — Return to Exam
             </button>
@@ -1503,8 +1503,8 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       {/* ═════════ CONFIRM SUBMIT MODAL (LIGHT THEME) ═════════ */}
       {showSubmitModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 select-none">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-5 shadow-2xl">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center mx-auto">
+          <div className="bg-white border border-slate-200 rounded-[var(--radius)] p-6 sm:p-8 max-w-md w-full text-center space-y-5 shadow-2xl">
+            <div className="w-12 h-12 rounded-[var(--radius)] bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center mx-auto">
               <FileCheck className="w-6 h-6" />
             </div>
 
@@ -1515,11 +1515,11 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800">
+            <div className="grid grid-cols-2 gap-2 text-xs font-medium">
+              <div className="p-3 bg-emerald-50 rounded-[var(--radius)] border border-emerald-200 text-emerald-800">
                 {answeredCount} Answered
               </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-600">
+              <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-600">
                 {notAnsweredCount} Remaining
               </div>
             </div>
@@ -1527,14 +1527,14 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs transition-colors"
               >
                 Continue Exam
               </button>
               <button
                 onClick={() => handleSubmitQuiz(false)}
                 disabled={submitting}
-                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-transform hover:scale-102"
+                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-102"
               >
                 {submitting ? "Submitting..." : "Yes, Submit"}
               </button>

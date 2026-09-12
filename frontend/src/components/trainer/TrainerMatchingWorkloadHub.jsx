@@ -129,7 +129,7 @@ export const TrainerMatchingWorkloadHub = ({
   const optimalCount = workloads.filter(w => w.workloadLevel === "Optimal" && !w.isColdStart).length;
 
   const handleAssignFaculty = (trainer) => {
-    setAssignmentSuccessMsg(`✅ ${trainer.trainerName} successfully shortlisted and matched for "${simulatedSubject}"!`);
+    setAssignmentSuccessMsg(`${trainer.trainerName} successfully shortlisted and matched for "${simulatedSubject}"!`);
     setTimeout(() => setAssignmentSuccessMsg(null), 4500);
     if (onAssignToCourse) onAssignToCourse(trainer, simulatedSubject);
   };
@@ -138,7 +138,7 @@ export const TrainerMatchingWorkloadHub = ({
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
       {/* ═════════ 1. HERO BANNER: RULES 17 & 18 TRAINER MATCHING ENGINE ═════════ */}
-      <div className="bg-gradient-to-r from-[#0B3475] via-[#0D3F8D] to-[#08285C] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#0B3475] via-[#0D3F8D] to-[#08285C] rounded-[var(--radius)] p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2 z-10 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-3 py-1 rounded-full text-[10px] font-black bg-amber-400 text-slate-900 uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
@@ -163,7 +163,7 @@ export const TrainerMatchingWorkloadHub = ({
         <div className="flex flex-wrap items-center gap-3 shrink-0 z-10">
           <button
             onClick={() => setShowConfigModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-xs backdrop-blur-md transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-[var(--radius)] text-xs backdrop-blur-md transition-all"
           >
             <SlidersHorizontal className="w-4 h-4 text-amber-300" />
             <span>Workload Thresholds</span>
@@ -172,7 +172,7 @@ export const TrainerMatchingWorkloadHub = ({
           {onOpenCreateCourse && (
             <button
               onClick={onOpenCreateCourse}
-              className="flex items-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-2xl text-xs shadow-lg transition-transform hover:scale-105"
+              className="flex items-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-[var(--radius)] text-xs shadow-lg transition-transform hover:scale-105"
             >
               <BookOpen className="w-4 h-4" />
               <span>Create New Course</span>
@@ -181,7 +181,7 @@ export const TrainerMatchingWorkloadHub = ({
 
           <button
             onClick={fetchWorkloads}
-            className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/10 transition-colors"
+            className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-[var(--radius)] border border-white/10 transition-colors"
             title="Refresh Live Telemetry"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-amber-300" : ""}`} />
@@ -193,12 +193,12 @@ export const TrainerMatchingWorkloadHub = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         {/* Rule 17 Card: Cold-Start */}
-        <div className="p-5 rounded-3xl bg-emerald-50/70 border border-emerald-200/90 shadow-2xs space-y-2.5 relative overflow-hidden">
+        <div className="p-5 rounded-[var(--radius)] bg-emerald-50/70 border border-emerald-200/90 shadow-2xs space-y-2.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white uppercase tracking-wider">
               Rule 17 • Cold-Start Handling
             </span>
-            <span className="text-[11px] font-bold text-emerald-800">Zero Artificial Scores</span>
+            <span className="text-[11px] font-medium text-emerald-800">Zero Artificial Scores</span>
           </div>
 
           <h3 className="font-black text-emerald-950 text-sm flex items-center gap-2">
@@ -209,20 +209,20 @@ export const TrainerMatchingWorkloadHub = ({
             If a trainer has <b>no previous trainee feedback</b> or <b>assessment history</b>, the system will <b>NEVER assign an artificial performance score</b>. Instead, it displays <code>Performance history unavailable</code> and matches based on:
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-[11px] font-bold text-emerald-900">
-            <div className="p-2 bg-white/80 rounded-xl border border-emerald-100 flex items-center gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-[11px] font-medium text-emerald-900">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-emerald-100 flex items-center gap-1.5">
               <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Verified Competency</span>
             </div>
-            <div className="p-2 bg-white/80 rounded-xl border border-emerald-100 flex items-center gap-1.5">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-emerald-100 flex items-center gap-1.5">
               <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>WMO / Certifications</span>
             </div>
-            <div className="p-2 bg-white/80 rounded-xl border border-emerald-100 flex items-center gap-1.5">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-emerald-100 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Field Experience</span>
             </div>
-            <div className="p-2 bg-white/80 rounded-xl border border-emerald-100 flex items-center gap-1.5">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-emerald-100 flex items-center gap-1.5">
               <GraduationCap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Qualifications</span>
             </div>
@@ -230,12 +230,12 @@ export const TrainerMatchingWorkloadHub = ({
         </div>
 
         {/* Rule 18 Card: Workload & Availability */}
-        <div className="p-5 rounded-3xl bg-amber-50/70 border border-amber-200/90 shadow-2xs space-y-2.5 relative overflow-hidden">
+        <div className="p-5 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200/90 shadow-2xs space-y-2.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-600 text-white uppercase tracking-wider">
               Rule 18 • Workload Balancing
             </span>
-            <span className="text-[11px] font-bold text-amber-800">Beyond "Available = true"</span>
+            <span className="text-[11px] font-medium text-amber-800">Beyond "Available = true"</span>
           </div>
 
           <h3 className="font-black text-amber-950 text-sm flex items-center gap-2">
@@ -246,20 +246,20 @@ export const TrainerMatchingWorkloadHub = ({
             Faculty availability is never a binary boolean. The engine calculates active operational load and issues recommendations with realistic workload warnings:
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-[11px] font-bold text-amber-900">
-            <div className="p-2 bg-white/80 rounded-xl border border-amber-100 flex items-center gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-[11px] font-medium text-amber-900">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-amber-100 flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>Current Course Load</span>
             </div>
-            <div className="p-2 bg-white/80 rounded-xl border border-amber-100 flex items-center gap-1.5">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-amber-100 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>Active Learners</span>
             </div>
-            <div className="p-2 bg-white/80 rounded-xl border border-amber-100 flex items-center gap-1.5">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-amber-100 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>Scheduled Exams</span>
             </div>
-            <div className="p-2 bg-white/80 rounded-xl border border-amber-100 flex items-center gap-1.5">
+            <div className="p-2 bg-white/80 rounded-[var(--radius)] border border-amber-100 flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span>Declared Availability</span>
             </div>
@@ -269,7 +269,7 @@ export const TrainerMatchingWorkloadHub = ({
       </div>
 
       {/* ═════════ 3. INTERACTIVE SUBJECT SIMULATION BAR ═════════ */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+      <div className="bg-white p-5 rounded-[var(--radius)] border border-slate-200/90 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <span className="text-[10px] font-black uppercase tracking-wider text-[#0B3475] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
@@ -287,19 +287,19 @@ export const TrainerMatchingWorkloadHub = ({
               value={simulatedSubject}
               onChange={(e) => handleSimulateSubjectChange(e.target.value)}
               placeholder="Type meteorology domain (e.g. Doppler Radar, NWP WRF, Cyclone)..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-900 focus:bg-white focus:border-[#0B3475] outline-none shadow-2xs"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-900 focus:bg-white focus:border-[#0B3475] outline-none shadow-2xs"
             />
           </div>
         </div>
 
         {/* Quick presets */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-          <span className="text-[11px] font-bold text-slate-400 shrink-0">Quick Presets:</span>
+          <span className="text-[11px] font-medium text-slate-400 shrink-0">Quick Presets:</span>
           {DOMAIN_PRESETS.map((p, idx) => (
             <button
               key={idx}
               onClick={() => handleSimulateSubjectChange(p)}
-              className={`px-3 py-1.5 rounded-xl font-bold text-xs shrink-0 transition-all ${
+              className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs shrink-0 transition-all ${
                 simulatedSubject === p
                   ? "bg-[#0B3475] text-white shadow-xs"
                   : "bg-slate-100 hover:bg-slate-200 text-slate-700"
@@ -312,14 +312,14 @@ export const TrainerMatchingWorkloadHub = ({
       </div>
 
       {assignmentSuccessMsg && (
-        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-2xl text-xs font-bold flex items-center gap-2 animate-in fade-in shadow-xs">
+        <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-[var(--radius)] text-xs font-medium flex items-center gap-2 animate-in fade-in shadow-xs">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{assignmentSuccessMsg}</span>
         </div>
       )}
 
       {/* ═════════ 4. FILTER TABS & SEARCH BAR ═════════ */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-[var(--radius)] border border-slate-200/90 shadow-2xs">
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {[
@@ -332,7 +332,7 @@ export const TrainerMatchingWorkloadHub = ({
             <button
               key={tab.id}
               onClick={() => setActiveFilterTab(tab.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-[var(--radius)] text-xs font-medium transition-all shrink-0 flex items-center gap-1.5 ${
                 activeFilterTab === tab.id
                   ? "bg-[#0B3475] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -351,7 +351,7 @@ export const TrainerMatchingWorkloadHub = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search faculty, skills, cadre..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:bg-white focus:border-[#0B3475]"
+            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-800 outline-none focus:bg-white focus:border-[#0B3475]"
           />
         </div>
       </div>
@@ -365,7 +365,7 @@ export const TrainerMatchingWorkloadHub = ({
           return (
             <div
               key={t.trainerId}
-              className={`p-6 rounded-3xl bg-white border transition-all duration-200 shadow-sm flex flex-col justify-between space-y-5 hover:shadow-md ${
+              className={`p-6 rounded-[var(--radius)] bg-white border transition-all duration-200 shadow-sm flex flex-col justify-between space-y-5 hover:shadow-md ${
                 t.isColdStart 
                   ? "border-emerald-200 ring-1 ring-emerald-100/80" 
                   : isWarning 
@@ -381,7 +381,7 @@ export const TrainerMatchingWorkloadHub = ({
                     <img
                       src={t.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"}
                       alt={t.trainerName}
-                      className="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-100 shadow-xs shrink-0"
+                      className="w-14 h-14 rounded-[var(--radius)] object-cover ring-2 ring-slate-100 shadow-xs shrink-0"
                     />
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -421,9 +421,9 @@ export const TrainerMatchingWorkloadHub = ({
                 </div>
 
                 {/* ─── RULE 17: PERFORMANCE HISTORY SECTION ─── */}
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/90 space-y-1.5">
+                <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200/90 space-y-1.5">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-slate-500 flex items-center gap-1">
+                    <span className="font-medium text-slate-500 flex items-center gap-1">
                       <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
                       <span>Rule 17 Performance Signal:</span>
                     </span>
@@ -434,7 +434,7 @@ export const TrainerMatchingWorkloadHub = ({
 
                   {t.isColdStart ? (
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="px-2.5 py-1 rounded-xl bg-slate-200 text-slate-700 font-bold text-[11px] border border-slate-300 font-mono">
+                      <span className="px-2.5 py-1 rounded-[var(--radius)] bg-slate-200 text-slate-700 font-medium text-[11px] border border-slate-300 font-mono">
                         Performance history unavailable
                       </span>
                       <span className="text-[11px] text-slate-500 font-medium">
@@ -444,10 +444,10 @@ export const TrainerMatchingWorkloadHub = ({
                   ) : (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 font-black text-xs flex items-center gap-1">
+                        <span className="px-2.5 py-1 rounded-[var(--radius)] bg-amber-100 text-amber-900 font-black text-xs flex items-center gap-1">
                           ★ {t.performanceScore} / 5.0
                         </span>
-                        <span className="text-xs text-slate-700 font-bold">
+                        <span className="text-xs text-slate-700 font-medium">
                           {t.feedbackCount} Trainee Evaluations
                         </span>
                       </div>
@@ -459,9 +459,9 @@ export const TrainerMatchingWorkloadHub = ({
                 </div>
 
                 {/* ─── RULE 18: WORKLOAD & AVAILABILITY TELEMETRY ─── */}
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/90 space-y-2.5">
+                <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200/90 space-y-2.5">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-slate-500 flex items-center gap-1">
+                    <span className="font-medium text-slate-500 flex items-center gap-1">
                       <BookOpen className="w-3.5 h-3.5 text-slate-400" />
                       <span>Rule 18 Workload Calculation:</span>
                     </span>
@@ -478,22 +478,22 @@ export const TrainerMatchingWorkloadHub = ({
 
                   {/* 4 Pillars Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                    <div className="p-2 bg-white rounded-xl border border-slate-200">
+                    <div className="p-2 bg-white rounded-[var(--radius)] border border-slate-200">
                       <span className="text-[10px] text-slate-400 block font-medium">Course Load</span>
                       <b className="text-slate-900 font-black text-sm">{t.currentCourseLoad}</b>
                       <span className="text-[9px] text-slate-400 block">Active Tracks</span>
                     </div>
-                    <div className="p-2 bg-white rounded-xl border border-slate-200">
+                    <div className="p-2 bg-white rounded-[var(--radius)] border border-slate-200">
                       <span className="text-[10px] text-slate-400 block font-medium">Active Learners</span>
                       <b className="text-slate-900 font-black text-sm">{t.activeLearners}</b>
                       <span className="text-[9px] text-slate-400 block">Trainees Enrolled</span>
                     </div>
-                    <div className="p-2 bg-white rounded-xl border border-slate-200">
+                    <div className="p-2 bg-white rounded-[var(--radius)] border border-slate-200">
                       <span className="text-[10px] text-slate-400 block font-medium">Assessments</span>
                       <b className="text-slate-900 font-black text-sm">{t.scheduledAssessments}</b>
                       <span className="text-[9px] text-slate-400 block">Exams On Deck</span>
                     </div>
-                    <div className="p-2 bg-white rounded-xl border border-slate-200">
+                    <div className="p-2 bg-white rounded-[var(--radius)] border border-slate-200">
                       <span className="text-[10px] text-slate-400 block font-medium">Availability</span>
                       <b className={`font-black text-xs ${
                         t.declaredAvailability === "Limited" 
@@ -516,21 +516,21 @@ export const TrainerMatchingWorkloadHub = ({
                   </span>
                   <div className="flex flex-wrap gap-1">
                     {(t.skills || []).slice(0, 4).map((sk, sIdx) => (
-                      <span key={sIdx} className="px-2.5 py-1 bg-blue-50 text-blue-900 rounded-lg font-bold text-[10px] border border-blue-100">
+                      <span key={sIdx} className="px-2.5 py-1 bg-blue-50 text-blue-900 rounded-[var(--radius)] font-medium text-[10px] border border-blue-100">
                         {sk}
                       </span>
                     ))}
-                    <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold text-[10px]">
+                    <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-[var(--radius)] font-medium text-[10px]">
                       {t.matchedCredentials?.qualification?.split("(")[0]}
                     </span>
-                    <span className="px-2.5 py-1 bg-emerald-50 text-emerald-900 rounded-lg font-bold text-[10px] border border-emerald-100">
+                    <span className="px-2.5 py-1 bg-emerald-50 text-emerald-900 rounded-[var(--radius)] font-medium text-[10px] border border-emerald-100">
                       {t.matchedCredentials?.experienceDisplay || "10+ Yrs Exp"}
                     </span>
                   </div>
                 </div>
 
                 {/* ─── FINAL RECOMMENDATION BANNER ─── */}
-                <div className={`p-3.5 rounded-2xl border text-xs flex items-start gap-2.5 ${
+                <div className={`p-3.5 rounded-[var(--radius)] border text-xs flex items-start gap-2.5 ${
                   t.recommendationTone === "warning"
                     ? "bg-rose-50/80 border-rose-200 text-rose-950"
                     : t.recommendationTone === "cold-start"
@@ -570,7 +570,7 @@ export const TrainerMatchingWorkloadHub = ({
                 <button
                   type="button"
                   onClick={() => setSelectedTrainerDossier(t)}
-                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs transition-colors flex items-center gap-1.5"
                 >
                   <Info className="w-3.5 h-3.5" />
                   <span>Inspect Credentials Dossier</span>
@@ -579,7 +579,7 @@ export const TrainerMatchingWorkloadHub = ({
                 <button
                   type="button"
                   onClick={() => handleAssignFaculty(t)}
-                  className={`px-4 py-2 font-extrabold rounded-xl text-xs transition-all shadow-xs flex items-center gap-1.5 ${
+                  className={`px-4 py-2 font-extrabold rounded-[var(--radius)] text-xs transition-all shadow-xs flex items-center gap-1.5 ${
                     t.recommendationTone === "warning"
                       ? "bg-amber-500 hover:bg-amber-600 text-slate-950"
                       : "bg-[#0B3475] hover:bg-[#08285C] text-white"
@@ -597,7 +597,7 @@ export const TrainerMatchingWorkloadHub = ({
       {/* ═════════ 6. TRAINER CREDENTIALS DOSSIER MODAL ═════════ */}
       {selectedTrainerDossier && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-6 text-xs text-slate-800">
+          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-6 text-xs text-slate-800">
             
             {/* Header */}
             <div className="flex items-start justify-between pb-4 border-b border-slate-100">
@@ -605,7 +605,7 @@ export const TrainerMatchingWorkloadHub = ({
                 <img
                   src={selectedTrainerDossier.avatar}
                   alt={selectedTrainerDossier.trainerName}
-                  className="w-14 h-14 rounded-2xl object-cover ring-2 ring-[#0B3475]/20 shadow-md"
+                  className="w-14 h-14 rounded-[var(--radius)] object-cover ring-2 ring-[#0B3475]/20 shadow-md"
                 />
                 <div>
                   <div className="flex items-center gap-2">
@@ -623,14 +623,14 @@ export const TrainerMatchingWorkloadHub = ({
 
               <button
                 onClick={() => setSelectedTrainerDossier(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl"
+                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-[var(--radius)]"
               >
                 ✕
               </button>
             </div>
 
             {/* Rule 17 Cold Start Breakdown */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-2">
               <h4 className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Verified Matching Pillars (Rule 17)</span>
@@ -638,19 +638,19 @@ export const TrainerMatchingWorkloadHub = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-slate-400 text-[11px] block">Academic Qualification</span>
-                  <p className="font-bold text-slate-900">{selectedTrainerDossier.matchedCredentials?.qualification}</p>
+                  <p className="font-medium text-slate-900">{selectedTrainerDossier.matchedCredentials?.qualification}</p>
                 </div>
                 <div>
                   <span className="text-slate-400 text-[11px] block">Operational Experience</span>
-                  <p className="font-bold text-slate-900">{selectedTrainerDossier.matchedCredentials?.experienceDisplay}</p>
+                  <p className="font-medium text-slate-900">{selectedTrainerDossier.matchedCredentials?.experienceDisplay}</p>
                 </div>
                 <div>
                   <span className="text-slate-400 text-[11px] block">Performance Signal</span>
-                  <p className="font-bold text-slate-900">{selectedTrainerDossier.performanceDisplay}</p>
+                  <p className="font-medium text-slate-900">{selectedTrainerDossier.performanceDisplay}</p>
                 </div>
                 <div>
                   <span className="text-slate-400 text-[11px] block">Active Workload</span>
-                  <p className="font-bold text-slate-900">{selectedTrainerDossier.workloadStatus} ({selectedTrainerDossier.currentCourseLoad} Courses • {selectedTrainerDossier.activeLearners} Cadets)</p>
+                  <p className="font-medium text-slate-900">{selectedTrainerDossier.workloadStatus} ({selectedTrainerDossier.currentCourseLoad} Courses • {selectedTrainerDossier.activeLearners} Cadets)</p>
                 </div>
               </div>
             </div>
@@ -661,14 +661,14 @@ export const TrainerMatchingWorkloadHub = ({
               {selectedTrainerDossier.assignedCourses?.length > 0 ? (
                 <div className="space-y-1.5">
                   {selectedTrainerDossier.assignedCourses.map((c, i) => (
-                    <div key={i} className="p-2.5 bg-blue-50/60 rounded-xl border border-blue-100 flex items-center justify-between text-xs">
-                      <span className="font-bold text-blue-950">{c.title}</span>
-                      <span className="text-[10px] font-mono text-blue-600 font-bold">{c.code || "ACTIVE"}</span>
+                    <div key={i} className="p-2.5 bg-blue-50/60 rounded-[var(--radius)] border border-blue-100 flex items-center justify-between text-xs">
+                      <span className="font-medium text-blue-950">{c.title}</span>
+                      <span className="text-[10px] font-mono text-blue-600 font-medium">{c.code || "ACTIVE"}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-400 text-center text-xs">
+                <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-400 text-center text-xs">
                   No currently assigned active courses. Full bandwidth available.
                 </div>
               )}
@@ -678,7 +678,7 @@ export const TrainerMatchingWorkloadHub = ({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
               <button
                 onClick={() => setSelectedTrainerDossier(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
               >
                 Close Dossier
               </button>
@@ -687,7 +687,7 @@ export const TrainerMatchingWorkloadHub = ({
                   handleAssignFaculty(selectedTrainerDossier);
                   setSelectedTrainerDossier(null);
                 }}
-                className="px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs shadow-md"
+                className="px-5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs shadow-md"
               >
                 Designate as Faculty Lead
               </button>
@@ -700,7 +700,7 @@ export const TrainerMatchingWorkloadHub = ({
       {/* ═════════ 7. CONFIGURABLE WORKLOAD THRESHOLDS MODAL ═════════ */}
       {showConfigModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 text-xs text-slate-800">
+          <div className="bg-white rounded-[var(--radius)] max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 text-xs text-slate-800">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-[#0B3475]" />
@@ -717,7 +717,7 @@ export const TrainerMatchingWorkloadHub = ({
 
             <div className="space-y-4">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">
+                <label className="font-medium text-slate-700 block mb-1">
                   High Load Course Limit (Courses per Faculty):
                 </label>
                 <input
@@ -726,12 +726,12 @@ export const TrainerMatchingWorkloadHub = ({
                   max="10"
                   value={thresholds.maxCoursesHighLoad}
                   onChange={(e) => setThresholds(p => ({ ...p, maxCoursesHighLoad: Number(e.target.value) }))}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">
+                <label className="font-medium text-slate-700 block mb-1">
                   High Load Trainee Capacity Threshold:
                 </label>
                 <input
@@ -740,12 +740,12 @@ export const TrainerMatchingWorkloadHub = ({
                   max="500"
                   value={thresholds.maxLearnersHighLoad}
                   onChange={(e) => setThresholds(p => ({ ...p, maxLearnersHighLoad: Number(e.target.value) }))}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">
+                <label className="font-medium text-slate-700 block mb-1">
                   Competency Top-Match Cutoff (%):
                 </label>
                 <input
@@ -754,7 +754,7 @@ export const TrainerMatchingWorkloadHub = ({
                   max="95"
                   value={thresholds.competencyHighMatchCutoff}
                   onChange={(e) => setThresholds(p => ({ ...p, competencyHighMatchCutoff: Number(e.target.value) }))}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-xs"
                 />
               </div>
             </div>
@@ -762,7 +762,7 @@ export const TrainerMatchingWorkloadHub = ({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
               <button
                 onClick={() => setShowConfigModal(false)}
-                className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-bold rounded-xl text-xs"
+                className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs"
               >
                 Save Thresholds
               </button>

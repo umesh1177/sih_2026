@@ -90,12 +90,12 @@ export const AiCourseAdvisorModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200 font-sans">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="bg-white rounded-[var(--radius)] shadow-2xl max-w-3xl w-full border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
         
         {/* Header (Clean Light Theme with AI Accent) */}
         <div className="p-6 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-purple-50/50 border-b border-slate-200 text-slate-900 flex items-start justify-between shrink-0">
           <div className="flex items-start gap-3.5">
-            <div className="p-3 rounded-2xl bg-white border border-blue-200 text-blue-600 shadow-sm">
+            <div className="p-3 rounded-[var(--radius)] bg-white border border-blue-200 text-blue-600 shadow-sm">
               <Sparkles className="w-6 h-6 text-indigo-600 animate-pulse" />
             </div>
             <div>
@@ -103,7 +103,7 @@ export const AiCourseAdvisorModal = ({
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-800 text-[10px] font-black uppercase tracking-wider">
                   AI Capacity Advisor
                 </span>
-                <span className="text-[10px] text-slate-500 font-mono bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">
+                <span className="text-[10px] text-slate-500 font-mono bg-white/80 px-2 py-0.5 rounded-[var(--radius)] border border-slate-200">
                   {aiSource}
                 </span>
               </div>
@@ -117,7 +117,7 @@ export const AiCourseAdvisorModal = ({
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-white/80 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors border border-slate-200"
+            className="p-1.5 rounded-[var(--radius)] bg-white/80 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors border border-slate-200"
           >
             <X className="w-5 h-5" />
           </button>
@@ -127,28 +127,28 @@ export const AiCourseAdvisorModal = ({
         <div className="bg-slate-100/80 px-6 py-3 border-b border-slate-200 text-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-[11px] shadow-2xs">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-white border border-slate-200 text-slate-700 font-medium text-[11px] shadow-2xs">
                 <Building2 className="w-3.5 h-3.5 text-blue-600" />
                 <span>{userDept}</span>
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-[11px] shadow-2xs">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-white border border-slate-200 text-slate-700 font-medium text-[11px] shadow-2xs">
                 <Briefcase className="w-3.5 h-3.5 text-purple-600" />
                 <span>{userRole}</span>
               </span>
               {userQualifications.length > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 border border-purple-200 text-purple-800 font-bold text-[11px]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-purple-50 border border-purple-200 text-purple-800 font-medium text-[11px]">
                   <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
                   <span>{userQualifications.length} Qualifications</span>
                 </span>
               )}
               {userCertificates.length > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[11px]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-amber-50 border border-amber-200 text-amber-800 font-medium text-[11px]">
                   <Award className="w-3.5 h-3.5 text-amber-600" />
                   <span>{userCertificates.length} Certificates</span>
                 </span>
               )}
               {userSkills.length > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-[11px]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-emerald-50 border border-emerald-200 text-emerald-800 font-medium text-[11px]">
                   <Zap className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{userSkills.length} Skills</span>
                 </span>
@@ -157,7 +157,7 @@ export const AiCourseAdvisorModal = ({
             <button
               onClick={loadRecommendations}
               disabled={loading}
-              className="text-xs font-bold text-blue-700 hover:text-blue-900 bg-white hover:bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 flex items-center gap-1 transition-all"
+              className="text-xs font-semibold text-blue-700 hover:text-blue-900 bg-white hover:bg-blue-50 px-2.5 py-1 rounded-[var(--radius)] border border-blue-200 flex items-center gap-1 transition-all"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
               <span>{loading ? "Analyzing..." : "Re-evaluate"}</span>
@@ -178,7 +178,7 @@ export const AiCourseAdvisorModal = ({
           ) : (
             <>
               {recommendations.length === 0 ? (
-                <div className="py-14 bg-white rounded-2xl border border-slate-200 text-center space-y-3 p-8 shadow-xs">
+                <div className="py-14 bg-white rounded-[var(--radius)] border border-slate-200 text-center space-y-3 p-8 shadow-xs">
                   <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
                   <h3 className="font-black text-slate-900 text-base">All Recommended Courses Enrolled!</h3>
                   <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
@@ -197,18 +197,18 @@ export const AiCourseAdvisorModal = ({
                     return (
                       <div 
                         key={rec.courseId || index}
-                        className="p-5 rounded-2xl border border-slate-200 hover:border-blue-300 bg-white shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group"
+                        className="p-5 rounded-[var(--radius)] border border-slate-200 hover:border-blue-300 bg-white shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-3.5">
                             <img 
                               src={courseObj.thumbnail || "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&q=80&w=800"} 
                               alt={rec.courseTitle || courseObj.title}
-                              className="w-16 h-16 rounded-xl object-cover ring-1 ring-slate-200 shrink-0" 
+                              className="w-16 h-16 rounded-[var(--radius)] object-cover ring-1 ring-slate-200 shrink-0" 
                             />
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black text-blue-800 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
+                                <span className="text-[10px] font-black text-blue-800 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-[var(--radius)]">
                                   {courseObj.code || "TRACK"}
                                 </span>
                                 <span className="text-[10px] text-slate-500 font-semibold">
@@ -226,7 +226,7 @@ export const AiCourseAdvisorModal = ({
 
                           {/* Match Score Badge */}
                           <div className="text-right shrink-0">
-                            <span className={`px-3 py-1.5 border rounded-xl text-xs font-black shadow-2xs inline-flex items-center gap-1 ${scoreBg}`}>
+                            <span className={`px-3 py-1.5 border rounded-[var(--radius)] text-xs font-black shadow-2xs inline-flex items-center gap-1 ${scoreBg}`}>
                               <Sparkles className="w-3 h-3" />
                               <span>{matchScore}% Match</span>
                             </span>
@@ -234,11 +234,11 @@ export const AiCourseAdvisorModal = ({
                         </div>
 
                         {/* AI Rationale Box */}
-                        <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200 text-xs space-y-2">
+                        <div className="p-3.5 bg-slate-50/80 rounded-[var(--radius)] border border-slate-200 text-xs space-y-2">
                           <div className="flex items-start gap-2">
                             <BrainCircuit className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                             <p className="text-slate-700 leading-relaxed text-[11px]">
-                              <b className="text-slate-900 font-bold">AI Recommendation Rationale:</b> {rec.reason}
+                              <b className="text-slate-900 font-medium">AI Recommendation Rationale:</b> {rec.reason}
                             </p>
                           </div>
 
@@ -251,9 +251,9 @@ export const AiCourseAdvisorModal = ({
 
                           {Array.isArray(rec.skillGapsAddressed) && rec.skillGapsAddressed.length > 0 && (
                             <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target Competencies:</span>
+                              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Target Competencies:</span>
                               {rec.skillGapsAddressed.map((gap, gIdx) => (
-                                <span key={gIdx} className="px-2 py-0.5 bg-white border border-slate-200 text-slate-700 rounded-md text-[10px] font-semibold">
+                                <span key={gIdx} className="px-2 py-0.5 bg-white border border-slate-200 text-slate-700 rounded-[var(--radius)] text-[10px] font-semibold">
                                   {gap}
                                 </span>
                               ))}
@@ -273,7 +273,7 @@ export const AiCourseAdvisorModal = ({
                                 onSelectCourse(courseObj);
                                 onClose();
                               }}
-                              className="px-3.5 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold transition-colors"
+                              className="px-3.5 py-1.5 rounded-[var(--radius)] border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium transition-colors"
                             >
                               Overview
                             </button>
@@ -283,7 +283,7 @@ export const AiCourseAdvisorModal = ({
                                 if (onEnrollCourse) onEnrollCourse(courseObj);
                                 onClose();
                               }}
-                              className="px-4 py-1.5 rounded-xl font-bold shadow-sm transition-all flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
+                              className="px-4 py-1.5 rounded-[var(--radius)] font-medium shadow-sm transition-all flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                             >
                               <span>Enroll in Course</span>
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -307,7 +307,7 @@ export const AiCourseAdvisorModal = ({
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-700 font-bold transition-colors"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-[var(--radius)] text-slate-700 font-semibold transition-colors"
           >
             Close
           </button>

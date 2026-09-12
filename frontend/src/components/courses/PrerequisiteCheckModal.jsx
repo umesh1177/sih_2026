@@ -120,12 +120,12 @@ export const PrerequisiteCheckModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-[var(--radius)] shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden">
         
         {/* Header */}
         <div className={`p-6 text-white ${isEligible ? "bg-gradient-to-r from-[#0a2558] to-blue-900" : "bg-gradient-to-r from-amber-700 to-amber-900"} flex items-start justify-between`}>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-md">
+            <div className="p-2.5 rounded-[var(--radius)] bg-white/10 backdrop-blur-md">
               {isEligible ? (
                 <ShieldCheck className="w-6 h-6 text-emerald-300" />
               ) : (
@@ -136,7 +136,7 @@ export const PrerequisiteCheckModal = ({
               <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">
                 MoES Competency Gatekeeper
               </span>
-              <h2 className="text-lg font-bold tracking-tight mt-0.5">
+              <h2 className="text-lg font-semibold tracking-tight mt-0.5">
                 {isEligible ? "Prerequisite Evaluation: Qualified" : "Prerequisite Verification Required"}
               </h2>
             </div>
@@ -153,7 +153,7 @@ export const PrerequisiteCheckModal = ({
         <div className="p-6 space-y-5">
           
           {/* Course Summary Card */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3.5">
+          <div className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 flex items-center gap-3.5">
             <img 
               src={course.thumbnail} 
               alt={course.title} 
@@ -161,13 +161,13 @@ export const PrerequisiteCheckModal = ({
                 e.target.onerror = null;
                 e.target.src = "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&q=80&w=800";
               }}
-              className="w-14 h-14 rounded-xl object-cover ring-1 ring-slate-300 shrink-0" 
+              className="w-14 h-14 rounded-[var(--radius)] object-cover ring-1 ring-slate-300 shrink-0" 
             />
             <div className="overflow-hidden">
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
                 {course.code} • {course.level} Level
               </span>
-              <h3 className="font-bold text-slate-900 text-xs mt-1 truncate">{course.title}</h3>
+              <h3 className="font-semibold text-slate-900 text-xs mt-1 truncate">{course.title}</h3>
               <p className="text-[11px] text-slate-500">
                 Duration: {course.duration} • Department: {course.department}
               </p>
@@ -177,11 +177,11 @@ export const PrerequisiteCheckModal = ({
           {/* Prerequisite Breakdown */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <h4 className="text-xs font-medium text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                 <FileCheck className="w-4 h-4 text-[#0a2558]" />
                 <span>Required Foundational Skills ({satisfiedCount}/{prerequisites.length} Verified)</span>
               </h4>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+              <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
                 isEligible ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
               }`}>
                 {isEligible ? "Criteria Satisfied" : "Partial Alignment"}
@@ -192,7 +192,7 @@ export const PrerequisiteCheckModal = ({
               {evaluatedPrereqs.map((prereq, index) => (
                 <div 
                   key={index}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs ${
+                  className={`p-3 rounded-[var(--radius)] border flex items-center justify-between gap-3 text-xs ${
                     prereq.isSatisfied 
                       ? "bg-emerald-50/70 border-emerald-200 text-slate-800" 
                       : "bg-amber-50/70 border-amber-200 text-slate-800"
@@ -205,11 +205,11 @@ export const PrerequisiteCheckModal = ({
                       <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                     )}
                     <div>
-                      <p className="font-bold text-slate-900">{prereq.title}</p>
+                      <p className="font-medium text-slate-900">{prereq.title}</p>
                       <p className="text-[10px] text-slate-500">{prereq.matchType}</p>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                  <span className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded ${
                     prereq.isSatisfied ? "bg-emerald-200/60 text-emerald-900" : "bg-amber-200/60 text-amber-900"
                   }`}>
                     {prereq.isSatisfied ? "Satisfied" : "Skill Gap"}
@@ -220,12 +220,12 @@ export const PrerequisiteCheckModal = ({
           </div>
 
           {/* Officer Skills Context */}
-          <div className="p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100 text-xs">
-            <p className="text-[11px] font-bold text-slate-700 mb-1.5">Your Registered Officer Competencies:</p>
+          <div className="p-3.5 bg-blue-50/50 rounded-[var(--radius)] border border-blue-100 text-xs">
+            <p className="text-[11px] font-medium text-slate-700 mb-1.5">Your Registered Officer Competencies:</p>
             <div className="flex flex-wrap gap-1.5">
               {userSkills.length > 0 ? (
                 userSkills.map((s, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-white text-[#0a2558] border border-blue-200 rounded-md font-semibold text-[10px]">
+                  <span key={i} className="px-2 py-0.5 bg-white text-[#0a2558] border border-blue-200 rounded-[var(--radius)] font-semibold text-[10px]">
                     {s}
                   </span>
                 ))
@@ -237,7 +237,7 @@ export const PrerequisiteCheckModal = ({
 
           {/* Administrative Approval Gating Alert */}
           {currentUser?.role === "trainee" && currentUser?.status !== "approved" && (
-            <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-2xl text-rose-950 text-xs space-y-2">
+            <div className="p-4 bg-rose-50 border-2 border-rose-200 rounded-[var(--radius)] text-rose-950 text-xs space-y-2">
               <div className="flex items-center gap-2 font-black text-rose-900">
                 <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
                 <span>Administrative Verification Required to Enroll</span>
@@ -246,13 +246,13 @@ export const PrerequisiteCheckModal = ({
                 Ministry of Earth Sciences regulations mandate that only officers with <b>Administrative Approval</b> can enroll in operational LMS courses.
               </p>
               {currentUser?.status === "rejected" && (
-                <div className="p-3 bg-white/90 rounded-xl border border-rose-200 font-medium">
-                  <span className="font-bold text-rose-900 block mb-0.5">Admin Rejection Feedback:</span>
+                <div className="p-3 bg-white/90 rounded-[var(--radius)] border border-rose-200 font-medium">
+                  <span className="font-medium text-rose-900 block mb-0.5">Admin Rejection Feedback:</span>
                   "{currentUser.rejectionReason || 'Incomplete qualifications or credential verification failure.'}"
                 </div>
               )}
               {currentUser?.status === "pending" && (
-                <p className="text-[11px] text-amber-800 bg-amber-100/80 p-2.5 rounded-xl border border-amber-200">
+                <p className="text-[11px] text-amber-800 bg-amber-100/80 p-2.5 rounded-[var(--radius)] border border-amber-200">
                   ⏳ Your officer registration dossier is currently in the review queue. Please wait for Admin concurrence.
                 </p>
               )}
@@ -261,7 +261,7 @@ export const PrerequisiteCheckModal = ({
 
           {/* Enrollment Success Notice */}
           {enrollSuccessNotice && (
-            <div className="p-4 bg-emerald-500 text-white rounded-2xl shadow-md text-xs flex items-center gap-3 animate-in zoom-in-95">
+            <div className="p-4 bg-emerald-500 text-white rounded-[var(--radius)] shadow-md text-xs flex items-center gap-3 animate-in zoom-in-95">
               <CheckCircle2 className="w-6 h-6 text-white shrink-0" />
               <div>
                 <h4 className="font-extrabold text-sm">Enrollment Confirmed!</h4>
@@ -275,17 +275,17 @@ export const PrerequisiteCheckModal = ({
           {/* Status Alert Message (When approved) */}
           {!enrollSuccessNotice && (!currentUser || currentUser.status === "approved") && (
             isEligible ? (
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+              <div className="p-3 bg-emerald-50 rounded-[var(--radius)] border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>
                   <b>Ready for Enrollment:</b> Your scientific background and qualifications qualify you for this program.
                 </span>
               </div>
             ) : (
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+              <div className="p-3 bg-amber-50 rounded-[var(--radius)] border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold">Prerequisite Skill Gap Detected:</p>
+                  <p className="font-medium">Prerequisite Skill Gap Detected:</p>
                   <p className="text-[11px] text-amber-800 mt-0.5">
                     This course requires prior meteorological background. You can submit an Officer Waiver Request or update your verified qualifications.
                   </p>
@@ -300,7 +300,7 @@ export const PrerequisiteCheckModal = ({
         <div className="p-6 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-colors"
+            className="px-4 py-2.5 rounded-[var(--radius)] border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition-colors"
           >
             Cancel
           </button>
@@ -311,7 +311,7 @@ export const PrerequisiteCheckModal = ({
                 if (onOpenProfile) onOpenProfile();
                 else onClose();
               }}
-              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-2"
+              className="px-5 py-2.5 rounded-[var(--radius)] bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium shadow-md transition-all flex items-center gap-2"
             >
               <User className="w-4 h-4" />
               <span>Go to Officer Profile & Resubmit</span>
@@ -322,7 +322,7 @@ export const PrerequisiteCheckModal = ({
                 <button
                   onClick={handleRequestWaiver}
                   disabled={isProcessing || waiverRequested}
-                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+                  className="px-4 py-2.5 rounded-[var(--radius)] bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-md transition-all flex items-center gap-1.5"
                 >
                   <Award className="w-4 h-4" />
                   <span>{waiverRequested ? "Waiver Approved!" : "Request Officer Waiver & Enroll"}</span>
@@ -333,7 +333,7 @@ export const PrerequisiteCheckModal = ({
                 <button
                   onClick={handleConfirmEnroll}
                   disabled={isProcessing}
-                  className="px-6 py-2.5 rounded-xl bg-[#0a2558] hover:bg-[#071c42] text-white text-xs font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-[var(--radius)] bg-[#0a2558] hover:bg-[#071c42] text-white text-xs font-semibold shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center gap-2"
                 >
                   {isProcessing ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

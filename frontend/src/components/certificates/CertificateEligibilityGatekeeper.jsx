@@ -243,14 +243,14 @@ export const CertificateEligibilityGatekeeper = ({
       
       {/* ─── TOAST NOTIFICATION ─── */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-[var(--radius)] bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
           <div className={`w-2.5 h-2.5 rounded-full ${toastMessage.type === "error" ? "bg-red-400" : "bg-emerald-400"}`} />
-          <span className="text-xs font-bold">{toastMessage.text}</span>
+          <span className="text-xs font-medium">{toastMessage.text}</span>
         </div>
       )}
 
       {/* ═════════ 1. RULE 15 EXPLANATION HERO BANNER ═════════ */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-white rounded-[var(--radius)] p-6 sm:p-7 border border-slate-200 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
             <div className="flex items-center gap-2 flex-wrap">
@@ -258,7 +258,7 @@ export const CertificateEligibilityGatekeeper = ({
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
                 Rule 15: 4-Pillar Certification Compliance Engine
               </span>
-              <span className="text-xs font-bold text-slate-400">
+              <span className="text-xs font-medium text-slate-400">
                 Course-Specific Configurable Gating
               </span>
             </div>
@@ -275,25 +275,25 @@ export const CertificateEligibilityGatekeeper = ({
 
         {/* 4 Mandatory Conditions Formula Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-          <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-1">
+          <div className="p-3.5 rounded-[var(--radius)] bg-blue-50/70 border border-blue-200 space-y-1">
             <span className="text-[10px] font-black text-blue-800 uppercase tracking-wider block">Condition 1</span>
             <p className="font-extrabold text-xs text-blue-950">Required Modules Completed</p>
             <p className="text-[10px] text-blue-700">100% of curriculum lectures & labs</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-1">
+          <div className="p-3.5 rounded-[var(--radius)] bg-indigo-50/70 border border-indigo-200 space-y-1">
             <span className="text-[10px] font-black text-indigo-800 uppercase tracking-wider block">Condition 2</span>
             <p className="font-extrabold text-xs text-indigo-950">Required Assessment Passed</p>
             <p className="text-[10px] text-indigo-700">&ge; 70% passing threshold score</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1">
+          <div className="p-3.5 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200 space-y-1">
             <span className="text-[10px] font-black text-amber-800 uppercase tracking-wider block">Condition 3</span>
             <p className="font-extrabold text-xs text-amber-950">Minimum Attendance / Part.</p>
             <p className="text-[10px] text-amber-700">&ge; 75% attendance required</p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1">
+          <div className="p-3.5 rounded-[var(--radius)] bg-emerald-50/70 border border-emerald-200 space-y-1">
             <span className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block">Condition 4</span>
             <p className="font-extrabold text-xs text-emerald-950">No Disqualification (Integrity)</p>
             <p className="text-[10px] text-emerald-700">Zero kiosk violations tolerated</p>
@@ -307,20 +307,20 @@ export const CertificateEligibilityGatekeeper = ({
           <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider">
             Enrolled Training Programs & Certification Standing
           </h3>
-          <span className="text-xs font-bold text-slate-400">
+          <span className="text-xs font-medium text-slate-400">
             {courseEligibilityList.length} Active Tracks
           </span>
         </div>
 
         {courseEligibilityList.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-sm">
-            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+          <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-12 text-center space-y-4 shadow-sm">
+            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-[var(--radius)] flex items-center justify-center mx-auto">
               <Award className="w-8 h-8" />
             </div>
             <h3 className="font-extrabold text-slate-900 text-base">No Enrolled Courses Found</h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
               Certificate eligibility is tracked per enrolled course. Browse available training programs in the 
-              <span className="font-bold text-blue-600"> Courses</span> tab and enroll to track your 4-pillar compliance.
+              <span className="font-medium text-blue-600"> Courses</span> tab and enroll to track your 4-pillar compliance.
             </p>
           </div>
         ) : (
@@ -331,7 +331,7 @@ export const CertificateEligibilityGatekeeper = ({
               return (
               <div
                 key={courseId}
-                className={`p-6 rounded-3xl border bg-white transition-all space-y-5 shadow-xs ${
+                className={`p-6 rounded-[var(--radius)] border bg-white transition-all space-y-5 shadow-xs ${
                   isEligible 
                     ? "border-emerald-300 ring-1 ring-emerald-300/60" 
                     : "border-slate-200"
@@ -357,7 +357,7 @@ export const CertificateEligibilityGatekeeper = ({
                     {isTrainer && (
                       <button
                         onClick={() => handleOpenConfigModal(course)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 rounded-xl text-xs font-bold border border-indigo-200 transition-colors"
+                        className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 rounded-[var(--radius)] text-xs font-medium border border-indigo-200 transition-colors"
                       >
                         <Sliders className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Config Criteria</span>
@@ -365,7 +365,7 @@ export const CertificateEligibilityGatekeeper = ({
                     )}
 
                     {/* Overall Status Badge */}
-                    <div className={`px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-2xs ${
+                    <div className={`px-4 py-2 rounded-[var(--radius)] text-xs font-black flex items-center gap-1.5 shadow-2xs ${
                       isClaimed
                         ? "bg-purple-100 text-purple-900 border border-purple-200"
                         : isEligible
@@ -396,7 +396,7 @@ export const CertificateEligibilityGatekeeper = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   
                   {/* Pillar 1: Modules Completed */}
-                  <div className={`p-4 rounded-2xl border transition-all space-y-2 ${
+                  <div className={`p-4 rounded-[var(--radius)] border transition-all space-y-2 ${
                     telemetry.isModulesPassed 
                       ? "bg-emerald-50/70 border-emerald-200" 
                       : "bg-slate-50 border-slate-200"
@@ -424,7 +424,7 @@ export const CertificateEligibilityGatekeeper = ({
                   </div>
 
                   {/* Pillar 2: Assessment Passed */}
-                  <div className={`p-4 rounded-2xl border transition-all space-y-2 ${
+                  <div className={`p-4 rounded-[var(--radius)] border transition-all space-y-2 ${
                     telemetry.isAssessmentPassed 
                       ? "bg-emerald-50/70 border-emerald-200" 
                       : "bg-slate-50 border-slate-200"
@@ -452,7 +452,7 @@ export const CertificateEligibilityGatekeeper = ({
                   </div>
 
                   {/* Pillar 3: Attendance */}
-                  <div className={`p-4 rounded-2xl border transition-all space-y-2 ${
+                  <div className={`p-4 rounded-[var(--radius)] border transition-all space-y-2 ${
                     telemetry.isAttendancePassed 
                       ? "bg-emerald-50/70 border-emerald-200" 
                       : "bg-slate-50 border-slate-200"
@@ -480,7 +480,7 @@ export const CertificateEligibilityGatekeeper = ({
                   </div>
 
                   {/* Pillar 4: Integrity / No Disqualification */}
-                  <div className={`p-4 rounded-2xl border transition-all space-y-2 ${
+                  <div className={`p-4 rounded-[var(--radius)] border transition-all space-y-2 ${
                     telemetry.isIntegrityPassed 
                       ? "bg-emerald-50/70 border-emerald-200" 
                       : "bg-rose-50 border-rose-200"
@@ -513,11 +513,11 @@ export const CertificateEligibilityGatekeeper = ({
                 <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="text-xs text-slate-500">
                     {isClaimed ? (
-                      <span className="text-purple-700 font-bold">
+                      <span className="text-purple-700 font-medium">
                         Credential ID: {claimedCertificates[courseId].certId} • Lifetime Verified
                       </span>
                     ) : isEligible ? (
-                      <span className="text-emerald-700 font-bold">
+                      <span className="text-emerald-700 font-medium">
                         ✓ All 4 accreditation criteria satisfied. Ready for immediate credential generation.
                       </span>
                     ) : (
@@ -531,7 +531,7 @@ export const CertificateEligibilityGatekeeper = ({
                     {isClaimed ? (
                       <button
                         onClick={() => handleClaim(item)}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105"
                       >
                         <Download className="w-4 h-4" />
                         <span>View / Download Certificate</span>
@@ -539,7 +539,7 @@ export const CertificateEligibilityGatekeeper = ({
                     ) : isEligible ? (
                       <button
                         onClick={() => handleClaim(item)}
-                        className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black rounded-xl text-xs shadow-md transition-transform hover:scale-105 active:scale-95"
+                        className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105 active:scale-95"
                       >
                         <Sparkles className="w-4 h-4 text-amber-300" />
                         <span>Claim & Issue Official Certificate</span>
@@ -549,7 +549,7 @@ export const CertificateEligibilityGatekeeper = ({
                         onClick={() => {
                           if (onOpenStudio) onOpenStudio(course);
                         }}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
                       >
                         <BookOpen className="w-3.5 h-3.5 text-slate-600" />
                         <span>Continue Curriculum &rarr;</span>
@@ -568,7 +568,7 @@ export const CertificateEligibilityGatekeeper = ({
       {/* ═════════ 3. CONFIG COURSE CERTIFICATE ELIGIBILITY CRITERIA MODAL ═════════ */}
       {configuringCourse && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-6 shadow-2xl border border-slate-200 animate-in fade-in">
+          <div className="bg-white rounded-[var(--radius)] max-w-lg w-full p-6 sm:p-7 space-y-6 shadow-2xl border border-slate-200 animate-in fade-in">
             
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -581,7 +581,7 @@ export const CertificateEligibilityGatekeeper = ({
                 <p className="text-xs text-slate-500 font-medium">{configuringCourse.title}</p>
               </div>
 
-              <button onClick={() => setConfiguringCourse(null)} className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100">
+              <button onClick={() => setConfiguringCourse(null)} className="p-1.5 text-slate-400 hover:text-slate-700 rounded-[var(--radius)] hover:bg-slate-100">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -589,8 +589,8 @@ export const CertificateEligibilityGatekeeper = ({
             <div className="space-y-4 text-xs">
               
               {/* Criterion 1: Min Module Completion % */}
-              <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-                <div className="flex items-center justify-between font-bold">
+              <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
+                <div className="flex items-center justify-between font-medium">
                   <span className="text-slate-800">1. Required Modules Completed:</span>
                   <span className="font-mono text-indigo-700 text-sm">{tempRules.minModuleCompletionPct}%</span>
                 </div>
@@ -607,8 +607,8 @@ export const CertificateEligibilityGatekeeper = ({
               </div>
 
               {/* Criterion 2: Min Assessment Pass Score */}
-              <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-                <div className="flex items-center justify-between font-bold">
+              <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
+                <div className="flex items-center justify-between font-medium">
                   <span className="text-slate-800">2. Required Assessment Pass Mark:</span>
                   <span className="font-mono text-indigo-700 text-sm">{tempRules.minAssessmentPassScore}%</span>
                 </div>
@@ -625,8 +625,8 @@ export const CertificateEligibilityGatekeeper = ({
               </div>
 
               {/* Criterion 3: Min Attendance % */}
-              <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-                <div className="flex items-center justify-between font-bold">
+              <div className="space-y-1.5 p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
+                <div className="flex items-center justify-between font-medium">
                   <span className="text-slate-800">3. Minimum Attendance / Participation:</span>
                   <span className="font-mono text-indigo-700 text-sm">{tempRules.minAttendancePct}%</span>
                 </div>
@@ -643,9 +643,9 @@ export const CertificateEligibilityGatekeeper = ({
               </div>
 
               {/* Criterion 4: Strict Disqualification Check */}
-              <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+              <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                 <div>
-                  <p className="font-bold text-slate-900">4. Enforce Zero Disqualification (Integrity)</p>
+                  <p className="font-medium text-slate-900">4. Enforce Zero Disqualification (Integrity)</p>
                   <p className="text-[10px] text-slate-500">Block certificate if proctoring integrity flag was raised</p>
                 </div>
                 <input
@@ -661,13 +661,13 @@ export const CertificateEligibilityGatekeeper = ({
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
               <button
                 onClick={() => setTempRules(DEFAULT_COURSE_CERT_RULES)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
               >
                 Reset Standard
               </button>
               <button
                 onClick={handleSaveCourseRules}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs shadow-sm"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-[var(--radius)] text-xs shadow-sm"
               >
                 Save Criteria for Course
               </button>

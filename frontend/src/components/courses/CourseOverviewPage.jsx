@@ -213,7 +213,7 @@ export const CourseOverviewPage = ({
           {/* Breadcrumb Back link */}
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 mb-5 transition-all group bg-slate-100 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl w-fit"
+            className="flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 mb-5 transition-all group bg-slate-100 hover:bg-slate-200 px-3.5 py-1.5 rounded-[var(--radius)] w-fit"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-slate-500" />
             <span>Back to Course Catalog</span>
@@ -262,10 +262,10 @@ export const CourseOverviewPage = ({
           <div className="lg:col-span-8 space-y-6">
             
             {/* Tab Navigation Header */}
-            <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <div className="bg-white rounded-[var(--radius)] p-2 border border-slate-200 shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveTab("about")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === "about"
                     ? "bg-blue-600 text-white shadow-sm"
                     : "text-slate-600 hover:text-blue-600 hover:bg-slate-50"
@@ -277,7 +277,7 @@ export const CourseOverviewPage = ({
 
               <button
                 onClick={() => setActiveTab("content")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === "content"
                     ? "bg-blue-600 text-white shadow-sm"
                     : "text-slate-600 hover:text-blue-600 hover:bg-slate-50"
@@ -292,7 +292,7 @@ export const CourseOverviewPage = ({
                 <>
                   <button
                     onClick={() => setActiveTab("trainees")}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all whitespace-nowrap ${
                       activeTab === "trainees"
                         ? "bg-blue-600 text-white shadow-sm"
                         : "text-slate-600 hover:text-blue-600 hover:bg-slate-50"
@@ -304,7 +304,7 @@ export const CourseOverviewPage = ({
 
                   <button
                     onClick={() => setActiveTab("quizzes")}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all whitespace-nowrap ${
                       activeTab === "quizzes"
                         ? "bg-blue-600 text-white shadow-sm"
                         : "text-slate-600 hover:text-blue-600 hover:bg-slate-50"
@@ -319,7 +319,7 @@ export const CourseOverviewPage = ({
               {/* Feedback Tab */}
               <button
                 onClick={() => setActiveTab("feedback")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === "feedback"
                     ? "bg-blue-600 text-white shadow-sm"
                     : "text-slate-600 hover:text-blue-600 hover:bg-slate-50"
@@ -339,7 +339,7 @@ export const CourseOverviewPage = ({
 
             {/* ═════════ TAB 1: ABOUT ═════════ */}
             {activeTab === "about" && (
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8 animate-in fade-in duration-150">
+              <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8 animate-in fade-in duration-150">
                 
                 {/* Description */}
                 <div className="space-y-2.5">
@@ -354,7 +354,7 @@ export const CourseOverviewPage = ({
                   </p>
                   <button
                     onClick={() => setExpandedDescription(!expandedDescription)}
-                    className="text-xs font-bold text-blue-600 hover:underline"
+                    className="text-xs font-medium text-blue-600 hover:underline"
                   >
                     {expandedDescription ? "view less" : "view more"}
                   </button>
@@ -368,7 +368,7 @@ export const CourseOverviewPage = ({
                   </h2>
                   <ul className="space-y-2.5 text-xs sm:text-sm text-slate-600">
                     {(expandedOutcomes ? defaultOutcomes : defaultOutcomes.slice(0, 3)).map((outcome, idx) => (
-                      <li key={idx} className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <li key={idx} className="flex items-start gap-3 p-2.5 rounded-[var(--radius)] bg-slate-50 border border-slate-100">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                         <span className="leading-snug">{outcome}</span>
                       </li>
@@ -376,7 +376,7 @@ export const CourseOverviewPage = ({
                   </ul>
                   <button
                     onClick={() => setExpandedOutcomes(!expandedOutcomes)}
-                    className="text-xs font-bold text-blue-600 hover:underline"
+                    className="text-xs font-medium text-blue-600 hover:underline"
                   >
                     {expandedOutcomes ? "view less" : "view more"}
                   </button>
@@ -389,19 +389,19 @@ export const CourseOverviewPage = ({
                       <ShieldCheck className="w-4 h-4 text-blue-600" />
                       <span>Prerequisites & Skill Requirements</span>
                     </h2>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                       Verified Criteria
                     </span>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {(Array.isArray(course.prerequisites) ? course.prerequisites : [course.prerequisites || "Domain Fundamentals"]).map((prereq, i) => (
-                      <div key={i} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                      <div key={i} className="p-3.5 rounded-[var(--radius)] border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span className="font-bold text-slate-800">{prereq}</span>
+                          <span className="font-medium text-slate-800">{prereq}</span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-500 uppercase px-2 py-0.5 rounded bg-slate-200/70">
+                        <span className="text-[10px] font-medium text-slate-500 uppercase px-2 py-0.5 rounded bg-slate-200/70">
                           Mandatory
                         </span>
                       </div>
@@ -416,10 +416,10 @@ export const CourseOverviewPage = ({
                   </h2>
                   
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="px-4 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
                       Functional
                     </span>
-                    <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                    <span className="px-4 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200">
                       {course.category || "Domain Specialization"}
                     </span>
                     {(course.competenciesGained || []).map((comp, i) => (
@@ -435,13 +435,13 @@ export const CourseOverviewPage = ({
 
             {/* ═════════ TAB 2: CONTENT & UPLOADED MATERIALS ═════════ */}
             {activeTab === "content" && (
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                   <div>
                     <h2 className="text-base font-extrabold text-slate-900">Curricula, Lecture Decks & Study Manuals</h2>
                     <p className="text-xs text-slate-500 mt-0.5">Uploaded by official faculty and senior trainers</p>
                   </div>
-                  <span className="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                  <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
                     {totalSubjects} Subjects • {totalModules} Modules
                   </span>
                 </div>
@@ -450,7 +450,7 @@ export const CourseOverviewPage = ({
                   {(course.subjects || []).map((subject, sIdx) => {
                     const isOpen = openSubjectId === subject.id || openSubjectId === "";
                     return (
-                      <div key={subject.id || sIdx} className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                      <div key={subject.id || sIdx} className="border border-slate-200 rounded-[var(--radius)] overflow-hidden shadow-xs">
                         <button
                           onClick={() => setOpenSubjectId(isOpen ? "__closed" : subject.id)}
                           className="w-full p-4 bg-slate-50 hover:bg-slate-100 flex items-center justify-between text-left transition-colors"
@@ -459,7 +459,7 @@ export const CourseOverviewPage = ({
                             <span className="text-[10px] font-black text-blue-700 uppercase tracking-wider">
                               Subject {sIdx + 1}
                             </span>
-                            <h3 className="font-bold text-slate-900 text-sm mt-0.5">{subject.name || subject.title}</h3>
+                            <h3 className="font-semibold text-slate-900 text-sm mt-0.5">{subject.name || subject.title}</h3>
                           </div>
                           <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                         </button>
@@ -467,9 +467,9 @@ export const CourseOverviewPage = ({
                         {isOpen && (
                           <div className="p-4 space-y-3 bg-white border-t border-slate-100">
                             {(subject.modules || []).map((mod, mIdx) => (
-                              <div key={mod.id || mIdx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                              <div key={mod.id || mIdx} className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                                  <h4 className="font-medium text-xs text-slate-900 flex items-center gap-1.5">
                                     <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                                     <span>{mod.title || mod.name}</span>
                                   </h4>
@@ -481,27 +481,27 @@ export const CourseOverviewPage = ({
                                 {/* Materials list with Uploader info */}
                                 <div className="space-y-2">
                                   {(mod.materials || []).map((mat, matIdx) => (
-                                    <div key={mat.id || matIdx} className="p-3 bg-white rounded-xl border border-slate-200 hover:border-blue-300 transition-all space-y-1.5">
+                                    <div key={mat.id || matIdx} className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 hover:border-blue-300 transition-all space-y-1.5">
                                       <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2.5">
                                           {mat.type === "video" ? (
-                                            <div className="p-1.5 bg-rose-50 text-rose-600 rounded-lg">
+                                            <div className="p-1.5 bg-rose-50 text-rose-600 rounded-[var(--radius)]">
                                               <PlayCircle className="w-4 h-4" />
                                             </div>
                                           ) : (
-                                            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                                            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-[var(--radius)]">
                                               <FileText className="w-4 h-4" />
                                             </div>
                                           )}
                                           <div>
-                                            <h5 className="font-bold text-xs text-slate-900">{mat.title}</h5>
+                                            <h5 className="font-medium text-xs text-slate-900">{mat.title}</h5>
                                             <p className="text-[10px] text-slate-500">
                                               {mat.type === "video" ? `Video Lecture • ${mat.duration || "45 mins"}` : `Study Document • ${mat.size || `${mat.pages || 20} pages`}`}
                                             </p>
                                           </div>
                                         </div>
 
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                        <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                                           {mat.allowDownload ? "Downloadable" : "In-Portal"}
                                         </span>
                                       </div>
@@ -532,7 +532,7 @@ export const CourseOverviewPage = ({
 
             {/* ═════════ TAB 3 (TRAINER): ENROLLED CADETS ROSTER ═════════ */}
             {activeTab === "trainees" && currentUser?.role === "trainer" && (
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4 animate-in fade-in duration-150">
+              <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4 animate-in fade-in duration-150">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                   <div>
                     <h2 className="text-base font-extrabold text-slate-900">
@@ -550,7 +550,7 @@ export const CourseOverviewPage = ({
                       placeholder="Search cadet, station, cadre ID..."
                       value={traineeSearch}
                       onChange={(e) => setTraineeSearch(e.target.value)}
-                      className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                      className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -572,7 +572,7 @@ export const CourseOverviewPage = ({
                         <tr key={trainee.id} className="hover:bg-slate-50/80 transition-colors">
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                              <div className="w-9 h-9 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-medium text-xs shrink-0 shadow-xs">
                                 {trainee.name?.split(" ").map(n => n[0]).join("") || "TR"}
                               </div>
                               <div>
@@ -583,7 +583,7 @@ export const CourseOverviewPage = ({
                           </td>
 
                           <td className="py-3.5 px-4 space-y-0.5">
-                            <span className="font-mono font-bold text-slate-800 text-[11px] block">{trainee.cadreId || "—"}</span>
+                            <span className="font-mono font-medium text-slate-800 text-[11px] block">{trainee.cadreId || "—"}</span>
                             <span className="text-slate-500 text-[11px] flex items-center gap-1">
                               <Building2 className="w-3 h-3 text-slate-400" />
                               <span>{trainee.station || "Regional Centre"}</span>
@@ -591,7 +591,7 @@ export const CourseOverviewPage = ({
                           </td>
 
                           <td className="py-3.5 px-4 space-y-1">
-                            <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                            <div className="flex items-center justify-between text-[11px] font-medium text-slate-700">
                               <span>{trainee.progressPercentage || 0}%</span>
                               <span className="text-[10px] text-slate-400">({trainee.completedModulesCount || 0}/{trainee.totalModulesCount || 0} Mods)</span>
                             </div>
@@ -622,7 +622,7 @@ export const CourseOverviewPage = ({
                           <td className="py-3.5 px-4 text-right">
                             <button
                               onClick={() => setSelectedTraineeForDossier(trainee)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5 text-slate-600" />
                               <span>View Dossier</span>
@@ -638,7 +638,7 @@ export const CourseOverviewPage = ({
 
             {/* ═════════ TAB 4 (TRAINER): SUBJECT QUIZZES ═════════ */}
             {activeTab === "quizzes" && currentUser?.role === "trainer" && (
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 animate-in fade-in duration-150">
+              <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 animate-in fade-in duration-150">
                 
                 {/* Header with Filter & Create Quiz */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -653,7 +653,7 @@ export const CourseOverviewPage = ({
 
                   <button
                     onClick={onOpenAiGenerator}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 shrink-0"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 shrink-0"
                   >
                     <Plus className="w-4 h-4 text-white" />
                     <span>Create Subject Quiz</span>
@@ -664,7 +664,7 @@ export const CourseOverviewPage = ({
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
                   <button
                     onClick={() => setSelectedSubjectQuizFilter("all")}
-                    className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${
+                    className={`px-3 py-1.5 rounded-[var(--radius)] font-medium whitespace-nowrap transition-all ${
                       selectedSubjectQuizFilter === "all"
                         ? "bg-blue-600 text-white shadow-xs"
                         : "bg-slate-100 hover:bg-slate-200 text-slate-600"
@@ -676,7 +676,7 @@ export const CourseOverviewPage = ({
                     <button
                       key={s.id || idx}
                       onClick={() => setSelectedSubjectQuizFilter(s.id || s.name)}
-                      className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${
+                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium whitespace-nowrap transition-all ${
                         selectedSubjectQuizFilter === (s.id || s.name)
                           ? "bg-blue-600 text-white shadow-xs"
                           : "bg-slate-100 hover:bg-slate-200 text-slate-600"
@@ -689,7 +689,7 @@ export const CourseOverviewPage = ({
 
                 {/* Quiz Cards Grid */}
                 {filteredQuizzes.length === 0 ? (
-                  <div className="py-12 text-center text-slate-500 text-xs bg-slate-50 rounded-2xl border border-slate-200">
+                  <div className="py-12 text-center text-slate-500 text-xs bg-slate-50 rounded-[var(--radius)] border border-slate-200">
                     No quizzes scheduled yet for this subject filter.
                   </div>
                 ) : (
@@ -700,11 +700,11 @@ export const CourseOverviewPage = ({
                       return (
                         <div
                           key={quiz.id}
-                          className="bg-white rounded-3xl border border-slate-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all p-6 space-y-4"
+                          className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all p-6 space-y-4"
                         >
                           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 rounded-xl text-xs font-bold">
+                              <span className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200 rounded-[var(--radius)] text-xs font-medium">
                                 {quiz.subjectName || "Subject Assessment"}
                               </span>
 
@@ -719,7 +719,7 @@ export const CourseOverviewPage = ({
                               )}
                             </div>
 
-                            <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
+                            <div className="flex items-center gap-3 text-xs font-medium text-slate-500">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3.5 h-3.5 text-blue-600" />
                                 <span>{quiz.durationMinutes || 30} Mins</span>
@@ -747,7 +747,7 @@ export const CourseOverviewPage = ({
                             <div className="flex items-center gap-2 flex-wrap">
                               <button
                                 onClick={() => setSelectedQuizForEvaluation(quiz)}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-xs transition-colors"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-xs transition-colors"
                               >
                                 <ClipboardList className="w-3.5 h-3.5 text-blue-100" />
                                 <span>Evaluate Submissions & Feedback</span>
@@ -765,7 +765,7 @@ export const CourseOverviewPage = ({
                                   attempted: quiz.submissionsCount || 0,
                                   questions: quiz.questions || []
                                 })}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs transition-colors"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
                               >
                                 <BarChart3 className="w-3.5 h-3.5 text-slate-600" />
                                 <span>Quiz Analytics</span>
@@ -782,13 +782,13 @@ export const CourseOverviewPage = ({
                                     console.error("Publish failed:", e);
                                   }
                                 }}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xs transition-all"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-xs transition-all"
                               >
                                 <Sparkles className="w-3.5 h-3.5 text-emerald-100" />
                                 <span>Publish Quiz Results</span>
                               </button>
                             ) : (
-                              <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                              <span className="text-[11px] font-medium text-emerald-700 flex items-center gap-1">
                                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                                 <span>Scores Visible to Trainees</span>
                               </span>
@@ -809,7 +809,7 @@ export const CourseOverviewPage = ({
               <div className="space-y-6 animate-in fade-in duration-150">
                 
                 {/* Institutional Notice */}
-                <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 flex items-start gap-3">
+                <div className="p-4 rounded-[var(--radius)] bg-blue-50 border border-blue-200 flex items-start gap-3">
                   <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                   <div className="space-y-0.5 text-xs text-blue-950">
                     <p className="font-extrabold text-blue-900">
@@ -825,14 +825,14 @@ export const CourseOverviewPage = ({
 
                 {/* Trainee Form */}
                 {currentUser?.role === "trainee" && (
-                  <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                  <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
                     {!isCourse100Percent ? (
-                      <div className="text-center py-12 px-6 bg-slate-50 rounded-3xl border-2 border-dashed border-amber-200 space-y-4">
-                        <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-700 flex items-center justify-center mx-auto">
+                      <div className="text-center py-12 px-6 bg-slate-50 rounded-[var(--radius)] border-2 border-dashed border-amber-200 space-y-4">
+                        <div className="w-16 h-16 rounded-[var(--radius)] bg-amber-50 text-amber-700 flex items-center justify-center mx-auto">
                           <Lock className="w-8 h-8" />
                         </div>
                         <div className="max-w-md mx-auto space-y-1.5">
-                          <h3 className="text-lg font-bold text-slate-900">
+                          <h3 className="text-lg font-semibold text-slate-900">
                             Course Feedback Locked ({progressPercentage}% Completed)
                           </h3>
                           <p className="text-xs text-slate-600 leading-relaxed">
@@ -842,7 +842,7 @@ export const CourseOverviewPage = ({
 
                         <button
                           onClick={() => onOpenStudio(course)}
-                          className="mt-4 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105"
+                          className="mt-4 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105"
                         >
                           Resume Learning to Complete Course
                         </button>
@@ -854,23 +854,23 @@ export const CourseOverviewPage = ({
                             <h2 className="text-base font-extrabold text-slate-900">Official Institutional Feedback Form</h2>
                             <p className="text-xs text-slate-500 mt-0.5">Your evaluation helps refine future curriculum delivery.</p>
                           </div>
-                          <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1">
+                          <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-medium flex items-center gap-1">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 100% Completed
                           </span>
                         </div>
 
                         {feedbackSubmitted ? (
-                          <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3">
+                          <div className="p-6 bg-emerald-50 rounded-[var(--radius)] border border-emerald-200 text-center space-y-3">
                             <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
                               <Check className="w-6 h-6" />
                             </div>
-                            <h3 className="text-sm font-bold text-emerald-900">Thank You! Your Feedback Has Been Registered.</h3>
+                            <h3 className="text-sm font-semibold text-emerald-900">Thank You! Your Feedback Has Been Registered.</h3>
                           </div>
                         ) : (
                           <form onSubmit={handleSubmitFeedback} className="space-y-5">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
-                                <label className="text-xs font-bold text-slate-800">Trainer Delivery & Pedagogy</label>
+                              <div className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-2 text-center">
+                                <label className="text-xs font-medium text-slate-800">Trainer Delivery & Pedagogy</label>
                                 <div className="flex justify-center gap-1">
                                   {[1, 2, 3, 4, 5].map((star) => (
                                     <button
@@ -883,11 +883,11 @@ export const CourseOverviewPage = ({
                                     </button>
                                   ))}
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-500">{feedbackForm.trainerRating} / 5 Stars</span>
+                                <span className="text-[10px] font-medium text-slate-500">{feedbackForm.trainerRating} / 5 Stars</span>
                               </div>
 
-                              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
-                                <label className="text-xs font-bold text-slate-800">Content & Material Rigor</label>
+                              <div className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-2 text-center">
+                                <label className="text-xs font-medium text-slate-800">Content & Material Rigor</label>
                                 <div className="flex justify-center gap-1">
                                   {[1, 2, 3, 4, 5].map((star) => (
                                     <button
@@ -900,11 +900,11 @@ export const CourseOverviewPage = ({
                                     </button>
                                   ))}
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-500">{feedbackForm.contentRating} / 5 Stars</span>
+                                <span className="text-[10px] font-medium text-slate-500">{feedbackForm.contentRating} / 5 Stars</span>
                               </div>
 
-                              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-center">
-                                <label className="text-xs font-bold text-slate-800">Relevance to Domain</label>
+                              <div className="p-4 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-2 text-center">
+                                <label className="text-xs font-medium text-slate-800">Relevance to Domain</label>
                                 <div className="flex justify-center gap-1">
                                   {[1, 2, 3, 4, 5].map((star) => (
                                     <button
@@ -917,12 +917,12 @@ export const CourseOverviewPage = ({
                                     </button>
                                   ))}
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-500">{feedbackForm.relevanceRating} / 5 Stars</span>
+                                <span className="text-[10px] font-medium text-slate-500">{feedbackForm.relevanceRating} / 5 Stars</span>
                               </div>
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-800">
+                              <label className="text-xs font-medium text-slate-800">
                                 Detailed Remarks & Recommendations:
                               </label>
                               <textarea
@@ -931,14 +931,14 @@ export const CourseOverviewPage = ({
                                 placeholder="Share your experience on course depth, presentation clarity, and hands-on sessions..."
                                 value={feedbackForm.comment}
                                 onChange={(e) => setFeedbackForm({ ...feedbackForm, comment: e.target.value })}
-                                className="w-full p-3.5 rounded-2xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+                                className="w-full p-3.5 rounded-[var(--radius)] border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
                               />
                             </div>
 
                             <button
                               type="submit"
                               disabled={feedbackSubmitting}
-                              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs shadow-sm transition-transform hover:scale-105 flex items-center gap-2"
+                              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 flex items-center gap-2"
                             >
                               <Send className="w-4 h-4" />
                               <span>{feedbackSubmitting ? "Submitting..." : "Submit Institutional Evaluation"}</span>
@@ -958,14 +958,14 @@ export const CourseOverviewPage = ({
                   </h3>
 
                   {feedbacks.map((fb, idx) => (
-                    <div key={fb.id || idx} className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
+                    <div key={fb.id || idx} className="bg-white rounded-[var(--radius)] p-6 border border-slate-200 shadow-sm space-y-3">
                       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                          <div className="w-10 h-10 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-medium text-sm">
                             {fb.traineeName ? fb.traineeName.charAt(0) : "O"}
                           </div>
                           <div>
-                            <h4 className="font-bold text-slate-900 text-xs sm:text-sm">{fb.traineeName || "Trainee"}</h4>
+                            <h4 className="font-medium text-slate-900 text-xs sm:text-sm">{fb.traineeName || "Trainee"}</h4>
                             <p className="text-[10px] text-slate-400 font-medium">
                               {fb.cadreId || "CADRE"} • {fb.station || fb.department || "Operations"}
                             </p>
@@ -973,7 +973,7 @@ export const CourseOverviewPage = ({
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">
+                          <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-[var(--radius)] border border-amber-200">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                             <span className="text-xs font-black text-amber-900">
                               {(() => {
@@ -990,16 +990,16 @@ export const CourseOverviewPage = ({
                       </div>
 
                       {/* Comment body */}
-                      <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-2xl border border-slate-100 whitespace-pre-line">
+                      <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-[var(--radius)] border border-slate-100 whitespace-pre-line">
                         "{fb.comment}"
                       </p>
                     </div>
                   ))}
 
                   {feedbacks.length === 0 && (
-                    <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-6">
+                    <div className="text-center py-12 bg-white rounded-[var(--radius)] border border-dashed border-slate-200 p-6">
                       <MessageSquare className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                      <p className="text-xs font-bold text-slate-700">No feedbacks uploaded yet for this course</p>
+                      <p className="text-xs font-medium text-slate-700">No feedbacks uploaded yet for this course</p>
                     </div>
                   )}
                 </div>
@@ -1010,7 +1010,7 @@ export const CourseOverviewPage = ({
           </div>
 
           {/* ─── RIGHT FLOATING SPECIFICATIONS CARD (LIGHT & CLEAN) ─── */}
-          <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden sticky top-6">
+          <div className="lg:col-span-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm overflow-hidden sticky top-6">
             
             {/* Top Video Preview box */}
             <div className="h-56 bg-slate-100 relative group overflow-hidden border-b border-slate-200">
@@ -1031,7 +1031,7 @@ export const CourseOverviewPage = ({
                   <PlayCircle className="w-8 h-8 fill-current" />
                 </div>
               </div>
-              <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs font-bold drop-shadow">
+              <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs font-medium drop-shadow">
                 <span>{course.duration || "4 Weeks"}</span>
                 <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] font-extrabold">HD Video + Slides</span>
               </div>
@@ -1043,7 +1043,7 @@ export const CourseOverviewPage = ({
               {currentUser?.role === "trainer" || currentUser?.role === "admin" ? (
                 <button
                   onClick={() => onOpenStudio(course)}
-                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-[var(--radius)] text-sm shadow-sm transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Eye className="w-4 h-4 text-blue-100" />
                   <span>Launch Learning Studio</span>
@@ -1051,7 +1051,7 @@ export const CourseOverviewPage = ({
               ) : isEnrolled ? (
                 <button
                   onClick={() => onOpenStudio(course)}
-                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-[var(--radius)] text-sm shadow-sm transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>Start / Resume Learning</span>
@@ -1059,7 +1059,7 @@ export const CourseOverviewPage = ({
               ) : currentUser?.status === "rejected" ? (
                 <button
                   onClick={() => alert(`❌ Enrollment Blocked: Profile was rejected.\n\nReason: "${currentUser.rejectionReason || 'Incomplete credentials.'}"`)}
-                  className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-[var(--radius)] text-sm shadow-sm transition-all flex items-center justify-center gap-2"
                 >
                   <AlertTriangle className="w-4 h-4 text-rose-200" />
                   <span>Enrollment Locked</span>
@@ -1067,7 +1067,7 @@ export const CourseOverviewPage = ({
               ) : currentUser?.status === "pending" ? (
                 <button
                   onClick={() => alert("⏳ Enrollment Restricted: Registration is currently under administrative review.")}
-                  className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-[var(--radius)] text-sm shadow-sm transition-all flex items-center justify-center gap-2"
                 >
                   <Clock className="w-4 h-4 text-slate-900" />
                   <span>Pending Admin Approval</span>
@@ -1075,7 +1075,7 @@ export const CourseOverviewPage = ({
               ) : (
                 <button
                   onClick={() => onEnrollClick(course)}
-                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-[var(--radius)] text-sm shadow-sm transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <ShieldCheck className="w-4 h-4 text-emerald-200" />
                   <span>Enroll in Course</span>
@@ -1086,42 +1086,42 @@ export const CourseOverviewPage = ({
               <div className="grid grid-cols-4 gap-4 text-center border-t border-b border-slate-100 py-6">
                 <div className="flex flex-col items-center justify-center space-y-1">
                   <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-[11px] font-bold text-slate-700">{course.duration?.split(" ")[0] || "4w"}</span>
+                  <span className="text-[11px] font-medium text-slate-700">{course.duration?.split(" ")[0] || "4w"}</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1">
                   <Layers className="w-5 h-5 text-blue-600" />
-                  <span className="text-[11px] font-bold text-slate-700">{totalModules} Modules</span>
+                  <span className="text-[11px] font-medium text-slate-700">{totalModules} Modules</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1">
                   <PlayCircle className="w-5 h-5 text-blue-600" />
-                  <span className="text-[11px] font-bold text-slate-700">{totalVideos} Videos</span>
+                  <span className="text-[11px] font-medium text-slate-700">{totalVideos} Videos</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  <span className="text-[10px] font-bold text-slate-700 leading-tight">{totalInteractiveDocs} Docs</span>
+                  <span className="text-[10px] font-medium text-slate-700 leading-tight">{totalInteractiveDocs} Docs</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1 pt-2">
                   <Coins className="w-5 h-5 text-blue-600" />
-                  <span className="text-[11px] font-bold text-slate-700">Free</span>
+                  <span className="text-[11px] font-medium text-slate-700">Free</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1 pt-2">
                   <GraduationCap className="w-5 h-5 text-blue-600" />
-                  <span className="text-[10px] font-bold text-slate-700 leading-tight">Blended</span>
+                  <span className="text-[10px] font-medium text-slate-700 leading-tight">Blended</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1 pt-2">
                   <KeyRound className="w-5 h-5 text-blue-600" />
-                  <span className="text-[10px] font-bold text-slate-700 leading-tight">CC BY 4.0</span>
+                  <span className="text-[10px] font-medium text-slate-700 leading-tight">CC BY 4.0</span>
                 </div>
                 <div className="flex flex-col items-center justify-center space-y-1 pt-2">
                   <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                  <span className="text-[10px] font-bold text-slate-700 leading-tight">Verified</span>
+                  <span className="text-[10px] font-medium text-slate-700 leading-tight">Verified</span>
                 </div>
               </div>
 
               {/* Creators Section */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-900">Lead Faculty & Creators</h3>
-                <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <h3 className="text-xs font-semibold text-slate-900">Lead Faculty & Creators</h3>
+                <div className="flex items-center gap-3.5 p-3 rounded-[var(--radius)] bg-slate-50 border border-slate-100">
                   <div className="w-11 h-11 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
                     {course.leadTrainerName?.split(" ")?.map(n => n[0])?.slice(0, 2)?.join("") || "AS"}
                   </div>

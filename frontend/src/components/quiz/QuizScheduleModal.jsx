@@ -137,14 +137,14 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8">
+      <div className="bg-white rounded-[var(--radius)] max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-black uppercase">
                 Assessment Designer
               </span>
-              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Anti-Cheat Integrity Monitored
               </span>
@@ -156,27 +156,27 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
               Configure quiz scheduling, trainee targeting, proctored kiosk constraints, and questions
             </p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+          <button onClick={onClose} className="p-2 rounded-[var(--radius)] text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="py-4 space-y-5 text-xs">
           <div>
-            <label className="block font-bold text-slate-800 mb-1.5">Assessment Title *</label>
+            <label className="block font-medium text-slate-800 mb-1.5">Assessment Title *</label>
             <input
               type="text"
               required
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g. Mid-Term Evaluation: Doppler Radar & Convective Nowcasting"
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-semibold text-slate-900"
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-semibold text-slate-900"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-800 mb-1.5">Associated Course</label>
+              <label className="block font-medium text-slate-800 mb-1.5">Associated Course</label>
               <select
                 value={form.courseId}
                 onChange={(e) => {
@@ -187,7 +187,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     courseName: c ? c.title : ""
                   });
                 }}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none text-slate-800 font-semibold"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none text-slate-800 font-semibold"
               >
                 {courses.map(c => (
                   <option key={c.id} value={c.id}>{c.title}</option>
@@ -196,21 +196,21 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-1.5">Proctored Duration (Minutes)</label>
+              <label className="block font-medium text-slate-800 mb-1.5">Proctored Duration (Minutes)</label>
               <input
                 type="number"
                 min={10}
                 max={180}
                 value={form.durationMinutes}
                 onChange={(e) => setForm({ ...form, durationMinutes: e.target.value })}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-bold text-slate-900"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-medium text-slate-900"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-800 mb-1.5">
+              <label className="block font-medium text-slate-800 mb-1.5">
                 📅 Scheduled Start / Go-Live Time
               </label>
               <input
@@ -218,12 +218,12 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                 required
                 value={form.scheduledStartTime}
                 onChange={(e) => setForm({ ...form, scheduledStartTime: e.target.value })}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-semibold text-slate-800"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-semibold text-slate-800"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-1.5">
+              <label className="block font-medium text-slate-800 mb-1.5">
                 ⏳ Final Assessment Deadline
               </label>
               <input
@@ -231,13 +231,13 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                 required
                 value={form.deadlineTime}
                 onChange={(e) => setForm({ ...form, deadlineTime: e.target.value })}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-semibold text-slate-800"
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none font-semibold text-slate-800"
               />
             </div>
           </div>
 
           {/* ─── TARGET TRAINEES CONFIGURATION ─── */}
-          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+          <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <label className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
@@ -249,11 +249,11 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-1 bg-white p-1 rounded-[var(--radius)] border border-slate-200">
                 <button
                   type="button"
                   onClick={() => setTargetType("all")}
-                  className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                  className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${
                     targetType === "all"
                       ? "bg-blue-600 text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-900"
@@ -264,7 +264,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                 <button
                   type="button"
                   onClick={() => setTargetType("specific")}
-                  className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all ${
+                  className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${
                     targetType === "specific"
                       ? "bg-blue-600 text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-900"
@@ -285,14 +285,14 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                       placeholder="Search trainees by name or station..."
                       value={traineeSearch}
                       onChange={(e) => setTraineeSearch(e.target.value)}
-                      className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium"
+                      className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-[var(--radius)] text-xs font-medium"
                     />
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => setSelectedTraineeIds(enrolledTrainees.map(t => t.id))}
-                      className="text-xs font-bold text-blue-600 hover:underline"
+                      className="text-xs font-medium text-blue-600 hover:underline"
                     >
                       Select All ({enrolledTrainees.length})
                     </button>
@@ -300,21 +300,21 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     <button
                       type="button"
                       onClick={() => setSelectedTraineeIds([])}
-                      className="text-xs font-bold text-slate-500 hover:underline"
+                      className="text-xs font-medium text-slate-500 hover:underline"
                     >
                       Clear
                     </button>
                   </div>
                 </div>
 
-                <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-white rounded-xl border border-slate-200">
+                <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-white rounded-[var(--radius)] border border-slate-200">
                   {filteredTrainees.map(t => {
                     const isSelected = selectedTraineeIds.includes(t.id);
                     return (
                       <div
                         key={t.id}
                         onClick={() => handleToggleTrainee(t.id)}
-                        className={`p-2.5 rounded-lg border text-xs cursor-pointer flex items-center justify-between transition-colors ${
+                        className={`p-2.5 rounded-[var(--radius)] border text-xs cursor-pointer flex items-center justify-between transition-colors ${
                           isSelected
                             ? "bg-blue-50 border-blue-300 text-blue-950 font-medium"
                             : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
@@ -328,7 +328,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                             className="w-4 h-4 text-blue-600 rounded"
                           />
                           <div>
-                            <span className="font-bold text-slate-900">{t.name}</span>
+                            <span className="font-medium text-slate-900">{t.name}</span>
                             <span className="text-[10px] text-slate-500 ml-2">({t.email})</span>
                           </div>
                         </div>
@@ -349,7 +349,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
           {/* Select Questions from Bank */}
           <div className="pt-2">
             <div className="flex items-center justify-between mb-2">
-              <label className="font-bold text-slate-800">
+              <label className="font-medium text-slate-800">
                 Select Questions from Question Bank ({selectedQuestions.length} selected)
               </label>
               <button
@@ -361,20 +361,20 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     setSelectedQuestions(questionBank.map(q => q.id));
                   }
                 }}
-                className="text-blue-600 font-bold hover:underline"
+                className="text-blue-600 font-medium hover:underline"
               >
                 {selectedQuestions.length === questionBank.length ? "Deselect All" : "Select All"}
               </button>
             </div>
 
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1 border border-slate-200 rounded-2xl p-3 bg-slate-50">
+            <div className="space-y-2 max-h-56 overflow-y-auto pr-1 border border-slate-200 rounded-[var(--radius)] p-3 bg-slate-50">
               {questionBank.map(q => {
                 const isSelected = selectedQuestions.includes(q.id);
                 return (
                   <div
                     key={q.id}
                     onClick={() => handleToggleQuestion(q.id)}
-                    className={`p-3 rounded-xl border text-xs cursor-pointer flex items-center gap-3 transition-colors ${
+                    className={`p-3 rounded-[var(--radius)] border text-xs cursor-pointer flex items-center gap-3 transition-colors ${
                       isSelected
                         ? "bg-blue-50 border-blue-300 text-blue-950 font-medium"
                         : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
@@ -389,7 +389,7 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
                     <div className="flex-1">
                       <p className="line-clamp-1 font-medium">{q.question}</p>
                       <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500">
-                        <span className="font-bold text-blue-700">{q.marks || 2} Marks</span>
+                        <span className="font-medium text-blue-700">{q.marks || 2} Marks</span>
                         <span>•</span>
                         <span>{q.difficulty}</span>
                         <span>•</span>
@@ -406,14 +406,14 @@ export const QuizScheduleModal = ({ isOpen, onClose, currentUser, onQuizCreated 
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-[var(--radius)] font-semibold transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition-all transform hover:scale-[1.02]"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-[var(--radius)] font-semibold shadow-md transition-all transform hover:scale-[1.02]"
             >
               {loading ? "Publishing Assessment..." : "Schedule & Publish Assessment"}
             </button>

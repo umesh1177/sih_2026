@@ -182,12 +182,12 @@ export const SubjectMaterialUploadModal = ({
 
   return (
     <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl flex flex-col overflow-hidden text-slate-800 font-sans my-auto max-h-[90vh]">
+      <div className="bg-white rounded-[var(--radius)] shadow-2xl border border-slate-200 w-full max-w-2xl flex flex-col overflow-hidden text-slate-800 font-sans my-auto max-h-[90vh]">
         
         {/* ═════════ HEADER ═════════ */}
         <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 font-bold shadow-xs">
+            <div className="w-10 h-10 rounded-[var(--radius)] bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 font-medium shadow-xs">
               <Upload className="w-5 h-5" />
             </div>
             <div>
@@ -202,7 +202,7 @@ export const SubjectMaterialUploadModal = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
+            className="p-1.5 rounded-[var(--radius)] bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -213,11 +213,11 @@ export const SubjectMaterialUploadModal = ({
           
           {/* Target Module Selection */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1.5">Target Module</label>
+            <label className="block font-medium text-slate-700 mb-1.5">Target Module</label>
             <select
               value={selectedModuleId}
               onChange={(e) => setSelectedModuleId(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
             >
               {modules.map((m, mIdx) => (
                 <option key={m.id || mIdx} value={m.id || `mod_${mIdx}`}>
@@ -229,7 +229,7 @@ export const SubjectMaterialUploadModal = ({
 
           {/* Material Format Type Selector */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1.5">Resource Format Type</label>
+            <label className="block font-medium text-slate-700 mb-1.5">Resource Format Type</label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               
               <button
@@ -238,7 +238,7 @@ export const SubjectMaterialUploadModal = ({
                   setMaterialType("video");
                   setDuration("45 Mins");
                 }}
-                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
+                className={`p-2.5 rounded-[var(--radius)] border text-center transition-all flex flex-col items-center gap-1 ${
                   materialType === "video"
                     ? "bg-rose-50 border-rose-600 text-rose-950 font-black shadow-sm"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -255,7 +255,7 @@ export const SubjectMaterialUploadModal = ({
                   setDuration("15 Mins");
                   setTitle("Video Quiz: Comprehension & Concept Check");
                 }}
-                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
+                className={`p-2.5 rounded-[var(--radius)] border text-center transition-all flex flex-col items-center gap-1 ${
                   materialType === "quiz"
                     ? "bg-indigo-50 border-indigo-600 text-indigo-950 font-black shadow-sm"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -271,7 +271,7 @@ export const SubjectMaterialUploadModal = ({
                   setMaterialType("ppt");
                   setDuration("28 Slides");
                 }}
-                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
+                className={`p-2.5 rounded-[var(--radius)] border text-center transition-all flex flex-col items-center gap-1 ${
                   materialType === "ppt"
                     ? "bg-amber-50 border-amber-600 text-amber-950 font-black shadow-sm"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -287,7 +287,7 @@ export const SubjectMaterialUploadModal = ({
                   setMaterialType("pdf");
                   setDuration("12 Pages");
                 }}
-                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
+                className={`p-2.5 rounded-[var(--radius)] border text-center transition-all flex flex-col items-center gap-1 ${
                   materialType === "pdf"
                     ? "bg-purple-50 border-purple-600 text-purple-950 font-black shadow-sm"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -303,7 +303,7 @@ export const SubjectMaterialUploadModal = ({
                   setMaterialType("lab");
                   setDuration("1.5 Hours");
                 }}
-                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center gap-1 ${
+                className={`p-2.5 rounded-[var(--radius)] border text-center transition-all flex flex-col items-center gap-1 ${
                   materialType === "lab"
                     ? "bg-emerald-50 border-emerald-600 text-emerald-950 font-black shadow-sm"
                     : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -337,10 +337,10 @@ export const SubjectMaterialUploadModal = ({
           {materialType !== "quiz" && (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block font-bold text-slate-700">
+                <label className="block font-medium text-slate-700">
                   Select Local File ({materialType === "ppt" ? "PPTX / PPT" : materialType === "pdf" ? "PDF Document" : materialType === "video" ? "MP4 Video" : "DOCX / PDF"}) *
                 </label>
-                <span className="text-[10px] text-indigo-600 font-bold">Verified for Trainee Study Studio</span>
+                <span className="text-[10px] text-indigo-600 font-medium">Verified for Trainee Study Studio</span>
               </div>
 
               <div
@@ -355,7 +355,7 @@ export const SubjectMaterialUploadModal = ({
                   setIsDraggingFile(false);
                   handleFileSelect(e);
                 }}
-                className={`p-4 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center ${
+                className={`p-4 rounded-[var(--radius)] border-2 border-dashed transition-all cursor-pointer text-center ${
                   isDraggingFile
                     ? "border-indigo-600 bg-indigo-50 ring-2 ring-indigo-200"
                     : selectedFileObj || fileDataUrl
@@ -366,11 +366,11 @@ export const SubjectMaterialUploadModal = ({
                 {selectedFileObj ? (
                   <div className="flex items-center justify-between gap-3 text-left">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-[var(--radius)] bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                         <FileCheck className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900 text-xs truncate max-w-xs">{selectedFileObj.name}</p>
+                        <p className="font-medium text-slate-900 text-xs truncate max-w-xs">{selectedFileObj.name}</p>
                         <p className="text-[10px] text-emerald-700 font-semibold">{fileSize} • Ready to upload to module</p>
                       </div>
                     </div>
@@ -382,7 +382,7 @@ export const SubjectMaterialUploadModal = ({
                           e.stopPropagation();
                           fileInputRef.current?.click();
                         }}
-                        className="px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg border border-slate-200 text-[11px]"
+                        className="px-2.5 py-1 bg-white hover:bg-slate-50 text-slate-700 font-medium rounded-[var(--radius)] border border-slate-200 text-[11px]"
                       >
                         Change
                       </button>
@@ -392,7 +392,7 @@ export const SubjectMaterialUploadModal = ({
                           e.stopPropagation();
                           handleClearFile();
                         }}
-                        className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200"
+                        className="p-1 rounded-[var(--radius)] bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -401,7 +401,7 @@ export const SubjectMaterialUploadModal = ({
                 ) : (
                   <div className="space-y-1">
                     <UploadCloud className="w-7 h-7 text-indigo-600 mx-auto mb-1 opacity-80" />
-                    <p className="text-xs font-bold text-slate-700">
+                    <p className="text-xs font-medium text-slate-700">
                       Click to browse or drop {materialType === "ppt" ? "PowerPoint (.ppt, .pptx)" : materialType === "pdf" ? "PDF Document (.pdf)" : materialType === "video" ? "MP4 Video (.mp4)" : "Lab Guide"} here
                     </p>
                     <p className="text-[10px] text-slate-400">File verified & preview generated automatically</p>
@@ -412,7 +412,7 @@ export const SubjectMaterialUploadModal = ({
               {/* Video Stream URL Link Option */}
               {materialType === "video" && (
                 <div className="mt-2.5">
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  <label className="block text-[11px] font-medium text-slate-600 mb-1">
                     Or enter Stream / Embed / YouTube URL:
                   </label>
                   <input
@@ -420,7 +420,7 @@ export const SubjectMaterialUploadModal = ({
                     placeholder="https://www.youtube.com/embed/... or direct MP4 URL"
                     value={url.startsWith("data:") ? "" : url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                   />
                 </div>
               )}
@@ -429,7 +429,7 @@ export const SubjectMaterialUploadModal = ({
 
           {/* Title Input */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1">
+            <label className="block font-medium text-slate-700 mb-1">
               {materialType === "quiz" ? "Assessment / Quiz Title" : "Material Title *"}
             </label>
             <input
@@ -445,7 +445,7 @@ export const SubjectMaterialUploadModal = ({
               }
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none font-medium"
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none font-medium"
               required
             />
           </div>
@@ -453,23 +453,23 @@ export const SubjectMaterialUploadModal = ({
           {/* Duration & Passing score or file size */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Estimated Duration</label>
+              <label className="block font-medium text-slate-700 mb-1">Estimated Duration</label>
               <input
                 type="text"
                 placeholder="e.g. 45 Mins or 15 Mins"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
               />
             </div>
 
             {materialType === "quiz" ? (
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Pass Grade Requirement</label>
+                <label className="block font-medium text-slate-700 mb-1">Pass Grade Requirement</label>
                 <select
                   value={passPercentage}
                   onChange={(e) => setPassPercentage(Number(e.target.value))}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-900"
                 >
                   <option value={50}>50% (Standard Pass)</option>
                   <option value={70}>70% (Rigorous Pass)</option>
@@ -478,20 +478,20 @@ export const SubjectMaterialUploadModal = ({
               </div>
             ) : (
               <div>
-                <label className="block font-bold text-slate-700 mb-1">File Size / Format</label>
+                <label className="block font-medium text-slate-700 mb-1">File Size / Format</label>
                 <input
                   type="text"
                   placeholder="e.g. 2.4 MB or 14.8 MB"
                   value={fileSize}
                   onChange={(e) => setFileSize(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                 />
               </div>
             )}
           </div>
 
           {/* Progression Rule Option */}
-          <div className="p-3.5 bg-indigo-50/80 border border-indigo-200 rounded-2xl space-y-2 text-indigo-950">
+          <div className="p-3.5 bg-indigo-50/80 border border-indigo-200 rounded-[var(--radius)] space-y-2 text-indigo-950">
             <span className="font-extrabold text-xs block text-indigo-900">
               🔒 Controlled Learning Progression Rule:
             </span>
@@ -513,14 +513,14 @@ export const SubjectMaterialUploadModal = ({
           </div>
 
           {/* Upload Metadata Preview */}
-          <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-2xl flex items-center justify-between text-blue-950 text-xs">
+          <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-[var(--radius)] flex items-center justify-between text-blue-950 text-xs">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-blue-700 shrink-0" />
               <span>
                 Metadata Stamp: <b>Uploaded by: {currentUser?.name || "Dr. Amit Sengupta (Trainer)"}</b>
               </span>
             </div>
-            <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
               Trainer Authorized
             </span>
           </div>
@@ -530,7 +530,7 @@ export const SubjectMaterialUploadModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
+              className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-[var(--radius)] text-xs transition-colors"
             >
               Cancel
             </button>
@@ -538,7 +538,7 @@ export const SubjectMaterialUploadModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs shadow-md transition-all"
+              className="flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-all"
             >
               <Upload className="w-4 h-4 text-white" />
               <span>{loading ? "Publishing to Module..." : success ? "Published Successfully ✓" : "Publish & Connect to Path"}</span>
