@@ -155,7 +155,7 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
               activeTab === "rankings" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
-            <span>🏆 Trainee Leaderboard ({rankings.length})</span>
+            <span>Trainee Leaderboard ({rankings.length})</span>
             {disqualifiedCount > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">
                 {disqualifiedCount} Disq
@@ -168,7 +168,7 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
               activeTab === "questions" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
-            🎯 Question Accuracy Breakdown
+            Question Accuracy Breakdown
           </button>
           <button
             onClick={() => setIsItemAnalysisOpen(true)}

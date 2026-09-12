@@ -1784,7 +1784,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   </div>
                 )}
 
-                {/* 2. 📝 IN-STUDIO INTERACTIVE VIDEO QUIZ STAGE */}
+                {/* 2. IN-STUDIO INTERACTIVE VIDEO QUIZ STAGE */}
                 {selectedMaterial?.type === "quiz" && (
                   <div className="w-full max-w-4xl bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-8 space-y-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
@@ -2139,7 +2139,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
               </button>
             </div>
 
-            {/* ═════════ TAB 1: 📝 LECTURE NOTES FORM ═════════ */}
+            {/* ═════════ TAB 1: LECTURE NOTES FORM ═════════ */}
             {rightPanelTab === "notes" && (
               <div className="p-4 sm:p-5 flex-1 flex flex-col space-y-3 overflow-y-auto">
                 <div className="flex items-center justify-between text-xs">
