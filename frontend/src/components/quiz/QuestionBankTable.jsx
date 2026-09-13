@@ -13,8 +13,6 @@ import {
   ArrowUpDown,
   CheckCircle2,
   X,
-  Layers,
-  HelpCircle,
   AlertTriangle,
   AlertCircle
 } from "lucide-react";
@@ -40,7 +38,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
   const [generatePaperError, setGeneratePaperError] = useState("");
   const [generatingPaper, setGeneratingPaper] = useState(false);
 
-  // New Question Form state
   const [newQuestionForm, setNewQuestionForm] = useState({
     question: "",
     subjectId: "sub_nwp_01",
@@ -66,7 +63,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
       const res = await api.getQuestions(params);
       if (res?.success) {
         let qs = Array.isArray(res.questions) ? res.questions : [];
-        // DATA ISOLATION: Trainee and Trainer see only their own questions
         if (currentUser?.role === "trainee" || currentUser?.role === "trainer") {
           qs = qs.filter(q => 
             q.createdBy === currentUser.id || 
@@ -90,7 +86,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
     fetchQuestions();
   }, [selectedSubject, selectedType, selectedDifficulty]);
 
-  // Handle manual question creation
   const handleCreateQuestion = async (e) => {
     e.preventDefault();
     try {
@@ -132,7 +127,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
     }
   };
 
-  // Duplicate question
   const handleDuplicate = async (id) => {
     setActiveMenuId(null);
     try {
@@ -145,10 +139,9 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
     }
   };
 
-  // Delete question
   const handleDelete = async (id) => {
     setActiveMenuId(null);
-    if (!window.confirm("Are you sure you want to delete this question from the Question Bank?")) return;
+    if (!window.confirm("Are you sure you want to delete this question?")) return;
     try {
       const res = await api.deleteQuestion(id);
       if (res.success) {
@@ -159,7 +152,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
     }
   };
 
-  // Filtered in-memory list if search text changes
   const displayedQuestions = questions.filter(q => {
     if (!searchQuery) return true;
     const qLower = searchQuery.toLowerCase();
@@ -167,13 +159,12 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
   });
 
   return (
-    <div className="p-4 sm:p-6 bg-[#F8FAFC] min-h-full font-sans text-slate-800">
+    <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto text-[#172033]">
       {/* Top Header & Toolbar */}
-      <div className="bg-white rounded-[var(--radius)] border border-slate-200/90 shadow-xs p-4 sm:p-5 mb-5">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs p-4 sm:p-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           {/* Left search & subject selector */}
           <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            {/* Search Box */}
             <div className="relative min-w-[240px]">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -182,16 +173,15 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchQuestions()}
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:outline-none focus:ring-1 focus:ring-[#0B3475] focus:bg-white text-slate-800"
+                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#2563EB] focus:bg-white text-[#172033]"
               />
             </div>
 
-            {/* Subject Selector Dropdown */}
             <div className="relative">
               <select
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#0B3475] cursor-pointer"
+                className="appearance-none pl-3 pr-8 py-1.5 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:outline-none focus:ring-1 focus:ring-[#2563EB] cursor-pointer"
               >
                 <option value="all">All Subjects</option>
                 <option value="sub_nwp_01">Subject 1: Governing Equations & Dynamics</option>
@@ -206,66 +196,60 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap sm:flex-nowrap">
-            {/* Generate Adaptive Practice Paper CTA */}
             <button
               onClick={() => setIsGeneratePaperModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-[var(--radius)] text-xs font-semibold shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium shadow-xs transition-colors"
               title="Assemble an adaptive practice test from the Question Bank"
             >
-              <Sparkles className="w-3 h-3 text-amber-300" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
               <span>Adaptive Drill</span>
             </button>
 
-            {/* Filter Toggle */}
             <button
               onClick={() => setShowFilterModal(!showFilterModal)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-[var(--radius)] text-xs font-medium text-slate-700 shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#E2E8F0] hover:bg-slate-50 rounded-lg text-xs font-medium text-slate-700 shadow-xs transition-colors"
             >
-              <Filter className="w-3 h-3 text-slate-500" />
+              <Filter className="w-3.5 h-3.5 text-slate-500" />
               <span>Filters</span>
             </button>
 
-            {/* AI Generate Button */}
             {onOpenAiGenerator && (
               <button
                 onClick={onOpenAiGenerator}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-[var(--radius)] text-xs font-semibold shadow-xs transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium shadow-xs transition-colors"
               >
-                <Sparkles className="w-3 h-3 text-yellow-300" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                 <span>AI Generator</span>
               </button>
             )}
 
-            {/* Weak Question & Difficult Concept Item Analysis */}
             <button
               onClick={() => setIsItemAnalysisOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-[var(--radius)] text-xs font-semibold shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-medium shadow-xs transition-colors"
             >
-              <AlertTriangle className="w-3 h-3 text-rose-600" />
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
               <span>Item Analysis</span>
             </button>
 
-            {/* + Create Question Button */}
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white rounded-[var(--radius)] text-xs font-semibold shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg text-xs font-medium shadow-xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5 text-white" />
-              <span>+ Create Question</span>
+              <span>Create Question</span>
             </button>
           </div>
         </div>
 
-
-        {/* Filter Drawer if expanded */}
+        {/* Filter Drawer */}
         {showFilterModal && (
-          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs animate-in fade-in duration-150">
+          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs">
             <div>
-              <span className="text-slate-500 font-medium mr-2">Question Type:</span>
+              <span className="text-[#475569] font-medium mr-2">Question Type:</span>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-slate-700"
+                className="px-2.5 py-1.5 bg-slate-50 border border-[#E2E8F0] rounded-lg font-medium text-[#172033]"
               >
                 <option value="all">All Types</option>
                 <option value="MCQ">MCQ</option>
@@ -275,11 +259,11 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
             </div>
 
             <div>
-              <span className="text-slate-500 font-medium mr-2">Difficulty:</span>
+              <span className="text-[#475569] font-medium mr-2">Difficulty:</span>
               <select
                 value={selectedDifficulty}
                 onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-slate-700"
+                className="px-2.5 py-1.5 bg-slate-50 border border-[#E2E8F0] rounded-lg font-medium text-[#172033]"
               >
                 <option value="all">All Difficulties</option>
                 <option value="Easy">Easy</option>
@@ -295,7 +279,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 setSelectedSubject("all");
                 setSearchQuery("");
               }}
-              className="text-blue-700 font-medium hover:underline ml-auto"
+              className="text-[#2563EB] font-medium hover:underline ml-auto"
             >
               Reset Filters
             </button>
@@ -303,24 +287,19 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
         )}
       </div>
 
-      {/* Questions Data Table strictly matching Screenshots 1 & 3 */}
-      <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm overflow-hidden">
+      {/* Questions Data Table */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-600 font-semibold select-none">
+              <tr className="border-b border-[#E2E8F0] bg-slate-50/70 text-[#475569] font-semibold select-none">
                 <th className="py-3.5 px-4 w-1/2">
-                  <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-900">
+                  <div className="flex items-center gap-1.5">
                     <span>Question</span>
                     <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
-                <th className="py-3.5 px-4 w-20 text-center">
-                  <div className="flex items-center justify-center gap-1 cursor-pointer hover:text-slate-900">
-                    <span>Marks</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
+                <th className="py-3.5 px-4 w-20 text-center">Marks</th>
                 <th className="py-3.5 px-4 w-28 text-center">Type</th>
                 <th className="py-3.5 px-4 w-44">Labels</th>
                 <th className="py-3.5 px-4 w-12 text-center"></th>
@@ -342,41 +321,36 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
               ) : (
                 displayedQuestions.map((q) => {
                   return (
-                    <tr key={q.id} className="hover:bg-slate-50/80 transition-colors group">
-                      {/* Question Text */}
+                    <tr key={q.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-4 px-4 align-middle">
-                        <p className="font-normal text-slate-800 leading-relaxed max-w-2xl line-clamp-2">
+                        <p className="font-normal text-[#172033] leading-relaxed max-w-2xl line-clamp-2">
                           {q.question}
                         </p>
                       </td>
 
-                      {/* Marks */}
-                      <td className="py-4 px-4 text-center font-semibold text-slate-700 align-middle">
+                      <td className="py-4 px-4 text-center font-medium text-[#172033] align-middle">
                         {q.marks || 2}
                       </td>
 
-                      {/* Type Badge matching reference styling */}
                       <td className="py-4 px-4 text-center align-middle">
                         <span
-                          className={`inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide ${
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide ${
                             q.type === "MCQ"
-                              ? "bg-[#0a2558] text-white"
+                              ? "bg-blue-100 text-[#2563EB]"
                               : q.type === "Descriptive"
-                              ? "bg-[#085287] text-white"
-                              : "bg-[#0f766e] text-white"
+                              ? "bg-indigo-100 text-indigo-700"
+                              : "bg-teal-100 text-teal-700"
                           }`}
                         >
                           {q.type === "MCQ" ? "MCQ" : q.type === "Descriptive" ? "Descriptive" : "One Word"}
                         </span>
                       </td>
 
-                      {/* Labels Column (Difficulty & Module badges) */}
                       <td className="py-4 px-4 align-middle">
                         <div className="flex flex-col gap-1">
-                          {/* Difficulty Pill */}
                           <div>
                             <span
-                              className={`inline-block px-2.5 py-0.5 rounded-[var(--radius)] text-[10px] font-medium ${
+                              className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-medium ${
                                 q.difficulty === "Hard"
                                   ? "bg-rose-50 text-rose-700 border border-rose-200"
                                   : q.difficulty === "Medium"
@@ -387,7 +361,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                               Difficulty: {q.difficulty || "Medium"}
                             </span>
                           </div>
-                          {/* Module Pill */}
                           <div>
                             <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
                               Module: {q.module || "Module 1"}
@@ -396,24 +369,22 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                         </div>
                       </td>
 
-                      {/* Actions Popover Button matching Screenshot 1 & 3 */}
                       <td className="py-4 px-4 text-center align-middle relative">
                         <button
                           onClick={() => setActiveMenuId(activeMenuId === q.id ? null : q.id)}
-                          className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+                          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
 
-                        {/* Action Menu Popup matching screenshot exactly */}
                         {activeMenuId === q.id && (
-                          <div className="absolute right-6 top-8 w-36 bg-white rounded-[var(--radius)] shadow-xl border border-slate-200 py-1.5 z-40 text-left animate-in fade-in zoom-in-95 duration-100">
+                          <div className="absolute right-6 top-8 w-36 bg-white rounded-lg shadow-lg border border-[#E2E8F0] py-1.5 z-40 text-left">
                             <button
                               onClick={() => {
                                 setPreviewQuestion(q);
                                 setActiveMenuId(null);
                               }}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#172033] hover:bg-slate-50 transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5 text-slate-500" />
                               <span>Preview</span>
@@ -425,7 +396,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                                 setIsCreateModalOpen(true);
                                 setActiveMenuId(null);
                               }}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#172033] hover:bg-slate-50 transition-colors"
                             >
                               <FileEdit className="w-3.5 h-3.5 text-slate-500" />
                               <span>Edit</span>
@@ -433,7 +404,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
                             <button
                               onClick={() => handleDuplicate(q.id)}
-                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                              className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#172033] hover:bg-slate-50 transition-colors"
                             >
                               <Copy className="w-3.5 h-3.5 text-slate-500" />
                               <span>Duplicate</span>
@@ -462,40 +433,39 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
       {/* Question Preview Modal */}
       {previewQuestion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-white rounded-[var(--radius)] max-w-xl w-full p-6 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-xl w-full p-6 shadow-xl border border-[#E2E8F0]">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#0a2558] text-white">
+                <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-[#2563EB] text-white">
                   {previewQuestion.type}
                 </span>
-                <span className="text-xs font-semibold text-slate-500">
+                <span className="text-xs font-medium text-slate-500">
                   {previewQuestion.marks} Marks
                 </span>
               </div>
               <button
                 onClick={() => setPreviewQuestion(null)}
-                className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="py-4 space-y-4">
-              <h3 className="text-base font-semibold text-slate-900 leading-snug">
+              <h3 className="text-base font-semibold text-[#172033] leading-snug">
                 {previewQuestion.question}
               </h3>
 
-              {/* MCQ Options Display */}
               {previewQuestion.options && previewQuestion.options.length > 0 ? (
                 <div className="space-y-2 mt-3">
                   {previewQuestion.options.map((opt, i) => (
                     <div
                       key={i}
-                      className={`p-3 rounded-[var(--radius)] border text-xs flex items-center gap-3 ${
+                      className={`p-3 rounded-lg border text-xs flex items-center gap-3 ${
                         previewQuestion.correctAnswer === i
                           ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-medium"
-                          : "bg-slate-50 border-slate-200 text-slate-700"
+                          : "bg-slate-50 border-[#E2E8F0] text-slate-700"
                       }`}
                     >
                       <span className="w-6 h-6 rounded-full bg-white border border-slate-300 flex items-center justify-center font-medium shrink-0 text-slate-600">
@@ -509,20 +479,15 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                   ))}
                 </div>
               ) : previewQuestion.expectedAnswer ? (
-                <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-[var(--radius)] text-xs space-y-1 text-slate-800">
-                  <span className="font-medium block text-amber-950">🔑 Expected Answer / Keyword:</span>
+                <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-1 text-[#172033]">
+                  <span className="font-semibold block text-amber-950">🔑 Expected Answer / Keyword:</span>
                   <p className="font-mono text-emerald-800 font-medium text-sm">{previewQuestion.expectedAnswer}</p>
-                  {previewQuestion.acceptedAnswers && previewQuestion.acceptedAnswers.length > 1 && (
-                    <p className="text-[10px] text-slate-500">
-                      Accepted variations: {previewQuestion.acceptedAnswers.join(", ")}
-                    </p>
-                  )}
                 </div>
               ) : null}
 
               {previewQuestion.explanation && (
-                <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-[var(--radius)] text-xs text-blue-900">
-                  <span className="font-medium block mb-1">Scientific Explanation:</span>
+                <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-lg text-xs text-blue-900">
+                  <span className="font-semibold block mb-1">Explanation:</span>
                   <p>{previewQuestion.explanation}</p>
                 </div>
               )}
@@ -531,7 +496,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
             <div className="pt-3 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => setPreviewQuestion(null)}
-                className="px-4 py-2 bg-[#0a2558] text-white rounded-[var(--radius)] text-xs font-medium"
+                className="px-4 py-2 bg-[#2563EB] text-white rounded-lg text-xs font-medium"
               >
                 Close Preview
               </button>
@@ -542,20 +507,20 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
       {/* Create / Edit Question Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 shadow-2xl border border-slate-200 my-8">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-2xl w-full p-6 shadow-xl border border-[#E2E8F0] my-8">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
-                <h2 className="text-base font-black text-slate-900">
+                <h2 className="text-base font-semibold text-[#172033]">
                   {newQuestionForm.id ? "Edit Assessment Question" : "Create New Assessment Question"}
                 </h2>
-                <p className="text-[11px] text-slate-500">
-                  Add domain questions directly into your trainer Question Bank.
+                <p className="text-[11px] text-[#475569]">
+                  Add domain questions directly into your Question Bank.
                 </p>
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1.5 rounded-[var(--radius)] text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -563,24 +528,24 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
             <form onSubmit={handleCreateQuestion} className="py-4 space-y-4 text-xs">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Question Prompt *</label>
+                <label className="block font-medium text-[#172033] mb-1">Question Prompt *</label>
                 <textarea
                   required
                   rows={3}
                   value={newQuestionForm.question}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, question: e.target.value })}
-                  placeholder="Enter the meteorological problem or question here..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-[#0a2558] focus:outline-none text-slate-900 font-medium"
+                  placeholder="Enter the problem or question here..."
+                  className="w-full p-3 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:ring-1 focus:ring-[#2563EB] focus:outline-none text-[#172033] font-normal"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Question Format</label>
+                  <label className="block font-medium text-[#172033] mb-1">Question Format</label>
                   <select
                     value={newQuestionForm.type}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, type: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium text-slate-800"
+                    className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none font-medium text-[#172033]"
                   >
                     <option value="MCQ">Multiple Choice (MCQ)</option>
                     <option value="One Word">One Word / Short Answer</option>
@@ -588,11 +553,11 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 </div>
 
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Difficulty Level</label>
+                  <label className="block font-medium text-[#172033] mb-1">Difficulty Level</label>
                   <select
                     value={newQuestionForm.difficulty}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, difficulty: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
+                    className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none"
                   >
                     <option value="Easy">Easy (Conceptual)</option>
                     <option value="Medium">Medium (Analytical)</option>
@@ -601,50 +566,50 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 </div>
 
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Marks Assigned</label>
+                  <label className="block font-medium text-[#172033] mb-1">Marks Assigned</label>
                   <input
                     type="number"
                     min={1}
                     max={20}
                     value={newQuestionForm.marks}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, marks: Number(e.target.value) })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium"
+                    className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none font-medium"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Subject Name *</label>
+                  <label className="block font-medium text-[#172033] mb-1">Subject Name *</label>
                   <input
                     type="text"
                     required
                     value={newQuestionForm.subjectName}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, subjectName: e.target.value })}
                     placeholder="e.g. Governing Equations & Dynamics"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium"
+                    className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Module</label>
+                  <label className="block font-medium text-[#172033] mb-1">Module</label>
                   <input
                     type="text"
                     value={newQuestionForm.module}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, module: e.target.value })}
-                    placeholder="e.g. Module 1, Module 2"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium"
+                    placeholder="e.g. Module 1"
+                    className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Topic Name</label>
+                  <label className="block font-medium text-[#172033] mb-1">Topic Name</label>
                   <input
                     type="text"
                     value={newQuestionForm.topic || ""}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, topic: e.target.value })}
-                    placeholder="e.g. CFL Condition, Doppler Moments"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium"
+                    placeholder="e.g. Core Topic"
+                    className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none font-medium"
                   />
                 </div>
               </div>
@@ -652,7 +617,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
               {/* MCQ Options */}
               {newQuestionForm.type === "MCQ" && (
                 <div className="space-y-2 pt-2">
-                  <label className="block font-medium text-slate-700">
+                  <label className="block font-medium text-[#172033]">
                     Multiple Choice Options (Select radio button for the correct option)
                   </label>
                   {newQuestionForm.options.map((opt, i) => (
@@ -662,7 +627,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                         name="correctAnswer"
                         checked={newQuestionForm.correctAnswer === i}
                         onChange={() => setNewQuestionForm({ ...newQuestionForm, correctAnswer: i })}
-                        className="w-4 h-4 text-[#0a2558] focus:ring-[#0a2558]"
+                        className="w-4 h-4 text-[#2563EB] focus:ring-[#2563EB]"
                       />
                       <span className="w-5 text-center font-medium text-slate-500">
                         {String.fromCharCode(65 + i)}:
@@ -677,7 +642,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                           setNewQuestionForm({ ...newQuestionForm, options: updated });
                         }}
                         placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                        className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none"
+                        className="flex-1 p-2 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none"
                       />
                     </div>
                   ))}
@@ -686,8 +651,8 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
               {/* One Word / Short Answer Expected Answer */}
               {newQuestionForm.type === "One Word" && (
-                <div className="space-y-1.5 pt-2 animate-in fade-in duration-150">
-                  <label className="block font-medium text-slate-700">
+                <div className="space-y-1.5 pt-2">
+                  <label className="block font-medium text-[#172033]">
                     Expected Single Word / Keyword Answer *
                   </label>
                   <input
@@ -695,23 +660,20 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                     required
                     value={newQuestionForm.expectedAnswer || ""}
                     onChange={(e) => setNewQuestionForm({ ...newQuestionForm, expectedAnswer: e.target.value })}
-                    placeholder="e.g. Rossby Number, Vorticity, 4D-Var"
-                    className="w-full p-2.5 bg-amber-50/70 border border-amber-300 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium text-slate-900"
+                    placeholder="e.g. Core Keyword"
+                    className="w-full p-2.5 bg-amber-50/70 border border-amber-300 rounded-lg focus:bg-white focus:outline-none font-medium text-[#172033]"
                   />
-                  <p className="text-[10px] text-slate-500">
-                    Cadets must submit this specific term (case-insensitive) to receive full marks.
-                  </p>
                 </div>
               )}
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Explanation / Solution Note</label>
+                <label className="block font-medium text-[#172033] mb-1">Explanation / Solution Note</label>
                 <textarea
                   rows={2}
                   value={newQuestionForm.explanation}
                   onChange={(e) => setNewQuestionForm({ ...newQuestionForm, explanation: e.target.value })}
-                  placeholder="Reference formulas, physics equations, or IMD SOP notes..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:outline-none font-medium"
+                  placeholder="Reference notes or explanations..."
+                  className="w-full p-2.5 bg-slate-50 border border-[#E2E8F0] rounded-lg focus:bg-white focus:outline-none font-medium"
                 />
               </div>
 
@@ -719,15 +681,15 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-[var(--radius)] font-medium"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-[var(--radius)] font-semibold shadow-md"
+                  className="px-5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg font-medium shadow-xs"
                 >
-                  Save Question to Bank
+                  Save Question
                 </button>
               </div>
             </form>
@@ -735,20 +697,20 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
         </div>
       )}
 
-      {/* ═════════ GENERATE ADAPTIVE PAPER FROM QUESTION BANK MODAL ═════════ */}
+      {/* GENERATE ADAPTIVE PAPER MODAL */}
       {isGeneratePaperModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-[var(--radius)] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-800 relative my-8">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 shadow-xl border border-[#E2E8F0] text-[#172033] relative my-8">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-[var(--radius)] bg-gradient-to-tr from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-md">
-                  <Sparkles className="w-5 h-5 text-amber-300" />
+                <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                  <Sparkles className="w-4 h-4 text-amber-200" />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-slate-900">
+                  <h2 className="text-base font-semibold text-[#172033]">
                     Generate Adaptive Question Paper
                   </h2>
-                  <p className="text-[11px] text-slate-500 font-medium">
+                  <p className="text-[11px] text-[#475569]">
                     Assemble practice test from {questions.length} questions in Question Bank
                   </p>
                 </div>
@@ -756,7 +718,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
 
               <button
                 onClick={() => setIsGeneratePaperModalOpen(false)}
-                className="p-1.5 rounded-[var(--radius)] hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -788,7 +750,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                     });
 
                     if (matchedQuestions.length === 0) {
-                      setGeneratePaperError(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate fresh questions.`);
+                      setGeneratePaperError(`For this topic "${enteredTopic}", questions do not exist in the question bank.`);
                       setGeneratingPaper(false);
                       return;
                     }
@@ -810,7 +772,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                     title: generatePaperTitle || (enteredTopic ? `${enteredTopic} Adaptive Drill` : "Adaptive Question Bank Drill"),
                     courseId: "crs_nwp_101",
                     courseName: "Question Bank Adaptive Practice",
-                    trainerName: "MoES Adaptive Engine",
+                    trainerName: "Adaptive Testing Engine",
                     totalMarks: pickedQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) || 20,
                     passMarks: Math.round((pickedQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) || 20) * 0.5),
                     durationMinutes: Number(generatePaperCount) * 2,
@@ -841,7 +803,7 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
               className="space-y-4 text-xs"
             >
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#172033] mb-1">
                   Practice Paper Title:
                 </label>
                 <input
@@ -849,12 +811,12 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                   required
                   value={generatePaperTitle}
                   onChange={(e) => setGeneratePaperTitle(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0B3475]"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                 />
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#172033] mb-1">
                   Topic / Domain Focus (Optional):
                 </label>
                 <input
@@ -864,13 +826,13 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                     setGeneratePaperTopic(e.target.value);
                     if (generatePaperError) setGeneratePaperError("");
                   }}
-                  placeholder="e.g. Radar, Numerical Weather Prediction, Dynamics, Cyclone"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0B3475]"
+                  placeholder="e.g. Radar, Dynamics, Cyclone"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                 />
               </div>
 
               {generatePaperError && (
-                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-[var(--radius)] text-amber-950 space-y-2">
+                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-lg text-amber-950 space-y-2">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <div>
@@ -889,25 +851,24 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                         setIsGeneratePaperModalOpen(false);
                         onOpenAiGenerator();
                       }}
-                      className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs flex items-center gap-1.5 shadow-xs"
+                      className="px-3 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs flex items-center gap-1.5 shadow-xs"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                      <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                       <span>Switch to AI Question Generator</span>
                     </button>
                   )}
                 </div>
               )}
 
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">
+                  <label className="block font-medium text-[#172033] mb-1">
                     Number of Questions:
                   </label>
                   <select
                     value={generatePaperCount}
                     onChange={(e) => setGeneratePaperCount(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none"
                   >
                     <option value={5}>5 Questions (Speed Drill)</option>
                     <option value={10}>10 Questions (Standard)</option>
@@ -917,13 +878,13 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 </div>
 
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">
+                  <label className="block font-medium text-[#172033] mb-1">
                     Subject Filter:
                   </label>
                   <select
                     value={selectedSubject}
                     onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none"
                   >
                     <option value="all">All Subjects Pool</option>
                     <option value="sub_nwp_01">Atmospheric Dynamics</option>
@@ -934,13 +895,13 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 </div>
               </div>
 
-              <div className="p-3.5 bg-blue-50 rounded-[var(--radius)] border border-blue-200 text-[11px] text-blue-900 space-y-1">
-                <span className="font-extrabold flex items-center gap-1 text-[#0a2558]">
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-[11px] text-blue-900 space-y-0.5">
+                <span className="font-semibold flex items-center gap-1 text-[#2563EB]">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  Dynamic Adaptive Testing Enabled:
+                  Dynamic Adaptive Testing Enabled
                 </span>
                 <p className="text-blue-800">
-                  Real-time question difficulty calibration dynamically scales to ensure comprehensive concept coverage across selected subjects.
+                  Question difficulty dynamically scales to test concept coverage across selected subjects.
                 </p>
               </div>
 
@@ -948,16 +909,16 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
                 <button
                   type="button"
                   onClick={() => setIsGeneratePaperModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 font-medium rounded-[var(--radius)] text-xs hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 border border-[#E2E8F0] text-[#475569] font-medium rounded-lg text-xs hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={generatingPaper}
-                  className="px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-all disabled:opacity-60"
+                  className="px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors disabled:opacity-60"
                 >
-                  {generatingPaper ? "Generating..." : "⚡ Generate & Start Exam"}
+                  {generatingPaper ? "Generating..." : "Generate & Start Exam"}
                 </button>
               </div>
             </form>
@@ -965,7 +926,6 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
         </div>
       )}
 
-      {/* ─── RULE 11: WEAK QUESTIONS & DIFFICULT CONCEPT DETECTION MODAL ─── */}
       <ItemAnalysisDifficultQuestionsModal
         isOpen={isItemAnalysisOpen}
         onClose={() => setIsItemAnalysisOpen(false)}
@@ -976,4 +936,3 @@ export const QuestionBankTable = ({ currentUser, onOpenAiGenerator, onNavigatePr
     </div>
   );
 };
-

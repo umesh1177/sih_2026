@@ -1,58 +1,53 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  FileText, 
-  ClipboardList, 
-  Layers, 
-  BarChart3, 
-  BellRing, 
-  UserCheck, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  FileText,
+  ClipboardList,
+  Layers,
+  BarChart3,
+  BellRing,
+  UserCheck,
   GraduationCap,
   Award,
   LogOut,
-  Building2,
   FolderKanban,
   Sparkles,
   TrendingUp,
   ShieldAlert,
   Star,
-  Users,
-  X
+  Users
 } from "lucide-react";
 
-export const Sidebar = ({ 
-  activeTab, 
-  setActiveTab, 
-  onOpenLoginPage, 
-  onOpenHomePage, 
+export const Sidebar = ({
+  activeTab,
+  setActiveTab,
+  onOpenLoginPage,
   onOpenAiAdvisor,
   isOpenMobile,
   onCloseMobile
 }) => {
   const { currentUser, logout } = useAuth();
 
-  // Role based navigation links
+  // Role based navigation items
   const getNavItems = () => {
     const baseItems = [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { id: "courses", label: "Course Catalog", icon: BookOpen },
+      { id: "courses", label: "Course Catalog", icon: BookOpen }
     ];
-
     if (currentUser?.role === "trainer") {
       return [
         ...baseItems,
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
-        { id: "learning-gaps", label: "Learning Gap Detection", icon: ShieldAlert },
+        { id: "learning-gaps", label: "Learning Gaps", icon: ShieldAlert },
         { id: "schedule-assessment", label: "Assessments", icon: ClipboardList },
         { id: "questions", label: "Question Bank", icon: Layers },
         { id: "content-library", label: "Learning Resources", icon: FolderKanban },
         { id: "certificates", label: "Credentials", icon: Award },
-        { id: "profile", label: "Profile", icon: FileText },
+        { id: "profile", label: "Profile", icon: FileText }
       ];
     }
-
     if (currentUser?.role === "admin") {
       return [
         ...baseItems,
@@ -60,13 +55,12 @@ export const Sidebar = ({
         { id: "trainee-performance", label: "Learning", icon: TrendingUp },
         { id: "course-feedback", label: "Governance & Quality", icon: Star },
         { id: "learning-gaps", label: "Competency & Gaps", icon: ShieldAlert },
-        { id: "approvals", label: "Officer Approvals", icon: UserCheck },
+        { id: "approvals", label: "User Approvals", icon: UserCheck },
         { id: "announcements", label: "Communication", icon: BellRing },
         { id: "analytics", label: "Reports & Analytics", icon: BarChart3 },
-        { id: "profile", label: "Profile", icon: FileText },
+        { id: "profile", label: "Profile", icon: FileText }
       ];
     }
-
     // Trainee view
     return [
       ...baseItems,
@@ -78,7 +72,7 @@ export const Sidebar = ({
       { id: "questions", label: "Question Bank", icon: Layers },
       { id: "certificates", label: "Certificates", icon: Award },
       { id: "profile", label: "Profile", icon: FileText },
-      { id: "analytics", label: "Competency Passport", icon: BarChart3 },
+      { id: "analytics", label: "Competency Passport", icon: BarChart3 }
     ];
   };
 
@@ -99,107 +93,52 @@ export const Sidebar = ({
   };
 
   const sidebarContent = (
-    <div className="w-64 bg-[#0B3475] text-slate-200 flex flex-col h-full select-none shrink-0 border-r border-[#123F82] shadow-sm">
+    <div className="w-64 bg-[#FFFFFF] text-[#475569] flex flex-col h-full select-none shrink-0 border-r border-[#E2E8F0] shadow-xs">
       {/* Brand Header */}
-      <div className="p-4.5 border-b border-white/10 flex items-center justify-between bg-[#08285C]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-semibold text-xs tracking-wider shadow-sm shrink-0">
-            CC
-          </div>
-          <div className="overflow-hidden">
-            <h1 className="font-semibold text-sm tracking-tight text-white uppercase truncate">
-              CAPACITY CONNECT
-            </h1>
-            <p className="text-[10px] text-blue-200/80 font-normal tracking-wide truncate">
-              Learning & Assessment Portal
-            </p>
-          </div>
-        </div>
-
-        {/* Mobile Close Button */}
-        {onCloseMobile && (
-          <button
-            onClick={onCloseMobile}
-            className="lg:hidden p-1.5 rounded-[var(--radius)] text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
+      <div className="p-4 border-b border-[#E2E8F0] flex items-center">
+        <span className="text-xl font-semibold text-[#172033]">Capacity Connect</span>
       </div>
-
-      {/* Nav List */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
-        {onOpenHomePage && (
-          <button
-            onClick={() => {
-              onOpenHomePage();
-              if (onCloseMobile) onCloseMobile();
-            }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[var(--radius)] font-medium text-xs bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/20 transition-all text-left mb-2"
-          >
-            <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="truncate">Public Portal & Verify</span>
-          </button>
-        )}
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-3 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           const isAdvisor = item.isModalTrigger;
-
           return (
             <button
               key={item.id}
               onClick={() => handleItemClick(item)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] text-xs font-medium transition-all duration-150 text-left ${
-                isActive
-                  ? "bg-white/15 text-white font-semibold border-l-3 border-blue-400 shadow-2xs"
-                  : isAdvisor
-                  ? "bg-amber-500/15 text-amber-200 hover:bg-amber-500/25 border border-amber-400/20"
-                  : "text-slate-200 hover:bg-white/8 hover:text-white"
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-blue-50 text-[#2563EB]" : "hover:bg-slate-100"}`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-blue-300" : isAdvisor ? "text-amber-300" : "text-slate-300"}`} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? "stroke-[#2563EB]" : "stroke-[#475569]"}`} />
               <span className="truncate">{item.label}</span>
               {isAdvisor && (
-                <span className="ml-auto px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[9px] font-medium uppercase tracking-wider">
-                  AI
-                </span>
+                <span className="ml-auto px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-semibold uppercase">AI</span>
               )}
             </button>
           );
         })}
       </nav>
-
-      {/* User Footer Profile Card & Sign Out */}
-      <div className="border-t border-white/10 bg-[#07214A] p-3 space-y-2">
+      {/* User Footer */}
+      <div className="border-t border-[#E2E8F0] p-3 space-y-2">
         <button
           type="button"
-          onClick={() => {
-            setActiveTab("profile");
-            if (onCloseMobile) onCloseMobile();
-          }}
-          title="Click to view Profile"
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[var(--radius)] bg-white/5 hover:bg-white/10 border border-white/10 shadow-2xs overflow-hidden transition-all text-left cursor-pointer group"
+          onClick={() => { setActiveTab("profile"); if (onCloseMobile) onCloseMobile(); }}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-left"
         >
           <img
             src={currentUser?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250"}
             alt="User"
-            className="w-8 h-8 rounded-[var(--radius)] object-cover ring-1 ring-white/20 shrink-0"
+            className="w-8 h-8 rounded-full object-cover ring-1 ring-[#E2E8F0] shrink-0"
           />
-          <div className="overflow-hidden flex-1">
-            <p className="text-xs font-medium text-white truncate group-hover:text-blue-200 transition-colors">
-              {currentUser?.name || "Officer"}
-            </p>
-            <p className="text-[10px] text-slate-300 truncate capitalize">
-              {currentUser?.designation || currentUser?.department || currentUser?.role || "Cadre Member"}
-            </p>
+          <div className="flex flex-col overflow-hidden">
+            <p className="text-sm font-semibold text-[#172033] truncate">{currentUser?.name || "User"}</p>
+            <p className="text-xs text-[#475569] capitalize truncate">{currentUser?.role || ""}</p>
           </div>
         </button>
-
-        {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-400/20 text-rose-200 rounded-[var(--radius)] text-xs font-semibold transition-all cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-[#E2E8F0] text-[#475569] rounded-lg text-xs font-medium transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
@@ -210,24 +149,15 @@ export const Sidebar = ({
 
   return (
     <>
-      {/* Desktop Sticky Sidebar */}
-      <aside className="hidden lg:flex flex-col h-screen shrink-0 z-30">
-        {sidebarContent}
-      </aside>
-
-      {/* Mobile Drawer Backdrop and Drawer */}
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col h-screen shrink-0 z-30">{sidebarContent}</aside>
+      {/* Mobile Drawer */}
       {isOpenMobile && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={onCloseMobile}
-          />
-          <div className="relative z-50 h-full animate-in slide-in-from-left duration-200">
-            {sidebarContent}
-          </div>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs" onClick={onCloseMobile} />
+          <div className="relative z-50 h-full w-64 animate-in slide-in-from-left duration-200">{sidebarContent}</div>
         </div>
       )}
     </>
   );
 };
-

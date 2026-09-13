@@ -154,8 +154,8 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       alert(submitForApproval 
-        ? "Professional profile submitted for Administrative KYC & Competency Verification!" 
-        : "Officer Profile details saved and synced to database!");
+        ? "Professional profile submitted for Administrative Verification!" 
+        : "Profile details saved and synced to database!");
     } catch (err) {
       alert("Failed updating profile: " + err.message);
     } finally {
@@ -167,7 +167,7 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
     <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto font-sans text-slate-800 select-none">
       
       {/* ═════════ TOP HERO PROFILE IDENTIFICATION CARD ═════════ */}
-      <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden">
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-xs relative overflow-hidden">
         
         {/* Background Decorative Accent */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-50/80 via-indigo-50/40 to-transparent rounded-full -mr-20 -mt-20 pointer-events-none" />
@@ -175,12 +175,12 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
           
           <div className="flex items-center gap-5">
-            {/* Officer Avatar with Verification Ring */}
+            {/* User Avatar with Verification Ring */}
             <div className="relative">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[var(--radius)] bg-gradient-to-tr from-[#0a2558] to-[#1e40af] text-white flex items-center justify-center font-black text-2xl sm:text-3xl shadow-lg border-2 border-white">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-tr from-blue-700 to-blue-900 text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md border-2 border-white">
                 {form.name.split(" ").map(n => n[0]).join("") || "RS"}
               </div>
-              <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full ring-4 ring-white shadow-md" title="Verified Officer">
+              <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full ring-4 ring-white shadow-xs" title="Verified Account">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
             </div>
@@ -188,31 +188,31 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
             {/* Name & Designation */}
             <div className="space-y-1">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                   {form.name}
                 </h1>
                 
                 {currentUser?.status === "approved" && (
-                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-black flex items-center gap-1 shadow-sm">
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-semibold flex items-center gap-1 shadow-xs">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>MoES Verified Officer</span>
+                    <span>Verified Account</span>
                   </span>
                 )}
                 {currentUser?.status === "pending" && (
-                  <span className="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 rounded-full text-xs font-black flex items-center gap-1 shadow-sm animate-pulse">
+                  <span className="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 rounded-full text-xs font-semibold flex items-center gap-1 shadow-xs animate-pulse">
                     <Clock className="w-3.5 h-3.5 text-amber-600" />
                     <span>Pending Administrative Review</span>
                   </span>
                 )}
                 {currentUser?.status === "rejected" && (
-                  <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full text-xs font-black flex items-center gap-1 shadow-sm">
+                  <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-300 rounded-full text-xs font-semibold flex items-center gap-1 shadow-xs">
                     <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                     <span>Verification Rejected</span>
                   </span>
                 )}
               </div>
 
-              <p className="text-xs sm:text-sm font-extrabold text-blue-900 flex items-center gap-1.5">
+              <p className="text-xs sm:text-sm font-semibold text-blue-900 flex items-center gap-1.5">
                 <Building2 className="w-4 h-4 text-blue-600" />
                 <span>{form.designation}</span>
               </p>
@@ -224,17 +224,17 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
             </div>
           </div>
 
-          {/* Cadre ID & Quick Action */}
+          {/* Registration ID & Quick Action */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-            <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-xs">
-              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">NATIONAL CADRE ID</span>
-              <span className="font-mono font-black text-slate-900 text-sm">{form.cadreId}</span>
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">REGISTRATION ID</span>
+              <span className="font-mono font-bold text-slate-900 text-sm">{form.cadreId}</span>
             </div>
 
             <button
               onClick={() => handleSaveProfile(false)}
               disabled={loading}
-              className="flex items-center gap-2 px-5 py-3 bg-[#0a2558] hover:bg-[#071c42] text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+              className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs shadow-xs transition-transform hover:scale-[1.02]"
             >
               <Save className="w-4 h-4 text-emerald-300" />
               <span>{loading ? "Saving..." : saveSuccess ? "Saved to DB ✓" : "Save Changes"}</span>
@@ -243,11 +243,11 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
 
         </div>
 
-        {/* Quick Officer Metrics Strip */}
+        {/* Quick User Metrics Strip */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
-          <div className="p-4 bg-slate-50/80 rounded-[var(--radius)] border border-slate-100">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase">Division</span>
-            <p className="font-extrabold text-slate-800 text-xs mt-0.5">{form.department}</p>
+          <div className="p-4 bg-slate-50/80 rounded-lg border border-slate-200/60">
+            <span className="text-[10px] font-semibold text-slate-400 uppercase">Division</span>
+            <p className="font-semibold text-slate-800 text-xs mt-0.5">{form.department}</p>
           </div>
 
           <div className="p-4 bg-slate-50/80 rounded-[var(--radius)] border border-slate-100">

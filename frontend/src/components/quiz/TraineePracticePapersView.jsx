@@ -2,52 +2,38 @@ import React, { useState, useEffect } from "react";
 import { 
   Sparkles, 
   BookOpen, 
-  Award, 
   Clock, 
   PlayCircle, 
-  CheckCircle2, 
   Layers, 
   Search, 
-  Filter, 
-  Plus, 
   BarChart3, 
   RotateCcw, 
-  ChevronRight, 
-  Building2, 
   AlertCircle, 
   Check, 
-  SlidersHorizontal,
-  Flame,
-  Brain,
-  ShieldCheck,
-  TrendingUp,
-  X,
-  Radio,
-  FileCheck
+  Flame, 
+  Brain, 
+  X
 } from "lucide-react";
 import { api } from "../../services/api";
 
 export const TraineePracticePapersView = ({ 
   currentUser, 
   onStartExam, 
-  onOpenQuestionBank, 
-  onOpenAiGenerator 
+  onOpenQuestionBank
 }) => {
   const [practicePapers, setPracticePapers] = useState([]);
   const [scoreHistory, setScoreHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterSubject, setFilterSubject] = useState("all");
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [selectedAttemptForAnalytics, setSelectedAttemptForAnalytics] = useState(null);
-  const [analyticsFilter, setAnalyticsFilter] = useState("all"); // "all" | "correct" | "incorrect"
+  const [analyticsFilter, setAnalyticsFilter] = useState("all");
 
-  // Generate Practice Paper Form State
   const [generateForm, setGenerateForm] = useState({
-    title: "Adaptive Atmospheric Dynamics & NWP Practice Paper",
-    source: "bank", // "bank" | "ai"
-    topic: "Numerical Weather Prediction & Radar Data Assimilation",
+    title: "Adaptive Practice Paper",
+    source: "bank",
+    topic: "Core Domain Practice & Review",
     subjectId: "all",
     questionCount: 10,
     durationMinutes: 20,
@@ -59,9 +45,8 @@ export const TraineePracticePapersView = ({
     setLoading(true);
     try {
       const userId = currentUser?.id || "u_trainee_1";
-      const cacheKey = `moes_practice_papers_${userId}`;
+      const cacheKey = `practice_papers_${userId}`;
 
-      // 1. Fetch practice papers from backend
       const [qRes, subRes] = await Promise.all([
         api.getQuizzes({ practiceOnly: "true", traineeId: userId }),
         api.getTraineeSubmissions(userId)
@@ -78,7 +63,6 @@ export const TraineePracticePapersView = ({
           }));
       }
 
-      // 2. Load locally cached papers for offline/refresh resilience
       let localPapers = [];
       try {
         localPapers = JSON.parse(localStorage.getItem(cacheKey) || "[]");
@@ -86,7 +70,6 @@ export const TraineePracticePapersView = ({
         localPapers = [];
       }
 
-      // 3. Merge backend and local papers by unique ID
       const paperMap = new Map();
       localPapers.forEach(p => { if (p && p.id) paperMap.set(p.id, p); });
       backendPapers.forEach(p => { if (p && p.id) paperMap.set(p.id, p); });
@@ -95,14 +78,12 @@ export const TraineePracticePapersView = ({
         (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
       );
 
-      // Update cache
       try {
         localStorage.setItem(cacheKey, JSON.stringify(mergedPapers));
       } catch (e) {}
 
       setPracticePapers(mergedPapers);
 
-      // Score history strictly for practice attempts (filter out scheduled course exams and dummy records)
       if (subRes.success && subRes.submissions) {
         const genuinePracticeAttempts = subRes.submissions.filter(sub => {
           if (sub.isPractice === true || sub.type === "practice") return true;
@@ -116,10 +97,9 @@ export const TraineePracticePapersView = ({
       }
     } catch (err) {
       console.error("Error loading practice papers:", err);
-      // Fallback to local storage if network glitch
       try {
         const userId = currentUser?.id || "u_trainee_1";
-        const localPapers = JSON.parse(localStorage.getItem(`moes_practice_papers_${userId}`) || "[]");
+        const localPapers = JSON.parse(localStorage.getItem(`practice_papers_${userId}`) || "[]");
         if (localPapers.length > 0) setPracticePapers(localPapers);
       } catch (e) {}
     } finally {
@@ -133,7 +113,6 @@ export const TraineePracticePapersView = ({
 
   const [topicErrorMessage, setTopicErrorMessage] = useState("");
 
-  // Handle Generating new practice paper
   const handleGeneratePracticePaper = async (e) => {
     e.preventDefault();
     setTopicErrorMessage("");
@@ -146,107 +125,56 @@ export const TraineePracticePapersView = ({
 
       if (generateForm.source === "ai") {
         const requestedCount = Number(generateForm.questionCount) || 10;
-        // Generate with AI specifically tailored to the entered topic
         const res = await api.generateAiQuestions({
-          topic: enteredTopic,
-          difficulty: generateForm.initialDifficulty || "Medium",
-          count: requestedCount,
-          subjectName: generateForm.title || enteredTopic
+          topic: enteredTopic || "General Meteorology & Forecasting",
+          numQuestions: requestedCount,
+          difficulty: generateForm.initialDifficulty || "Medium"
         });
 
-        if (res.success && res.generatedQuestions && res.generatedQuestions.length > 0) {
-          generatedQuestions = res.generatedQuestions;
-          // Persist generated questions to question bank
-          for (const q of generatedQuestions) {
-            api.createQuestion({
-              question: q.question,
-              subjectId: "sub_gen_01",
-              subjectName: q.subjectName || generateForm.title || enteredTopic,
-              module: q.module || "AI Synthesis",
-              topic: enteredTopic,
-              marks: q.marks || (generateForm.initialDifficulty === "Hard" ? 4 : 3),
-              type: "MCQ",
-              difficulty: q.difficulty || generateForm.initialDifficulty,
-              options: q.options,
-              correctAnswer: q.correctAnswer,
-              explanation: q.explanation
-            }).catch(() => {});
-          }
+        if (res?.success && Array.isArray(res.questions) && res.questions.length > 0) {
+          generatedQuestions = res.questions;
         } else {
-          setTopicErrorMessage(res?.message || `AI Generation was unable to produce questions for topic "${enteredTopic}". Please check your topic name or try again.`);
+          setTopicErrorMessage("AI question generation could not find sufficient matching questions. Please try another topic query.");
           setGenerating(false);
           return;
         }
       } else {
-        // Fetch from Question Bank with exact and semantic topic filtering
-        const qbRes = await api.getQuestions();
-        if (qbRes.success && qbRes.questions && qbRes.questions.length > 0) {
-          let pool = [...qbRes.questions];
-          
-          if (generateForm.subjectId !== "all") {
-            pool = pool.filter(q => q.subjectId === generateForm.subjectId);
+        const qRes = await api.getQuestions({});
+        let pool = qRes.success && Array.isArray(qRes.questions) ? qRes.questions : [];
+
+        if (enteredTopic) {
+          const topicLower = enteredTopic.toLowerCase();
+          const topicTokens = topicLower.split(/[\s,./\-&]+/).map(t => t.trim()).filter(t => t.length > 2);
+
+          const matched = pool.filter(q => {
+            const text = `${q.question || ""} ${q.subjectName || ""} ${q.module || ""} ${q.topic || ""} ${q.explanation || ""}`.toLowerCase();
+            if (text.includes(topicLower)) return true;
+            return topicTokens.some(tok => text.includes(tok));
+          });
+
+          if (matched.length === 0) {
+            setTopicErrorMessage(`No questions matching "${enteredTopic}" found in Question Bank.`);
+            setGenerating(false);
+            return;
           }
-
-          if (enteredTopic) {
-            const topicLower = enteredTopic.toLowerCase();
-            const topicTokens = topicLower
-              .split(/[\s,./\-&]+/)
-              .map(t => t.trim())
-              .filter(t => t.length > 2); // filter out tiny stop-words
-
-            // Match questions that contain the topic or topic keywords
-            const matchedQuestions = pool.filter(q => {
-              const searchableText = `${q.question || ""} ${q.subjectName || ""} ${q.module || ""} ${q.topic || ""} ${q.explanation || ""} ${(q.options || []).join(" ")}`.toLowerCase();
-              
-              if (searchableText.includes(topicLower)) return true;
-              return topicTokens.some(token => searchableText.includes(token));
-            });
-
-            if (matchedQuestions.length === 0) {
-              setTopicErrorMessage(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate fresh questions.`);
-              setGenerating(false);
-              return;
-            }
-
-            pool = matchedQuestions;
-          }
-
-          // Shuffle and pick requested count
-          pool = pool.sort(() => 0.5 - Math.random());
-          generatedQuestions = pool.slice(0, Number(generateForm.questionCount) || 10);
-        } else {
-          setTopicErrorMessage(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate questions.`);
-          setGenerating(false);
-          return;
+          pool = matched;
         }
+
+        pool = pool.sort(() => 0.5 - Math.random());
+        generatedQuestions = pool.slice(0, Number(generateForm.questionCount) || 10);
       }
 
-      if (generatedQuestions.length === 0) {
-        setTopicErrorMessage(`For this topic "${enteredTopic}", questions do not exist in the question bank. Please try another topic keyword or choose 'AI Question Generator' to generate questions.`);
-        setGenerating(false);
-        return;
-      }
-
-
-      // Create new practice quiz object with complete metadata
-      const calculatedTotalMarks = generatedQuestions.reduce((acc, q) => acc + (Number(q.marks) || 3), 0) || 30;
       const newPaper = {
         id: `paper_practice_${Date.now()}`,
-        title: generateForm.title || `${enteredTopic || "Meteorology"} Practice Drill`,
+        title: generateForm.title || "Adaptive Practice Paper",
         courseId: "crs_nwp_101",
-        courseName: "MoES Operational Meteorology",
-        subjectName: enteredTopic || "Atmospheric Dynamics",
-        trainerName: "AI Adaptive Engine",
-        totalMarks: calculatedTotalMarks,
-        passMarks: Math.round(calculatedTotalMarks * 0.5),
+        courseName: "Adaptive Practice Track",
+        trainerName: "Adaptive Engine",
+        totalMarks: generatedQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) || 20,
+        passMarks: Math.round((generatedQuestions.reduce((acc, q) => acc + (q.marks || 2), 0) || 20) * 0.5),
         durationMinutes: Number(generateForm.durationMinutes) || 20,
         questionCount: generatedQuestions.length,
-        isPractice: true,
-        type: "practice",
-        createdBy: userId,
-        createdByName: currentUser?.name || "Trainee",
-        createdByRole: currentUser?.role || "trainee",
-        isAdaptive: generateForm.isAdaptive !== undefined ? generateForm.isAdaptive : true,
+        isAdaptive: !!generateForm.isAdaptive,
         initialDifficulty: generateForm.initialDifficulty || "Medium",
         source: generateForm.source || "ai",
         topic: enteredTopic,
@@ -254,7 +182,6 @@ export const TraineePracticePapersView = ({
         createdAt: new Date().toISOString()
       };
 
-      // Save quiz to backend DB
       try {
         const createRes = await api.createQuiz(newPaper);
         if (createRes?.quiz?.id) {
@@ -264,9 +191,8 @@ export const TraineePracticePapersView = ({
         console.warn("Backend save warning for practice paper:", err);
       }
 
-      // Persist to local storage for zero-loss refresh safety
       try {
-        const cacheKey = `moes_practice_papers_${userId}`;
+        const cacheKey = `practice_papers_${userId}`;
         const existingLocal = JSON.parse(localStorage.getItem(cacheKey) || "[]");
         const updatedLocal = [newPaper, ...existingLocal.filter(p => p.id !== newPaper.id)];
         localStorage.setItem(cacheKey, JSON.stringify(updatedLocal));
@@ -275,8 +201,6 @@ export const TraineePracticePapersView = ({
       setPracticePapers(prev => [newPaper, ...prev.filter(p => p.id !== newPaper.id)]);
       setIsGenerateModalOpen(false);
       setTopicErrorMessage("");
-
-      alert(`Practice Paper "${newPaper.title}" successfully created with ${generatedQuestions.length} questions on topic "${enteredTopic || "General"}"!`);
     } catch (err) {
       setTopicErrorMessage("Failed generating practice paper: " + err.message);
     } finally {
@@ -294,80 +218,84 @@ export const TraineePracticePapersView = ({
     return true;
   });
 
+  if (loading) {
+    return (
+      <div className="p-12 flex flex-col items-center justify-center min-h-[400px] space-y-3">
+        <div className="w-8 h-8 border-3 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-medium text-[#475569]">Loading Practice Studio...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in select-none font-sans text-slate-800">
+    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto text-[#172033]">
       
       {/* ─── 1. HEADER SECTION ─── */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-200/90">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-[#0B3475] border border-blue-200 uppercase">
-              Trainee Practice Studio
+            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-[#2563EB] border border-blue-200 uppercase">
+              Practice Studio
             </span>
-            <span className="text-xs text-slate-500 font-medium">• {practicePapers.length} Practice Papers Available</span>
+            <span className="text-xs text-[#475569]">• {practicePapers.length} Papers Available</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#172033] tracking-tight flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            <span>AI Practice Papers & Adaptive Assessment Studio</span>
+            <span>Practice Papers &amp; Assessment Studio</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
-            Generate customized practice question papers with AI or from the MoES Question Bank. Features <b>Dynamic Adaptive Testing</b> with real-time competency calibration and instant performance analytics.
+          <p className="text-xs text-[#475569] mt-0.5 leading-relaxed">
+            Generate customized practice question papers with AI or from the Question Bank with real-time adaptive difficulty.
           </p>
         </div>
 
-        {/* Top Actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setIsGenerateModalOpen(true)}
-            className="flex items-center gap-2 px-3.5 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Create New Practice Paper</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+            <span>Create Practice Paper</span>
           </button>
 
           {onOpenQuestionBank && (
             <button
               onClick={onOpenQuestionBank}
-              className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#E2E8F0] hover:bg-slate-50 text-slate-700 font-medium rounded-lg text-xs shadow-xs transition-colors"
             >
-              <Layers className="w-3.5 h-3.5 text-[#0B3475]" />
-              <span>Browse Question Bank</span>
+              <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
+              <span>Question Bank</span>
             </button>
           )}
 
           <button
             onClick={loadData}
             title="Refresh Papers"
-            className="p-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-[var(--radius)] transition-colors shadow-xs"
+            className="p-2 bg-white border border-[#E2E8F0] hover:bg-slate-50 text-slate-600 rounded-lg transition-colors shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-
-      {/* ─── 2. ADAPTIVE TESTING ENGINE EXPLANATION BANNER (LIGHT CARD) ─── */}
-      <div className="p-6 bg-white text-slate-800 rounded-[var(--radius)] border border-slate-200 shadow-2xs relative overflow-hidden">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-extrabold uppercase tracking-wider">
+      {/* ─── 2. ADAPTIVE BANNER ─── */}
+      <div className="p-5 bg-white text-[#172033] rounded-xl border border-[#E2E8F0] shadow-xs">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold uppercase tracking-wider">
               <Flame className="w-3.5 h-3.5 text-amber-600" />
-              <span>Smart Practice Engine</span>
+              <span>Adaptive Testing Engine</span>
             </div>
-            <h3 className="text-lg font-black text-slate-900 tracking-tight">
-              Adaptive Practice & Continuous Competency Calibration
+            <h3 className="text-base font-semibold text-[#172033]">
+              Smart Adaptive Practice
             </h3>
-            <p className="text-xs text-slate-500 leading-relaxed font-normal">
-              Practice sessions dynamically evaluate topic understanding in real-time, tailoring question sequences across your selected subjects.
+            <p className="text-xs text-[#475569] leading-relaxed">
+              Practice sessions dynamically adjust question difficulty in real-time based on your responses.
             </p>
           </div>
 
-          <div className="bg-slate-50 rounded-[var(--radius)] p-4 border border-slate-200 text-center space-y-2 shrink-0 w-full lg:w-64">
-            <Brain className="w-8 h-8 text-blue-600 mx-auto" />
-            <p className="font-black text-slate-900 text-xs">1-Click Fast Drill</p>
-            <p className="text-[11px] text-slate-500">
-              Start an instant adaptive assessment with available papers:
-            </p>
+          <div className="bg-slate-50 rounded-lg p-3.5 border border-[#E2E8F0] text-center space-y-2 shrink-0 w-full lg:w-60">
+            <Brain className="w-7 h-7 text-[#2563EB] mx-auto" />
+            <p className="font-semibold text-[#172033] text-xs">Quick Practice</p>
             <button
               onClick={() => {
                 if (practicePapers.length > 0 && onStartExam) {
@@ -375,7 +303,7 @@ export const TraineePracticePapersView = ({
                 }
               }}
               disabled={practicePapers.length === 0}
-              className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium rounded-[var(--radius)] text-xs shadow-xs transition-all active:scale-95"
+              className="w-full py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-medium rounded-lg text-xs shadow-xs transition-colors"
             >
               Launch Quick Drill ⚡
             </button>
@@ -383,95 +311,86 @@ export const TraineePracticePapersView = ({
         </div>
       </div>
 
-      {/* ─── 3. AVAILABLE PRACTICE QUESTION PAPERS SECTION ─── */}
+      {/* ─── 3. PAPERS GRID ─── */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-700" />
-              <span>Generated Question Papers ({filteredPapers.length})</span>
+            <h2 className="text-base font-semibold text-[#172033] flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#2563EB]" />
+              <span>Available Practice Papers ({filteredPapers.length})</span>
             </h2>
-            <p className="text-xs text-slate-500">
-              Select any question paper to launch full-screen kiosk practice mode
-            </p>
           </div>
 
-          {/* Search bar */}
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative w-full sm:w-60">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search paper title..."
-              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-[var(--radius)] text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+              className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:outline-none focus:ring-1 focus:ring-[#2563EB] shadow-xs"
             />
           </div>
         </div>
 
-        {/* Papers Grid */}
         {filteredPapers.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-[var(--radius)] border border-dashed border-slate-300 space-y-3">
-            <BookOpen className="w-10 h-10 text-slate-300 mx-auto" />
-            <h4 className="font-medium text-slate-800 text-sm">No practice papers matching search</h4>
-            <p className="text-xs text-slate-500">Click "Create New Practice Paper" to generate one with AI!</p>
+          <div className="p-10 text-center bg-white rounded-xl border border-dashed border-[#E2E8F0] space-y-2">
+            <BookOpen className="w-8 h-8 text-slate-300 mx-auto" />
+            <h4 className="font-medium text-[#172033] text-xs">No practice papers match your search</h4>
             <button
               onClick={() => setIsGenerateModalOpen(true)}
-              className="px-4 py-2 bg-[#0a2558] text-white rounded-[var(--radius)] text-xs font-medium shadow-sm"
+              className="mt-2 px-3.5 py-1.5 bg-[#2563EB] text-white rounded-lg text-xs font-medium shadow-xs"
             >
-              Generate AI Question Paper
+              Create New Paper
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredPapers.map((paper, idx) => (
               <div
                 key={paper.id || idx}
-                className="bg-white rounded-[var(--radius)] border border-slate-200 p-6 shadow-sm hover:shadow-xl transition-all duration-200 flex flex-col justify-between group relative overflow-hidden"
+                className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
               >
-                {/* Adaptive Indicator Pill */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-900 border border-blue-200 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-500" />
-                    {paper.isAdaptive ? "ADAPTIVE ENGINE" : "STANDARD"}
-                  </span>
-                  <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    {paper.durationMinutes || 20} mins
-                  </span>
-                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-[#2563EB] border border-blue-200 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      {paper.isAdaptive ? "ADAPTIVE" : "STANDARD"}
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {paper.durationMinutes || 20} mins
+                    </span>
+                  </div>
 
-                <div className="space-y-2 mb-4">
-                  <h3 className="font-semibold text-slate-900 text-sm leading-snug group-hover:text-blue-700 transition-colors line-clamp-2">
+                  <h3 className="font-semibold text-[#172033] text-sm line-clamp-2">
                     {paper.title}
                   </h3>
-                  <p className="text-xs text-slate-500 line-clamp-2">
-                    {paper.courseName || "Operational Meteorological Science"} • {paper.subjectName || "Dynamics & Observations"}
+                  <p className="text-xs text-[#475569] line-clamp-1">
+                    {paper.courseName || "Practice Module"}
                   </p>
+
+                  <div className="grid grid-cols-3 gap-2 py-2 border-y border-slate-100 text-center text-xs">
+                    <div>
+                      <p className="font-semibold text-[#172033]">{paper.questionCount || (paper.questions ? paper.questions.length : 10)}</p>
+                      <p className="text-[10px] text-slate-400">Questions</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#172033]">{paper.totalMarks || 30}</p>
+                      <p className="text-[10px] text-slate-400">Marks</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-emerald-600">{paper.initialDifficulty || "Medium"}</p>
+                      <p className="text-[10px] text-slate-400">Difficulty</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Specs tags */}
-                <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 text-center mb-4 text-xs">
-                  <div>
-                    <p className="font-extrabold text-slate-800">{paper.questionCount || (paper.questions ? paper.questions.length : 10)}</p>
-                    <p className="text-[10px] text-slate-400">Questions</p>
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-slate-800">{paper.totalMarks || 30}</p>
-                    <p className="text-[10px] text-slate-400">Total Marks</p>
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-emerald-600">{paper.initialDifficulty || "Dynamic"}</p>
-                    <p className="text-[10px] text-slate-400">Difficulty</p>
-                  </div>
-                </div>
-
-                {/* Launch Button */}
                 <button
                   onClick={() => onStartExam && onStartExam(paper)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-medium rounded-[var(--radius)] text-xs transition-all shadow-md group-hover:scale-102 active:scale-95"
+                  className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs transition-colors shadow-xs"
                 >
-                  <PlayCircle className="w-4 h-4 text-emerald-400" />
+                  <PlayCircle className="w-4 h-4 text-blue-100" />
                   <span>Start Practice Exam</span>
                 </button>
               </div>
@@ -480,40 +399,36 @@ export const TraineePracticePapersView = ({
         )}
       </div>
 
-      {/* ─── 4. PRACTICE SCORE HISTORY & PERFORMANCE LEDGER ─── */}
-      <div className="space-y-4 pt-4">
+      {/* ─── 4. SCORE HISTORY ─── */}
+      <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-emerald-600" />
-              <span>Practice Scores & Performance History</span>
+            <h2 className="text-base font-semibold text-[#172033] flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-emerald-600" />
+              <span>Practice Scores &amp; History</span>
             </h2>
-            <p className="text-xs text-slate-500">
-              Track your past practice attempts, accuracy percentages, and adaptive difficulty milestones
-            </p>
           </div>
-          <span className="text-xs font-semibold text-slate-500">{scoreHistory.length} attempts recorded</span>
+          <span className="text-xs font-medium text-[#475569]">{scoreHistory.length} attempts</span>
         </div>
 
-        <div className="bg-white rounded-[var(--radius)] border border-slate-200 overflow-hidden shadow-sm">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 text-[11px] font-extrabold text-slate-500 uppercase border-b border-slate-200">
+            <table className="w-full text-left text-xs text-[#172033]">
+              <thead className="bg-slate-50 text-[11px] font-semibold text-[#475569] uppercase border-b border-[#E2E8F0]">
                 <tr>
-                  <th className="px-6 py-3.5">Practice Paper Title</th>
-                  <th className="px-4 py-3.5">Score / Marks</th>
-                  <th className="px-4 py-3.5">Accuracy %</th>
-                  <th className="px-4 py-3.5">Adaptive Trajectory</th>
-                  <th className="px-4 py-3.5">Time Spent</th>
-                  <th className="px-4 py-3.5">Attempt Date</th>
-                  <th className="px-4 py-3.5 text-right">Action</th>
+                  <th className="px-4 py-3">Title</th>
+                  <th className="px-3 py-3">Score</th>
+                  <th className="px-3 py-3">Accuracy</th>
+                  <th className="px-3 py-3">Time Spent</th>
+                  <th className="px-3 py-3">Date</th>
+                  <th className="px-4 py-3 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {scoreHistory.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-slate-400">
-                      No practice exam attempts recorded yet. Launch a practice paper above to start!
+                    <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+                      No practice attempts recorded yet.
                     </td>
                   </tr>
                 ) : (
@@ -521,42 +436,38 @@ export const TraineePracticePapersView = ({
                     const isPassed = hist.percentage >= 50;
                     return (
                       <tr key={hist.id || i} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="px-6 py-4 font-medium text-slate-900 max-w-xs truncate">
-                          {hist.quizTitle || "Adaptive Practice Paper"}
+                        <td className="px-4 py-3 font-semibold text-[#172033] max-w-xs truncate">
+                          {hist.quizTitle || "Practice Paper"}
                         </td>
-                        <td className="px-4 py-4 font-mono font-medium text-slate-800">
+                        <td className="px-3 py-3 font-mono font-medium">
                           {hist.score} / {hist.totalMarks || 30}
                         </td>
-                        <td className="px-4 py-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
-                            isPassed ? "bg-emerald-100 text-emerald-900" : "bg-rose-100 text-rose-900"
+                        <td className="px-3 py-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                            isPassed ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-rose-50 text-rose-800 border border-rose-200"
                           }`}>
                             {hist.percentage}% • {isPassed ? "PASSED" : "RETRY"}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-[11px] text-slate-600 font-medium">
-                          {hist.adaptiveTrajectory || "Medium ➔ Advanced"}
-                        </td>
-                        <td className="px-4 py-4 text-slate-500 font-mono text-[11px]">
+                        <td className="px-3 py-3 font-mono text-slate-500">
                           {Math.floor((hist.timeTakenSeconds || 600) / 60)}m {((hist.timeTakenSeconds || 600) % 60)}s
                         </td>
-                        <td className="px-4 py-4 text-slate-400 text-[11px]">
-                          {new Date(hist.submittedAt || Date.now()).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        <td className="px-3 py-3 text-slate-400 text-[11px]">
+                          {new Date(hist.submittedAt || Date.now()).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                         </td>
-                        <td className="px-4 py-4 text-right space-x-2">
+                        <td className="px-4 py-3 text-right space-x-2">
                           <button
                             onClick={() => {
-                              // Find matching paper for full question metadata
                               const matchingPaper = practicePapers.find(p => p.title === hist.quizTitle || p.id === hist.quizId) || practicePapers[0];
                               setSelectedAttemptForAnalytics({
                                 ...hist,
                                 paper: matchingPaper
                               });
                             }}
-                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 font-extrabold rounded-[var(--radius)] text-xs transition-colors border border-blue-200 inline-flex items-center gap-1"
+                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-[#2563EB] font-medium rounded-lg text-xs transition-colors border border-blue-200 inline-flex items-center gap-1"
                           >
-                            <BarChart3 className="w-3 h-3 text-blue-700" />
-                            <span>Analytics & Responses</span>
+                            <BarChart3 className="w-3 h-3 text-[#2563EB]" />
+                            <span>Analytics</span>
                           </button>
 
                           <button
@@ -564,9 +475,9 @@ export const TraineePracticePapersView = ({
                               const matchingPaper = practicePapers.find(p => p.title === hist.quizTitle || p.id === hist.quizId) || practicePapers[0];
                               if (matchingPaper && onStartExam) onStartExam(matchingPaper);
                             }}
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs transition-colors"
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-lg text-xs transition-colors"
                           >
-                            Retake 🔄
+                            Retake
                           </button>
                         </td>
                       </tr>
@@ -579,42 +490,37 @@ export const TraineePracticePapersView = ({
         </div>
       </div>
 
-      {/* ═════════ CREATE PRACTICE PAPER MODAL ═════════ */}
+      {/* CREATE MODAL */}
       {isGenerateModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
-          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-slate-800 relative my-8">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-xl w-full p-6 shadow-xl border border-[#E2E8F0] text-[#172033] relative my-8">
             
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-[var(--radius)] bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center shadow-md">
-                  <Sparkles className="w-5 h-5 text-amber-300" />
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-lg bg-[#2563EB] text-white flex items-center justify-center shadow-xs">
+                  <Sparkles className="w-4 h-4 text-amber-200" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-slate-900">
-                    Generate Practice Question Paper
+                  <h2 className="text-base font-semibold text-[#172033]">
+                    Generate Practice Paper
                   </h2>
-                  <p className="text-[11px] text-slate-500 font-normal">
-                    Configure question parameters with AI or MoES Question Bank
+                  <p className="text-[11px] text-[#475569]">
+                    Configure questions with AI or Question Bank
                   </p>
-
                 </div>
               </div>
 
               <button
                 onClick={() => setIsGenerateModalOpen(false)}
-                className="p-1.5 rounded-[var(--radius)] hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Form Body */}
-            <form onSubmit={handleGeneratePracticePaper} className="space-y-4 text-xs">
-              
-              {/* Paper Title */}
+            <form onSubmit={handleGeneratePracticePaper} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#172033] mb-1">
                   Question Paper Title:
                 </label>
                 <input
@@ -622,52 +528,43 @@ export const TraineePracticePapersView = ({
                   required
                   value={generateForm.title}
                   onChange={(e) => setGenerateForm({ ...generateForm, title: e.target.value })}
-                  placeholder="e.g. Adaptive NWP 4D-Var & Radar Assimilation Test"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g. Adaptive Practice Drill"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                 />
               </div>
 
-              {/* Source Option: AI vs Question Bank */}
               <div className="grid grid-cols-2 gap-3">
                 <div
                   onClick={() => setGenerateForm({ ...generateForm, source: "bank" })}
-                  className={`p-3 rounded-[var(--radius)] border cursor-pointer transition-colors ${
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     generateForm.source === "bank"
-                      ? "bg-blue-50 border-[#0B3475] text-[#0B3475] shadow-xs"
-                      : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                      ? "bg-blue-50 border-[#2563EB] text-[#2563EB]"
+                      : "bg-slate-50 border-[#E2E8F0] text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-medium mb-1">
-                    <Layers className="w-4 h-4 text-[#0B3475]" />
-                    <span>MoES Question Bank</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    Extract verified curated questions from the central repository.
-                  </p>
+                  <div className="font-semibold text-xs mb-0.5">Question Bank</div>
+                  <p className="text-[10px] text-slate-500">From repository</p>
                 </div>
 
                 <div
                   onClick={() => setGenerateForm({ ...generateForm, source: "ai" })}
-                  className={`p-3 rounded-[var(--radius)] border cursor-pointer transition-colors ${
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     generateForm.source === "ai"
-                      ? "bg-blue-50 border-[#0B3475] text-[#0B3475] shadow-xs"
-                      : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                      ? "bg-blue-50 border-[#2563EB] text-[#2563EB]"
+                      : "bg-slate-50 border-[#E2E8F0] text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2 font-medium mb-1">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>AI Question Generator</span>
+                  <div className="font-semibold text-xs mb-0.5 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    <span>AI Generator</span>
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    Live generate fresh domain-specific MCQs tailored to your topic.
-                  </p>
+                  <p className="text-[10px] text-slate-500">AI generated MCQs</p>
                 </div>
               </div>
 
-              {/* Domain / Topic */}
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
-                  Topic / Domain Focus:
+                <label className="block font-medium text-[#172033] mb-1">
+                  Topic / Focus:
                 </label>
                 <input
                   type="text"
@@ -677,152 +574,74 @@ export const TraineePracticePapersView = ({
                     setGenerateForm({ ...generateForm, topic: e.target.value });
                     if (topicErrorMessage) setTopicErrorMessage("");
                   }}
-                  placeholder="e.g. Numerical Weather Prediction, Radar Polarimetry, Tropical Cyclones"
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0B3475]"
+                  placeholder="e.g. Core Topic Name"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
                 />
               </div>
 
-              {/* Topic Error / Not Found Alert Box */}
               {topicErrorMessage && (
-                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-[var(--radius)] text-amber-950 space-y-2 animate-in fade-in">
+                <div className="p-3 bg-amber-50 border border-amber-300 rounded-lg text-amber-950 space-y-1.5">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-xs text-amber-900">
-                        Topic Questions Not Found in Question Bank
-                      </h4>
-                      <p className="text-[11px] text-amber-800 leading-relaxed mt-0.5 font-normal">
-                        {topicErrorMessage}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-1 flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setGenerateForm({ ...generateForm, source: "ai" });
-                        setTopicErrorMessage("");
-                      }}
-                      className="px-3 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs flex items-center gap-1.5"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                      <span>Switch to AI Generator & Generate</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setTopicErrorMessage("")}
-                      className="px-2.5 py-1.5 text-slate-500 hover:text-slate-800 font-medium text-xs"
-                    >
-                      Dismiss
-                    </button>
+                    <p className="text-[11px] text-amber-800 leading-relaxed">
+                      {topicErrorMessage}
+                    </p>
                   </div>
                 </div>
               )}
 
-
-              {/* Questions Count & Duration */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">
-                    Number of Questions:
+                  <label className="block font-medium text-[#172033] mb-1">
+                    Questions:
                   </label>
                   <select
                     value={generateForm.questionCount}
                     onChange={(e) => setGenerateForm({ ...generateForm, questionCount: Number(e.target.value) })}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none"
                   >
-                    <option value={5}>5 Questions (Speed Drill)</option>
-                    <option value={10}>10 Questions (Standard Drill)</option>
-                    <option value={15}>15 Questions (Full Assessment)</option>
-                    <option value={20}>20 Questions (Comprehensive)</option>
+                    <option value={5}>5 Questions</option>
+                    <option value={10}>10 Questions</option>
+                    <option value={15}>15 Questions</option>
+                    <option value={20}>20 Questions</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">
-                    Duration (Minutes):
+                  <label className="block font-medium text-[#172033] mb-1">
+                    Duration:
                   </label>
                   <select
                     value={generateForm.durationMinutes}
                     onChange={(e) => setGenerateForm({ ...generateForm, durationMinutes: Number(e.target.value) })}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-lg text-xs font-medium text-[#172033] focus:bg-white focus:outline-none"
                   >
-                    <option value={10}>10 Minutes</option>
-                    <option value={20}>20 Minutes</option>
-                    <option value={30}>30 Minutes</option>
-                    <option value={45}>45 Minutes</option>
+                    <option value={10}>10 Mins</option>
+                    <option value={20}>20 Mins</option>
+                    <option value={30}>30 Mins</option>
                   </select>
                 </div>
               </div>
 
-              {/* Initial Difficulty & Adaptive Toggle */}
-              <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                      <Flame className="w-4 h-4 text-amber-500" />
-                      <span>Enable Dynamic Adaptive Testing</span>
-                    </span>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Dynamically scales question difficulty based on response accuracy
-                    </p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={generateForm.isAdaptive}
-                    onChange={(e) => setGenerateForm({ ...generateForm, isAdaptive: e.target.checked })}
-                    className="w-5 h-5 accent-blue-600 rounded cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-medium text-slate-700 mb-1 text-[11px]">
-                    Starting Difficulty Level:
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {["Easy", "Medium", "Hard"].map(lvl => (
-                      <button
-                        type="button"
-                        key={lvl}
-                        onClick={() => setGenerateForm({ ...generateForm, initialDifficulty: lvl })}
-                        className={`py-1.5 rounded-[var(--radius)] font-medium text-xs border transition-colors ${
-                          generateForm.initialDifficulty === lvl
-                            ? "bg-[#0a2558] text-white border-[#0a2558]"
-                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
-                        }`}
-                      >
-                        {lvl}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Buttons */}
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsGenerateModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 text-slate-600 font-medium rounded-[var(--radius)] text-xs hover:bg-slate-100 transition-colors"
+                  className="px-3.5 py-1.5 border border-[#E2E8F0] text-slate-600 font-medium rounded-lg text-xs hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={generating}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-all disabled:opacity-60"
+                  className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors disabled:opacity-60"
                 >
                   {generating ? (
-                    <>
-                      <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
-                      <span>Generating Paper...</span>
-                    </>
+                    <span>Generating...</span>
                   ) : (
                     <>
-                      <Check className="w-4 h-4 text-emerald-400" />
-                      <span>Generate & Save Paper</span>
+                      <Check className="w-3.5 h-3.5 text-blue-100" />
+                      <span>Save &amp; Start</span>
                     </>
                   )}
                 </button>
@@ -834,285 +653,109 @@ export const TraineePracticePapersView = ({
         </div>
       )}
 
-      {/* ═════════ 5. PRACTICE ATTEMPT ANALYTICS & QUESTION RESPONSES MODAL ═════════ */}
+      {/* ANALYTICS MODAL */}
       {selectedAttemptForAnalytics && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in duration-150 font-sans">
-          <div className="bg-white rounded-[var(--radius)] shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto text-xs">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-xl border border-[#E2E8F0] w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden text-[#172033] my-auto text-xs">
             
-            {/* Modal Header */}
-            <div className="p-6 bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+            <div className="p-4 bg-[#172033] text-white flex items-center justify-between shrink-0">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase">
-                    PRACTICE PERFORMANCE AUDIT
-                  </span>
-                  <span className="text-[11px] text-blue-200">
-                    {new Date(selectedAttemptForAnalytics.submittedAt || Date.now()).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-white">
-                  {selectedAttemptForAnalytics.quizTitle || selectedAttemptForAnalytics.paper?.title || "Adaptive Practice Paper Drill"}
+                <span className="text-[10px] font-semibold text-blue-300 uppercase">PRACTICE AUDIT</span>
+                <h3 className="text-sm font-semibold text-white">
+                  {selectedAttemptForAnalytics.quizTitle || selectedAttemptForAnalytics.paper?.title || "Practice Drill"}
                 </h3>
               </div>
 
               <button
                 onClick={() => setSelectedAttemptForAnalytics(null)}
-                className="w-9 h-9 rounded-[var(--radius)] bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white self-end sm:self-auto shrink-0"
+                className="p-1 rounded-lg hover:bg-white/10 text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Performance Metric Cards (Trainee View) */}
-            <div className="p-5 bg-slate-50 border-b border-slate-200 shrink-0 space-y-3">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
-                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">SCORE</span>
-                  <p className="text-xl font-black text-blue-700 font-mono">
+            <div className="p-4 bg-slate-50 border-b border-[#E2E8F0] shrink-0">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-3 bg-white rounded-lg border border-[#E2E8F0] space-y-0.5">
+                  <span className="text-slate-400 text-[10px] font-medium uppercase block">SCORE</span>
+                  <p className="text-lg font-semibold text-[#2563EB]">
                     {selectedAttemptForAnalytics.score} / {selectedAttemptForAnalytics.totalMarks || 20}
                   </p>
-                  <span className="text-slate-500 font-medium text-[10px]">Points Earned ({selectedAttemptForAnalytics.percentage}%)</span>
                 </div>
 
-                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
-                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ACCURACY</span>
-                  <p className="text-xl font-black text-emerald-600">
+                <div className="p-3 bg-white rounded-lg border border-[#E2E8F0] space-y-0.5">
+                  <span className="text-slate-400 text-[10px] font-medium uppercase block">ACCURACY</span>
+                  <p className="text-lg font-semibold text-emerald-600">
                     {selectedAttemptForAnalytics.accuracy || selectedAttemptForAnalytics.percentage}%
                   </p>
-                  <span className="text-emerald-700 font-medium text-[10px]">
-                    {selectedAttemptForAnalytics.percentage >= 50 ? "Passing Grade Achieved" : "Remediation Suggested"}
-                  </span>
                 </div>
 
-                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
-                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL TIME</span>
-                  <p className="text-xl font-black text-slate-900 font-mono">
-                    {selectedAttemptForAnalytics.totalTimeText || `${Math.floor((selectedAttemptForAnalytics.timeTakenSeconds || 600) / 60)}m ${((selectedAttemptForAnalytics.timeTakenSeconds || 600) % 60)}s`}
+                <div className="p-3 bg-white rounded-lg border border-[#E2E8F0] space-y-0.5">
+                  <span className="text-slate-400 text-[10px] font-medium uppercase block">TIME SPENT</span>
+                  <p className="text-lg font-semibold text-[#172033] font-mono">
+                    {Math.floor((selectedAttemptForAnalytics.timeTakenSeconds || 600) / 60)}m {((selectedAttemptForAnalytics.timeTakenSeconds || 600) % 60)}s
                   </p>
-                  <span className="text-slate-500 font-medium text-[10px]">Pacing: Well Paced</span>
-                </div>
-
-                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-xs space-y-1">
-                  <span className="text-slate-400 font-extrabold uppercase text-[9px] block">AVERAGE TIME</span>
-                  <p className="text-xl font-black text-indigo-700">
-                    {selectedAttemptForAnalytics.averageTimeText || `${Math.round((selectedAttemptForAnalytics.timeTakenSeconds || 600) / Math.max(1, (selectedAttemptForAnalytics.paper?.questions || []).length || 10))} sec/question`}
-                  </p>
-                  <span className="text-indigo-600 font-medium text-[10px]">Speed per Question</span>
                 </div>
               </div>
-
-              {/* Secondary Breakdown Summary */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-600">
-                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Questions:</span>
-                  <b className="text-slate-900">{selectedAttemptForAnalytics.paper?.questions?.length || 10} Total</b>
-                </div>
-                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Correct Answers:</span>
-                  <b className="text-emerald-700 font-medium">{selectedAttemptForAnalytics.correctCount !== undefined ? selectedAttemptForAnalytics.correctCount : Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10))}</b>
-                </div>
-                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Incorrect Answers:</span>
-                  <b className="text-rose-700 font-medium">{selectedAttemptForAnalytics.incorrectCount !== undefined ? selectedAttemptForAnalytics.incorrectCount : Math.max(0, (selectedAttemptForAnalytics.paper?.questions?.length || 10) - Math.round(((selectedAttemptForAnalytics.percentage || 75) / 100) * (selectedAttemptForAnalytics.paper?.questions?.length || 10)))}</b>
-                </div>
-                <div className="p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 flex items-center justify-between">
-                  <span className="text-slate-500 font-medium">Adaptive Path:</span>
-                  <b className="text-purple-700 truncate">{selectedAttemptForAnalytics.adaptiveTrajectory ? (Array.isArray(selectedAttemptForAnalytics.adaptiveTrajectory) ? selectedAttemptForAnalytics.adaptiveTrajectory.join(" ➔ ") : selectedAttemptForAnalytics.adaptiveTrajectory) : "Moderate ➔ Hard"}</b>
-                </div>
-              </div>
-
-              {/* ⚡ Chronological Difficulty Transitions Trail ⚡ */}
-              {selectedAttemptForAnalytics.difficultyHistory && selectedAttemptForAnalytics.difficultyHistory.length > 0 && (
-                <div className="p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-purple-50/70 rounded-[var(--radius)] border border-blue-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-black text-blue-950 text-xs flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Adaptive Difficulty Progression Trail</span>
-                    </span>
-                    <span className="text-[10px] font-medium text-slate-500">
-                      Rule: 3 Correct ➔ ↑ Level | 3 Wrong ➔ ↓ Level
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 text-[11px]">
-                    {selectedAttemptForAnalytics.difficultyHistory.map((h, idx) => {
-                      const diff = h.difficulty || "Moderate";
-                      const isHard = diff === "Hard";
-                      const isEasy = diff === "Easy";
-                      const isMod = !isHard && !isEasy;
-
-                      return (
-                        <div
-                          key={idx}
-                          className={`p-2 rounded-[var(--radius)] border flex items-center justify-between font-medium ${
-                            isHard 
-                              ? "bg-purple-100/90 border-purple-300 text-purple-900"
-                              : isMod 
-                              ? "bg-blue-100/90 border-blue-300 text-blue-900"
-                              : "bg-emerald-100/90 border-emerald-300 text-emerald-900"
-                          }`}
-                        >
-                          <span className="font-mono text-[10px]">Q{h.questionNumber || idx + 1}</span>
-                          <span className="text-[10px] font-black uppercase">{diff}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Filter controls */}
-            <div className="px-6 py-3 bg-white border-b border-slate-100 flex items-center justify-between shrink-0">
-              <span className="font-extrabold text-slate-800 text-xs">
-                Question-by-Question Response Audit:
-              </span>
-
-              <div className="flex items-center gap-2">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+              <span className="font-semibold text-[#172033] text-xs">Question Audit</span>
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setAnalyticsFilter("all")}
-                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors ${
-                    analyticsFilter === "all" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  className={`px-2.5 py-1 rounded text-xs font-medium ${analyticsFilter === "all" ? "bg-[#172033] text-white" : "bg-slate-100 text-slate-600"}`}
                 >
-                  All Questions
+                  All
                 </button>
                 <button
                   onClick={() => setAnalyticsFilter("correct")}
-                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors ${
-                    analyticsFilter === "correct" ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  className={`px-2.5 py-1 rounded text-xs font-medium ${analyticsFilter === "correct" ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"}`}
                 >
-                  Correct Only
+                  Correct
                 </button>
                 <button
                   onClick={() => setAnalyticsFilter("incorrect")}
-                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors ${
-                    analyticsFilter === "incorrect" ? "bg-rose-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  className={`px-2.5 py-1 rounded text-xs font-medium ${analyticsFilter === "incorrect" ? "bg-rose-600 text-white" : "bg-slate-100 text-slate-600"}`}
                 >
-                  Incorrect Only
+                  Incorrect
                 </button>
               </div>
             </div>
 
-            {/* Question Breakdown List */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#f8fafc]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F8FAFC]">
               {(() => {
                 const qList = selectedAttemptForAnalytics.paper?.questions || [];
                 const ansMap = selectedAttemptForAnalytics.answers || {};
-
-                const displayQuestions = qList;
-
-                if (displayQuestions.length === 0) {
-                  return (
-                    <div className="p-12 text-center text-slate-400 font-medium text-xs">
-                      No question breakdown available for this attempt.
-                    </div>
-                  );
-                }
-
-                const filtered = displayQuestions.filter((q, qIdx) => {
-                  const ans = ansMap[q.id] || ansMap[`q_${qIdx + 1}`] || ansMap[`q${qIdx + 1}`] || {};
-                  const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer || (qIdx === 0));
+                const filtered = qList.filter((q, qIdx) => {
+                  const ans = ansMap[q.id] || ansMap[`q_${qIdx + 1}`] || {};
+                  const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer);
                   if (analyticsFilter === "correct") return isCorrect;
                   if (analyticsFilter === "incorrect") return !isCorrect;
                   return true;
                 });
 
+                if (filtered.length === 0) {
+                  return <div className="p-8 text-center text-slate-400 text-xs">No questions match filter.</div>;
+                }
+
                 return filtered.map((q, idx) => {
-                  const ans = ansMap[q.id] || ansMap[`q_${idx + 1}`] || ansMap[`q${idx + 1}`] || {};
-                  const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer || (idx === 0));
-                  const chosenIdx = ans.selected !== undefined ? ans.selected : (isCorrect ? q.correctAnswer : (q.correctAnswer + 1) % (q.options?.length || 4));
-                  const qTopic = q.topic || q.subjectName || "Atmospheric Dynamics";
-                  const qDiff = q.difficulty || (idx === 1 ? "Hard" : "Medium");
-                  const qTimeSpent = ans.timeSpent || (idx === 0 ? 38 : idx === 1 ? 54 : 42);
+                  const ans = ansMap[q.id] || ansMap[`q_${idx + 1}`] || {};
+                  const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer);
 
                   return (
-                    <div
-                      key={q.id || idx}
-                      className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-4 hover:border-blue-300 transition-all"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-[var(--radius)] border border-slate-200 text-xs">
-                              Question {idx + 1}
-                            </span>
-                            <span className="font-medium text-slate-700 text-xs">
-                              Topic: <b className="text-slate-900">{qTopic}</b>
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className={`px-2.5 py-1 rounded-full font-black text-[10px] uppercase border shrink-0 ${
-                          isCorrect ? "bg-emerald-100 text-emerald-900 border-emerald-300" : "bg-rose-100 text-rose-900 border-rose-300"
-                        }`}>
-                          Result: {isCorrect ? "Correct" : "Incorrect"}
+                    <div key={q.id || idx} className="p-4 bg-white rounded-lg border border-[#E2E8F0] space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-[#172033]">Question {idx + 1}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                          {isCorrect ? "Correct" : "Incorrect"}
                         </span>
                       </div>
-
-                      {/* Question Metadata Bar matching specification */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200/80 text-[11px] text-slate-700">
-                        <div><b>Topic:</b> {qTopic}</div>
-                        <div><b>Difficulty:</b> <span className="font-semibold">{qDiff}</span></div>
-                        <div><b>Time Spent:</b> <span className="font-mono font-semibold">{qTimeSpent} sec</span></div>
-                        <div><b>Result:</b> <span className={`font-medium ${isCorrect ? "text-emerald-700" : "text-rose-700"}`}>{isCorrect ? "Correct" : "Incorrect"}</span></div>
-                      </div>
-
-                      <p className="text-slate-900 font-medium text-xs sm:text-sm leading-relaxed">
-                        {q.question}
-                      </p>
-
-                      <div className="space-y-2">
-                        {q.options?.map((opt, oIdx) => {
-                          const isOptionCorrect = q.correctAnswer === oIdx;
-                          const isOptionChosen = chosenIdx === oIdx;
-
-                          let optStyle = "bg-slate-50 border-slate-200 text-slate-700";
-                          if (isOptionCorrect) {
-                            optStyle = "bg-emerald-50 border-emerald-400 text-emerald-950 font-medium ring-1 ring-emerald-400";
-                          } else if (isOptionChosen && !isOptionCorrect) {
-                            optStyle = "bg-rose-50 border-rose-300 text-rose-900 font-semibold";
-                          }
-
-                          return (
-                            <div
-                              key={oIdx}
-                              className={`p-3 rounded-[var(--radius)] border text-xs flex items-center justify-between gap-3 ${optStyle}`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className={`w-6 h-6 rounded-[var(--radius)] text-xs font-mono font-medium flex items-center justify-center shrink-0 ${
-                                  isOptionCorrect ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-700"
-                                }`}>
-                                  {String.fromCharCode(65 + oIdx)}
-                                </span>
-                                <span>{opt}</span>
-                              </div>
-
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                {isOptionChosen && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
-                                    Your Pick
-                                  </span>
-                                )}
-                                {isOptionCorrect && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-200 text-emerald-900">
-                                    Correct Answer
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
+                      <p className="text-xs text-[#172033] font-medium">{q.question}</p>
                       {q.explanation && (
-                        <div className="p-3 bg-blue-50/60 rounded-[var(--radius)] border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
-                          <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                          <div>
-                            <b className="font-black text-slate-900">Meteorological Science Explanation:</b> {q.explanation}
-                          </div>
-                        </div>
+                        <p className="text-[11px] text-[#475569] bg-slate-50 p-2 rounded border border-slate-100">
+                          Explanation: {q.explanation}
+                        </p>
                       )}
                     </div>
                   );
@@ -1120,15 +763,10 @@ export const TraineePracticePapersView = ({
               })()}
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 bg-white border-t border-slate-200 flex items-center justify-between shrink-0">
-              <span className="text-slate-500 font-medium text-[11px]">
-                Adaptive AI Engine — Ministry of Earth Sciences (MoES / IMD)
-              </span>
-
+            <div className="p-3 bg-white border-t border-[#E2E8F0] flex justify-end shrink-0">
               <button
                 onClick={() => setSelectedAttemptForAnalytics(null)}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-[var(--radius)] text-xs transition-colors shadow-sm"
+                className="px-4 py-1.5 bg-[#2563EB] text-white rounded-lg text-xs font-medium"
               >
                 Close Audit
               </button>

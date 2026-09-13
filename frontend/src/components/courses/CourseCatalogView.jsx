@@ -1,24 +1,17 @@
 import React, { useState } from "react";
 import { 
   Search, 
-  Filter, 
   BookOpen, 
   Clock, 
-  Layers, 
   CheckCircle2, 
-  ArrowRight, 
   ShieldCheck, 
   GraduationCap,
-  Award,
   ChevronRight,
   SlidersHorizontal,
   Plus,
   Settings,
   Edit3,
-  Users,
-  Sparkles,
-  BarChart3,
-  FileCheck2
+  Users
 } from "lucide-react";
 import { CreateCourseModal } from "./CreateCourseModal";
 import { CourseManagementHubModal } from "./CourseManagementHubModal";
@@ -38,9 +31,8 @@ export const CourseCatalogView = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
-  const [selectedStatus, setSelectedStatus] = useState("All"); // "All" | "Enrolled" | "Available" | "Recent"
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
-  // Admin Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [courseToEdit, setCourseToEdit] = useState(null);
   const [courseToManage, setCourseToManage] = useState(null);
@@ -55,11 +47,6 @@ export const CourseCatalogView = ({
     "Climate Science"
   ];
 
-  const levels = ["All", "Beginner", "Intermediate", "Advanced"];
-
-  // 1. My Learning Mode: strictly filter to courses where this trainee is enrolled
-  // 2. Trainer Mode: filter courses assigned to this trainer
-  // 3. Admin / General Catalog: all courses
   const getBaseCourses = () => {
     if (isMyLearningMode) {
       return courses.filter(c => (c.enrolledTraineeIds || []).includes(currentUser?.id));
@@ -89,24 +76,18 @@ export const CourseCatalogView = ({
 
   const coursesToFilter = getBaseCourses();
 
-  // Filter courses with search, category, level
   const filteredCourses = coursesToFilter.filter(course => {
     const isEnrolled = (course.enrolledTraineeIds || []).includes(currentUser?.id);
 
-    // Search query filter
     const matchesSearch = searchQuery === "" || 
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (course.prerequisites && JSON.stringify(course.prerequisites).toLowerCase().includes(searchQuery.toLowerCase()));
 
-    // Category filter
     const matchesCategory = selectedCategory === "All" || course.category === selectedCategory;
-
-    // Level filter
     const matchesLevel = selectedLevel === "All" || (course.level && course.level.includes(selectedLevel));
 
-    // Status filter (only relevant in general catalog view)
     const matchesStatus = isMyLearningMode || selectedStatus === "All" || 
       (selectedStatus === "Enrolled" && isEnrolled) ||
       (selectedStatus === "Available" && !isEnrolled) ||
@@ -123,26 +104,26 @@ export const CourseCatalogView = ({
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 text-[#172033]">
       
-      {/* Header Banner with Admin Create Course Trigger / My Learning Title */}
-      <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 text-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-200/90 relative overflow-hidden">
-        <div className="space-y-1.5 max-w-2xl z-10">
+      {/* Header Banner */}
+      <div className="bg-white rounded-xl p-5 sm:p-6 text-[#172033] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-[#E2E8F0]">
+        <div className="space-y-1 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[#0B3475] text-[10px] font-black uppercase tracking-wider">
-              {isMyLearningMode ? "Enrolled Officer Programs" : "MoES / IMD National Curricula"}
+            <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-[#2563EB] text-[10px] font-semibold uppercase tracking-wider">
+              {isMyLearningMode ? "Enrolled Programs" : "Institutional Curricula"}
             </span>
-            <span className="text-xs text-slate-400 font-medium">
-              • {filteredCourses.length} {isMyLearningMode ? "Enrolled Course(s)" : "Standardized Programs"}
+            <span className="text-xs text-[#475569]">
+              • {filteredCourses.length} {isMyLearningMode ? "Enrolled Course(s)" : "Programs Available"}
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
-            {isMyLearningMode ? "My Enrolled Courses & Learning Tracks" : "Digital Capacity Building Course Library"}
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-[#172033]">
+            {isMyLearningMode ? "My Learning & Course Tracks" : "Course Catalog"}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
             {isMyLearningMode 
               ? "Access your active learning modules, interactive training laboratories, and enrolled subject syllabi."
-              : "Explore operational training tracks, numerical models, Doppler radar, and satellite meteorology syllabi."}
+              : "Explore operational training tracks, numerical models, remote sensing, and specialty course syllabi."}
           </p>
         </div>
 
@@ -153,26 +134,26 @@ export const CourseCatalogView = ({
               setCourseToEdit(null);
               setIsCreateModalOpen(true);
             }}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-all shrink-0 z-10"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4 text-blue-200" />
-            <span>+ Publish New Operational Course</span>
+            <Plus className="w-4 h-4 text-blue-100" />
+            <span>Publish New Course</span>
           </button>
         )}
 
         {isMyLearningMode && onNavigateCourses && (
           <button
             onClick={onNavigateCourses}
-            className="flex items-center gap-2 px-5 py-3 bg-[#0B3475] hover:bg-[#08285C] text-white font-semibold rounded-[var(--radius)] text-xs shadow-md transition-all shrink-0 z-10"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors shrink-0"
           >
-            <BookOpen className="w-4 h-4 text-blue-200" />
+            <BookOpen className="w-4 h-4 text-blue-100" />
             <span>Browse Full Catalog</span>
           </button>
         )}
       </div>
 
       {/* ─── FILTERS & SEARCH BAR ─── */}
-      <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4 shadow-sm space-y-3">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 shadow-xs space-y-3">
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
           
           {/* Search Input */}
@@ -180,10 +161,10 @@ export const CourseCatalogView = ({
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search courses by title, topic, radar, NWP, cyclone or prerequisite..."
+              placeholder="Search courses by title, code, description, or prerequisite..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-[var(--radius)] border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              className="w-full pl-10 pr-8 py-2 rounded-lg border border-[#E2E8F0] text-xs focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
             />
             {searchQuery && (
               <button 
@@ -200,7 +181,7 @@ export const CourseCatalogView = ({
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="px-3 py-2.5 rounded-[var(--radius)] border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="px-3 py-2 rounded-lg border border-[#E2E8F0] text-xs font-medium text-[#172033] bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
             >
               <option value="All">All Proficiency Levels</option>
               <option value="Beginner">Beginner Level</option>
@@ -213,7 +194,7 @@ export const CourseCatalogView = ({
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2.5 rounded-[var(--radius)] border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="px-3 py-2 rounded-lg border border-[#E2E8F0] text-xs font-medium text-[#172033] bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
               >
                 <option value="All">All Courses</option>
                 <option value="Enrolled">My Enrolled Courses</option>
@@ -226,7 +207,7 @@ export const CourseCatalogView = ({
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2.5 rounded-[var(--radius)] border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="px-3 py-2 rounded-lg border border-[#E2E8F0] text-xs font-medium text-[#172033] bg-white focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
               >
                 <option value="All">All Curricula</option>
                 <option value="Recent">Recently Added Courses</option>
@@ -237,19 +218,19 @@ export const CourseCatalogView = ({
         </div>
 
         {/* Category Pills Bar */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar text-xs">
-          <span className="text-[11px] font-medium text-slate-400 uppercase mr-1 shrink-0 flex items-center gap-1">
-            <SlidersHorizontal className="w-3 h-3" />
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 text-xs">
+          <span className="text-[11px] font-medium text-[#475569] uppercase mr-1 shrink-0 flex items-center gap-1">
+            <SlidersHorizontal className="w-3 h-3 text-slate-400" />
             <span>Category:</span>
           </span>
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-[var(--radius)] font-medium whitespace-nowrap transition-all text-xs ${
+              className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors text-xs ${
                 selectedCategory === cat
-                  ? "bg-[#0a2558] text-white shadow-sm"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                  ? "bg-[#2563EB] text-white shadow-xs"
+                  : "bg-slate-100 hover:bg-slate-200 text-[#475569]"
               }`}
             >
               {cat}
@@ -259,7 +240,7 @@ export const CourseCatalogView = ({
       </div>
 
       {/* ─── COURSE CARDS GRID ─── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredCourses.map((course) => {
           const isEnrolled = (course.enrolledTraineeIds || []).includes(currentUser?.id);
           const enrolledCount = course.enrolledTraineeIds?.length || 0;
@@ -268,12 +249,12 @@ export const CourseCatalogView = ({
           return (
             <div
               key={course.id}
-              className="bg-white rounded-[var(--radius)] border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between group cursor-pointer"
+              className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
               onClick={() => onSelectCourse(course)}
             >
               <div>
                 {/* Thumbnail Header */}
-                <div className="h-44 relative overflow-hidden bg-slate-100">
+                <div className="h-40 relative overflow-hidden bg-slate-100">
                   <img
                     src={course.thumbnail}
                     alt={course.title}
@@ -284,22 +265,22 @@ export const CourseCatalogView = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#0B3475]/90 text-white shadow backdrop-blur-sm">
+                    <span className="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-[#172033]/90 text-white backdrop-blur-xs">
                       {course.code}
                     </span>
                     {currentUser?.role === "trainee" ? (
                       isEnrolled ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500 text-white shadow flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-600 text-white flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" /> Enrolled
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-white/90 text-slate-800 shadow">
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-medium bg-white/95 text-slate-800">
                           {course.level || "Intermediate"}
                         </span>
                       )
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-white/95 text-slate-800 shadow flex items-center gap-1">
-                        <Users className="w-3 h-3 text-blue-600" />
+                      <span className="px-2.5 py-0.5 rounded text-[10px] font-medium bg-white/95 text-slate-800 flex items-center gap-1">
+                        <Users className="w-3 h-3 text-[#2563EB]" />
                         <span>{enrolledCount}/{maxCap}</span>
                       </span>
                     )}
@@ -307,27 +288,27 @@ export const CourseCatalogView = ({
                 </div>
 
                 {/* Body Details */}
-                <div className="p-5 space-y-2">
+                <div className="p-4.5 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-blue-700 uppercase tracking-wider">
+                    <span className="text-[10px] font-semibold text-[#2563EB] uppercase tracking-wider">
                       {course.category}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-1">
+                    <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
                       <Clock className="w-3 h-3 text-slate-400" />
                       {course.duration}
                     </span>
                   </div>
 
-                  <h3 className="font-semibold text-slate-900 text-sm line-clamp-2 leading-snug group-hover:text-blue-700 transition-colors">
+                  <h3 className="font-semibold text-[#172033] text-sm line-clamp-2 leading-snug group-hover:text-[#2563EB] transition-colors">
                     {course.title}
                   </h3>
 
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#475569] line-clamp-2 leading-relaxed">
                     {course.description}
                   </p>
 
                   {/* Prerequisites Preview */}
-                  <div className="pt-2 flex flex-wrap gap-1">
+                  <div className="pt-1.5 flex flex-wrap gap-1">
                     {(course.prerequisites || []).slice(0, 2).map((p, pIdx) => (
                       <span key={pIdx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium truncate max-w-[150px]">
                         {p}
@@ -343,8 +324,8 @@ export const CourseCatalogView = ({
               </div>
 
               {/* Action Button Footer */}
-              <div className="p-5 pt-0 border-t border-slate-100 flex items-center justify-between mt-auto">
-                <span className="text-[11px] text-slate-500 font-semibold">
+              <div className="p-4.5 pt-0 border-t border-slate-100 flex items-center justify-between mt-auto">
+                <span className="text-[11px] text-[#475569] font-medium">
                   {course.subjects?.length || 2} Subjects
                 </span>
 
@@ -355,7 +336,7 @@ export const CourseCatalogView = ({
                         e.stopPropagation();
                         onSelectCourse(course);
                       }}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-all flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>Resume Learning</span>
@@ -364,10 +345,10 @@ export const CourseCatalogView = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        alert(`❌ Enrollment Blocked: Your officer profile verification was rejected by MoES Administrator.\n\nReason: "${currentUser.rejectionReason || 'Incomplete credentials.'}"\n\nPlease visit your Officer Profile tab to update details and resubmit.`);
+                        alert(`❌ Enrollment Blocked: Profile verification pending/rejected.\n\nReason: "${currentUser.rejectionReason || 'Incomplete credentials.'}"\n\nPlease visit your Profile tab to update details.`);
                       }}
-                      className="px-3.5 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 font-medium rounded-[var(--radius)] text-xs transition-colors flex items-center gap-1"
-                      title="Enrollment Locked: Profile Rejected"
+                      className="px-3 py-1.5 bg-rose-100 text-rose-800 font-medium rounded-lg text-xs transition-colors"
+                      title="Enrollment Locked"
                     >
                       <span>🔒 Verification Rejected</span>
                     </button>
@@ -375,10 +356,10 @@ export const CourseCatalogView = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        alert("⏳ Enrollment Restricted: Your officer profile is currently awaiting MoES administrative verification. Once approved, you can enroll in this course.");
+                        alert("⏳ Enrollment Restricted: Profile is currently awaiting administrative verification.");
                       }}
-                      className="px-3.5 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-medium rounded-[var(--radius)] text-xs transition-colors flex items-center gap-1"
-                      title="Enrollment Restricted: Awaiting Approval"
+                      className="px-3 py-1.5 bg-amber-100 text-amber-900 font-medium rounded-lg text-xs transition-colors"
+                      title="Enrollment Restricted"
                     >
                       <span>⏳ Pending Approval</span>
                     </button>
@@ -389,7 +370,7 @@ export const CourseCatalogView = ({
                         if (onEnrollClick) onEnrollClick(course);
                         else onSelectCourse(course);
                       }}
-                      className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-all flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1"
                     >
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
                       <span>Enroll in Course</span>
@@ -403,8 +384,8 @@ export const CourseCatalogView = ({
                         setCourseToEdit(course);
                         setIsCreateModalOpen(true);
                       }}
-                      className="p-2 hover:bg-slate-100 text-slate-600 hover:text-blue-700 rounded-[var(--radius)] transition-colors border border-slate-200"
-                      title="Edit Course Structure"
+                      className="p-1.5 hover:bg-slate-100 text-slate-600 hover:text-[#2563EB] rounded-lg transition-colors border border-[#E2E8F0]"
+                      title="Edit Course"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
@@ -413,9 +394,9 @@ export const CourseCatalogView = ({
                         e.stopPropagation();
                         setCourseToManage(course);
                       }}
-                      className="px-3.5 py-1.5 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs shadow transition-all flex items-center gap-1.5"
+                      className="px-3 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1"
                     >
-                      <Settings className="w-3.5 h-3.5 text-blue-200" />
+                      <Settings className="w-3.5 h-3.5 text-blue-100" />
                       <span>Manage</span>
                     </button>
                   </div>
@@ -425,9 +406,9 @@ export const CourseCatalogView = ({
                       e.stopPropagation();
                       onSelectCourse(course);
                     }}
-                    className="px-4 py-2 bg-[#0B3475] hover:bg-[#08285C] text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-all flex items-center gap-1"
+                    className="px-3.5 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg text-xs shadow-xs transition-colors flex items-center gap-1"
                   >
-                    <span>View Curricula</span>
+                    <span>View Curriculum</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 )}
@@ -438,29 +419,29 @@ export const CourseCatalogView = ({
       </div>
 
       {filteredCourses.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-[var(--radius)] border border-dashed border-slate-300 p-8 space-y-3">
+        <div className="text-center py-16 bg-white rounded-xl border border-dashed border-[#E2E8F0] p-8 space-y-3">
           {isMyLearningMode ? (
             <>
-              <GraduationCap className="w-14 h-14 text-blue-300 mx-auto" />
-              <h3 className="text-base font-black text-slate-800">You are not enrolled in any training tracks yet</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Explore the official MoES / IMD Course Catalog to enroll in numerical modeling, Doppler radar nowcasting, and satellite meteorology programs.
+              <GraduationCap className="w-12 h-12 text-blue-400 mx-auto" />
+              <h3 className="text-sm font-semibold text-[#172033]">You are not enrolled in any training tracks yet</h3>
+              <p className="text-xs text-[#475569] max-w-md mx-auto">
+                Explore the Course Catalog to enroll in training programs and specialized tracks.
               </p>
               {onNavigateCourses && (
                 <button
                   onClick={onNavigateCourses}
-                  className="mt-2 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071c42] text-white rounded-[var(--radius)] text-xs font-semibold shadow-md transition-all inline-flex items-center gap-2"
+                  className="mt-2 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-lg text-xs font-medium shadow-xs transition-colors inline-flex items-center gap-1.5"
                 >
-                  <BookOpen className="w-4 h-4 text-blue-200" />
+                  <BookOpen className="w-4 h-4 text-blue-100" />
                   <span>Browse Course Catalog</span>
                 </button>
               )}
             </>
           ) : (
             <>
-              <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-slate-800">No matching training courses found</h3>
-              <p className="text-xs text-slate-500 mt-1">Try clearing your filters or changing your search terms.</p>
+              <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+              <h3 className="text-sm font-semibold text-[#172033]">No matching training courses found</h3>
+              <p className="text-xs text-[#475569] mt-1">Try clearing your filters or changing your search query.</p>
               <button
                 onClick={() => {
                   setSearchQuery("");
@@ -468,7 +449,7 @@ export const CourseCatalogView = ({
                   setSelectedLevel("All");
                   setSelectedStatus("All");
                 }}
-                className="mt-4 px-4 py-2 bg-[#0a2558] text-white rounded-[var(--radius)] text-xs font-medium"
+                className="mt-3 px-3.5 py-2 bg-[#2563EB] text-white rounded-lg text-xs font-medium"
               >
                 Reset Filters
               </button>
@@ -477,7 +458,7 @@ export const CourseCatalogView = ({
         </div>
       )}
 
-      {/* ─── MODAL: CREATE / EDIT COURSE MODAL ─── */}
+      {/* MODAL: CREATE / EDIT COURSE MODAL */}
       {isCreateModalOpen && (
         <CreateCourseModal
           isOpen={isCreateModalOpen}
@@ -490,7 +471,7 @@ export const CourseCatalogView = ({
         />
       )}
 
-      {/* ─── MODAL: ADMIN COURSE MANAGEMENT HUB ─── */}
+      {/* MODAL: ADMIN COURSE MANAGEMENT HUB */}
       {courseToManage && (
         <CourseManagementHubModal
           isOpen={!!courseToManage}
