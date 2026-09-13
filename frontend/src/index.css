@@ -1,68 +1,63 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color-scheme: light;
 
-  /* Institutional Assessment & LMS Design Tokens */
-  --bg-primary: #F8FAFC;
-  --bg-secondary: #F1F5F9;
+  /* Capacity Connect Design System Tokens */
+  --bg-primary: #F7F9FC;
   --surface: #FFFFFF;
-  --surface-hover: #F8FAFC;
+  --primary: #2563EB;
+  --primary-dark: #1D4ED8;
+  --deep-blue: #1E40AF;
+  --teal: #0F766E;
+  --soft-blue: #EFF6FF;
+  --soft-teal: #ECFDF5;
 
-  --text-primary: #172033;
-  --text-secondary: #475569;
-  --text-muted: #64748B;
+  --heading: #172033;
+  --body: #475569;
+  --secondary: #64748B;
+  --muted: #94A3B8;
 
   --border: #E2E8F0;
-  --border-subtle: #CBD5E1;
-
-  --primary: #0B3475;
-  --primary-hover: #08285C;
-  --primary-accent: #1D4ED8;
-  --primary-soft: #EFF6FF;
+  --strong-border: #CBD5E1;
 
   --success: #15803D;
-  --success-soft: #ECFDF5;
-
   --warning: #B45309;
-  --warning-soft: #FFFBEB;
-
   --danger: #B91C1C;
-  --danger-soft: #FEF2F2;
-
-  --info: #0369A1;
-  --info-soft: #F0F9FF;
+  --info: #2563EB;
 }
 
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--body);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Institutional Card Shadows & Borders */
+/* Institutional Card Shadows & Surface Utilities */
 .app-card {
   background-color: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  border-radius: 0.75rem; /* rounded-xl */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   transition: all 0.15s ease-in-out;
 }
 
 .app-card:hover {
   border-color: #CBD5E1;
-  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-.subtle-mesh {
-  background-color: #F8FAFC;
+.app-surface {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem; /* rounded-2xl */
 }
 
 /* Clean Custom Scrollbar */
@@ -84,7 +79,7 @@ body {
   background: #94A3B8;
 }
 
-/* Printing styles for MoES Certificates */
+/* Printing styles for Certificates */
 @media print {
   body * {
     visibility: hidden;

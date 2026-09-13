@@ -163,7 +163,7 @@ export const ItemAnalysisDifficultQuestionsModal = ({
     setIsEditingMode(false);
     setBroadcastSent(false);
     setClonedQuestions([]);
-    setBroadcastNote(`[Clarification Note on Question ${q.questionNumber}: ${q.topic}]\n\nDear Cadets,\nDuring the recent assessment on ${q.topic}, several trainees faced difficulties with: ${q.misunderstoodReason}\n\nPlease note: ${q.explanation}\n\nRecommended Action: ${q.remedialRecommendation}`);
+    setBroadcastNote(`[Clarification Note on Question ${q.questionNumber}: ${q.topic}]\n\nDear Learners,\nDuring the recent assessment on ${q.topic}, several trainees faced difficulties with: ${q.misunderstoodReason}\n\nPlease note: ${q.explanation}\n\nRecommended Action: ${q.remedialRecommendation}`);
   };
 
   // 1. Action: Save Revised Question Wording
@@ -186,7 +186,7 @@ export const ItemAnalysisDifficultQuestionsModal = ({
     showToast("✓ Question wording & distractors updated in Question Bank!");
   };
 
-  // 2. Action: Send Remedial Broadcast to Cadets
+  // 2. Action: Send Remedial Broadcast to Learners
   const handleSendRemedialBroadcast = () => {
     setBroadcastSent(true);
     showToast(`📢 Remedial Clarification Note broadcasted to all ${selectedQuestion.attempts} cadets who attempted Question ${selectedQuestion.questionNumber}!`);
@@ -570,7 +570,7 @@ export const ItemAnalysisDifficultQuestionsModal = ({
                   </div>
 
                   <div className="bg-white p-3.5 rounded-[var(--radius)] border border-indigo-100 space-y-2 text-slate-700">
-                    <p className="font-medium text-slate-900">Why Cadets are Failing this Item:</p>
+                    <p className="font-medium text-slate-900">Why Learners are Failing this Item:</p>
                     <p className="text-xs leading-relaxed text-slate-800">
                       {selectedQuestion.misunderstoodReason}
                     </p>
@@ -591,11 +591,11 @@ export const ItemAnalysisDifficultQuestionsModal = ({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Send className="w-4 h-4 text-blue-600" />
-                      <h5 className="font-black text-slate-900">Draft Clarification Bulletin to Cadets</h5>
+                      <h5 className="font-black text-slate-900">Draft Clarification Bulletin to Learners</h5>
                     </div>
                     {broadcastSent && (
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Sent to {selectedQuestion.attempts} Cadets
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Sent to {selectedQuestion.attempts} Learners
                       </span>
                     )}
                   </div>

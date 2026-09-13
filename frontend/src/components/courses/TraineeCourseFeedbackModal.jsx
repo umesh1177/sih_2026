@@ -43,7 +43,7 @@ export const TraineeCourseFeedbackModal = ({
       id: `rev_${Date.now()}`,
       courseId: course?.id || "course_nwp_01",
       courseTitle: course?.title || "NWP Course",
-      traineeName: currentUser?.name || "Officer Trainee",
+      traineeName: currentUser?.name || "Trainee",
       station: currentUser?.station || "Regional Center",
       date: "Just now",
       overall: Number(overallRating),

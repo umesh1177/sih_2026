@@ -280,12 +280,12 @@ export const CourseManagementHubModal = ({
               </div>
             </div>
 
-            {/* Enrolled Cadets Search & List */}
+            {/* Enrolled Learners Search & List */}
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                   <Users className="w-4 h-4 text-blue-600" />
-                  <span>Enrolled Cadets Directory ({filteredTrainees.length})</span>
+                  <span>Enrolled Learners Directory ({filteredTrainees.length})</span>
                 </h3>
 
                 <div className="relative w-full sm:w-64">
@@ -300,7 +300,7 @@ export const CourseManagementHubModal = ({
                 </div>
               </div>
 
-              {/* Cadets Table */}
+              {/* Learners Table */}
               <div className="border border-slate-200 rounded-[var(--radius)] overflow-hidden shadow-sm">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
@@ -465,7 +465,7 @@ export const CourseManagementHubModal = ({
               <div className="p-4 rounded-[var(--radius)] bg-purple-50/70 border border-purple-200">
                 <span className="text-[10px] font-medium text-purple-700 uppercase">Course Completion</span>
                 <p className="text-2xl font-black text-purple-950 mt-1">78.5%</p>
-                <span className="text-[10px] text-slate-500 font-medium">Active Cadets in track</span>
+                <span className="text-[10px] text-slate-500 font-medium">Active Learners in track</span>
               </div>
 
               <div className="p-4 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200">
@@ -587,7 +587,7 @@ export const CourseManagementHubModal = ({
                 <span>
                   {isGeneratingCertificates
                     ? "Generating & Issuing Bulk Digital Certificates..."
-                    : `Generate & Issue Certificates to ${enrolledCount || 2} Cadets & Faculty`}
+                    : `Generate & Issue Certificates to ${enrolledCount || 2} Learners & Faculty`}
                 </span>
               </button>
             </div>

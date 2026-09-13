@@ -223,7 +223,7 @@ export const CertificateEligibilityGatekeeper = ({
         credentialId: certId,
         title: item.course.title,
         courseTitle: item.course.title,
-        traineeName: currentUser?.name || "Officer Trainee",
+        traineeName: currentUser?.name || "Trainee",
         grade: item.telemetry.assessmentScore >= 90 ? "Distinction (90%+)" : "Merit Pass",
         performanceCategory: item.telemetry.assessmentScore >= 90 ? "Distinction" : "Merit",
         issueDate: new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),

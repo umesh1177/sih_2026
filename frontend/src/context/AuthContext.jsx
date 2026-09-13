@@ -174,11 +174,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     clearToken();
     clearStoredUser();
-    // Revert to default demo trainer
-    const defaultUser = demoAccounts[0].user;
-    setCurrentUser(defaultUser);
-    setStoredUser(defaultUser);
-    setToken(`demo-jwt-token-${defaultUser.id}`);
+    setCurrentUser(null);
   };
 
   // On mount: ensure token exists and fetch fresh user profile from backend

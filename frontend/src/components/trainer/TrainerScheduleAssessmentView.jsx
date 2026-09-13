@@ -2190,11 +2190,11 @@ export const TrainerScheduleAssessmentView = ({
                       </div>
                     </div>
 
-                    <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-100 text-[11px] flex items-center justify-between">
-                      <span className="text-slate-500 font-semibold">
-                        Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Cadets</b>
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200/80 text-[11px] flex items-center justify-between">
+                      <span className="text-slate-500 font-medium">
+                        Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Learners</b>
                       </span>
-                      <span className="text-emerald-700 font-black">
+                      <span className="text-emerald-700 font-bold">
                         {isDeadlinePassed ? "Window Closed" : "Exam Live"}
                       </span>
                     </div>
@@ -2204,7 +2204,7 @@ export const TrainerScheduleAssessmentView = ({
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                     <button
                       onClick={() => handleInspectQuiz(quiz)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-[#0a2558] text-slate-800 hover:text-white font-extrabold rounded-[var(--radius)] text-xs transition-colors shadow-xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white font-semibold rounded-lg text-xs transition-colors shadow-xs"
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
                       <span>Class Analytics</span>
@@ -2214,23 +2214,22 @@ export const TrainerScheduleAssessmentView = ({
                       isDeadlinePassed ? (
                         <button
                           onClick={() => handlePublishResultsForQuiz(quiz.id)}
-                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-[var(--radius)] text-xs shadow-xs transition-transform hover:scale-105"
-                          title="Publish Results to Cadets"
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs shadow-xs transition-transform hover:scale-105"
+                          title="Publish Results to Learners"
                         >
                           Publish Results
                         </button>
                       ) : (
                         <div
-                          className="px-2.5 py-2 bg-slate-100 border border-slate-200 text-slate-400 font-medium rounded-[var(--radius)] text-[11px] flex items-center gap-1 cursor-not-allowed"
+                          className="px-2.5 py-2 bg-slate-100 border border-slate-200 text-slate-400 font-medium rounded-lg text-[11px] flex items-center gap-1 cursor-not-allowed"
                           title={`Results can be published after deadline: ${deadlineFormatted}`}
                         >
-                          <Clock className="w-3 h-3 text-amber-500" />
-                          <span>Publish Locked</span>
+                          <span>Pending Deadline</span>
                         </div>
                       )
                     ) : (
-                      <span className="px-2.5 py-1.5 bg-emerald-50 text-emerald-800 font-medium rounded-[var(--radius)] text-[11px] border border-emerald-200">
-                        Published ✓
+                      <span className="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-[11px] font-semibold flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Published
                       </span>
                     )}
                   </div>
@@ -2315,7 +2314,7 @@ export const TrainerScheduleAssessmentView = ({
                     className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
                   >
                     <Sparkles className="w-4 h-4 text-emerald-200" />
-                    <span>Publish Ratified Quiz Results to Cadets</span>
+                    <span>Publish Ratified Quiz Results to Learners</span>
                   </button>
                 );
               })()}
@@ -3038,7 +3037,7 @@ export const TrainerScheduleAssessmentView = ({
                 <table className="w-full text-left text-xs bg-white">
                   <thead className="text-[11px] font-black uppercase text-slate-400 bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="py-3 px-4">Trainee Cadet</th>
+                      <th className="py-3 px-4">Trainee Learner</th>
                       <th className="py-3 px-4">Cadre ID & Station</th>
                       <th className="py-3 px-4">Score & Percentage</th>
                       <th className="py-3 px-4">Time Taken</th>
@@ -3069,7 +3068,7 @@ export const TrainerScheduleAssessmentView = ({
                                   {(sub.traineeName || "TR").slice(0, 2).toUpperCase()}
                                 </div>
                                 <div>
-                                  <span className="block">{sub.traineeName || "Cadet"}</span>
+                                  <span className="block">{sub.traineeName || "Learner"}</span>
                                   {isDisq && (
                                     <span className="text-[10px] text-red-600 font-semibold block">
                                       Tab-Switch Violation Limit Exceeded
@@ -3297,7 +3296,7 @@ export const TrainerScheduleAssessmentView = ({
                     <thead className="text-[11px] font-black uppercase text-slate-400 bg-slate-50 border-b border-slate-200">
                       <tr>
                         <th className="py-3 px-4">Rank</th>
-                        <th className="py-3 px-4">Examinee Cadet</th>
+                        <th className="py-3 px-4">Examinee Learner</th>
                         <th className="py-3 px-4">Cadre ID & Station</th>
                         <th className="py-3 px-4">Score</th>
                         <th className="py-3 px-4">Accuracy</th>
@@ -3505,7 +3504,7 @@ export const TrainerScheduleAssessmentView = ({
                         {q.type === "one_word" || q.type === "short_answer" || (!q.options || q.options.length === 0) ? (
                           <div className="p-3 rounded-[var(--radius)] bg-purple-50/60 border border-purple-200/80 space-y-1.5 text-[11px]">
                             <div className="flex items-center justify-between">
-                              <span className="font-medium text-slate-700">Cadet Typed Response:</span>
+                              <span className="font-medium text-slate-700">Learner Typed Response:</span>
                               <span className="font-mono font-medium px-2 py-0.5 rounded bg-white border border-purple-200 text-purple-950">
                                 "{ans.text || ans.selected || ans.userAnswer || "No answer entered"}"
                               </span>
@@ -3538,7 +3537,7 @@ export const TrainerScheduleAssessmentView = ({
                                 <span>{String.fromCharCode(65 + oIdx)}. {opt}</span>
                                 {chosenIdx === oIdx && (
                                   <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
-                                    Cadet Pick
+                                    Learner Pick
                                   </span>
                                 )}
                               </div>

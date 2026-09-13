@@ -498,7 +498,7 @@ export const CourseOverviewPage = ({
                         <th className="py-2.5 px-3">Progress</th>
                         <th className="py-2.5 px-3">Avg Score</th>
                         <th className="py-2.5 px-3">Status</th>
-                        <th className="py-2.5 px-3 text-right">Dossier</th>
+                        <th className="py-2.5 px-3 text-right">Profile/Record</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -557,7 +557,7 @@ export const CourseOverviewPage = ({
                               className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-lg text-xs transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5 text-slate-600" />
-                              <span>Dossier</span>
+                              <span>Profile/Record</span>
                             </button>
                           </td>
                         </tr>

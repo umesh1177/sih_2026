@@ -256,7 +256,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         quizId: quiz?.id || "quiz_unspecified",
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
-        traineeName: currentUser?.name || currentUser?.email || "Officer Trainee",
+        traineeName: currentUser?.name || currentUser?.email || "Trainee",
         score: calculatedScore,
         totalMarks,
         percentage,
@@ -313,7 +313,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         quizId: quiz?.id || "quiz_unspecified",
         quizTitle: quiz?.title || "National Meteorological Assessment",
         traineeId: currentUser?.id || "u_trainee_1",
-        traineeName: currentUser?.name || currentUser?.email || "Officer Trainee",
+        traineeName: currentUser?.name || currentUser?.email || "Trainee",
         score: disqualified ? 0 : 16,
         totalMarks: 20,
         percentage: disqualified ? 0 : 80,
@@ -859,7 +859,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               {isDisq ? "ASSESSMENT DISQUALIFIED" : (submissionResult.quizTitle || "Assessment Completed")}
             </h2>
             <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">
-              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Submission ID: <span className="font-mono">{submissionResult.resultId || "SUB-2026-98"}</span>
+              Candidate: <b className="text-slate-800">{currentUser?.name || currentUser?.email || "Trainee"}</b> • Submission ID: <span className="font-mono">{submissionResult.resultId || "SUB-2026-98"}</span>
             </p>
           </div>
 
@@ -1140,7 +1140,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               </span>
             </div>
             <p className="text-[11px] text-slate-500 font-normal">
-              Candidate: <b className="text-slate-800 font-medium">{currentUser?.name || currentUser?.email || "Officer Trainee"}</b> • Security Engine Active
+              Candidate: <b className="text-slate-800 font-medium">{currentUser?.name || currentUser?.email || "Trainee"}</b> • Security Engine Active
             </p>
           </div>
         </div>

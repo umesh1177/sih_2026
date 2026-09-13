@@ -48,7 +48,7 @@ export const OfficerProfileView = ({ onOpenCertificate }) => {
   };
 
   const getInitialForm = (user) => ({
-    name: user?.name || user?.email || "Officer Trainee",
+    name: user?.name || user?.email || "Trainee",
     email: user?.email || "",
     department: user?.department || "",
     designation: user?.designation || (user?.role === "trainer" ? "Faculty Trainer" : "Scientist 'B' (Trainee)"),

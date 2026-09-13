@@ -111,7 +111,7 @@ export const CourseFeedbackImprovementStudio = ({
 
         return {
           id: r.id || `rev_${idx}`,
-          traineeName: r.traineeName || "Cadet Trainee",
+          traineeName: r.traineeName || "Learner Trainee",
           station: r.station || r.designation || "MoES/IMD Center",
           date: r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "Recent",
           overall: overall,
@@ -189,7 +189,7 @@ export const CourseFeedbackImprovementStudio = ({
         metricName: "Learning Material",
         score: m.learningMaterial,
         title: "⚠ Learning Material Review Recommended",
-        description: `Learning Material rating (${m.learningMaterial}/5.0) is below the ${alertThreshold} threshold. Cadets requested higher-fidelity slides or updated reference notes.`,
+        description: `Learning Material rating (${m.learningMaterial}/5.0) is below the ${alertThreshold} threshold. Learners requested higher-fidelity slides or updated reference notes.`,
         actionLabel: "Update Syllabus Learning Materials",
         actionType: "material"
       });
@@ -229,9 +229,9 @@ export const CourseFeedbackImprovementStudio = ({
     const weakMetric = selectedCourse.metrics.assessmentQuality < alertThreshold ? "Assessment Quality" : "Learning Material";
     const plan = `[AI Course Quality Remediation Directive — ${selectedCourse.courseTitle}]\n\n` +
       `Identified Quality Bottleneck: ${weakMetric} (Score: ${selectedCourse.metrics.assessmentQuality < alertThreshold ? selectedCourse.metrics.assessmentQuality : selectedCourse.metrics.learningMaterial} / 5.0)\n\n` +
-      `Cadet Feedback Consensus:\n` +
+      `Learner Feedback Consensus:\n` +
       `- Questions on 4D-Var variational equations and CFL numerical stability contained ambiguous double negatives.\n` +
-      `- Cadets requested 3 step-by-step mathematical examples before timed quizzes.\n\n` +
+      `- Learners requested 3 step-by-step mathematical examples before timed quizzes.\n\n` +
       `Recommended Action Items for Faculty:\n` +
       `1. Refine Question #17 and #9 in Question Bank to remove ambiguous distractors.\n` +
       `2. Insert a 5-minute video walkthrough on Nyquist Velocity Unwrapping in Module 1.\n` +
@@ -322,7 +322,7 @@ export const CourseFeedbackImprovementStudio = ({
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
-              Based on <b>{selectedCourse.totalReviews} Verified Cadets</b>
+              Based on <b>{selectedCourse.totalReviews} Verified Learners</b>
             </p>
           </div>
 

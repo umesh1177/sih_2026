@@ -108,21 +108,21 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
         <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shrink-0">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
+              <span className="px-3 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">
                 FACULTY EVALUATION DESK
               </span>
               {isPublished ? (
-                <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Results Published to Cadets
+                <span className="px-3 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Results Published to Learners
                 </span>
               ) : (
-                <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                <span className="px-3 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                   <Clock className="w-3 h-3 text-amber-600 animate-pulse" /> Pending Result Publication
                 </span>
               )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
               {quiz?.title || "Subject Assessment Evaluation"}
             </h1>
             <p className="text-xs text-slate-500 font-medium">
@@ -136,21 +136,21 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
               <button
                 onClick={handlePublishResults}
                 disabled={publishing || submissions.length === 0}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-[var(--radius)] text-xs shadow-sm transition-all"
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg text-xs shadow-xs transition-all"
               >
                 <Sparkles className="w-4 h-4 text-emerald-100" />
                 <span>{publishing ? "Publishing..." : "Publish Quiz Results"}</span>
               </button>
             ) : (
-              <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 font-medium rounded-[var(--radius)] text-xs">
+              <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 font-medium rounded-lg text-xs">
                 <Check className="w-4 h-4 text-emerald-600" />
-                <span>Scores Live on Cadet Portals</span>
+                <span>Scores Live on Learner Portals</span>
               </div>
             )}
 
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-[var(--radius)] bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

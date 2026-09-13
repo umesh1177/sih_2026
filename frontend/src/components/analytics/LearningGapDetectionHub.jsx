@@ -736,7 +736,7 @@ export const LearningGapDetectionHub = ({
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-slate-900 text-sm">{selectedTraineeObj.name}</h3>
                   <span className="px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900 font-medium text-[10px]">
-                    {selectedTraineeObj.cadreId || "Officer Trainee"}
+                    {selectedTraineeObj.cadreId || "Trainee"}
                   </span>
                 </div>
                 <p className="text-xs text-slate-600">

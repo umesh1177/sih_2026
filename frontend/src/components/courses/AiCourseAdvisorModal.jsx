@@ -53,7 +53,7 @@ export const AiCourseAdvisorModal = ({
   const userQualifications = useMemo(() => parseArray(currentUser?.qualifications), [currentUser]);
   const userCertificates = useMemo(() => parseArray(currentUser?.certificates || currentUser?.credentials), [currentUser]);
   const userDept = currentUser?.department || "Operations & Weather Forecasting";
-  const userRole = currentUser?.designation || currentUser?.role || "Officer Trainee";
+  const userRole = currentUser?.designation || currentUser?.role || "Trainee";
 
   // Non-enrolled courses available for recommendation
   const availableUnenrolledCourses = useMemo(() => {

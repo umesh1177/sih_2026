@@ -619,7 +619,7 @@ export const ExamAnalyticsModal = ({ exam, currentUser, onClose, onOpenStudio })
                       <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-black tracking-wider border-b border-slate-100">
                         <tr>
                           <th className="p-4">Rank</th>
-                          <th className="p-4">Officer Trainee</th>
+                          <th className="p-4">Trainee</th>
                           <th className="p-4">Station / Centre</th>
                           <th className="p-4">Score</th>
                           <th className="p-4">Accuracy</th>

@@ -52,12 +52,37 @@ import {
   PlayCircle,
   FileText
 } from "lucide-react";
+import { TAB_ACCESS } from "./constants/tabAccess";
+import AccessRestricted from "./components/ui/AccessRestricted";
 
 const MainApp = () => {
   const { currentUser, switchAccount, demoAccounts } = useAuth();
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+// Helper to check tab access based on currentUser.role
+const isTabAllowed = (tab) => {
+  const allowed = TAB_ACCESS[tab];
+  if (!allowed) return true; // If no entry, allow by default
+  if (allowed.includes("all")) return true;
+  return currentUser && allowed.includes(currentUser.role);
+};
+
+// Navigation function that enforces RBAC
+const navigateToTab = (tab) => {
+  if (isTabAllowed(tab)) {
+    setActiveTab(tab);
+  } else {
+    alert("You do not have permission to access this section.");
+  }
+};
+
   useEffect(() => {
-    // Reset activeTab to default when user changes (login/logout)
-    setActiveTab("dashboard");
+    // Reset activeTab to default when user changes or logs out
+    if (!currentUser) {
+      setViewMode("landing");
+    } else {
+      navigateToTab("dashboard");
+    }
   }, [currentUser]);
   
   // Navigation & Page views: Defaults to Home Page ("landing")
@@ -68,7 +93,6 @@ const MainApp = () => {
     if (params.get("mode") === "login") return "login";
     return "landing";
   });
-  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Course Overview (Matching iGOT style) and Learning Studio
   const [selectedOverviewCourse, setSelectedOverviewCourse] = useState(null);
@@ -172,11 +196,11 @@ const MainApp = () => {
         <Sidebar
           activeTab={activeTab}
           setActiveTab={(tab) => {
-            setActiveTrainerStudioCourse(null);
-            setSelectedOverviewCourse(null);
-            setActiveStudioCourse(null);
-            setActiveTab(tab);
-          }}
+              setActiveTrainerStudioCourse(null);
+              setSelectedOverviewCourse(null);
+              setActiveStudioCourse(null);
+              navigateToTab(tab);
+            }}
           onOpenLoginPage={() => setViewMode("login")}
           onOpenHomePage={() => setViewMode("landing")}
           isOpenMobile={isMobileSidebarOpen}
@@ -191,7 +215,7 @@ const MainApp = () => {
             onOpenContentLibrary={(subjectId) => {
               setActiveTrainerStudioCourse(null);
               setContentLibrarySubjectFilter(subjectId || "all");
-              setActiveTab("content-library");
+              navigateToTab("content-library");
             }}
             onOpenAiGenerator={() => setIsAiModalOpen(true)}
             onOpenAnalytics={(qId) => setSelectedQuizAnalyticsId(qId || "quiz_nwp_01")}
@@ -208,10 +232,10 @@ const MainApp = () => {
         <Sidebar
           activeTab={activeTab}
           setActiveTab={(tab) => {
-            setActiveStudioCourse(null);
-            setSelectedOverviewCourse(null);
-            setActiveTab(tab);
-          }}
+              setActiveStudioCourse(null);
+              setSelectedOverviewCourse(null);
+              navigateToTab(tab);
+            }}
           onOpenLoginPage={() => setViewMode("login")}
           onOpenHomePage={() => setViewMode("landing")}
           isOpenMobile={isMobileSidebarOpen}
@@ -236,9 +260,9 @@ const MainApp = () => {
         <Sidebar
           activeTab={activeTab}
           setActiveTab={(tab) => {
-            setSelectedOverviewCourse(null);
-            setActiveTab(tab);
-          }}
+              setSelectedOverviewCourse(null);
+              navigateToTab(tab);
+            }}
           onOpenLoginPage={() => setViewMode("login")}
           onOpenHomePage={() => setViewMode("landing")}
           isOpenMobile={isMobileSidebarOpen}
@@ -272,13 +296,19 @@ const MainApp = () => {
             onOpenProfile={() => {
               setPrereqModalCourse(null);
               setSelectedOverviewCourse(null);
-              setActiveTab("profile");
+              navigateToTab("profile");
             }}
           />
         )}
       </div>
     );
   }
+
+  // Helper to render tab with RBAC guard
+  const renderTabContent = (tab, content) =>
+    isTabAllowed(tab) ? content : (
+      <AccessRestricted tab={tab} onNavigate={() => navigateToTab('dashboard')} />
+    );
 
   return (
     <div className="flex h-screen bg-[#f8fafc] text-slate-800 font-sans overflow-hidden select-none">
@@ -308,15 +338,15 @@ const MainApp = () => {
         {/* Dynamic Tab Pane */}
         <main className="flex-1 overflow-y-auto">
           {/* 1. DASHBOARD VIEW (Role specific) */}
-          {activeTab === "dashboard" && (
+          {activeTab === "dashboard" && renderTabContent("dashboard", (
             <>
               {currentUser?.role === "trainee" && (
                 <TraineeDashboardView
                   currentUser={currentUser}
                   onStartExam={(q) => setActiveExamQuiz(q)}
                   onOpenCourse={(c) => setSelectedOverviewCourse(c)}
-                  onOpenProfile={() => setActiveTab("profile")}
-                  onNavigateTab={(tab) => setActiveTab(tab)}
+                  onOpenProfile={() => navigateToTab("profile")}
+                  onNavigateTab={(tab) => navigateToTab(tab)}
                   onOpenAiAdvisor={() => setIsAiCourseAdvisorOpen(true)}
                   onOpenCertificate={(submission, courseTitle, traineeName) => {
                     setCertificateData({ submission, courseTitle, traineeName });
@@ -327,7 +357,7 @@ const MainApp = () => {
               {currentUser?.role === "trainer" && (
                 <TrainerDashboardView
                   currentUser={currentUser}
-                  onOpenQuestionBank={() => setActiveTab("questions")}
+                  onOpenQuestionBank={() => navigateToTab("questions")}
                   onOpenAiGenerator={() => setIsAiModalOpen(true)}
                   onOpenScheduleQuiz={() => setIsScheduleModalOpen(true)}
                   onOpenAnalytics={(qId) => setSelectedQuizAnalyticsId(qId)}
@@ -336,27 +366,27 @@ const MainApp = () => {
                   onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
                   onOpenContentLibrary={(subjectId) => {
                     setContentLibrarySubjectFilter(subjectId || "all");
-                    setActiveTab("content-library");
+                    navigateToTab("content-library");
                   }}
-                  onNavigatePerformance={() => setActiveTab("trainee-performance")}
+                  onNavigatePerformance={() => navigateToTab("trainee-performance")}
                 />
               )}
 
               {currentUser?.role === "admin" && (
                 <AdminDashboardView
-                  onOpenApprovals={() => setActiveTab("approvals")}
-                  onOpenBroadcastModal={() => setActiveTab("announcements")}
+                  onOpenApprovals={() => navigateToTab("approvals")}
+                  onOpenBroadcastModal={() => navigateToTab("announcements")}
                   onOpenCreateCourse={() => setIsCreateCourseModalOpen(true)}
-                  onOpenAnalytics={() => setActiveTab("analytics")}
-                  onNavigatePerformance={() => setActiveTab("trainee-performance")}
-                  onNavigateTrainerMatching={() => setActiveTab("trainer-matching")}
+                  onOpenAnalytics={() => navigateToTab("analytics")}
+                  onNavigatePerformance={() => navigateToTab("trainee-performance")}
+                  onNavigateTrainerMatching={() => navigateToTab("trainer-matching")}
                 />
               )}
             </>
-          )}
+          ))}
 
           {/* 2. CONTENT LIBRARY (Trainer Media & Learning Materials Repository) */}
-          {activeTab === "content-library" && (
+          {activeTab === "content-library" && renderTabContent("content-library", (
             <ContentLibraryView
               currentUser={currentUser}
               initialSubjectFilter={contentLibrarySubjectFilter}
@@ -365,41 +395,41 @@ const MainApp = () => {
                 setActiveStudioCourse(course);
               }}
             />
-          )}
+          ))}
 
           {/* 3. AI PRACTICE PAPERS & ADAPTIVE TESTING (Trainee Studio) */}
-          {activeTab === "practice-papers" && (
+          {activeTab === "practice-papers" && renderTabContent("practice-papers", (
             <TraineePracticePapersView
               currentUser={currentUser}
               onStartExam={(paper) => setActiveExamQuiz(paper)}
-              onOpenQuestionBank={() => setActiveTab("questions")}
+              onOpenQuestionBank={() => navigateToTab("questions")}
               onOpenAiGenerator={() => setIsAiModalOpen(true)}
             />
-          )}
+          ))}
 
           {/* 4. QUESTION BANK (Accessible by Trainees, Trainers & Admins) */}
-          {activeTab === "questions" && (
+          {activeTab === "questions" && renderTabContent("questions", (
             <div className="p-6 space-y-6">
               <QuestionBankTable
                 currentUser={currentUser}
                 onOpenAiGenerator={() => setIsAiModalOpen(true)}
                 onOpenScheduleQuiz={() => setIsScheduleModalOpen(true)}
-                onNavigatePracticePapers={() => setActiveTab("practice-papers")}
+                onNavigatePracticePapers={() => navigateToTab("practice-papers")}
                 onStartExam={(paper) => setActiveExamQuiz(paper)}
               />
             </div>
-          )}
+          ))}
 
           {/* 3. TRAINER SCHEDULE ASSESSMENT (Dedicated Comprehensive Module) */}
           {(activeTab === "schedule-assessment" || (currentUser?.role === "trainer" && activeTab === "quizzes")) && (
             <TrainerScheduleAssessmentView
               currentUser={currentUser}
-              onOpenQuestionBank={() => setActiveTab("questions")}
+              onOpenQuestionBank={() => navigateToTab("questions")}
               onScheduleSuccess={() => {
                 refreshGlobalData();
-                setActiveTab("schedule-assessment");
+                navigateToTab("schedule-assessment");
               }}
-              onOpenContentLibrary={() => setActiveTab("content-library")}
+              onOpenContentLibrary={() => navigateToTab("content-library")}
             />
           )}
 
@@ -476,7 +506,7 @@ const MainApp = () => {
               courses={courses}
               currentUser={currentUser}
               activeTab={activeTab}
-              onNavigateCourses={() => setActiveTab("courses")}
+              onNavigateCourses={() => navigateToTab("courses")}
               onSelectCourse={(course) => setSelectedOverviewCourse(course)}
               onEnrollClick={(course) => setPrereqModalCourse(course)}
               onOpenCertificate={(submission, courseTitle, traineeName) => {
@@ -523,7 +553,7 @@ const MainApp = () => {
               onOpenCourse={(course) => {
                 setSelectedOverviewCourse(course);
               }}
-              onNavigateTab={(tab) => setActiveTab(tab)}
+              onNavigateTab={(tab) => navigateToTab(tab)}
             />
           )}
 
@@ -535,8 +565,8 @@ const MainApp = () => {
                 setSelectedOverviewCourse(null);
                 setActiveStudioCourse(course);
               }}
-              onOpenQuestionBank={() => setActiveTab("questions")}
-              onOpenAssessment={() => setActiveTab("schedule-assessment")}
+              onOpenQuestionBank={() => navigateToTab("questions")}
+              onOpenAssessment={() => navigateToTab("schedule-assessment")}
             />
           )}
 
@@ -604,7 +634,7 @@ const MainApp = () => {
           onEnrollSuccess={handleEnrollCourseSuccess}
           onOpenProfile={() => {
             setPrereqModalCourse(null);
-            setActiveTab("profile");
+            navigateToTab("profile");
           }}
         />
       )}
@@ -626,7 +656,7 @@ const MainApp = () => {
         onClose={() => setIsAiModalOpen(false)}
         onQuestionsGenerated={() => {
           refreshGlobalData();
-          setActiveTab("questions");
+          navigateToTab("questions");
         }}
       />
 

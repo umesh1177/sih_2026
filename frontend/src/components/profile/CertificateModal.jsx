@@ -5,7 +5,7 @@ export const CertificateModal = ({ isOpen, onClose, submission, courseTitle, tra
   if (!isOpen) return null;
 
   const certId = submission?.certificateId || submission?.credentialId || submission?.id || `MOES-IMD-${Date.now().toString(36).toUpperCase()}`;
-  const name = traineeName || submission?.traineeName || submission?.recipientName || "Officer Trainee";
+  const name = traineeName || submission?.traineeName || submission?.recipientName || "Trainee";
   const course = courseTitle || submission?.title || submission?.quizTitle || "Operational Meteorology Capacity Building Program";
   
   const pct = submission?.percentage ?? submission?.finalScore ?? submission?.score;

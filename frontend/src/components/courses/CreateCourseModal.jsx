@@ -589,7 +589,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
 
               <div>
                 <label className="block font-medium text-slate-800 mb-1">
-                  Max Cadets Capacity <span className="text-blue-600">({form.maxEnrollment})</span>
+                  Max Learners Capacity <span className="text-blue-600">({form.maxEnrollment})</span>
                 </label>
                 <input
                   type="number"
@@ -1026,7 +1026,7 @@ export const CreateCourseModal = ({ isOpen, onClose, onCourseCreated, courseToEd
                     {form.code} • {form.level}
                   </span>
                   <h3 className="font-black text-slate-900 text-base mt-1.5">{form.title || "Untitled Course"}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{form.category} • {form.duration} • Max Capacity: {form.maxEnrollment} Cadets</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{form.category} • {form.duration} • Max Capacity: {form.maxEnrollment} Learners</p>
                 </div>
               </div>
 

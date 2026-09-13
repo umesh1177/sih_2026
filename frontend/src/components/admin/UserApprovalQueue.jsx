@@ -465,14 +465,14 @@ export const UserApprovalQueue = () => {
                       {/* Actions */}
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          {/* Inspect Full Dossier Modal Button */}
+                          {/* Inspect Full Profile/Record Modal Button */}
                           <button
                             onClick={() => setInspectUser(user)}
                             className="p-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-[var(--radius)] transition-all font-medium flex items-center gap-1 text-[11px]"
-                            title="Inspect Complete Officer Dossier & Certifications"
+                            title="Inspect Complete Officer Profile/Record & Certifications"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Dossier</span>
+                            <span className="hidden sm:inline">Profile/Record</span>
                           </button>
 
                           {/* Quick Approve button if not already approved */}
@@ -519,7 +519,7 @@ export const UserApprovalQueue = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in overflow-y-auto">
           <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200">
             
-            {/* Dossier Header */}
+            {/* Profile/Record Header */}
             <div className="bg-gradient-to-r from-blue-700 to-blue-900 p-6 text-white rounded-t-xl relative overflow-hidden">
               <div className="relative z-10 flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -557,7 +557,7 @@ export const UserApprovalQueue = () => {
               </div>
             </div>
 
-            {/* Dossier Body */}
+            {/* Profile/Record Body */}
             <div className="p-6 space-y-6 text-xs text-slate-700">
               
               {/* Status Alert Banner if rejected */}
@@ -754,13 +754,13 @@ export const UserApprovalQueue = () => {
               </div>
             </div>
 
-            {/* Dossier Footer Actions */}
+            {/* Profile/Record Footer Actions */}
             <div className="p-6 bg-slate-50 border-t border-slate-100 rounded-b-xl flex flex-col sm:flex-row items-center justify-between gap-3">
               <button
                 onClick={() => setInspectUser(null)}
                 className="w-full sm:w-auto px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg text-xs transition-colors"
               >
-                Close Dossier
+                Close Profile/Record
               </button>
 
               <div className="flex items-center gap-2.5 w-full sm:w-auto">

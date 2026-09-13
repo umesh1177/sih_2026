@@ -735,7 +735,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 </div>
 
                 <div className="space-y-1 text-xs text-slate-600">
-                  <p>Enrolled Cadets: <b>{dept.count} Officers</b></p>
+                  <p>Enrolled Learners: <b>{dept.count} Officers</b></p>
                   <div className="flex items-center gap-2 font-semibold">
                     <span className="text-emerald-700">🌟 {dept.excellent} Excellent</span>
                     <span>•</span>
@@ -1016,7 +1016,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                         {trainee.remarks ? "✓ Feedback Recorded" : "No Remarks Added"}
                       </span>
                       <span className="font-extrabold text-indigo-600 flex items-center gap-1 hover:underline">
-                        <span>View Dossier & Diagnostics</span>
+                        <span>View Profile/Record & Diagnostics</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -1159,7 +1159,7 @@ export const TraineePerformanceCategoryView = ({ currentUser, onOpenStudio, onOp
                 onClick={() => setSelectedTrainee(null)}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
               >
-                Close Dossier
+                Close Profile/Record
               </button>
 
               <button
