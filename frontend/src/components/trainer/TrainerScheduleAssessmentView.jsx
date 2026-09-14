@@ -44,8 +44,6 @@ import {
 import { api } from "../../services/api";
 import { cleanSubject, cleanTopic } from "./ContentLibraryView";
 import AssessmentCards from "./AssessmentCards";
-import LearningResourcesCards from "./LearningResourcesCards";
-import CredentialsCard from "./CredentialsCard";
 
 export const TrainerScheduleAssessmentView = ({
   currentUser,
@@ -60,6 +58,8 @@ export const TrainerScheduleAssessmentView = ({
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortFilter, setSortFilter] = useState("newest");
   const [notification, setNotification] = useState(null);
 
   // Selected Quiz for In-Depth Analytics / Evaluation
@@ -175,6 +175,14 @@ export const TrainerScheduleAssessmentView = ({
   };
 
   useEffect(() => {
+    const existing = document.querySelector('link[data-trainer-inter-font]');
+    if (!existing) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap";
+      link.dataset.trainerInterFont = "true";
+      document.head.appendChild(link);
+    }
     loadData();
   }, [currentUser]);
 
@@ -278,7 +286,7 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       console.error("Failed loading assessment data:", err);
-    } fontally ;{
+    } finally {
       setLoading(false);
     }
   };
@@ -469,7 +477,7 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       showToast("AI Generation error: " + err.message, "error");
-    } fontally ;{
+    } finally {
       setIsGeneratingAiPaper(false);
     }
   };
@@ -574,7 +582,7 @@ export const TrainerScheduleAssessmentView = ({
       showToast(`Synthesized ${synthesizedQuestions.length} questions conforming strictly to the Topic-Wise & Marks-Wise Blueprint!`);
     } catch (err) {
       showToast("Blueprint generation error: " + err.message, "error");
-    } fontally; {
+    } finally {
       setIsGeneratingAiPaper(false);
     }
   };
@@ -661,7 +669,7 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       showToast(err.message, "error");
-    } fontally; {
+    } finally {
       setLoading(false);
     }
   };
@@ -738,7 +746,7 @@ export const TrainerScheduleAssessmentView = ({
       setTrainerFeedbackMap(fbMap);
     } catch (err) {
       console.error("Error loading quiz submissions & analytics:", err);
-    } fontally; {
+    } finally {
       setLoadingAnalytics(false);
     }
   };
@@ -819,12 +827,19 @@ export const TrainerScheduleAssessmentView = ({
 
   const filteredQuizzes = quizzes.filter(q => {
     const isUpcoming = new Date(q.scheduledStartTime) > now;
-    const isCompleted = new Date(q.deadlineTime) < now || q.resultsPublished;
-    const isPendingEval = !q.resultsPublished && (q.submissionsCount > 0 || !isUpcoming);
+    const isDeadlinePassed = !q.deadlineTime || now >= new Date(q.deadlineTime);
+    const isPublished = q.resultsPublished;
+    const isCompleted = isDeadlinePassed || isPublished;
+    const isPendingEval = !isPublished && (q.submissionsCount > 0 || !isUpcoming);
 
     if (activeSubTab === "upcoming" && !isUpcoming) return false;
     if (activeSubTab === "completed" && !isCompleted) return false;
     if (activeSubTab === "pending-eval" && !isPendingEval) return false;
+
+    if (statusFilter === "upcoming" && !isUpcoming) return false;
+    if (statusFilter === "active" && (isUpcoming || isDeadlinePassed || isPublished)) return false;
+    if (statusFilter === "closed" && !isDeadlinePassed) return false;
+    if (statusFilter === "published" && !isPublished) return false;
 
     // Course hierarchy filter
     if (selectedHierarchyCourseId !== "all") {
@@ -853,26 +868,34 @@ export const TrainerScheduleAssessmentView = ({
     }
 
     return true;
+  }).sort((a, b) => {
+    const aStart = new Date(a.scheduledStartTime || 0).getTime();
+    const bStart = new Date(b.scheduledStartTime || 0).getTime();
+    const aDeadline = new Date(a.deadlineTime || 0).getTime();
+    const bDeadline = new Date(b.deadlineTime || 0).getTime();
+    if (sortFilter === "oldest") return aStart - bStart;
+    if (sortFilter === "deadline") return aDeadline - bDeadline;
+    return bStart - aStart;
   });
 
   // ─── HIERARCHICAL DRILLDOWN NAVIGATION BAR COMPONENT (Course -> Subject -> Assessment -> Trainee) ───
   const renderHierarchySelector = () => (
-    <div className="bg-[#0a2558] text-white rounded-[var(--radius)] p-5 sm:p-6 shadow-xl border border-blue-900/40 space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[var(--radius)] bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
+    <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-2xs">
             <SlidersHorizontal className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-black text-sm text-white tracking-wide">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-sm text-slate-900 tracking-tight">
                 Multi-Subject Trainer Schedule & Analytics Hierarchy
               </h3>
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 font-mono">
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 font-mono">
                 Course ➔ Subject ➔ Assessment ➔ Trainee
               </span>
             </div>
-            <p className="text-[11px] text-slate-300">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Filter schedules by course and assigned subjects to view topic evaluations and individual trainee performance.
             </p>
           </div>
@@ -887,9 +910,9 @@ export const TrainerScheduleAssessmentView = ({
               setSelectedHierarchyTraineeId("all");
               setSelectedQuizForDetails(null);
             }}
-            className="flex items-center gap-1 text-[11px] font-medium text-amber-300 hover:text-amber-200 transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-[var(--radius)] border border-amber-300/30"
+            className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors bg-slate-100 hover:bg-slate-200/80 px-3 py-1.5 rounded-xl border border-slate-200/80"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Filters</span>
           </button>
         )}
@@ -898,8 +921,8 @@ export const TrainerScheduleAssessmentView = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
         {/* 1. Select Course */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-black uppercase text-blue-300 flex items-center gap-1.5 tracking-wider">
-            <BookOpen className="w-3.5 h-3.5 text-blue-400" />
+          <label className="text-[11px] font-semibold uppercase text-blue-700 flex items-center gap-1.5 tracking-wider">
+            <BookOpen className="w-3.5 h-3.5 text-blue-600" />
             <span>1. Course</span>
           </label>
           <select
@@ -911,7 +934,7 @@ export const TrainerScheduleAssessmentView = ({
               setSelectedHierarchyAssessmentId("all");
               setSelectedHierarchyTraineeId("all");
             }}
-            className="w-full p-2.5 bg-slate-800/90 text-white border border-slate-700 rounded-[var(--radius)] font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full p-2.5 bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition-all"
           >
             <option value="all">All Assigned Courses ({courses.length})</option>
             {courses.map(c => (
@@ -922,8 +945,8 @@ export const TrainerScheduleAssessmentView = ({
 
         {/* 2. Select Subject (Multi-Subject Trainer Support) */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-black uppercase text-cyan-300 flex items-center gap-1.5 tracking-wider">
-            <Layers className="w-3.5 h-3.5 text-cyan-400" />
+          <label className="text-[11px] font-semibold uppercase text-cyan-700 flex items-center gap-1.5 tracking-wider">
+            <Layers className="w-3.5 h-3.5 text-cyan-600" />
             <span>2. Trainer Subject</span>
           </label>
           <select
@@ -934,7 +957,7 @@ export const TrainerScheduleAssessmentView = ({
               setSelectedHierarchyAssessmentId("all");
               setSelectedHierarchyTraineeId("all");
             }}
-            className="w-full p-2.5 bg-slate-800/90 text-white border border-slate-700 rounded-[var(--radius)] font-medium focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+            className="w-full p-2.5 bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-cyan-500 focus:bg-white focus:outline-none transition-all"
           >
             <option value="all">All Assigned Subjects ({availableHierarchySubjects.length})</option>
             {availableHierarchySubjects.map((s, idx) => (
@@ -947,8 +970,8 @@ export const TrainerScheduleAssessmentView = ({
 
         {/* 3. Select Assessment */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-black uppercase text-amber-300 flex items-center gap-1.5 tracking-wider">
-            <ClipboardList className="w-3.5 h-3.5 text-amber-400" />
+          <label className="text-[11px] font-semibold uppercase text-amber-700 flex items-center gap-1.5 tracking-wider">
+            <ClipboardList className="w-3.5 h-3.5 text-amber-600" />
             <span>3. Scheduled Assessment</span>
           </label>
           <select
@@ -966,7 +989,7 @@ export const TrainerScheduleAssessmentView = ({
                 }
               }
             }}
-            className="w-full p-2.5 bg-slate-800/90 text-white border border-slate-700 rounded-[var(--radius)] font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            className="w-full p-2.5 bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-amber-500 focus:bg-white focus:outline-none transition-all"
           >
             <option value="all">All Assessments ({availableHierarchyQuizzes.length})</option>
             {availableHierarchyQuizzes.map(q => (
@@ -977,8 +1000,8 @@ export const TrainerScheduleAssessmentView = ({
 
         {/* 4. Select Trainee */}
         <div className="space-y-1.5">
-          <label className="text-[11px] font-black uppercase text-emerald-300 flex items-center gap-1.5 tracking-wider">
-            <Users className="w-3.5 h-3.5 text-emerald-400" />
+          <label className="text-[11px] font-semibold uppercase text-emerald-700 flex items-center gap-1.5 tracking-wider">
+            <Users className="w-3.5 h-3.5 text-emerald-600" />
             <span>4. Trainee</span>
           </label>
           <select
@@ -998,7 +1021,7 @@ export const TrainerScheduleAssessmentView = ({
                 }
               }
             }}
-            className="w-full p-2.5 bg-slate-800/90 text-white border border-slate-700 rounded-[var(--radius)] font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            className="w-full p-2.5 bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition-all"
           >
             <option value="all">All Trainees / Aggregate ({activeSubmissions.length || enrolledTrainees.length})</option>
             {activeSubmissions.length > 0 ? (
@@ -1019,47 +1042,47 @@ export const TrainerScheduleAssessmentView = ({
   );
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto text-slate-800 select-none min-h-screen" style={{ fontFamily: "Inter, sans-serif" }}>
 
       {/* Toast Notification */}
       {notification && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-[var(--radius)] bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-slate-900 text-white shadow-xl border border-slate-700/80 animate-in slide-in-from-bottom-5">
           <div className={`w-2.5 h-2.5 rounded-full ${notification.type === "error" ? "bg-red-400" : "bg-emerald-400"}`} />
           <span className="text-xs font-medium">{notification.message}</span>
         </div>
       )}
 
       {/* ═════════ 1. HERO BANNER & PRIMARY CTA (LIGHT THEME) ═════════ */}
-      <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-blue-50/80 to-transparent pointer-events-none" />
 
         <div className="space-y-2 z-10">
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-900 font-extrabold text-xs border border-blue-200">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-900 font-semibold text-xs border border-blue-200/60">
               Examination Cell & Assessment Operations
             </span>
             <span className="text-xs text-slate-500 font-medium">Multi-Subject Trainer Scheduling Engine</span>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Detailed Trainee + Trainer Performance Analytics
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium">
+          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium leading-relaxed">
             Schedule multi-subject evaluations, balance timetables across modules, drill down through Course ➔ Subject ➔ Assessment ➔ Trainee, and audit responses with automated precision.
           </p>
         </div>
 
         {/* Global Action Hub */}
-        <div className="flex items-center gap-2.5 flex-wrap z-10">
+        <div className="flex items-center gap-3 flex-wrap z-10 shrink-0">
           <button
             onClick={() => {
               setActiveSubTab("create");
               setCreateStep("ai-paper");
             }}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-xl text-xs shadow-xs transition-all active:scale-98"
           >
             <Sparkles className="w-4 h-4 text-slate-950" />
-            <span>AI Question Paper Generator</span>
+            <span>AI question paper</span>
           </button>
 
           <button
@@ -1067,10 +1090,10 @@ export const TrainerScheduleAssessmentView = ({
               setActiveSubTab("create");
               setCreateStep("basic");
             }}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-xs transition-all active:scale-98"
           >
             <Plus className="w-4 h-4 text-white" />
-            <span>Schedule New Assessment</span>
+            <span>New assessment</span>
           </button>
         </div>
       </div>
@@ -1079,50 +1102,50 @@ export const TrainerScheduleAssessmentView = ({
       {activeSubTab !== "create" && renderHierarchySelector()}
 
       {/* ═════════ 3. 4 SUB-TABS NAVIGATION (ALL | UPCOMING | COMPLETED | PENDING EVALUATION | CREATE) ═════════ */}
-      <div className="bg-white rounded-[var(--radius)] p-2 border border-slate-200 shadow-sm flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="bg-white rounded-2xl p-2 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => { setActiveSubTab("all"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "all"
-                ? "bg-[#0a2558] text-white shadow-md"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeSubTab === "all"
+              ? "bg-[#0a2558] text-white shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
               }`}
           >
             <ClipboardList className="w-4 h-4" />
-            <span>All Scheduled Exams ({quizzes.length})</span>
+            <span>All ({quizzes.length})</span>
           </button>
 
           <button
             onClick={() => { setActiveSubTab("upcoming"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "upcoming"
-                ? "bg-[#0a2558] text-white shadow-md"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeSubTab === "upcoming"
+              ? "bg-[#0a2558] text-white shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
               }`}
           >
             <Calendar className="w-4 h-4 text-amber-500" />
-            <span>Upcoming Exams</span>
+            <span>Upcoming</span>
           </button>
 
           <button
             onClick={() => { setActiveSubTab("completed"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "completed"
-                ? "bg-[#0a2558] text-white shadow-md"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeSubTab === "completed"
+              ? "bg-[#0a2558] text-white shadow-xs"
+              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
               }`}
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-            <span>Completed & Analytics</span>
+            <span>Completed</span>
           </button>
 
           <button
             onClick={() => { setActiveSubTab("pending-eval"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "pending-eval"
-                ? "bg-amber-500 text-slate-950 shadow-md"
-                : "text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/80"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${activeSubTab === "pending-eval"
+              ? "bg-amber-500 text-slate-950 shadow-xs"
+              : "text-amber-800 bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80"
               }`}
           >
             <Clock className="w-4 h-4 text-amber-900" />
-            <span>Pending Evaluation & Publish</span>
+            <span>Pending review</span>
           </button>
         </div>
 
@@ -1132,40 +1155,40 @@ export const TrainerScheduleAssessmentView = ({
               setActiveSubTab("create");
               setCreateStep("basic");
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#0a2558] hover:bg-[#071739] text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Create Exam</span>
+            <span>Create assessment</span>
           </button>
         )}
       </div>
 
       {/* ═════════ 3. CREATE / AI GENERATE EXAM WORKFLOW (ON THE SAME PAGE) ═════════ */}
       {activeSubTab === "create" && (
-        <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 animate-in fade-in duration-150">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8 space-y-6 animate-in fade-in duration-150">
 
           {/* Workflow Step Indicator */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-blue-900 bg-blue-100 px-3 py-0.5 rounded-full">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-900 bg-blue-100/80 px-3 py-1 rounded-full border border-blue-200/50">
                 ASSESSMENT BLUEPRINT & AUTHORING
               </span>
-              <h2 className="text-lg font-black text-slate-900 tracking-tight mt-1">
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight mt-1.5">
                 Topic-Wise + Marks-Wise Question Paper Creation Engine
               </h2>
             </div>
 
-            <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-[var(--radius)] border border-slate-200 text-xs font-extrabold">
+            <div className="flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-xl border border-slate-200/80 text-xs font-semibold">
               <button
                 onClick={() => setCreateStep("basic")}
-                className={`px-3 py-1.5 rounded-[var(--radius)] transition-all ${createStep === "basic" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                className={`px-3.5 py-1.5 rounded-lg transition-all ${createStep === "basic" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
                   }`}
               >
                 1. Blueprint & Parameters
               </button>
               <button
                 onClick={() => setCreateStep("ai-paper")}
-                className={`px-3 py-1.5 rounded-[var(--radius)] flex items-center gap-1 transition-all ${createStep === "ai-paper" ? "bg-amber-400 text-slate-950 shadow-xs" : "text-slate-600 hover:text-slate-900"
+                className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${createStep === "ai-paper" ? "bg-amber-400 text-slate-950 shadow-xs" : "text-slate-600 hover:text-slate-900"
                   }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -1173,7 +1196,7 @@ export const TrainerScheduleAssessmentView = ({
               </button>
               <button
                 onClick={() => setCreateStep("questions")}
-                className={`px-3 py-1.5 rounded-[var(--radius)] transition-all ${createStep === "questions" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                className={`px-3.5 py-1.5 rounded-lg transition-all ${createStep === "questions" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
                   }`}
               >
                 3. Question Bank ({selectedQuestionIds.length})
@@ -1186,13 +1209,13 @@ export const TrainerScheduleAssessmentView = ({
             <div className="space-y-6 text-xs animate-in fade-in duration-150">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">
+                  <label className="font-semibold text-slate-800">
                     Assigned Course <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={createForm.courseId}
                     onChange={(e) => handleCourseChange(e.target.value)}
-                    className="w-full p-3 rounded-[var(--radius)] border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 font-medium text-slate-900"
+                    className="w-full p-3 rounded-xl border border-slate-200/80 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 font-medium text-slate-900 transition-all outline-none"
                   >
                     {courses.map(c => (
                       <option key={c.id} value={c.id}>{c.title} ({c.code})</option>
@@ -1201,13 +1224,13 @@ export const TrainerScheduleAssessmentView = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">
+                  <label className="font-semibold text-slate-800">
                     Assigned Subject in this Course <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={createForm.subjectId}
                     onChange={(e) => handleSubjectChange(e.target.value)}
-                    className="w-full p-3 rounded-[var(--radius)] border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 font-medium text-blue-950"
+                    className="w-full p-3 rounded-xl border border-slate-200/80 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-600 font-medium text-blue-950 transition-all outline-none"
                   >
                     {courses.find(c => c.id === createForm.courseId)?.subjects?.map((s, idx) => (
                       <option key={s.id || idx} value={s.id || s.name}>
@@ -1219,7 +1242,7 @@ export const TrainerScheduleAssessmentView = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-extrabold text-slate-800">
+                <label className="font-semibold text-slate-800">
                   Assessment Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1228,63 +1251,63 @@ export const TrainerScheduleAssessmentView = ({
                   value={createForm.title}
                   onChange={(e) => setCreateForm({ ...createForm, title: e.target.value })}
                   placeholder="e.g. Weather Forecasting — Mid Term Assessment"
-                  className="w-full p-3 rounded-[var(--radius)] border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium text-xs"
+                  className="w-full p-3 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-blue-600 font-medium text-xs transition-all outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">Proctored Duration (Mins)</label>
+                  <label className="font-semibold text-slate-800">Proctored Duration (Mins)</label>
                   <input
                     type="number"
                     min={10}
                     max={180}
                     value={createForm.durationMinutes}
                     onChange={(e) => setCreateForm({ ...createForm, durationMinutes: e.target.value })}
-                    className="w-full p-3 rounded-[var(--radius)] border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium"
+                    className="w-full p-3 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-blue-600 font-medium transition-all outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">Total Marks (Target)</label>
+                  <label className="font-semibold text-slate-800">Total Marks (Target)</label>
                   <input
                     type="number"
                     min={5}
                     max={200}
                     value={createForm.totalMarks}
                     onChange={(e) => setCreateForm({ ...createForm, totalMarks: Number(e.target.value), passMarks: Math.round(Number(e.target.value) * 0.5) })}
-                    className="w-full p-3 rounded-[var(--radius)] border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium text-blue-900"
+                    className="w-full p-3 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-blue-600 font-medium text-blue-900 transition-all outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">Scheduled Start / Go-Live</label>
+                  <label className="font-semibold text-slate-800">Scheduled Start / Go-Live</label>
                   <input
                     type="datetime-local"
                     value={createForm.scheduledStartTime}
                     onChange={(e) => setCreateForm({ ...createForm, scheduledStartTime: e.target.value })}
-                    className="w-full p-3 rounded-[var(--radius)] border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium"
+                    className="w-full p-3 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-blue-600 font-medium transition-all outline-none"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-extrabold text-slate-800">Final Assessment Deadline</label>
+                  <label className="font-semibold text-slate-800">Final Assessment Deadline</label>
                   <input
                     type="datetime-local"
                     value={createForm.deadlineTime}
                     onChange={(e) => setCreateForm({ ...createForm, deadlineTime: e.target.value })}
-                    className="w-full p-3 rounded-[var(--radius)] border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium"
+                    className="w-full p-3 rounded-xl border border-slate-200/80 focus:ring-2 focus:ring-blue-600 font-medium transition-all outline-none"
                   />
                 </div>
               </div>
 
               {/* ─── ASSESSMENT BLUEPRINT (TOPIC-WISE + MARKS-WISE DISTRIBUTION) ─── */}
-              <div className="p-5 bg-gradient-to-br from-slate-50 to-blue-50/60 rounded-[var(--radius)] border border-blue-200/80 space-y-4 shadow-2xs">
+              <div className="p-5 bg-gradient-to-br from-slate-50 to-blue-50/40 rounded-2xl border border-blue-200/80 space-y-4 shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-blue-200/60">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
                       <SlidersHorizontal className="w-4 h-4 text-blue-700" />
-                      <h3 className="font-black text-sm text-slate-900">
+                      <h3 className="font-semibold text-sm text-slate-900">
                         Assessment Blueprint (Topic-Wise & Marks-Wise Distribution)
                       </h3>
                     </div>
@@ -1318,7 +1341,7 @@ export const TrainerScheduleAssessmentView = ({
                           }
                         ]);
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-2xs transition-transform hover:scale-105"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-2xs transition-colors"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>+ Add Blueprint Topic</span>
@@ -1342,24 +1365,16 @@ export const TrainerScheduleAssessmentView = ({
                     }}
                   />
                 </div>
-                {/* Learning Resources */}
-                <div className="my-4">
-                  <LearningResourcesCards />
-                </div>
-                {/* Credentials */}
-                <div className="my-4">
-                  <CredentialsCard />
-                </div>
-  
+
 
                 {/* Blueprint Summary Footer */}
-                <div className="p-3.5 bg-white rounded-[var(--radius)] border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="p-4 bg-white rounded-xl border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-extrabold text-slate-700">Topic Allocation:</span>
+                    <span className="font-semibold text-slate-700">Topic Allocation:</span>
                     {blueprint.map((bp, i) => (
-                      <span key={i} className="px-2.5 py-1 rounded-[var(--radius)] bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-800 flex items-center gap-1">
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200/80 text-[11px] font-medium text-slate-800 flex items-center gap-1.5">
                         <span>{bp.topic}:</span>
-                        <b className="text-blue-700">{bp.totalMarks}m</b>
+                        <b className="text-blue-700 font-semibold">{bp.totalMarks}m</b>
                         <span className="text-[10px] text-slate-500">({bp.type === "one_word" ? "One-word" : "MCQ"})</span>
                       </span>
                     ))}
@@ -1367,8 +1382,8 @@ export const TrainerScheduleAssessmentView = ({
 
                   <div className="flex items-center gap-3 shrink-0">
                     <div className="text-right">
-                      <span className="text-[10px] text-slate-400 font-medium uppercase block">Blueprint Total Marks</span>
-                      <span className="font-mono font-black text-sm text-slate-900">
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Blueprint Total Marks</span>
+                      <span className="font-mono font-bold text-sm text-slate-900">
                         {blueprint.reduce((acc, bp) => acc + (Number(bp.totalMarks) || 0), 0)} / {createForm.totalMarks} Marks
                       </span>
                     </div>
@@ -1380,7 +1395,7 @@ export const TrainerScheduleAssessmentView = ({
                         setCreateForm(prev => ({ ...prev, totalMarks: sum, passMarks: Math.round(sum * 0.5) }));
                         showToast(`Exam total marks synchronized to blueprint sum: ${sum} marks.`);
                       }}
-                      className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-medium rounded-[var(--radius)] text-[11px] transition-colors"
+                      className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-semibold rounded-lg text-[11px] transition-colors"
                     >
                       Sync Total Marks
                     </button>
@@ -1389,10 +1404,10 @@ export const TrainerScheduleAssessmentView = ({
               </div>
 
               {/* Trainee Target Selection */}
-              <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-3">
+              <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <label className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                    <label className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
                       <Users className="w-4 h-4 text-blue-600" />
                       <span>Target Candidates / Trainees</span>
                     </label>
@@ -1401,13 +1416,13 @@ export const TrainerScheduleAssessmentView = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 bg-white p-1 rounded-[var(--radius)] border border-slate-200">
+                  <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200/80">
                     <button
                       type="button"
                       onClick={() => setTargetType("all")}
-                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${targetType === "all"
-                          ? "bg-blue-600 text-white shadow-xs"
-                          : "text-slate-600 hover:text-slate-900"
+                      className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all ${targetType === "all"
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
                         }`}
                     >
                       All Enrolled Trainees
@@ -1415,9 +1430,9 @@ export const TrainerScheduleAssessmentView = ({
                     <button
                       type="button"
                       onClick={() => setTargetType("specific")}
-                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${targetType === "specific"
-                          ? "bg-blue-600 text-white shadow-xs"
-                          : "text-slate-600 hover:text-slate-900"
+                      className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all ${targetType === "specific"
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
                         }`}
                     >
                       Specific Trainees ({selectedTraineeIds.length})
@@ -1435,14 +1450,14 @@ export const TrainerScheduleAssessmentView = ({
                           placeholder="Search trainees by name or station..."
                           value={targetTraineeSearch}
                           onChange={(e) => setTargetTraineeSearch(e.target.value)}
-                          className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-[var(--radius)] text-xs font-medium"
+                          className="w-full pl-8 pr-3 py-2 bg-white border border-slate-200/80 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
                           onClick={() => setSelectedTraineeIds(enrolledTrainees.map(t => t.id))}
-                          className="text-xs font-medium text-blue-600 hover:underline"
+                          className="text-xs font-semibold text-blue-600 hover:underline"
                         >
                           Select All ({enrolledTrainees.length})
                         </button>
@@ -1450,14 +1465,14 @@ export const TrainerScheduleAssessmentView = ({
                         <button
                           type="button"
                           onClick={() => setSelectedTraineeIds([])}
-                          className="text-xs font-medium text-slate-500 hover:underline"
+                          className="text-xs font-semibold text-slate-500 hover:underline"
                         >
                           Clear
                         </button>
                       </div>
                     </div>
 
-                    <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-white rounded-[var(--radius)] border border-slate-200">
+                    <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-white rounded-xl border border-slate-200/80">
                       {enrolledTrainees
                         .filter(t =>
                           !targetTraineeSearch ||
@@ -1477,9 +1492,9 @@ export const TrainerScheduleAssessmentView = ({
                                   setSelectedTraineeIds([...selectedTraineeIds, t.id]);
                                 }
                               }}
-                              className={`p-2.5 rounded-[var(--radius)] border text-xs cursor-pointer flex items-center justify-between transition-colors ${isSelected
-                                  ? "bg-blue-50 border-blue-300 text-blue-950 font-medium"
-                                  : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
+                              className={`p-2.5 rounded-xl border text-xs cursor-pointer flex items-center justify-between transition-all ${isSelected
+                                ? "bg-blue-50/80 border-blue-300 text-blue-950 font-medium"
+                                : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
                                 }`}
                             >
                               <div className="flex items-center gap-2.5">
@@ -1490,11 +1505,11 @@ export const TrainerScheduleAssessmentView = ({
                                   className="w-4 h-4 text-blue-600 rounded"
                                 />
                                 <div>
-                                  <span className="font-medium text-slate-900">{t.name}</span>
+                                  <span className="font-semibold text-slate-900">{t.name}</span>
                                   <span className="text-[10px] text-slate-500 ml-2">({t.email})</span>
                                 </div>
                               </div>
-                              <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded">
+                              <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded-md">
                                 {t.station || "National HQ"}
                               </span>
                             </div>
@@ -1515,7 +1530,7 @@ export const TrainerScheduleAssessmentView = ({
                     type="button"
                     onClick={handleGenerateBlueprintPaper}
                     disabled={isGeneratingAiPaper}
-                    className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 text-slate-950 font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-xl text-xs shadow-xs transition-colors"
                   >
                     {isGeneratingAiPaper ? (
                       <>
@@ -1525,7 +1540,7 @@ export const TrainerScheduleAssessmentView = ({
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 text-slate-950" />
-                        <span>⚡ Synthesize Full Paper from Blueprint</span>
+                        <span>Synthesize paper</span>
                       </>
                     )}
                   </button>
@@ -1533,7 +1548,7 @@ export const TrainerScheduleAssessmentView = ({
                   <button
                     type="button"
                     onClick={() => setCreateStep("ai-paper")}
-                    className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
                   >
                     <span>Proceed to Authoring Stage</span>
                     <ChevronRight className="w-4 h-4" />
@@ -1548,13 +1563,13 @@ export const TrainerScheduleAssessmentView = ({
             <div className="space-y-6 text-xs animate-in fade-in duration-150">
 
               {/* Top Quick Actions Bar (Light Theme) */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+              <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl text-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-900 font-black text-[10px] uppercase border border-blue-200">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-900 font-semibold text-[10px] uppercase border border-blue-200/60">
                       PAPER BUILDER
                     </span>
-                    <h3 className="font-extrabold text-sm text-slate-900">
+                    <h3 className="font-semibold text-sm text-slate-900">
                       Questions Authoring & AI Generation ({editableAiPaper.length} Questions)
                     </h3>
                   </div>
@@ -1568,10 +1583,10 @@ export const TrainerScheduleAssessmentView = ({
                     type="button"
                     onClick={handleGenerateBlueprintPaper}
                     disabled={isGeneratingAiPaper}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-xl text-xs shadow-xs transition-colors"
                   >
                     {isGeneratingAiPaper ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                    <span>⚡ Re-Synthesize from Blueprint</span>
+                    <span>Re-synthesize</span>
                   </button>
 
                   <button
@@ -1596,7 +1611,7 @@ export const TrainerScheduleAssessmentView = ({
                       });
                       setShowAddCustomModal(true);
                     }}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>+ Add Custom Question (MCQ / One-Word)</span>
@@ -1605,24 +1620,24 @@ export const TrainerScheduleAssessmentView = ({
               </div>
 
               {/* Single-Topic AI Generator Box */}
-              <div className="p-5 bg-gradient-to-br from-amber-50/70 to-yellow-50/70 rounded-[var(--radius)] border border-amber-200/80 space-y-4">
+              <div className="p-5 bg-gradient-to-br from-amber-50/70 to-yellow-50/70 rounded-2xl border border-amber-200/80 space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-amber-950 font-black text-sm">
+                  <div className="flex items-center gap-2 text-amber-950 font-semibold text-sm">
                     <Sparkles className="w-4 h-4 text-amber-600" />
                     <span>Generate Topic-Specific Questions: {createForm.subjectName}</span>
                   </div>
-                  <span className="text-[10px] font-extrabold bg-amber-200/70 text-amber-950 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-semibold bg-amber-200/70 text-amber-950 px-2.5 py-0.5 rounded-full">
                     AI Question Generator
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div className="space-y-1">
-                    <label className="font-extrabold text-slate-800">Select Uploaded Module</label>
+                    <label className="font-semibold text-slate-800">Select Uploaded Module</label>
                     <select
                       value={aiPaperConfig.moduleName}
                       onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, moduleName: e.target.value })}
-                      className="w-full p-2.5 bg-white border border-amber-300 rounded-[var(--radius)] font-medium text-slate-900"
+                      className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
                     >
                       {courses.find(c => c.id === createForm.courseId)?.subjects
                         ?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName)
@@ -1638,22 +1653,22 @@ export const TrainerScheduleAssessmentView = ({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-extrabold text-slate-800">Topic & Concept Focus</label>
+                    <label className="font-semibold text-slate-800">Topic & Concept Focus</label>
                     <input
                       type="text"
                       value={aiPaperConfig.conceptName}
                       onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, conceptName: e.target.value, topicName: e.target.value })}
                       placeholder="e.g. Arakawa-C Grid, CFL Condition, Adjoint 4D-Var"
-                      className="w-full p-2.5 bg-white border border-amber-300 rounded-[var(--radius)] font-medium"
+                      className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-extrabold text-slate-800">Questions Count</label>
+                    <label className="font-semibold text-slate-800">Questions Count</label>
                     <select
                       value={aiPaperConfig.questionCount}
                       onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, questionCount: e.target.value })}
-                      className="w-full p-2.5 bg-white border border-amber-300 rounded-[var(--radius)] font-medium"
+                      className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
                     >
                       <option value="3">3 Questions</option>
                       <option value="5">5 Questions</option>
@@ -1662,11 +1677,11 @@ export const TrainerScheduleAssessmentView = ({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-extrabold text-slate-800">Difficulty</label>
+                    <label className="font-semibold text-slate-800">Difficulty</label>
                     <select
                       value={aiPaperConfig.difficulty}
                       onChange={(e) => setAiPaperConfig({ ...aiPaperConfig, difficulty: e.target.value })}
-                      className="w-full p-2.5 bg-white border border-amber-300 rounded-[var(--radius)] font-medium"
+                      className="w-full p-2.5 bg-white border border-amber-300 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
                     >
                       <option value="Medium">Medium (Analytical)</option>
                       <option value="Hard">Hard (Mathematical)</option>
@@ -1679,7 +1694,7 @@ export const TrainerScheduleAssessmentView = ({
                   <button
                     onClick={handleGenerateAiPaper}
                     disabled={isGeneratingAiPaper}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
                   >
                     {isGeneratingAiPaper ? (
                       <>
@@ -1689,7 +1704,7 @@ export const TrainerScheduleAssessmentView = ({
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 text-amber-300" />
-                        <span>Generate Additional Topic Questions</span>
+                        <span>Generate questions</span>
                       </>
                     )}
                   </button>
@@ -1700,11 +1715,11 @@ export const TrainerScheduleAssessmentView = ({
               {editableAiPaper.length > 0 && (
                 <div className="space-y-4 pt-2">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
-                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                       <FileCheck2 className="w-4 h-4 text-emerald-600" />
                       <span>Configured Question Paper ({editableAiPaper.length} Questions — {editableAiPaper.reduce((acc, q) => acc + (Number(q.marks) || 2), 0)} Total Marks)</span>
                     </h3>
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-slate-500 font-medium">
                       Supports MCQ and One-Word Short Answer with case-insensitive trimmed evaluation.
                     </span>
                   </div>
@@ -1716,21 +1731,21 @@ export const TrainerScheduleAssessmentView = ({
                       return (
                         <div
                           key={q.id || qIdx}
-                          className="p-5 bg-slate-50/80 rounded-[var(--radius)] border border-slate-200 space-y-3 relative group"
+                          className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3 relative group transition-all"
                         >
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="w-6 h-6 rounded-full bg-[#0a2558] text-white font-mono font-medium flex items-center justify-center text-xs">
+                              <span className="w-6 h-6 rounded-full bg-[#0a2558] text-white font-mono font-semibold flex items-center justify-center text-xs">
                                 {qIdx + 1}
                               </span>
-                              <span className="font-extrabold text-slate-900 text-xs">
+                              <span className="font-semibold text-slate-900 text-xs">
                                 Question {qIdx + 1}
                               </span>
-                              <span className={`px-2 py-0.5 rounded-[var(--radius)] text-[10px] font-medium uppercase ${isOneWord ? "bg-purple-100 text-purple-900 border border-purple-200" : "bg-blue-100 text-blue-900 border border-blue-200"
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase ${isOneWord ? "bg-purple-100 text-purple-900 border border-purple-200/60" : "bg-blue-100 text-blue-900 border border-blue-200/60"
                                 }`}>
                                 {isOneWord ? "One-Word / Short Answer" : "MCQ"}
                               </span>
-                              <span className="text-[10px] text-slate-500 font-medium bg-white px-2 py-0.5 rounded border border-slate-200">
+                              <span className="text-[10px] text-slate-600 font-medium bg-white px-2.5 py-0.5 rounded-md border border-slate-200/80">
                                 Topic: {q.topic || q.subjectName || "Atmospheric Dynamics"}
                               </span>
                             </div>
@@ -1742,14 +1757,14 @@ export const TrainerScheduleAssessmentView = ({
                                 max={20}
                                 value={q.marks || 3}
                                 onChange={(e) => handleUpdateAiQuestion(qIdx, "marks", Number(e.target.value))}
-                                className="w-14 p-1 rounded-[var(--radius)] border border-slate-200 bg-white text-xs font-medium text-center"
+                                className="w-14 p-1 rounded-lg border border-slate-200/80 bg-white text-xs font-semibold text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 title="Marks for this question"
                               />
-                              <span className="text-[10px] text-slate-500 font-medium">Marks</span>
+                              <span className="text-[10px] text-slate-500 font-semibold uppercase">Marks</span>
 
                               <button
                                 onClick={() => handleDeleteAiQuestion(qIdx)}
-                                className="text-slate-400 hover:text-red-600 p-1.5 rounded-[var(--radius)] hover:bg-white transition-colors ml-2"
+                                className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-white transition-colors ml-2"
                                 title="Delete this question"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -1762,16 +1777,16 @@ export const TrainerScheduleAssessmentView = ({
                             rows={2}
                             value={q.question}
                             onChange={(e) => handleUpdateAiQuestion(qIdx, "question", e.target.value)}
-                            className="w-full p-2.5 bg-white rounded-[var(--radius)] border border-slate-200 font-semibold text-xs focus:ring-2 focus:ring-blue-600"
+                            className="w-full p-3 bg-white rounded-xl border border-slate-200/80 font-medium text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"
                             placeholder="Enter question prompt..."
                           />
 
                           {/* Render Options if MCQ or Expected Answer Inputs if One-Word */}
                           {isOneWord ? (
-                            <div className="space-y-2 p-3 bg-purple-50/50 rounded-[var(--radius)] border border-purple-200/80">
+                            <div className="space-y-2.5 p-3.5 bg-purple-50/50 rounded-xl border border-purple-200/80">
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                  <label className="font-extrabold text-purple-950 text-[11px]">
+                                  <label className="font-semibold text-purple-950 text-[11px]">
                                     Expected Answer (One Word) <span className="text-red-500">*</span>
                                   </label>
                                   <input
@@ -1779,12 +1794,12 @@ export const TrainerScheduleAssessmentView = ({
                                     value={q.expectedAnswer || q.correctAnswer || ""}
                                     onChange={(e) => handleUpdateAiQuestion(qIdx, "expectedAnswer", e.target.value)}
                                     placeholder="e.g. Bibliophile"
-                                    className="w-full p-2 bg-white rounded-[var(--radius)] border border-purple-300 font-medium text-xs"
+                                    className="w-full p-2 bg-white rounded-lg border border-purple-300/80 font-medium text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
                                   />
                                 </div>
 
                                 <div className="space-y-1">
-                                  <label className="font-extrabold text-purple-950 text-[11px]">
+                                  <label className="font-semibold text-purple-950 text-[11px]">
                                     Additional Accepted Synonyms / Variants (Comma-Separated)
                                   </label>
                                   <input
@@ -1792,13 +1807,13 @@ export const TrainerScheduleAssessmentView = ({
                                     value={Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers.join(", ") : (q.acceptedAnswers || "")}
                                     onChange={(e) => handleUpdateAiQuestion(qIdx, "acceptedAnswers", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
                                     placeholder="e.g. Bibliophile, BIBLIOPHILE, bibliophile, book collector"
-                                    className="w-full p-2 bg-white rounded-[var(--radius)] border border-purple-300 text-xs"
+                                    className="w-full p-2 bg-white rounded-lg border border-purple-300/80 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
                                   />
                                 </div>
                               </div>
 
                               <div className="space-y-1 pt-1">
-                                <label className="font-extrabold text-purple-950 text-[11px]">
+                                <label className="font-semibold text-purple-950 text-[11px]">
                                   Trainer Guidance Note for Trainee
                                 </label>
                                 <input
@@ -1806,25 +1821,25 @@ export const TrainerScheduleAssessmentView = ({
                                   value={q.guidanceNote || ""}
                                   onChange={(e) => handleUpdateAiQuestion(qIdx, "guidanceNote", e.target.value)}
                                   placeholder="e.g. Note: Write your answer in a single word without punctuation."
-                                  className="w-full p-2 bg-white rounded-[var(--radius)] border border-purple-300 text-xs"
+                                  className="w-full p-2 bg-white rounded-lg border border-purple-300/80 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
                               </div>
                             </div>
                           ) : (
                             /* Editable Options for MCQ */
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                               {(q.options || []).map((opt, optIdx) => (
                                 <div
                                   key={optIdx}
-                                  className={`p-2 rounded-[var(--radius)] border flex items-center gap-2 ${q.correctAnswer === optIdx
-                                      ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400"
-                                      : "bg-white border-slate-200"
+                                  className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all ${q.correctAnswer === optIdx
+                                    ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400/50"
+                                    : "bg-white border-slate-200/80"
                                     }`}
                                 >
                                   <button
                                     type="button"
                                     onClick={() => handleUpdateAiQuestion(qIdx, "correctAnswer", optIdx)}
-                                    className={`w-6 h-6 rounded-[var(--radius)] text-xs font-medium font-mono shrink-0 transition-colors ${q.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                                    className={`w-6 h-6 rounded-lg text-xs font-semibold font-mono shrink-0 transition-colors ${q.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
                                       }`}
                                     title="Click to set as correct answer"
                                   >
@@ -1848,7 +1863,7 @@ export const TrainerScheduleAssessmentView = ({
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                     <button
                       onClick={() => setCreateStep("questions")}
-                      className="px-4 py-2 bg-slate-100 text-slate-700 font-medium rounded-[var(--radius)] text-xs hover:bg-slate-200"
+                      className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs hover:bg-slate-200/80 transition-colors"
                     >
                       ← Also Select from Question Bank
                     </button>
@@ -1856,9 +1871,9 @@ export const TrainerScheduleAssessmentView = ({
                     <button
                       onClick={handleScheduleExamFinal}
                       disabled={loading}
-                      className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-black rounded-[var(--radius)] text-xs shadow-lg transition-transform hover:scale-105"
+                      className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
                     >
-                      {loading ? "Scheduling Exam..." : "Finalize & Schedule Exam Now"}
+                      {loading ? "Scheduling Exam..." : "Schedule assessment"}
                     </button>
                   </div>
                 </div>
@@ -1871,7 +1886,7 @@ export const TrainerScheduleAssessmentView = ({
             <div className="space-y-5 text-xs animate-in fade-in duration-150">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div>
-                  <h3 className="font-extrabold text-sm text-slate-900">
+                  <h3 className="font-semibold text-sm text-slate-900">
                     Questions Available for {createForm.subjectName} ({questionBank.length})
                   </h3>
                   <p className="text-[11px] text-slate-500">
@@ -1888,14 +1903,14 @@ export const TrainerScheduleAssessmentView = ({
                         setSelectedQuestionIds(questionBank.map(q => q.id));
                       }
                     }}
-                    className="text-xs font-medium text-blue-700 hover:underline px-2 py-1"
+                    className="text-xs font-semibold text-blue-700 hover:underline px-2 py-1"
                   >
                     {selectedQuestionIds.length === questionBank.length ? "Deselect All" : "Select All"}
                   </button>
 
                   <button
                     onClick={() => setCreateStep("ai-paper")}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-[var(--radius)] text-xs shadow-2xs"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold rounded-xl text-xs shadow-2xs"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Generate More via AI</span>
@@ -1914,9 +1929,9 @@ export const TrainerScheduleAssessmentView = ({
                         if (isSelected) setSelectedQuestionIds(selectedQuestionIds.filter(id => id !== q.id));
                         else setSelectedQuestionIds([...selectedQuestionIds, q.id]);
                       }}
-                      className={`p-4 rounded-[var(--radius)] border text-xs cursor-pointer transition-all flex items-start gap-3.5 ${isSelected
-                          ? "bg-blue-50/80 border-blue-300 shadow-sm"
-                          : "bg-white border-slate-200 hover:bg-slate-50"
+                      className={`p-4 rounded-2xl border text-xs cursor-pointer transition-all flex items-start gap-3.5 ${isSelected
+                        ? "bg-blue-50/80 border-blue-300 shadow-xs"
+                        : "bg-white border-slate-200/80 hover:bg-slate-50"
                         }`}
                     >
                       <input
@@ -1927,22 +1942,22 @@ export const TrainerScheduleAssessmentView = ({
                       />
                       <div className="flex-1 space-y-1.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2 py-0.5 rounded bg-[#0a2558] text-white font-mono text-[10px] font-medium">
+                          <span className="px-2.5 py-0.5 rounded-md bg-[#0a2558] text-white font-mono text-[10px] font-semibold">
                             {q.marks || 3} Marks
                           </span>
-                          <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-medium text-[10px]">
+                          <span className="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-900 font-semibold text-[10px]">
                             {q.difficulty || "Medium"}
                           </span>
                           <span className="text-slate-400 text-[10px] font-mono">
                             {q.module || "Module 1"}
                           </span>
                         </div>
-                        <p className="font-extrabold text-slate-900">{q.question}</p>
+                        <p className="font-semibold text-slate-900">{q.question}</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-slate-600 pt-1">
                           {(q.options || []).map((opt, optIdx) => (
                             <div
                               key={optIdx}
-                              className={`p-1 rounded-[var(--radius)] ${q.correctAnswer === optIdx ? "text-emerald-800 font-medium bg-emerald-50" : ""
+                              className={`p-1 rounded-lg ${q.correctAnswer === optIdx ? "text-emerald-800 font-semibold bg-emerald-50" : ""
                                 }`}
                             >
                               {String.fromCharCode(65 + optIdx)}. {opt}
@@ -1956,7 +1971,7 @@ export const TrainerScheduleAssessmentView = ({
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs font-extrabold text-slate-700">
+                <span className="text-xs font-semibold text-slate-700">
                   {selectedQuestionIds.length} Questions Selected from Bank
                   {editableAiPaper.length > 0 && ` + ${editableAiPaper.length} from AI Paper`}
                 </span>
@@ -1964,9 +1979,9 @@ export const TrainerScheduleAssessmentView = ({
                 <button
                   onClick={handleScheduleExamFinal}
                   disabled={loading || (selectedQuestionIds.length === 0 && editableAiPaper.length === 0)}
-                  className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                  className="px-6 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
                 >
-                  {loading ? "Scheduling Assessment..." : "Schedule & Publish Assessment"}
+                  {loading ? "Scheduling Assessment..." : "Schedule assessment"}
                 </button>
               </div>
             </div>
@@ -1980,7 +1995,7 @@ export const TrainerScheduleAssessmentView = ({
         <div className="space-y-6">
 
           {/* Filter and Search Bar */}
-          <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
               <input
@@ -1988,22 +2003,57 @@ export const TrainerScheduleAssessmentView = ({
                 placeholder="Search assessments by title, subject, or course..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all"
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-slate-400 uppercase text-[10px]">Filter Subject:</span>
+            <div className="flex flex-wrap items-center gap-2">
               <select
+                aria-label="Filter by subject"
                 value={subjectFilter}
                 onChange={(e) => setSubjectFilter(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               >
-                <option value="all">All Subjects</option>
-                <option value="Atmospheric Dynamics & Primitive Equations">Atmospheric Dynamics</option>
-                <option value="Doppler Weather Radar Dual-Polarization Moments">Doppler Radar</option>
-                <option value="Tropical Meteorology & Severe Weather">Tropical Cyclones</option>
+                <option value="all">All subjects</option>
+                {Array.from(new Map(quizzes.map((q) => [q.subjectId || q.subjectName, q.subjectName]).filter(([id, name]) => id && name)).values()).sort().map((subject) => (
+                  <option key={subject} value={subject}>{cleanSubject(subject)}</option>
+                ))}
               </select>
+
+              <select
+                aria-label="Filter by status"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              >
+                <option value="all">All status</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="active">Active</option>
+                <option value="closed">Closed</option>
+                <option value="published">Results published</option>
+              </select>
+
+              <select
+                aria-label="Sort assessments"
+                value={sortFilter}
+                onChange={(e) => setSortFilter(e.target.value)}
+                className="px-3 py-2 bg-slate-50 border border-slate-200/80 rounded-xl font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              >
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="deadline">Nearest deadline</option>
+              </select>
+
+              {(searchQuery || subjectFilter !== "all" || statusFilter !== "all" || sortFilter !== "newest") && (
+                <button
+                  type="button"
+                  onClick={() => { setSearchQuery(""); setSubjectFilter("all"); setStatusFilter("all"); setSortFilter("newest"); }}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 rounded-xl text-xs font-semibold"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Clear
+                </button>
+              )}
             </div>
           </div>
 
@@ -2018,31 +2068,31 @@ export const TrainerScheduleAssessmentView = ({
               return (
                 <div
                   key={quiz.id}
-                  className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm hover:shadow-md transition-all p-6 flex flex-col justify-between space-y-4 group"
+                  className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-6 flex flex-col justify-between space-y-4 group"
                 >
                   <div className="space-y-3">
                     {/* Header Badges */}
                     <div className="flex items-start justify-between gap-2">
-                      <span className="px-3 py-1 bg-gradient-to-r from-blue-900 to-indigo-900 text-white font-black text-[10px] rounded-[var(--radius)] shadow-xs">
+                      <span className="px-3 py-1 bg-gradient-to-r from-blue-900 to-indigo-900 text-white font-semibold text-[10px] rounded-full shadow-2xs">
                         {quiz.subjectName || "Atmospheric Dynamics"}
                       </span>
 
                       {isPublished ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Results Live
                         </span>
                       ) : !isDeadlinePassed ? (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 border border-blue-300 flex items-center gap-1" title={`Window active until ${deadlineFormatted}`}>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-900 border border-blue-300 flex items-center gap-1" title={`Window active until ${deadlineFormatted}`}>
                           <Clock className="w-3 h-3 text-blue-600" /> Active Window
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-amber-600" /> Deadline Passed (Ready to Publish)
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-amber-600" /> Deadline Passed
                         </span>
                       )}
                     </div>
 
-                    <h3 className="font-black text-slate-900 text-base leading-tight group-hover:text-blue-700 transition-colors">
+                    <h3 className="font-bold text-slate-900 text-base leading-tight group-hover:text-blue-700 transition-colors">
                       {quiz.title}
                     </h3>
 
@@ -2053,20 +2103,20 @@ export const TrainerScheduleAssessmentView = ({
                     {/* Timeline & Marks Summary */}
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
                       <div className="space-y-0.5">
-                        <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TIMING</span>
-                        <p className="font-medium text-slate-800">{quiz.durationMinutes || 30} Mins Kiosk</p>
+                        <span className="text-slate-400 font-semibold uppercase text-[9px] block">TIMING</span>
+                        <p className="font-semibold text-slate-800">{quiz.durationMinutes || 30} Mins Kiosk</p>
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-slate-400 font-extrabold uppercase text-[9px] block">DEADLINE</span>
-                        <p className="font-medium text-slate-800 truncate" title={deadlineFormatted}>{deadlineFormatted}</p>
+                        <span className="text-slate-400 font-semibold uppercase text-[9px] block">DEADLINE</span>
+                        <p className="font-semibold text-slate-800 truncate" title={deadlineFormatted}>{deadlineFormatted}</p>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200/80 text-[11px] flex items-center justify-between">
+                    <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 text-[11px] flex items-center justify-between">
                       <span className="text-slate-500 font-medium">
-                        Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Learners</b>
+                        Submissions: <b className="text-slate-900 font-semibold">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Learners</b>
                       </span>
-                      <span className="text-emerald-700 font-bold">
+                      <span className="text-emerald-700 font-semibold">
                         {isDeadlinePassed ? "Window Closed" : "Exam Live"}
                       </span>
                     </div>
@@ -2076,16 +2126,16 @@ export const TrainerScheduleAssessmentView = ({
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                     <button
                       onClick={() => handleInspectQuiz(quiz)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white font-semibold rounded-[var(--radius)] text-xs transition-colors shadow-xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white font-semibold rounded-xl text-xs transition-colors shadow-2xs"
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
-                      <span>Analytics & Evaluation</span>
+                      <span>Review</span>
                     </button>
 
                     {!isPublished && (
                       <button
                         onClick={() => handlePublishResultsForQuiz(quiz.id)}
-                        className="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-[var(--radius)] text-xs transition-transform hover:scale-105 shadow-xs flex items-center gap-1"
+                        className="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-2xs flex items-center gap-1"
                         title="Publish final scores to trainee portals"
                       >
                         <Send className="w-3.5 h-3.5" />
@@ -2099,15 +2149,15 @@ export const TrainerScheduleAssessmentView = ({
           </div>
 
           {filteredQuizzes.length === 0 && (
-            <div className="p-12 text-center bg-white rounded-[var(--radius)] border border-slate-200 space-y-3">
+            <div className="p-12 text-center bg-white rounded-2xl border border-slate-200/80 space-y-3">
               <AlertCircle className="w-8 h-8 text-slate-300 mx-auto" />
-              <h4 className="font-extrabold text-slate-700 text-sm">No scheduled assessments found</h4>
+              <h4 className="font-semibold text-slate-700 text-sm">No scheduled assessments found</h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 No active or scheduled exams match your current filters. Click below to author or generate a new assessment.
               </p>
               <button
                 onClick={() => { setActiveSubTab("create"); setCreateStep("basic"); }}
-                className="mt-2 px-4 py-2 bg-[#0a2558] text-white font-bold rounded-[var(--radius)] text-xs inline-flex items-center gap-1.5"
+                className="mt-2 px-4 py-2 bg-[#0a2558] text-white font-semibold rounded-xl text-xs inline-flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 <span>Schedule New Assessment</span>
@@ -2119,33 +2169,33 @@ export const TrainerScheduleAssessmentView = ({
 
       {/* ═════════ 5. IN-DEPTH PERFORMANCE ANALYTICS & TRAINEE RESPONSES MODAL/VIEW ═════════ */}
       {selectedQuizForDetails && (
-        <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-md p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
 
           {/* Header Bar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200/80">
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedQuizForDetails(null)}
-                  className="p-1.5 text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-[var(--radius)] text-xs font-bold transition-colors flex items-center gap-1"
+                  className="p-1.5 text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1"
                 >
                   ← Back to Scheduled List
                 </button>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-100 text-blue-900 border border-blue-200">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-blue-100 text-blue-900 border border-blue-200/60">
                   {selectedQuizForDetails.subjectName || "Atmospheric Dynamics"}
                 </span>
                 {selectedQuizForDetails.resultsPublished ? (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200/60">
                     Results Published
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-amber-100 text-amber-800 border border-amber-200/60">
                     Pending Publication
                   </span>
                 )}
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 {selectedQuizForDetails.title}
               </h2>
               <p className="text-xs text-slate-500 font-medium">
@@ -2157,7 +2207,7 @@ export const TrainerScheduleAssessmentView = ({
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={handleExportExcel}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold rounded-[var(--radius)] text-xs transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-semibold rounded-xl text-xs transition-colors"
               >
                 <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                 <span>Export Excel / CSV</span>
@@ -2165,7 +2215,7 @@ export const TrainerScheduleAssessmentView = ({
 
               <button
                 onClick={handleExportPdf}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold rounded-[var(--radius)] text-xs transition-colors"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 text-slate-800 font-semibold rounded-xl text-xs transition-colors"
               >
                 <Printer className="w-4 h-4 text-slate-600" />
                 <span>Print Scorecard</span>
@@ -2174,20 +2224,20 @@ export const TrainerScheduleAssessmentView = ({
               {!selectedQuizForDetails.resultsPublished && (
                 <button
                   onClick={() => handlePublishResultsForQuiz(selectedQuizForDetails.id)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs shadow-xs transition-colors"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Publish Results to Trainees</span>
+                  <span>Publish results</span>
                 </button>
               )}
             </div>
           </div>
 
           {/* Sub-Tabs for Assessment Analytics */}
-          <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto text-xs">
+          <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2 overflow-x-auto text-xs">
             <button
               onClick={() => { setAnalyticsSubTab("class-analytics"); setSelectedTraineeSubmission(null); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "class-analytics" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-colors whitespace-nowrap ${analyticsSubTab === "class-analytics" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100/80"
                 }`}
             >
               <BarChart3 className="w-4 h-4" />
@@ -2196,7 +2246,7 @@ export const TrainerScheduleAssessmentView = ({
 
             <button
               onClick={() => { setAnalyticsSubTab("question-analytics"); setSelectedTraineeSubmission(null); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "question-analytics" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-colors whitespace-nowrap ${analyticsSubTab === "question-analytics" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100/80"
                 }`}
             >
               <PieChart className="w-4 h-4 text-amber-400" />
@@ -2205,7 +2255,7 @@ export const TrainerScheduleAssessmentView = ({
 
             <button
               onClick={() => { setAnalyticsSubTab("trainee-responses"); setSelectedTraineeSubmission(null); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "trainee-responses" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-colors whitespace-nowrap ${analyticsSubTab === "trainee-responses" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100/80"
                 }`}
             >
               <Users className="w-4 h-4 text-emerald-400" />
@@ -2214,7 +2264,7 @@ export const TrainerScheduleAssessmentView = ({
 
             <button
               onClick={() => { setAnalyticsSubTab("leaderboard"); setSelectedTraineeSubmission(null); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "leaderboard" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-colors whitespace-nowrap ${analyticsSubTab === "leaderboard" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100/80"
                 }`}
             >
               <Trophy className="w-4 h-4 text-yellow-400" />
@@ -2227,57 +2277,57 @@ export const TrainerScheduleAssessmentView = ({
             <div className="space-y-6 text-xs animate-in fade-in duration-150">
               {/* Stat Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-1">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase">Total Examinees</span>
-                  <div className="text-2xl font-black text-slate-900">{quizAnalytics?.totalExaminees || activeSubmissions.length}</div>
+                <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-1">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase">Total Examinees</span>
+                  <div className="text-2xl font-bold text-slate-900">{quizAnalytics?.totalExaminees || activeSubmissions.length}</div>
                   <p className="text-[11px] text-slate-500 font-medium">100% Proctored Kiosk Attempts</p>
                 </div>
 
-                <div className="p-4 bg-blue-50/80 rounded-[var(--radius)] border border-blue-200 space-y-1">
-                  <span className="text-[10px] font-extrabold text-blue-600 uppercase">Class Average Percentage</span>
-                  <div className="text-2xl font-black text-blue-900">{quizAnalytics?.averagePercentage || 78.4}%</div>
+                <div className="p-4 bg-blue-50/80 rounded-2xl border border-blue-200/80 space-y-1">
+                  <span className="text-[10px] font-semibold text-blue-600 uppercase">Class Average Percentage</span>
+                  <div className="text-2xl font-bold text-blue-900">{quizAnalytics?.averagePercentage || 78.4}%</div>
                   <p className="text-[11px] text-blue-700 font-medium">Benchmark Standard: 70%</p>
                 </div>
 
-                <div className="p-4 bg-emerald-50/80 rounded-[var(--radius)] border border-emerald-200 space-y-1">
-                  <span className="text-[10px] font-extrabold text-emerald-600 uppercase">Qualification Pass Rate</span>
-                  <div className="text-2xl font-black text-emerald-900">{quizAnalytics?.passRate || 92}%</div>
+                <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 space-y-1">
+                  <span className="text-[10px] font-semibold text-emerald-600 uppercase">Qualification Pass Rate</span>
+                  <div className="text-2xl font-bold text-emerald-900">{quizAnalytics?.passRate || 92}%</div>
                   <p className="text-[11px] text-emerald-700 font-medium">{quizAnalytics?.passedCount || activeSubmissions.length} Qualified Cadets</p>
                 </div>
 
-                <div className="p-4 bg-amber-50/80 rounded-[var(--radius)] border border-amber-200 space-y-1">
-                  <span className="text-[10px] font-extrabold text-amber-700 uppercase">Top Merit Score</span>
-                  <div className="text-2xl font-black text-amber-900">{quizAnalytics?.highestScore || selectedQuizForDetails.totalMarks} / {selectedQuizForDetails.totalMarks}</div>
-                  <p className="text-[11px] text-amber-800 font-medium font-semibold truncate">Scorer: {quizAnalytics?.highestScorer || "Cadet Analyst"}</p>
+                <div className="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 space-y-1">
+                  <span className="text-[10px] font-semibold text-amber-700 uppercase">Top Merit Score</span>
+                  <div className="text-2xl font-bold text-amber-900">{quizAnalytics?.highestScore || selectedQuizForDetails.totalMarks} / {selectedQuizForDetails.totalMarks}</div>
+                  <p className="text-[11px] text-amber-800 font-medium truncate">Scorer: {quizAnalytics?.highestScorer || "Cadet Analyst"}</p>
                 </div>
               </div>
 
               {/* Score Distribution Breakdown */}
-              <div className="p-5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-4">
-                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-4">
+                <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-blue-600" />
                   <span>Cadet Score Distribution Tier Breakdown</span>
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center">
-                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
-                    <span className="text-[10px] text-emerald-600 font-extrabold uppercase">Distinction (≥90%)</span>
-                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.distinction || 0} Cadets</div>
+                  <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
+                    <span className="text-[10px] text-emerald-600 font-semibold uppercase">Distinction (≥90%)</span>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.distinction || 0} Cadets</div>
                   </div>
 
-                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
-                    <span className="text-[10px] text-blue-600 font-extrabold uppercase">First Class (75-89%)</span>
-                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.firstClass || 0} Cadets</div>
+                  <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
+                    <span className="text-[10px] text-blue-600 font-semibold uppercase">First Class (75-89%)</span>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.firstClass || 0} Cadets</div>
                   </div>
 
-                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
-                    <span className="text-[10px] text-amber-600 font-extrabold uppercase">Passed (50-74%)</span>
-                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.passed || 0} Cadets</div>
+                  <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
+                    <span className="text-[10px] text-amber-600 font-semibold uppercase">Passed (50-74%)</span>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.passed || 0} Cadets</div>
                   </div>
 
-                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
-                    <span className="text-[10px] text-red-600 font-extrabold uppercase font-semibold">Remediation (&lt;50%)</span>
-                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.remediation || 0} Cadets</div>
+                  <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
+                    <span className="text-[10px] text-red-600 font-semibold uppercase">Remediation Required (&lt;50%)</span>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.remediation || 0} Cadets</div>
                   </div>
                 </div>
               </div>
@@ -2287,315 +2337,99 @@ export const TrainerScheduleAssessmentView = ({
           {/* ─── TAB 2: QUESTION DIFFICULTY & ERROR ANALYSIS ─── */}
           {analyticsSubTab === "question-analytics" && (
             <div className="space-y-4 text-xs animate-in fade-in duration-150">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
-                <div>
-                  <h3 className="font-extrabold text-sm text-slate-900">
-                    Question-by-Question Accuracy & Common Misconceptions
-                  </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Identifies hard questions where examinees frequently selected wrong distractors.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Filter Difficulty:</span>
-                  <select
-                    value={questionDifficultyFilter}
-                    onChange={(e) => setQuestionDifficultyFilter(e.target.value)}
-                    className="p-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-slate-800"
-                  >
-                    <option value="all">All Difficulties</option>
-                    <option value="Hard">Hard Questions Only</option>
-                    <option value="Medium">Medium Questions Only</option>
-                  </select>
-                </div>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 className="font-semibold text-sm text-slate-900">Question Item Analysis & Success Rate</h3>
+                <span className="text-[11px] text-slate-500 font-medium">Automated error analysis on student responses</span>
               </div>
 
               <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                {(selectedQuizForDetails.questions || []).map((q, idx) => {
-                  const accuracy = Math.round(70 + (idx * 7) % 25); // Dynamic calculation indicator
-                  const isHard = q.difficulty === "Hard";
-
-                  return (
-                    <div key={q.id || idx} className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-2">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-[#0a2558] text-white font-mono flex items-center justify-center text-[10px] font-bold">
-                            {idx + 1}
-                          </span>
-                          <span className="font-extrabold text-slate-900 text-xs">
-                            {q.question}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-extrabold text-[10px]">
-                            {q.marks || 3} Marks
-                          </span>
-                          <span className={`px-2 py-0.5 rounded font-extrabold text-[10px] ${isHard ? "bg-red-100 text-red-900" : "bg-emerald-100 text-emerald-900"
-                            }`}>
-                            {q.difficulty || "Medium"}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Accuracy Bar */}
-                      <div className="space-y-1 pt-1">
-                        <div className="flex justify-between text-[10px] font-extrabold">
-                          <span className="text-slate-500">Class Accuracy Rate</span>
-                          <span className={accuracy >= 75 ? "text-emerald-700" : "text-amber-700"}>{accuracy}% Correct</span>
-                        </div>
-                        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full transition-all duration-500 ${accuracy >= 75 ? "bg-emerald-500" : "bg-amber-500"}`}
-                            style={{ width: `${accuracy}%` }}
-                          />
-                        </div>
-                      </div>
+                {(selectedQuizForDetails.questions || []).map((q, idx) => (
+                  <div key={q.id || idx} className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="font-semibold text-slate-900">
+                        Q{idx + 1}. {q.question}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-900 border border-blue-200/60">
+                        {q.type === "one_word" ? "One-Word" : "MCQ"} • {q.marks || 3} Marks
+                      </span>
                     </div>
-                  );
-                })}
+
+                    <div className="text-[11px] text-slate-600 bg-white p-3 rounded-xl border border-slate-200/80 space-y-1">
+                      <span className="font-semibold text-emerald-700">Correct Answer / Key:</span>
+                      <p className="font-medium text-slate-800">
+                        {q.type === "one_word"
+                          ? (q.expectedAnswer || (Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers.join(", ") : q.acceptedAnswers))
+                          : (q.options ? q.options[q.correctAnswer] : "Option " + (q.correctAnswer + 1))}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {/* ─── TAB 3: INDIVIDUAL TRAINEE RESPONSES & MANUAL EVALUATION ─── */}
+          {/* ─── TAB 3: INDIVIDUAL TRAINEE EVALUATION ─── */}
           {analyticsSubTab === "trainee-responses" && (
             <div className="space-y-4 text-xs animate-in fade-in duration-150">
-
-              {!selectedTraineeSubmission ? (
-                /* Trainee Roster List */
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-3 flex-wrap pb-2 border-b border-slate-100">
-                    <div className="relative flex-1 max-w-md">
-                      <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="Search cadet responses by name or station..."
-                        value={traineeSearchTerm}
-                        onChange={(e) => setTraineeSearchTerm(e.target.value)}
-                        className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium"
-                      />
-                    </div>
-                    <span className="text-slate-500 font-medium text-[11px]">
-                      Showing {activeSubmissions.length} Submitted Assessment Roster(s)
-                    </span>
-                  </div>
-
-                  <div className="overflow-x-auto border border-slate-200 rounded-[var(--radius)]">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-extrabold border-b border-slate-200">
-                        <tr>
-                          <th className="py-3 px-4">Trainee Candidate</th>
-                          <th className="py-3 px-3">Cadre / Station</th>
-                          <th className="py-3 px-3 text-center">Score</th>
-                          <th className="py-3 px-3 text-center">Percentage</th>
-                          <th className="py-3 px-3">Time Taken</th>
-                          <th className="py-3 px-3">Evaluation Status</th>
-                          <th className="py-3 px-4 text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
-                        {activeSubmissions
-                          .filter(s => !traineeSearchTerm || (s.traineeName || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()))
-                          .map((sub) => (
-                            <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
-                              <td className="py-3 px-4 font-black text-slate-900">
-                                {sub.traineeName || "Cadet Analyst"}
-                              </td>
-                              <td className="py-3 px-3 text-slate-600">
-                                {sub.station || "Regional Office"}
-                              </td>
-                              <td className="py-3 px-3 text-center font-mono font-black text-blue-900">
-                                {sub.score} / {selectedQuizForDetails.totalMarks}
-                              </td>
-                              <td className="py-3 px-3 text-center">
-                                <span className={`px-2 py-0.5 rounded-full font-black text-[10px] ${(sub.percentage || 0) >= 75 ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"
-                                  }`}>
-                                  {sub.percentage}%
-                                </span>
-                              </td>
-                              <td className="py-3 px-3 text-slate-600 font-mono">
-                                {sub.timeTaken || "18m 40s"}
-                              </td>
-                              <td className="py-3 px-3">
-                                {sub.isDisqualified ? (
-                                  <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-900 font-extrabold text-[10px]">
-                                    Disqualified
-                                  </span>
-                                ) : sub.status === "Published" ? (
-                                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-extrabold text-[10px]">
-                                    Evaluated & Published
-                                  </span>
-                                ) : (
-                                  <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 font-extrabold text-[10px]">
-                                    Auto-Graded (Ready)
-                                  </span>
-                                )}
-                              </td>
-                              <td className="py-3 px-4 text-right">
-                                <button
-                                  onClick={() => setSelectedTraineeSubmission(sub)}
-                                  className="px-3 py-1 bg-[#0a2558] hover:bg-[#071739] text-white font-bold rounded-[var(--radius)] text-[11px] shadow-xs"
-                                >
-                                  Audit Answers
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : (
-                /* Individual Answer Sheet Audit View */
-                <div className="space-y-5 animate-in fade-in duration-150">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                    <button
-                      onClick={() => setSelectedTraineeSubmission(null)}
-                      className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold rounded-[var(--radius)] text-xs flex items-center gap-1"
-                    >
-                      ← Back to Trainee Roster
-                    </button>
-
-                    <div className="text-right">
-                      <h3 className="font-black text-slate-900 text-sm">{selectedTraineeSubmission.traineeName}</h3>
-                      <p className="text-[10px] text-slate-500 font-medium">Cadre ID: {selectedTraineeSubmission.cadreId || "CAD-2026-88"}</p>
-                    </div>
-                  </div>
-
-                  {/* Submission Questions Audit */}
-                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                    {(selectedQuizForDetails.questions || []).map((q, qIdx) => {
-                      const traineeAns = selectedTraineeSubmission.answers?.[q.id] || selectedTraineeSubmission.answers?.[qIdx];
-                      const isCorrect = traineeAns === q.correctAnswer || traineeAns === q.expectedAnswer;
-
-                      return (
-                        <div key={q.id || qIdx} className={`p-4 rounded-[var(--radius)] border space-y-2 ${isCorrect ? "bg-emerald-50/50 border-emerald-200" : "bg-red-50/50 border-red-200"
-                          }`}>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-extrabold text-slate-900 text-xs">
-                              Q{qIdx + 1}: {q.question}
-                            </span>
-                            <span className={`px-2 py-0.5 rounded font-black text-[10px] ${isCorrect ? "bg-emerald-200 text-emerald-950" : "bg-red-200 text-red-950"
-                              }`}>
-                              {isCorrect ? `+${q.marks || 3} Marks` : "0 Marks"}
-                            </span>
-                          </div>
-
-                          <p className="text-xs font-medium text-slate-700">
-                            Trainee Response: <b className="text-slate-900">{traineeAns !== undefined ? String(traineeAns) : "Unanswered"}</b>
-                          </p>
-                          <p className="text-[11px] text-emerald-800 font-semibold">
-                            Official Model Answer: {q.type === "one_word" ? q.expectedAnswer : q.options?.[q.correctAnswer]}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Faculty Feedback Section */}
-                  <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-2">
-                    <label className="font-extrabold text-slate-900 text-xs block">
-                      Lead Trainer Remarks / Feedback for Cadet
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={trainerFeedbackMap[selectedTraineeSubmission.id] || ""}
-                      onChange={(e) => setTrainerFeedbackMap({ ...trainerFeedbackMap, [selectedTraineeSubmission.id]: e.target.value })}
-                      placeholder="Add qualitative remarks on numerical stability and advection theory..."
-                      className="w-full p-2.5 bg-white border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:ring-2 focus:ring-blue-600"
-                    />
-                    <div className="flex justify-end pt-1">
-                      <button
-                        onClick={() => showToast("Feedback saved for cadet assessment scorecard.")}
-                        className="px-4 py-1.5 bg-[#0a2558] text-white font-bold rounded-[var(--radius)] text-xs shadow-xs"
-                      >
-                        Save Remarks
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ─── TAB 4: CADET MERIT LEADERBOARD ─── */}
-          {analyticsSubTab === "leaderboard" && (
-            <div className="space-y-4 text-xs animate-in fade-in duration-150">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="space-y-0.5">
-                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
-                    <Trophy className="w-4 h-4 text-yellow-500" />
-                    <span>Cadet Assessment Merit Roster</span>
-                  </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Rankings computed by combined score percentage and kiosk completion time.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Sort By:</span>
-                  <button
-                    onClick={() => setLeaderboardSort("score")}
-                    className={`px-3 py-1 rounded-[var(--radius)] font-extrabold text-[11px] transition-colors ${leaderboardSort === "score" ? "bg-[#0a2558] text-white" : "bg-slate-100 text-slate-700"
-                      }`}
-                  >
-                    Highest Score
-                  </button>
-                  <button
-                    onClick={() => setLeaderboardSort("speed")}
-                    className={`px-3 py-1 rounded-[var(--radius)] font-extrabold text-[11px] transition-colors ${leaderboardSort === "speed" ? "bg-[#0a2558] text-white" : "bg-slate-100 text-slate-700"
-                      }`}
-                  >
-                    Fastest Time
-                  </button>
+                <h3 className="font-semibold text-sm text-slate-900">Cadet Responses & Individual Audit</h3>
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Filter trainee name..."
+                    value={traineeSearchTerm}
+                    onChange={(e) => setTraineeSearchTerm(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
 
-              {/* Leaderboard Roster Table */}
-              <div className="overflow-x-auto border border-slate-200 rounded-[var(--radius)]">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-extrabold border-b border-slate-200">
-                    <tr>
-                      <th className="py-3 px-4 text-center">Rank</th>
-                      <th className="py-3 px-4">Trainee Name</th>
-                      <th className="py-3 px-3">Station</th>
-                      <th className="py-3 px-3 text-center">Score</th>
-                      <th className="py-3 px-3 text-center">Percentage</th>
-                      <th className="py-3 px-3 text-right">Time Taken</th>
+              <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+                      <th className="p-3">Cadet / Trainee</th>
+                      <th className="p-3">Station</th>
+                      <th className="p-3">Score</th>
+                      <th className="p-3">Percentage</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium">
-                    {[...activeSubmissions]
-                      .sort((a, b) => leaderboardSort === "score" ? (b.score - a.score) : ((a.timeTaken || 999) - (b.timeTaken || 999)))
-                      .map((sub, rIdx) => (
+                  <tbody className="divide-y divide-slate-200/80 font-medium text-slate-800">
+                    {activeSubmissions
+                      .filter(s => !traineeSearchTerm || (s.traineeName || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()))
+                      .map((sub) => (
                         <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="py-3 px-4 text-center font-black">
-                            {rIdx === 0 ? (
-                              <span className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 inline-flex items-center justify-center font-black">1</span>
-                            ) : rIdx === 1 ? (
-                              <span className="w-6 h-6 rounded-full bg-slate-300 text-slate-900 inline-flex items-center justify-center font-black">2</span>
-                            ) : rIdx === 2 ? (
-                              <span className="w-6 h-6 rounded-full bg-amber-700 text-white inline-flex items-center justify-center font-black">3</span>
+                          <td className="p-3 font-semibold text-slate-900">{sub.traineeName || "Cadet"}</td>
+                          <td className="p-3 text-slate-500">{sub.station || "HQ"}</td>
+                          <td className="p-3 font-mono font-semibold text-blue-900">{sub.score} / {selectedQuizForDetails.totalMarks}</td>
+                          <td className="p-3 font-semibold text-slate-900">{sub.percentage}%</td>
+                          <td className="p-3">
+                            {sub.disqualified ? (
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-800 border border-red-200/60">
+                                Disqualified
+                              </span>
+                            ) : sub.percentage >= 50 ? (
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200/60">
+                                Qualified
+                              </span>
                             ) : (
-                              <span className="text-slate-500 font-mono">#{rIdx + 1}</span>
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200/60">
+                                Remediation
+                              </span>
                             )}
                           </td>
-                          <td className="py-3 px-4 font-black text-slate-900">
-                            {sub.traineeName || "Cadet Analyst"}
-                          </td>
-                          <td className="py-3 px-3 text-slate-600">
-                            {sub.station || "National Office"}
-                          </td>
-                          <td className="py-3 px-3 text-center font-mono font-black text-blue-900">
-                            {sub.score} / {selectedQuizForDetails.totalMarks}
-                          </td>
-                          <td className="py-3 px-3 text-center font-black text-emerald-800">
-                            {sub.percentage}%
-                          </td>
-                          <td className="py-3 px-3 text-right font-mono text-slate-600">
-                            {sub.timeTaken || "16m 20s"}
+                          <td className="p-3 text-right space-x-2">
+                            {sub.disqualified && (
+                              <button
+                                onClick={() => handleGrantRetake(selectedQuizForDetails.id, sub.traineeId, sub.traineeName)}
+                                className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-lg text-[11px] transition-colors"
+                              >
+                                Revoke Flag
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -2605,128 +2439,42 @@ export const TrainerScheduleAssessmentView = ({
             </div>
           )}
 
-        </div>
-      )}
-
-      {/* ═════════ 6. MODAL: ADD CUSTOM QUESTION ═════════ */}
-      {showAddCustomModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-2xl max-w-xl w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150 text-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="font-extrabold text-sm text-slate-900">Add Custom Question to Exam</h3>
-              <button
-                onClick={() => setShowAddCustomModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1 rounded-[var(--radius)]"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-extrabold text-slate-800">Question Type</label>
-                  <select
-                    value={newCustomQuestion.type}
-                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, type: e.target.value })}
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                  >
-                    <option value="mcq">MCQ (4 Options)</option>
-                    <option value="one_word">One-Word / Short Answer</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-extrabold text-slate-800">Marks</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={20}
-                    value={newCustomQuestion.marks}
-                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, marks: Number(e.target.value) })}
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                  />
-                </div>
+          {/* ─── TAB 4: CADET MERIT LEADERBOARD ─── */}
+          {analyticsSubTab === "leaderboard" && (
+            <div className="space-y-4 text-xs animate-in fade-in duration-150">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-yellow-500" />
+                  <span>Merit Leaderboard Ranking</span>
+                </h3>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-extrabold text-slate-800">Question Text Prompt</label>
-                <textarea
-                  rows={2}
-                  value={newCustomQuestion.question}
-                  onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, question: e.target.value })}
-                  placeholder="Enter the complete question statement..."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                />
-              </div>
+              <div className="space-y-2">
+                {[...activeSubmissions]
+                  .sort((a, b) => (b.score || 0) - (a.score || 0))
+                  .map((sub, idx) => (
+                    <div key={sub.id} className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-7 h-7 rounded-full font-bold font-mono flex items-center justify-center text-xs ${idx === 0 ? "bg-amber-400 text-slate-950 shadow-xs" : idx === 1 ? "bg-slate-300 text-slate-900" : idx === 2 ? "bg-amber-700 text-white" : "bg-slate-200 text-slate-700"
+                          }`}>
+                          #{idx + 1}
+                        </span>
+                        <div>
+                          <div className="font-semibold text-slate-900 text-xs">{sub.traineeName}</div>
+                          <div className="text-[10px] text-slate-500">{sub.station || "National Meteorological HQ"}</div>
+                        </div>
+                      </div>
 
-              {newCustomQuestion.type === "one_word" ? (
-                <div className="space-y-2 p-3 bg-purple-50 rounded-[var(--radius)] border border-purple-200">
-                  <div className="space-y-1">
-                    <label className="font-extrabold text-purple-950">Expected Single-Word Answer</label>
-                    <input
-                      type="text"
-                      value={newCustomQuestion.expectedAnswer}
-                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, expectedAnswer: e.target.value })}
-                      placeholder="e.g. Baroclinic"
-                      className="w-full p-2 bg-white border border-purple-300 rounded-[var(--radius)] font-medium"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <label className="font-extrabold text-slate-800">Options (Select Correct Option)</label>
-                  {newCustomQuestion.options.map((opt, oIdx) => (
-                    <div key={oIdx} className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setNewCustomQuestion({ ...newCustomQuestion, correctAnswer: oIdx })}
-                        className={`w-6 h-6 rounded-[var(--radius)] text-xs font-mono font-bold shrink-0 ${newCustomQuestion.correctAnswer === oIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
-                          }`}
-                      >
-                        {String.fromCharCode(65 + oIdx)}
-                      </button>
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) => {
-                          const opts = [...newCustomQuestion.options];
-                          opts[oIdx] = e.target.value;
-                          setNewCustomQuestion({ ...newCustomQuestion, options: opts });
-                        }}
-                        placeholder={`Option ${String.fromCharCode(65 + oIdx)}`}
-                        className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                      />
+                      <div className="text-right">
+                        <div className="font-mono font-bold text-blue-900 text-sm">{sub.score} Marks</div>
+                        <div className="text-[10px] text-emerald-600 font-semibold">{sub.percentage}% Score</div>
+                      </div>
                     </div>
                   ))}
-                </div>
-              )}
+              </div>
             </div>
+          )}
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
-                onClick={() => setShowAddCustomModal(false)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-[var(--radius)] text-xs"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={() => {
-                  if (!newCustomQuestion.question.trim()) {
-                    showToast("Please provide a question statement.", "error");
-                    return;
-                  }
-                  setEditableAiPaper(prev => [...prev, { ...newCustomQuestion, id: `custom_${Date.now()}` }]);
-                  setShowAddCustomModal(false);
-                  showToast("Custom question added to current paper.");
-                }}
-                className="px-5 py-2 bg-[#0a2558] text-white font-black rounded-[var(--radius)] text-xs shadow-md"
-              >
-                Add Question
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
