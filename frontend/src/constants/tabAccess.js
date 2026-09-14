@@ -18,5 +18,6 @@ export const TAB_ACCESS = {
   analytics: ["admin", "trainer"],
   certificates: ["admin", "trainer", "trainee"],
   profile: ["all"],
+  helpdesk: ["all"], // new helpdesk tab accessible to all logged‑in users
   // Add any additional tabs here as needed
 };

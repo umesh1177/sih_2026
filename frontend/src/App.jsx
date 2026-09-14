@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { HelpdeskView } from "./components/helpdesk/HelpdeskView";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Sidebar } from "./components/layout/Sidebar";
 import { TopNavbar } from "./components/layout/TopNavbar";
@@ -338,6 +339,7 @@ const navigateToTab = (tab) => {
         {/* Dynamic Tab Pane */}
         <main className="flex-1 overflow-y-auto">
           {/* 1. DASHBOARD VIEW (Role specific) */}
+          {/* Helpdesk view */}
           {activeTab === "dashboard" && renderTabContent("dashboard", (
             <>
               {currentUser?.role === "trainee" && (
@@ -384,6 +386,12 @@ const navigateToTab = (tab) => {
               )}
             </>
           ))}
+
+          {activeTab === "helpdesk" && renderTabContent("helpdesk", (
+            <HelpdeskView onBack={() => setActiveTab('dashboard')} />
+          ))}
+
+          
 
           {/* 2. CONTENT LIBRARY (Trainer Media & Learning Materials Repository) */}
           {activeTab === "content-library" && renderTabContent("content-library", (

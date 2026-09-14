@@ -33,9 +33,8 @@ import {
 } from "lucide-react";
 import { api } from "../../services/api";
 
-const DEFAULT_GAP_THRESHOLD = 60; // Accuracy < 60% is flagged as a learning gap
+const DEFAULT_GAP_THRESHOLD = 60;
 
-// Comprehensive Domain Knowledge Base for Weather & MoES Remediation Topics
 const TOPIC_REMEDIATION_KB = {
   "Radar Interpretation": {
     topic: "Radar Interpretation",
@@ -297,7 +296,6 @@ export const LearningGapDetectionHub = ({
   const isTrainer = currentUser?.role === "trainer" || isAdmin;
   const isTrainee = currentUser?.role === "trainee" && !isAdmin;
 
-  // ─── STATE ───
   const [gapThreshold, setGapThreshold] = useState(() => {
     const saved = localStorage.getItem("moes_gap_threshold");
     return saved ? Number(saved) : DEFAULT_GAP_THRESHOLD;
@@ -311,7 +309,7 @@ export const LearningGapDetectionHub = ({
   const [rawSubmissions, setRawSubmissions] = useState([]);
   const [topicsData, setTopicsData] = useState(TOPIC_REMEDIATION_KB);
   const [selectedTopicKey, setSelectedTopicKey] = useState("Radar Interpretation");
-  const [activeModal, setActiveModal] = useState(null); // null | "ai_summary" | "remediation_plan" | "config"
+  const [activeModal, setActiveModal] = useState(null);
   const [retestedScores, setRetestedScores] = useState(() => {
     const saved = localStorage.getItem("moes_retested_topics");
     return saved ? JSON.parse(saved) : {};
@@ -328,7 +326,6 @@ export const LearningGapDetectionHub = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // ─── LOAD LIVE COURSES, TRAINEES & SUBMISSIONS ───
   useEffect(() => {
     const loadPlatformData = async () => {
       setLoading(true);
@@ -360,7 +357,6 @@ export const LearningGapDetectionHub = ({
           })));
         }
 
-        // If trainee role, load their specific submissions directly
         if (isTrainee) {
           const userId = currentUser?.id || currentUser?.traineeId;
           if (userId) {
@@ -380,7 +376,7 @@ export const LearningGapDetectionHub = ({
 
       } catch (err) {
         console.error("Failed loading data in LearningGapDetectionHub:", err);
-      } finally {
+      } font-normal; {
         setLoading(false);
       }
     };
@@ -388,10 +384,8 @@ export const LearningGapDetectionHub = ({
     loadPlatformData();
   }, [currentUser, isAdmin, isTrainee]);
 
-  // ─── DYNAMIC LEARNING GAP TELEMETRY COMPUTATION ───
   useEffect(() => {
     const computeFilteredGaps = () => {
-      // 1. Filter submissions according to selected course and trainee
       let filteredSubs = [...rawSubmissions];
       if (selectedCourseId !== "all") {
         filteredSubs = filteredSubs.filter(s => s.courseId === selectedCourseId || (s.courseTitle && s.courseTitle.toLowerCase().includes(selectedCourseId.toLowerCase())));
@@ -400,7 +394,6 @@ export const LearningGapDetectionHub = ({
         filteredSubs = filteredSubs.filter(s => s.traineeId === selectedTraineeId || s.traineeName === selectedTraineeId);
       }
 
-      // If we have actual quiz submissions matching this filter
       if (filteredSubs.length > 0) {
         const dynamicTopicScores = {};
 
@@ -470,7 +463,6 @@ export const LearningGapDetectionHub = ({
           setSelectedTopicKey(keys[0]);
         }
       } else {
-        // Fallback to rich meteorological knowledge base filtered by course
         let kbFiltered = { ...TOPIC_REMEDIATION_KB };
         if (selectedCourseId !== "all") {
           const matched = Object.entries(TOPIC_REMEDIATION_KB).filter(([k, v]) => 
@@ -491,7 +483,6 @@ export const LearningGapDetectionHub = ({
     computeFilteredGaps();
   }, [rawSubmissions, selectedCourseId, selectedTraineeId, gapThreshold]);
 
-  // ─── GAP DETECTION CLASSIFICATION ───
   const detectedGaps = useMemo(() => {
     const list = Object.entries(topicsData).map(([key, data]) => {
       const retest = retestedScores[key];
@@ -518,13 +509,11 @@ export const LearningGapDetectionHub = ({
 
   const currentTopic = topicsData[selectedTopicKey] || detectedGaps[0] || Object.values(TOPIC_REMEDIATION_KB)[0];
 
-  // Selected Trainee Profile details
   const selectedTraineeObj = useMemo(() => {
     if (selectedTraineeId === "all") return null;
     return traineesList.find(t => (t.traineeId || t.id) === selectedTraineeId);
   }, [selectedTraineeId, traineesList]);
 
-  // ─── LAUNCH TARGETED PRACTICE QUIZ HANDLER ───
   const handleLaunchTargetedQuiz = async (topicKey) => {
     const topicInfo = topicsData[topicKey] || TOPIC_REMEDIATION_KB[topicKey];
     if (!topicInfo) return;
@@ -590,63 +579,61 @@ export const LearningGapDetectionHub = ({
 
     if (onStartExam) {
       onStartExam(targetedQuiz);
-      showToast(`🎯 Launching Targeted Adaptive Remediation Quiz for ${topicInfo.topic}!`);
+      showToast(`Targeting Adaptive Remediation Quiz for ${topicInfo.topic}!`);
     } else {
       showToast("Launching targeted evaluation in kiosk mode...", "info");
     }
   };
 
-  // ─── SIMULATE COMPLETED RETEST (GAP CLOSED) ───
   const handleSimulateRetestImprovement = (topicKey) => {
     const updated = { ...retestedScores, [topicKey]: 88 };
     setRetestedScores(updated);
     localStorage.setItem("moes_retested_topics", JSON.stringify(updated));
-    showToast(`🎉 Remediation Success! Retest score for ${topicKey} improved to 88% — Learning Gap CLOSED!`);
+    showToast(`Remediation Success! Retest score for ${topicKey} improved to 88% — Learning Gap CLOSED!`);
   };
 
   const handleAssignRemediation = (topicKey) => {
     const targetName = selectedTraineeObj ? selectedTraineeObj.name : "All Enrolled Officers";
-    showToast(`🚀 Prescribed Targeted Remediation Path for "${topicKey}" assigned to ${targetName}!`);
+    showToast(`Prescribed Targeted Remediation Path for "${topicKey}" assigned to ${targetName}!`);
   };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none min-h-screen">
       
-      {/* ─── TOAST NOTIFICATION ─── */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-[var(--radius)] bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
           <div className={`w-2.5 h-2.5 rounded-full ${toastMessage.type === "error" ? "bg-red-400" : "bg-emerald-400"}`} />
-          <span className="text-xs font-medium">{toastMessage.text}</span>
+          <span className="text-xs font-normal">{toastMessage.text}</span>
         </div>
       )}
 
-      {/* ═════════ 1. HEADER & CLOSED LOOP BANNER ═════════ */}
+      {/* 1. HEADER & CLOSED LOOP BANNER */}
       <div className="bg-white rounded-[var(--radius)] p-6 sm:p-8 border border-slate-200 shadow-sm relative overflow-hidden space-y-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-rose-50 border border-rose-200 text-rose-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="px-3 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 border border-rose-200 text-rose-700 uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldAlert className="w-3 h-3 text-rose-600" />
                 Adaptive Recommendation Engine
               </span>
-              <span className="text-xs font-medium text-slate-400">
+              <span className="text-xs font-normal text-slate-400">
                 Rule 10: Topic Accuracy &lt; {gapThreshold}% Trigger
               </span>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
               Automated Learning Gap Detection & Remediation
             </h1>
 
-            <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-              When recurring accuracy falls below the configured <b>{gapThreshold}% threshold</b>, the system automatically isolates the cognitive gap and provisions targeted <b>AI Module Summaries</b>, <b>Subject Materials</b>, and <b>Adaptive Practice Quizzes</b>.
+            <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+              When recurring accuracy falls below the configured threshold of {gapThreshold}%, the system automatically isolates the cognitive gap and provisions targeted AI Module Summaries, Subject Materials, and Adaptive Practice Quizzes.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
               onClick={() => setActiveModal("config")}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-[var(--radius)] text-xs border border-slate-200 shadow-xs transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-normal rounded-[var(--radius)] text-xs border border-slate-200 shadow-xs transition-colors"
             >
               <Sliders className="w-4 h-4 text-slate-600" />
               <span>Config Cutoff ({gapThreshold}%)</span>
@@ -658,7 +645,7 @@ export const LearningGapDetectionHub = ({
                 localStorage.removeItem("moes_retested_topics");
                 showToast("All topic gap telemetry reset to live evaluation baselines.");
               }}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold rounded-[var(--radius)] text-xs border border-slate-200"
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 font-normal rounded-[var(--radius)] text-xs border border-slate-200"
             >
               <RotateCcw className="w-4 h-4 text-slate-500" />
               <span>Reset State</span>
@@ -666,18 +653,16 @@ export const LearningGapDetectionHub = ({
           </div>
         </div>
 
-        {/* ─── FILTERS STRIP: COURSE & INDIVIDUAL TRAINEE SELECTORS ─── */}
+        {/* FILTERS STRIP */}
         <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            
-            {/* 1. Course Filter */}
             <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs">
               <BookOpen className="w-4 h-4 text-blue-600 shrink-0" />
-              <span className="font-medium text-slate-500">Course:</span>
+              <span className="font-normal text-slate-500">Course:</span>
               <select
                 value={selectedCourseId}
                 onChange={(e) => setSelectedCourseId(e.target.value)}
-                className="bg-transparent font-extrabold text-slate-800 focus:outline-hidden cursor-pointer"
+                className="bg-transparent font-semibold text-slate-800 focus:outline-hidden cursor-pointer"
               >
                 <option value="all">All Operational Courses ({coursesList.length || 6})</option>
                 {coursesList.map(c => (
@@ -686,14 +671,13 @@ export const LearningGapDetectionHub = ({
               </select>
             </div>
 
-            {/* 2. Individual Trainee Filter */}
             <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs">
               <Users className="w-4 h-4 text-purple-600 shrink-0" />
-              <span className="font-medium text-slate-500">Learner:</span>
+              <span className="font-normal text-slate-500">Learner:</span>
               <select
                 value={selectedTraineeId}
                 onChange={(e) => setSelectedTraineeId(e.target.value)}
-                className="bg-transparent font-extrabold text-slate-800 focus:outline-hidden cursor-pointer max-w-[220px] truncate"
+                className="bg-transparent font-semibold text-slate-800 focus:outline-hidden cursor-pointer max-w-[220px] truncate"
               >
                 <option value="all">All Enrolled Officers ({traineesList.length || 8})</option>
                 {traineesList.map(t => (
@@ -710,32 +694,32 @@ export const LearningGapDetectionHub = ({
                   setSelectedCourseId("all");
                   setSelectedTraineeId("all");
                 }}
-                className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 underline"
+                className="text-xs text-rose-600 hover:text-rose-700 font-normal flex items-center gap-1 underline"
               >
                 Clear Filters
               </button>
             )}
           </div>
 
-          <div className="text-xs font-medium text-slate-500 flex items-center gap-2">
+          <div className="text-xs font-normal text-slate-500 flex items-center gap-2">
             <span>Diagnostic Scope:</span>
-            <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-blue-100 text-blue-900 font-extrabold">
+            <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-blue-100 text-blue-900 font-semibold">
               {selectedTraineeObj ? `Officer: ${selectedTraineeObj.name}` : (selectedCourseId !== "all" ? "Single Course" : "National Organization Cohort")}
             </span>
           </div>
         </div>
 
-        {/* ─── INDIVIDUAL TRAINEE DOSSIER BANNER (WHEN SPECIFIC TRAINEE SELECTED) ─── */}
+        {/* INDIVIDUAL TRAINEE DOSSIER BANNER */}
         {selectedTraineeObj && (
           <div className="bg-purple-50/80 border border-purple-200 rounded-[var(--radius)] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-[var(--radius)] bg-purple-600 text-white font-black text-base flex items-center justify-center shadow-sm shrink-0">
+              <div className="w-12 h-12 rounded-[var(--radius)] bg-purple-600 text-white font-semibold text-base flex items-center justify-center shadow-sm shrink-0">
                 {selectedTraineeObj.name.charAt(0)}
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-slate-900 text-sm">{selectedTraineeObj.name}</h3>
-                  <span className="px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900 font-medium text-[10px]">
+                  <h3 className="font-semibold text-slate-900 text-sm">{selectedTraineeObj.name}</h3>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-200/80 text-purple-900 font-normal text-[10px]">
                     {selectedTraineeObj.cadreId || "Trainee"}
                   </span>
                 </div>
@@ -747,74 +731,74 @@ export const LearningGapDetectionHub = ({
 
             <div className="flex items-center gap-3 shrink-0">
               <div className="text-right px-3 py-1 bg-white rounded-[var(--radius)] border border-purple-200">
-                <span className="text-[10px] text-slate-400 font-medium uppercase block">Avg Score</span>
-                <b className="text-sm font-black text-purple-900">{selectedTraineeObj.assessmentScore || selectedTraineeObj.avgQuizScore || 78}%</b>
+                <span className="text-[10px] text-slate-400 font-normal uppercase block">Avg Score</span>
+                <span className="text-sm font-semibold text-purple-900">{selectedTraineeObj.assessmentScore || selectedTraineeObj.avgQuizScore || 78}%</span>
               </div>
               <div className="text-right px-3 py-1 bg-white rounded-[var(--radius)] border border-purple-200">
-                <span className="text-[10px] text-slate-400 font-medium uppercase block">Syllabus Progress</span>
-                <b className="text-sm font-black text-emerald-700">{selectedTraineeObj.completionPercentage || 65}%</b>
+                <span className="text-[10px] text-slate-400 font-normal uppercase block">Syllabus Progress</span>
+                <span className="text-sm font-semibold text-emerald-700">{selectedTraineeObj.completionPercentage || 65}%</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* ─── 5-STEP CLOSED-LOOP VISUAL CYCLE ─── */}
+        {/* 5-STEP CLOSED-LOOP VISUAL CYCLE */}
         <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 p-4 sm:p-5 rounded-[var(--radius)] border border-indigo-100 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase text-indigo-900 tracking-wider flex items-center gap-1.5">
+            <span className="text-[11px] font-semibold uppercase text-indigo-900 tracking-wider flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
               Continuous Closed-Loop Remediation Cycle
             </span>
-            <span className="text-[11px] font-medium text-indigo-700">
-              Active Gaps: <b className="text-rose-600">{criticalGapsCount + moderateGapsCount}</b> | Mastered: <b className="text-emerald-700">{masteredCount}</b>
+            <span className="text-[11px] font-normal text-indigo-700">
+              Active Gaps: <span className="text-rose-600 font-semibold">{criticalGapsCount + moderateGapsCount}</span> | Mastered: <span className="text-emerald-700 font-semibold">{masteredCount}</span>
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 text-center">
             <div className="bg-white p-3 rounded-[var(--radius)] border border-indigo-100 shadow-2xs space-y-1">
-              <div className="w-6 h-6 mx-auto rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center">1</div>
-              <p className="font-extrabold text-xs text-slate-900">ASSESS</p>
+              <div className="w-6 h-6 mx-auto rounded-full bg-blue-100 text-blue-700 font-semibold text-xs flex items-center justify-center">1</div>
+              <p className="font-semibold text-xs text-slate-900">ASSESS</p>
               <p className="text-[10px] text-slate-500">Timed MCQs & Practice</p>
             </div>
 
             <div className="bg-white p-3 rounded-[var(--radius)] border border-rose-200 shadow-2xs space-y-1 ring-1 ring-rose-200">
-              <div className="w-6 h-6 mx-auto rounded-full bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center">2</div>
-              <p className="font-extrabold text-xs text-rose-900">IDENTIFY GAP</p>
-              <p className="text-[10px] text-rose-600 font-medium">Accuracy &lt; {gapThreshold}%</p>
+              <div className="w-6 h-6 mx-auto rounded-full bg-rose-100 text-rose-700 font-semibold text-xs flex items-center justify-center">2</div>
+              <p className="font-semibold text-xs text-rose-900">IDENTIFY GAP</p>
+              <p className="text-[10px] text-rose-600 font-normal">Accuracy &lt; {gapThreshold}%</p>
             </div>
 
             <div className="bg-white p-3 rounded-[var(--radius)] border border-indigo-100 shadow-2xs space-y-1">
-              <div className="w-6 h-6 mx-auto rounded-full bg-indigo-100 text-indigo-700 font-black text-xs flex items-center justify-center">3</div>
-              <p className="font-extrabold text-xs text-slate-900">LEARN</p>
+              <div className="w-6 h-6 mx-auto rounded-full bg-indigo-100 text-indigo-700 font-semibold text-xs flex items-center justify-center">3</div>
+              <p className="font-semibold text-xs text-slate-900">LEARN</p>
               <p className="text-[10px] text-slate-500">AI Summary & Notes</p>
             </div>
 
             <div className="bg-white p-3 rounded-[var(--radius)] border border-indigo-100 shadow-2xs space-y-1">
-              <div className="w-6 h-6 mx-auto rounded-full bg-amber-100 text-amber-800 font-black text-xs flex items-center justify-center">4</div>
-              <p className="font-extrabold text-xs text-slate-900">PRACTICE</p>
+              <div className="w-6 h-6 mx-auto rounded-full bg-amber-100 text-amber-800 font-semibold text-xs flex items-center justify-center">4</div>
+              <p className="font-semibold text-xs text-slate-900">PRACTICE</p>
               <p className="text-[10px] text-slate-500">Targeted Adaptive Quiz</p>
             </div>
 
             <div className="bg-white p-3 rounded-[var(--radius)] border border-emerald-200 shadow-2xs space-y-1 col-span-2 sm:col-span-1">
-              <div className="w-6 h-6 mx-auto rounded-full bg-emerald-100 text-emerald-800 font-black text-xs flex items-center justify-center">5</div>
-              <p className="font-extrabold text-xs text-emerald-900">IMPROVE</p>
-              <p className="text-[10px] text-emerald-700 font-medium">Gap Closed (≥65%)</p>
+              <div className="w-6 h-6 mx-auto rounded-full bg-emerald-100 text-emerald-800 font-semibold text-xs flex items-center justify-center">5</div>
+              <p className="font-semibold text-xs text-emerald-900">IMPROVE</p>
+              <p className="text-[10px] text-emerald-700 font-normal">Gap Closed (≥65%)</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ═════════ 2. MAIN SPLIT VIEW: GAP TOPIC CARDS vs REMEDIATION ACTION CENTER ═════════ */}
+      {/* 2. MAIN SPLIT VIEW */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* ─── LEFT COLUMN: DETECTED TOPIC GAPS LIST (5 COLUMNS) ─── */}
+        {/* LEFT COLUMN: DETECTED TOPIC GAPS LIST */}
         <div className="lg:col-span-5 space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="font-semibold text-sm text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
               <Compass className="w-4 h-4 text-indigo-600" />
               <span>Diagnosed Topic Deficits</span>
             </h3>
-            <span className="text-xs font-medium text-slate-400">
+            <span className="text-xs font-normal text-slate-400">
               {detectedGaps.length} Subject Topics
             </span>
           </div>
@@ -842,12 +826,12 @@ export const LearningGapDetectionHub = ({
                         <span className={`w-2.5 h-2.5 rounded-full ${
                           isCritical ? "bg-rose-500 animate-pulse" : isModerate ? "bg-amber-500" : "bg-emerald-500"
                         }`} />
-                        <h4 className="font-black text-sm text-slate-900">{item.topic}</h4>
+                        <h4 className="font-semibold text-sm text-slate-900">{item.topic}</h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 font-medium pl-4.5">{item.subject}</p>
+                      <p className="text-[11px] text-slate-400 font-normal pl-4.5">{item.subject}</p>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-black shrink-0 ${
+                    <span className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-semibold shrink-0 ${
                       isCritical
                         ? "bg-rose-100 text-rose-800 border border-rose-200"
                         : isModerate
@@ -858,7 +842,6 @@ export const LearningGapDetectionHub = ({
                     </span>
                   </div>
 
-                  {/* Progress bar */}
                   <div className="space-y-1">
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                       <div
@@ -869,15 +852,15 @@ export const LearningGapDetectionHub = ({
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-medium">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-normal">
                       <span>Threshold: {gapThreshold}%</span>
                       {item.isGap ? (
-                        <span className="text-rose-700 font-medium flex items-center gap-1">
+                        <span className="text-rose-700 font-normal flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3 text-rose-600" />
                           Learning Gap Detected
                         </span>
                       ) : (
-                        <span className="text-emerald-700 font-medium flex items-center gap-1">
+                        <span className="text-emerald-700 font-normal flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                           Mastery Satisfied
                         </span>
@@ -885,12 +868,11 @@ export const LearningGapDetectionHub = ({
                     </div>
                   </div>
 
-                  {/* Quick Action Footer inside Card */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                     <span className="text-slate-400 text-[11px]">
                       {item.wrongQuestions} of {item.totalQuestions} Questions Incorrect
                     </span>
-                    <span className="font-medium text-indigo-700 flex items-center gap-1 hover:underline">
+                    <span className="font-normal text-indigo-700 flex items-center gap-1 hover:underline">
                       Inspect Remediation →
                     </span>
                   </div>
@@ -900,34 +882,33 @@ export const LearningGapDetectionHub = ({
           </div>
         </div>
 
-        {/* ─── RIGHT COLUMN: REMEDIATION ACTION WORKBENCH (7 COLUMNS) ─── */}
+        {/* RIGHT COLUMN: REMEDIATION ACTION WORKBENCH */}
         <div className="lg:col-span-7 bg-white rounded-[var(--radius)] border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 sticky top-6">
           
-          {/* Header of Active Selected Topic */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
                   (retestedScores[selectedTopicKey] || currentTopic.baselineAccuracy) < gapThreshold
                     ? "bg-rose-100 text-rose-800 border border-rose-200"
                     : "bg-emerald-100 text-emerald-800"
                 }`}>
-                  {(retestedScores[selectedTopicKey] || currentTopic.baselineAccuracy) < gapThreshold ? "🔴 Learning Gap Detected" : "🟢 Mastery Achieved"}
+                  {(retestedScores[selectedTopicKey] || currentTopic.baselineAccuracy) < gapThreshold ? "Learning Gap Detected" : "Mastery Achieved"}
                 </span>
-                <span className="text-xs text-slate-400 font-medium">
+                <span className="text-xs text-slate-400 font-normal">
                   {currentTopic.subject}
                 </span>
               </div>
               
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">
                 {currentTopic.topic}
               </h2>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
               <div className="text-right bg-slate-50 px-4 py-2 rounded-[var(--radius)] border border-slate-200">
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Topic Accuracy</span>
-                <span className={`text-2xl font-black ${
+                <span className="text-[10px] font-normal text-slate-400 uppercase tracking-wider block">Topic Accuracy</span>
+                <span className={`text-2xl font-semibold ${
                   (retestedScores[selectedTopicKey] || currentTopic.baselineAccuracy) < gapThreshold
                     ? "text-rose-600"
                     : "text-emerald-700"
@@ -939,7 +920,7 @@ export const LearningGapDetectionHub = ({
               {isTrainer && (
                 <button
                   onClick={() => handleAssignRemediation(currentTopic.topic)}
-                  className="px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95"
+                  className="px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Assign Remediation</span>
@@ -948,21 +929,20 @@ export const LearningGapDetectionHub = ({
             </div>
           </div>
 
-          {/* 3 Prescribed Remediation Pillars */}
           <div className="space-y-3">
-            <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
               Prescribed 3-Pillar Remediation Path:
             </h4>
 
-            {/* Pillar 1: AI Module Summary */}
+            {/* Pillar 1 */}
             <div className="p-4 sm:p-5 rounded-[var(--radius)] bg-indigo-50/70 border border-indigo-200 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-[var(--radius)] bg-indigo-600 text-white flex items-center justify-center font-medium shadow-xs">
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-indigo-600 text-white flex items-center justify-center font-normal shadow-xs">
                     <Sparkles className="w-5 h-5 text-amber-300" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm text-indigo-950">1. AI High-Yield Concept Summary</h4>
+                    <h4 className="font-semibold text-sm text-indigo-950">1. AI High-Yield Concept Summary</h4>
                     <p className="text-[11px] text-indigo-800">
                       Auto-synthesized key formulas, common traps, and physical principles.
                     </p>
@@ -976,29 +956,29 @@ export const LearningGapDetectionHub = ({
                     setFlashcardSelectedOption(null);
                     setActiveModal("ai_summary");
                   }}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
                 >
                   Read AI Summary
                 </button>
               </div>
 
               <div className="bg-white/80 p-3 rounded-[var(--radius)] border border-indigo-100 text-xs text-slate-700 space-y-1">
-                <p className="font-medium text-slate-900">Summary Highlights:</p>
+                <p className="font-normal text-slate-900">Summary Highlights:</p>
                 <p className="text-[11px] leading-relaxed line-clamp-2">
                   {currentTopic.summary?.headline}
                 </p>
               </div>
             </div>
 
-            {/* Pillar 2: Learning Material */}
+            {/* Pillar 2 */}
             <div className="p-4 sm:p-5 rounded-[var(--radius)] bg-blue-50/70 border border-blue-200 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-medium shadow-xs">
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-normal shadow-xs">
                     <BookOpen className="w-5 h-5 text-blue-100" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm text-blue-950">2. Relevant Learning Materials & Video Lectures</h4>
+                    <h4 className="font-semibold text-sm text-blue-950">2. Relevant Learning Materials & Video Lectures</h4>
                     <p className="text-[11px] text-blue-800">
                       Direct deep link into course syllabus modules, slides, and recorded video sessions.
                     </p>
@@ -1014,27 +994,27 @@ export const LearningGapDetectionHub = ({
                       onNavigateTab("courses");
                     }
                   }}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0"
                 >
                   Open Study Material
                 </button>
               </div>
 
               <div className="bg-white/80 p-3 rounded-[var(--radius)] border border-blue-100 text-xs text-slate-600 flex items-center justify-between">
-                <span>Direct module link: <b>{currentTopic.subject}</b></span>
-                <span className="text-[10px] text-blue-600 font-extrabold uppercase">Available Online</span>
+                <span>Direct module link: <span className="font-semibold">{currentTopic.subject}</span></span>
+                <span className="text-[10px] text-blue-600 font-semibold uppercase">Available Online</span>
               </div>
             </div>
 
-            {/* Pillar 3: Targeted Practice Quiz */}
+            {/* Pillar 3 */}
             <div className="p-4 sm:p-5 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200 space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-[var(--radius)] bg-amber-600 text-white flex items-center justify-center font-medium shadow-xs">
+                  <div className="w-9 h-9 rounded-[var(--radius)] bg-amber-600 text-white flex items-center justify-center font-normal shadow-xs">
                     <Flame className="w-5 h-5 text-amber-200" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm text-amber-950">3. Targeted Adaptive Practice Quiz</h4>
+                    <h4 className="font-semibold text-sm text-amber-950">3. Targeted Adaptive Practice Quiz</h4>
                     <p className="text-[11px] text-amber-800">
                       Adaptive timed evaluation isolating this specific knowledge gap.
                     </p>
@@ -1043,7 +1023,7 @@ export const LearningGapDetectionHub = ({
 
                 <button
                   onClick={() => handleLaunchTargetedQuiz(selectedTopicKey)}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 flex items-center gap-1.5"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 flex items-center gap-1.5"
                 >
                   <PlayCircle className="w-4 h-4" />
                   <span>Start Practice</span>
@@ -1051,21 +1031,20 @@ export const LearningGapDetectionHub = ({
               </div>
 
               <div className="bg-white/80 p-3 rounded-[var(--radius)] border border-amber-100 text-xs flex items-center justify-between">
-                <span className="text-slate-700">Adaptive Format: <b>5-10 High-Yield Questions</b></span>
-                <span className="text-amber-800 font-medium">15 Mins • Kiosk Mode Proctored</span>
+                <span className="text-slate-700">Adaptive Format: <span className="font-semibold">5-10 High-Yield Questions</span></span>
+                <span className="text-amber-800 font-normal">15 Mins • Kiosk Mode Proctored</span>
               </div>
             </div>
           </div>
 
-          {/* Simulate Retest / Gap Closed Button for Training Validation */}
           <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-slate-500">
-              Pass targeted retest with <b>≥65% score</b> to close this learning gap.
+              Pass targeted retest with <span className="font-semibold">≥65% score</span> to close this learning gap.
             </p>
 
             <button
               onClick={() => handleSimulateRetestImprovement(selectedTopicKey)}
-              className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Simulate Verified Retest (88%)</span>
@@ -1076,7 +1055,7 @@ export const LearningGapDetectionHub = ({
 
       </div>
 
-      {/* ═════════ 3. MODALS: AI SUMMARY & HIGH-YIELD FLASHCARD WORKBENCH ═════════ */}
+      {/* 3. MODALS: AI SUMMARY & HIGH-YIELD FLASHCARD WORKBENCH */}
       {activeModal === "ai_summary" && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in select-text font-sans">
           <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 my-8">
@@ -1084,12 +1063,12 @@ export const LearningGapDetectionHub = ({
             <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-black text-[10px] uppercase">
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-semibold text-[10px] uppercase">
                     AI Remedial Knowledge Capsule
                   </span>
-                  <span className="text-xs text-slate-400 font-medium">{currentTopic.subject}</span>
+                  <span className="text-xs text-slate-400 font-normal">{currentTopic.subject}</span>
                 </div>
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                <h3 className="text-xl font-semibold text-slate-900 tracking-tight">
                   {currentTopic.topic}
                 </h3>
               </div>
@@ -1101,11 +1080,9 @@ export const LearningGapDetectionHub = ({
               </button>
             </div>
 
-            {/* AI Summary Content */}
             <div className="space-y-5 text-xs text-slate-700 max-h-[60vh] overflow-y-auto pr-2">
-              
               <div className="bg-indigo-50/70 p-4 rounded-[var(--radius)] border border-indigo-100 space-y-1.5">
-                <h4 className="font-extrabold text-indigo-950 text-sm flex items-center gap-1.5">
+                <h4 className="font-semibold text-indigo-950 text-sm flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-indigo-600" />
                   <span>Executive Topic Diagnostic</span>
                 </h4>
@@ -1114,15 +1091,14 @@ export const LearningGapDetectionHub = ({
                 </p>
               </div>
 
-              {/* Core Physical Principles */}
               <div className="space-y-2">
-                <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider">
+                <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider">
                   Key Physical & Mathematical Principles
                 </h4>
                 <ul className="space-y-2">
                   {(currentTopic.summary?.keyPrinciples || []).map((p, idx) => (
                     <li key={idx} className="flex items-start gap-2 bg-slate-50 p-3 rounded-[var(--radius)] border border-slate-100">
-                      <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-semibold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <span className="leading-relaxed">{p}</span>
@@ -1131,47 +1107,44 @@ export const LearningGapDetectionHub = ({
                 </ul>
               </div>
 
-              {/* Common Exam Pitfalls */}
               <div className="space-y-2">
-                <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-rose-800">
+                <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider text-rose-800">
                   Common Cognitive Traps & Operational Pitfalls
                 </h4>
                 <div className="bg-rose-50/60 p-4 rounded-[var(--radius)] border border-rose-200 space-y-2">
                   {(currentTopic.summary?.commonPitfalls || []).map((pf, idx) => (
                     <div key={idx} className="flex items-start gap-2 text-rose-950">
                       <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                      <span className="leading-relaxed font-medium">{pf}</span>
+                      <span className="leading-relaxed font-normal">{pf}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Essential Formulas */}
               {(currentTopic.summary?.keyFormulas || []).length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider">
+                  <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider">
                     Core Operational Formulas
                   </h4>
                   <div className="grid grid-cols-1 gap-2">
                     {currentTopic.summary.keyFormulas.map((f, idx) => (
                       <div key={idx} className="p-3 bg-slate-900 text-white rounded-[var(--radius)] font-mono text-xs flex items-center justify-between">
                         <span className="text-slate-400 font-sans">{f.label}:</span>
-                        <code className="text-amber-300 font-medium">{f.formula}</code>
+                        <code className="text-amber-300 font-normal">{f.formula}</code>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Interactive Sample Question Drill */}
               {(currentTopic.sampleQuestions || []).length > 0 && (
                 <div className="p-4 rounded-[var(--radius)] bg-amber-50/70 border border-amber-200 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-black text-xs text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="font-semibold text-xs text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
                       <Flame className="w-4 h-4 text-amber-600" />
                       Concept Check: Instant Self-Test
                     </span>
-                    <span className="text-[10px] text-amber-800 font-medium">
+                    <span className="text-[10px] text-amber-800 font-normal">
                       Question {activeFlashcardIndex + 1} of {currentTopic.sampleQuestions.length}
                     </span>
                   </div>
@@ -1180,7 +1153,7 @@ export const LearningGapDetectionHub = ({
                     const q = currentTopic.sampleQuestions[activeFlashcardIndex] || currentTopic.sampleQuestions[0];
                     return (
                       <div className="space-y-3 bg-white p-4 rounded-[var(--radius)] border border-amber-100">
-                        <p className="font-medium text-slate-900 text-xs">{q.question}</p>
+                        <p className="font-normal text-slate-900 text-xs">{q.question}</p>
                         
                         <div className="space-y-1.5">
                           {q.options.map((opt, oIdx) => {
@@ -1189,10 +1162,10 @@ export const LearningGapDetectionHub = ({
                             let btnStyle = "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100";
                             
                             if (flashcardSubmitted) {
-                              if (isCorrect) btnStyle = "bg-emerald-100 border-emerald-300 text-emerald-950 font-medium";
+                              if (isCorrect) btnStyle = "bg-emerald-100 border-emerald-300 text-emerald-950 font-normal";
                               else if (isSelected) btnStyle = "bg-rose-100 border-rose-300 text-rose-950";
                             } else if (isSelected) {
-                              btnStyle = "bg-blue-100 border-blue-300 text-blue-950 font-medium";
+                              btnStyle = "bg-blue-100 border-blue-300 text-blue-950 font-normal";
                             }
 
                             return (
@@ -1202,7 +1175,7 @@ export const LearningGapDetectionHub = ({
                                 onClick={() => setFlashcardSelectedOption(oIdx)}
                                 className={`w-full text-left p-2.5 rounded-[var(--radius)] border text-xs transition-colors flex items-center gap-2 ${btnStyle}`}
                               >
-                                <span className="w-5 h-5 rounded-full bg-white border font-medium text-[10px] flex items-center justify-center shrink-0">
+                                <span className="w-5 h-5 rounded-full bg-white border font-normal text-[10px] flex items-center justify-center shrink-0">
                                   {String.fromCharCode(65 + oIdx)}
                                 </span>
                                 <span>{opt}</span>
@@ -1213,7 +1186,7 @@ export const LearningGapDetectionHub = ({
 
                         {flashcardSubmitted && (
                           <div className="p-3 rounded-[var(--radius)] bg-slate-50 border border-slate-200 space-y-1 text-xs text-slate-700">
-                            <span className="font-medium text-slate-900">💡 Explanation:</span>
+                            <span className="font-normal text-slate-900">Explanation:</span>
                             <p>{q.explanation}</p>
                           </div>
                         )}
@@ -1223,7 +1196,7 @@ export const LearningGapDetectionHub = ({
                             <button
                               disabled={flashcardSelectedOption === null}
                               onClick={() => setFlashcardSubmitted(true)}
-                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium rounded-[var(--radius)] text-xs transition-colors"
+                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-normal rounded-[var(--radius)] text-xs transition-colors"
                             >
                               Check Answer
                             </button>
@@ -1234,7 +1207,7 @@ export const LearningGapDetectionHub = ({
                                 setFlashcardSelectedOption(null);
                                 setActiveFlashcardIndex((prev) => (prev + 1) % currentTopic.sampleQuestions.length);
                               }}
-                              className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-[var(--radius)] text-xs transition-colors"
+                              className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-normal rounded-[var(--radius)] text-xs transition-colors"
                             >
                               Next Question →
                             </button>
@@ -1251,7 +1224,7 @@ export const LearningGapDetectionHub = ({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-normal rounded-[var(--radius)] text-xs"
               >
                 Close Summary
               </button>
@@ -1261,7 +1234,7 @@ export const LearningGapDetectionHub = ({
                   setActiveModal(null);
                   handleLaunchTargetedQuiz(selectedTopicKey);
                 }}
-                className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-md flex items-center gap-1.5"
+                className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-md flex items-center gap-1.5"
               >
                 <PlayCircle className="w-4 h-4" />
                 <span>Launch Targeted Quiz</span>
@@ -1272,14 +1245,14 @@ export const LearningGapDetectionHub = ({
         </div>
       )}
 
-      {/* ═════════ 4. CONFIG THRESHOLD CUTOFF MODAL ═════════ */}
+      {/* 4. CONFIG THRESHOLD CUTOFF MODAL */}
       {activeModal === "config" && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in font-sans select-none">
           <div className="bg-white rounded-[var(--radius)] max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-slate-200 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Sliders className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-lg font-black text-slate-900">Configure Learning Gap Cutoff</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Configure Learning Gap Cutoff</h3>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1 rounded-[var(--radius)] text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
@@ -1287,13 +1260,13 @@ export const LearningGapDetectionHub = ({
             </div>
 
             <p className="text-xs text-slate-500 leading-relaxed">
-              Any subject topic where candidate assessment accuracy drops below this percentage will be automatically classified as an active <b>Learning Gap</b> and trigger automated remedial recommendations.
+              Any subject topic where candidate assessment accuracy drops below this percentage will be automatically classified as an active <span className="font-semibold">Learning Gap</span> and trigger automated remedial recommendations.
             </p>
 
             <div className="space-y-4 bg-slate-50 p-4 rounded-[var(--radius)] border border-slate-200">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-700">Trigger Threshold:</span>
-                <span className="text-xl font-black text-indigo-600">{gapThreshold}%</span>
+                <span className="text-xs font-normal text-slate-700">Trigger Threshold:</span>
+                <span className="text-xl font-semibold text-indigo-600">{gapThreshold}%</span>
               </div>
 
               <input
@@ -1306,9 +1279,9 @@ export const LearningGapDetectionHub = ({
                 className="w-full h-2 bg-slate-200 rounded-[var(--radius)] appearance-none cursor-pointer accent-indigo-600"
               />
 
-              <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+              <div className="flex justify-between text-[10px] text-slate-400 font-normal">
                 <span>40% (Permissive)</span>
-                <span>60% (MoES Standard)</span>
+                <span>60% (Standard)</span>
                 <span>80% (Strict)</span>
               </div>
             </div>
@@ -1321,7 +1294,7 @@ export const LearningGapDetectionHub = ({
                   setActiveModal(null);
                   showToast(`Threshold reset to default ${DEFAULT_GAP_THRESHOLD}%.`);
                 }}
-                className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-700"
+                className="px-4 py-2 text-xs font-normal text-slate-500 hover:text-slate-700"
               >
                 Reset Default
               </button>
@@ -1332,7 +1305,7 @@ export const LearningGapDetectionHub = ({
                   setActiveModal(null);
                   showToast(`Saved gap detection threshold at ${gapThreshold}%.`);
                 }}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-[var(--radius)] text-xs shadow-sm"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-[var(--radius)] text-xs shadow-sm"
               >
                 Save Cutoff
               </button>

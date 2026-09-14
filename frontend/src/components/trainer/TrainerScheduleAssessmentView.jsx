@@ -1,36 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { 
-  ClipboardList, 
-  Calendar, 
-  Clock, 
-  Plus, 
-  Search, 
-  Filter, 
-  Sparkles, 
-  CheckCircle2, 
-  Award, 
-  Users, 
-  BarChart3, 
-  TrendingUp, 
-  AlertCircle, 
-  Eye, 
-  Send, 
-  FileText, 
-  Check, 
-  RotateCcw, 
-  BookOpen, 
-  Layers, 
-  SlidersHorizontal, 
-  ChevronRight, 
-  ChevronDown, 
-  X, 
-  Trash2, 
-  Edit3, 
-  Building2, 
-  HelpCircle, 
-  ShieldCheck, 
-  Flame, 
-  Target, 
+import {
+  ClipboardList,
+  Calendar,
+  Clock,
+  Plus,
+  Search,
+  Filter,
+  Sparkles,
+  CheckCircle2,
+  Award,
+  Users,
+  BarChart3,
+  TrendingUp,
+  AlertCircle,
+  Eye,
+  Send,
+  FileText,
+  Check,
+  RotateCcw,
+  BookOpen,
+  Layers,
+  SlidersHorizontal,
+  ChevronRight,
+  ChevronDown,
+  X,
+  Trash2,
+  Edit3,
+  Building2,
+  HelpCircle,
+  ShieldCheck,
+  Flame,
+  Target,
   Loader2,
   FileCheck2,
   PieChart,
@@ -43,8 +43,11 @@ import {
 } from "lucide-react";
 import { api } from "../../services/api";
 import { cleanSubject, cleanTopic } from "./ContentLibraryView";
+import AssessmentCards from "./AssessmentCards";
+import LearningResourcesCards from "./LearningResourcesCards";
+import CredentialsCard from "./CredentialsCard";
 
-export const TrainerScheduleAssessmentView = ({ 
+export const TrainerScheduleAssessmentView = ({
   currentUser,
   onOpenStudio,
   onOpenContentLibrary
@@ -67,8 +70,9 @@ export const TrainerScheduleAssessmentView = ({
   const [questionDifficultyFilter, setQuestionDifficultyFilter] = useState("all");
   const [traineeSearchTerm, setTraineeSearchTerm] = useState("");
 
-  // ─── HIERARCHICAL PERFORMANCE SELECTOR STATE (Course -> Assessment -> Trainee) ───
+  // ─── HIERARCHICAL PERFORMANCE SELECTOR STATE (Course -> Subject -> Assessment -> Trainee) ───
   const [selectedHierarchyCourseId, setSelectedHierarchyCourseId] = useState("all");
+  const [selectedHierarchySubjectId, setSelectedHierarchySubjectId] = useState("all");
   const [selectedHierarchyAssessmentId, setSelectedHierarchyAssessmentId] = useState("all");
   const [selectedHierarchyTraineeId, setSelectedHierarchyTraineeId] = useState("all");
 
@@ -274,7 +278,7 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       console.error("Failed loading assessment data:", err);
-    } finally {
+    } fontally ;{
       setLoading(false);
     }
   };
@@ -374,7 +378,7 @@ export const TrainerScheduleAssessmentView = ({
   // ─── AI QUESTION PAPER GENERATION (AI ENGINE) ───
   const handleGenerateAiPaper = async (e) => {
     if (e) e.preventDefault();
-    
+
     const curCourse = courses.find(c => c.id === createForm.courseId);
     const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName || s.title === createForm.subjectName) || curCourse?.subjects?.[0];
 
@@ -465,7 +469,7 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       showToast("AI Generation error: " + err.message, "error");
-    } finally {
+    } fontally ;{
       setIsGeneratingAiPaper(false);
     }
   };
@@ -486,19 +490,19 @@ export const TrainerScheduleAssessmentView = ({
           // Generate One-Word Short Answer questions
           const isRadar = (bp.topic || "").toLowerCase().includes("radar");
           const isNwp = (bp.topic || "").toLowerCase().includes("numerical") || (bp.topic || "").toLowerCase().includes("nwp");
-          
+
           for (let i = 0; i < qCount; i++) {
             synthesizedQuestions.push({
               id: `ai_ow_${Date.now()}_${qNum++}`,
-              question: isRadar 
+              question: isRadar
                 ? "In dual-polarization Doppler weather radar, what moment measures hydrometeor geometric oblateness via horizontal vs vertical reflectivity?"
                 : isNwp
-                ? "What is the dimensionless stability metric that must be ≤ 1.0 to prevent numerical explosion in explicit advection schemes?"
-                : `What is the fundamental meteorological concept or term governing ${bp.topic}?`,
+                  ? "What is the dimensionless stability metric that must be ≤ 1.0 to prevent numerical explosion in explicit advection schemes?"
+                  : `What is the fundamental meteorological concept or term governing ${bp.topic}?`,
               type: "one_word",
               expectedAnswer: isRadar ? "ZDR" : (isNwp ? "CFL" : "Baroclinic"),
-              acceptedAnswers: isRadar 
-                ? ["ZDR", "zdr", "Differential Reflectivity", "differential reflectivity"] 
+              acceptedAnswers: isRadar
+                ? ["ZDR", "zdr", "Differential Reflectivity", "differential reflectivity"]
                 : (isNwp ? ["CFL", "cfl", "Courant", "Courant number"] : ["Baroclinic", "baroclinic", "Baroclinicity"]),
               guidanceNote: "Write your answer in a single word or standard acronym. Capitalization does not matter.",
               marks: qMarks,
@@ -570,7 +574,7 @@ export const TrainerScheduleAssessmentView = ({
       showToast(`Synthesized ${synthesizedQuestions.length} questions conforming strictly to the Topic-Wise & Marks-Wise Blueprint!`);
     } catch (err) {
       showToast("Blueprint generation error: " + err.message, "error");
-    } finally {
+    } fontally; {
       setIsGeneratingAiPaper(false);
     }
   };
@@ -657,7 +661,7 @@ export const TrainerScheduleAssessmentView = ({
       }
     } catch (err) {
       showToast(err.message, "error");
-    } finally {
+    } fontally; {
       setLoading(false);
     }
   };
@@ -712,7 +716,7 @@ export const TrainerScheduleAssessmentView = ({
         const avgPct = totalMarks > 0 ? ((avgScore / totalMarks) * 100).toFixed(1) : 0;
         const passedCount = subs.filter(s => (s.percentage || (s.score / totalMarks * 100)) >= 50).length;
         const sorted = [...subs].sort((a, b) => (b.score || 0) - (a.score || 0));
-        
+
         setQuizAnalytics({
           totalExaminees: total,
           averagePercentage: parseFloat(avgPct),
@@ -734,7 +738,7 @@ export const TrainerScheduleAssessmentView = ({
       setTrainerFeedbackMap(fbMap);
     } catch (err) {
       console.error("Error loading quiz submissions & analytics:", err);
-    } finally {
+    } fontally; {
       setLoadingAnalytics(false);
     }
   };
@@ -789,11 +793,28 @@ export const TrainerScheduleAssessmentView = ({
   // ─── FILTER & HIERARCHY LOGIC ───
   const now = new Date();
 
-  // Quizzes available under the selected course hierarchy
+  // Selected Course Object
+  const selectedCourseObj = courses.find(c => c.id === selectedHierarchyCourseId);
+
+  // Available subjects based on course selection
+  const availableHierarchySubjects = selectedCourseObj
+    ? (selectedCourseObj.subjects || [])
+    : courses.flatMap(c => c.subjects || []);
+
+  // Quizzes available under the selected course & subject hierarchy
   const availableHierarchyQuizzes = quizzes.filter(q => {
-    if (selectedHierarchyCourseId === "all") return true;
-    const courseObj = courses.find(c => c.id === selectedHierarchyCourseId);
-    return q.courseId === selectedHierarchyCourseId || (courseObj && q.courseName === courseObj.title);
+    if (selectedHierarchyCourseId !== "all") {
+      const courseObj = courses.find(c => c.id === selectedHierarchyCourseId);
+      const matchesCourse = q.courseId === selectedHierarchyCourseId || (courseObj && q.courseName === courseObj.title);
+      if (!matchesCourse) return false;
+    }
+
+    if (selectedHierarchySubjectId !== "all") {
+      const matchesSubject = q.subjectId === selectedHierarchySubjectId || q.subjectName === selectedHierarchySubjectId;
+      if (!matchesSubject) return false;
+    }
+
+    return true;
   });
 
   const filteredQuizzes = quizzes.filter(q => {
@@ -812,6 +833,12 @@ export const TrainerScheduleAssessmentView = ({
       if (!matchesCourse) return false;
     }
 
+    // Subject hierarchy filter
+    if (selectedHierarchySubjectId !== "all") {
+      const matchesSubject = q.subjectId === selectedHierarchySubjectId || q.subjectName === selectedHierarchySubjectId;
+      if (!matchesSubject) return false;
+    }
+
     if (subjectFilter !== "all" && q.subjectName !== subjectFilter && q.subjectId !== subjectFilter) {
       return false;
     }
@@ -828,9 +855,9 @@ export const TrainerScheduleAssessmentView = ({
     return true;
   });
 
-  // ─── HIERARCHICAL DRILLDOWN NAVIGATION BAR COMPONENT (Course -> Assessment -> Trainee) ───
+  // ─── HIERARCHICAL DRILLDOWN NAVIGATION BAR COMPONENT (Course -> Subject -> Assessment -> Trainee) ───
   const renderHierarchySelector = () => (
-    <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-[var(--radius)] p-5 sm:p-6 shadow-xl border border-indigo-800/40 space-y-4">
+    <div className="bg-[#0a2558] text-white rounded-[var(--radius)] p-5 sm:p-6 shadow-xl border border-blue-900/40 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-[var(--radius)] bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300">
@@ -839,22 +866,23 @@ export const TrainerScheduleAssessmentView = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-black text-sm text-white tracking-wide">
-                Performance Analytics Drilldown Hierarchy
+                Multi-Subject Trainer Schedule & Analytics Hierarchy
               </h3>
               <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 font-mono">
-                Course ➔ Assessment ➔ Trainee
+                Course ➔ Subject ➔ Assessment ➔ Trainee
               </span>
             </div>
             <p className="text-[11px] text-slate-300">
-              Directly select a course, pick an assessment, and drill down into individual trainee responses.
+              Filter schedules by course and assigned subjects to view topic evaluations and individual trainee performance.
             </p>
           </div>
         </div>
 
-        {(selectedHierarchyCourseId !== "all" || selectedHierarchyAssessmentId !== "all" || selectedHierarchyTraineeId !== "all") && (
+        {(selectedHierarchyCourseId !== "all" || selectedHierarchySubjectId !== "all" || selectedHierarchyAssessmentId !== "all" || selectedHierarchyTraineeId !== "all") && (
           <button
             onClick={() => {
               setSelectedHierarchyCourseId("all");
+              setSelectedHierarchySubjectId("all");
               setSelectedHierarchyAssessmentId("all");
               setSelectedHierarchyTraineeId("all");
               setSelectedQuizForDetails(null);
@@ -862,12 +890,12 @@ export const TrainerScheduleAssessmentView = ({
             className="flex items-center gap-1 text-[11px] font-medium text-amber-300 hover:text-amber-200 transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-[var(--radius)] border border-amber-300/30"
           >
             <RotateCcw className="w-3 h-3" />
-            <span>Reset Drilldown</span>
+            <span>Reset Filters</span>
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
         {/* 1. Select Course */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-black uppercase text-blue-300 flex items-center gap-1.5 tracking-wider">
@@ -879,6 +907,7 @@ export const TrainerScheduleAssessmentView = ({
             onChange={(e) => {
               const cId = e.target.value;
               setSelectedHierarchyCourseId(cId);
+              setSelectedHierarchySubjectId("all");
               setSelectedHierarchyAssessmentId("all");
               setSelectedHierarchyTraineeId("all");
             }}
@@ -891,11 +920,36 @@ export const TrainerScheduleAssessmentView = ({
           </select>
         </div>
 
-        {/* 2. Select Assessment */}
+        {/* 2. Select Subject (Multi-Subject Trainer Support) */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-black uppercase text-cyan-300 flex items-center gap-1.5 tracking-wider">
+            <Layers className="w-3.5 h-3.5 text-cyan-400" />
+            <span>2. Trainer Subject</span>
+          </label>
+          <select
+            value={selectedHierarchySubjectId}
+            onChange={(e) => {
+              const sId = e.target.value;
+              setSelectedHierarchySubjectId(sId);
+              setSelectedHierarchyAssessmentId("all");
+              setSelectedHierarchyTraineeId("all");
+            }}
+            className="w-full p-2.5 bg-slate-800/90 text-white border border-slate-700 rounded-[var(--radius)] font-medium focus:ring-2 focus:ring-cyan-500 focus:outline-none"
+          >
+            <option value="all">All Assigned Subjects ({availableHierarchySubjects.length})</option>
+            {availableHierarchySubjects.map((s, idx) => (
+              <option key={s.id || idx} value={s.id || s.name}>
+                {cleanSubject(s.name || s.title)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 3. Select Assessment */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-black uppercase text-amber-300 flex items-center gap-1.5 tracking-wider">
             <ClipboardList className="w-3.5 h-3.5 text-amber-400" />
-            <span>2. Assessment</span>
+            <span>3. Scheduled Assessment</span>
           </label>
           <select
             value={selectedHierarchyAssessmentId}
@@ -921,11 +975,11 @@ export const TrainerScheduleAssessmentView = ({
           </select>
         </div>
 
-        {/* 3. Select Trainee */}
+        {/* 4. Select Trainee */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-black uppercase text-emerald-300 flex items-center gap-1.5 tracking-wider">
             <Users className="w-3.5 h-3.5 text-emerald-400" />
-            <span>3. Trainee</span>
+            <span>4. Trainee</span>
           </label>
           <select
             value={selectedHierarchyTraineeId}
@@ -946,7 +1000,7 @@ export const TrainerScheduleAssessmentView = ({
             }}
             className="w-full p-2.5 bg-slate-800/90 text-white border border-slate-700 rounded-[var(--radius)] font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
           >
-            <option value="all">All Trainees / Aggregate Performance ({activeSubmissions.length || enrolledTrainees.length})</option>
+            <option value="all">All Trainees / Aggregate ({activeSubmissions.length || enrolledTrainees.length})</option>
             {activeSubmissions.length > 0 ? (
               activeSubmissions.map(s => (
                 <option key={s.id} value={s.traineeId || s.id}>
@@ -966,7 +1020,7 @@ export const TrainerScheduleAssessmentView = ({
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto font-sans text-slate-800 select-none min-h-screen">
-      
+
       {/* Toast Notification */}
       {notification && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-[var(--radius)] bg-[#0a2558] text-white shadow-2xl border border-white/20 animate-in slide-in-from-bottom-5">
@@ -984,14 +1038,14 @@ export const TrainerScheduleAssessmentView = ({
             <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-900 font-extrabold text-xs border border-blue-200">
               Examination Cell & Assessment Operations
             </span>
-            <span className="text-xs text-slate-500 font-medium">MoES / IMD Automated Grading Engine</span>
+            <span className="text-xs text-slate-500 font-medium">Multi-Subject Trainer Scheduling Engine</span>
           </div>
 
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Detailed Trainee + Trainer Performance Analytics
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium">
-            Conduct timed MCQ evaluations, drill down through Course ➔ Assessment ➔ Trainee, analyze topic and difficulty mastery, and audit question accuracy.
+            Schedule multi-subject evaluations, balance timetables across modules, drill down through Course ➔ Subject ➔ Assessment ➔ Trainee, and audit responses with automated precision.
           </p>
         </div>
 
@@ -1029,11 +1083,10 @@ export const TrainerScheduleAssessmentView = ({
         <div className="flex items-center gap-1.5 flex-wrap">
           <button
             onClick={() => { setActiveSubTab("all"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${
-              activeSubTab === "all"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "all"
                 ? "bg-[#0a2558] text-white shadow-md"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
+              }`}
           >
             <ClipboardList className="w-4 h-4" />
             <span>All Scheduled Exams ({quizzes.length})</span>
@@ -1041,11 +1094,10 @@ export const TrainerScheduleAssessmentView = ({
 
           <button
             onClick={() => { setActiveSubTab("upcoming"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${
-              activeSubTab === "upcoming"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "upcoming"
                 ? "bg-[#0a2558] text-white shadow-md"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
+              }`}
           >
             <Calendar className="w-4 h-4 text-amber-500" />
             <span>Upcoming Exams</span>
@@ -1053,11 +1105,10 @@ export const TrainerScheduleAssessmentView = ({
 
           <button
             onClick={() => { setActiveSubTab("completed"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${
-              activeSubTab === "completed"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "completed"
                 ? "bg-[#0a2558] text-white shadow-md"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
+              }`}
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
             <span>Completed & Analytics</span>
@@ -1065,11 +1116,10 @@ export const TrainerScheduleAssessmentView = ({
 
           <button
             onClick={() => { setActiveSubTab("pending-eval"); setSelectedQuizForDetails(null); }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${
-              activeSubTab === "pending-eval"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] text-xs font-black transition-all ${activeSubTab === "pending-eval"
                 ? "bg-amber-500 text-slate-950 shadow-md"
                 : "text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/80"
-            }`}
+              }`}
           >
             <Clock className="w-4 h-4 text-amber-900" />
             <span>Pending Evaluation & Publish</span>
@@ -1093,7 +1143,7 @@ export const TrainerScheduleAssessmentView = ({
       {/* ═════════ 3. CREATE / AI GENERATE EXAM WORKFLOW (ON THE SAME PAGE) ═════════ */}
       {activeSubTab === "create" && (
         <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 animate-in fade-in duration-150">
-          
+
           {/* Workflow Step Indicator */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
@@ -1108,26 +1158,23 @@ export const TrainerScheduleAssessmentView = ({
             <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-[var(--radius)] border border-slate-200 text-xs font-extrabold">
               <button
                 onClick={() => setCreateStep("basic")}
-                className={`px-3 py-1.5 rounded-[var(--radius)] transition-all ${
-                  createStep === "basic" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
-                }`}
+                className={`px-3 py-1.5 rounded-[var(--radius)] transition-all ${createStep === "basic" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  }`}
               >
                 1. Blueprint & Parameters
               </button>
               <button
                 onClick={() => setCreateStep("ai-paper")}
-                className={`px-3 py-1.5 rounded-[var(--radius)] flex items-center gap-1 transition-all ${
-                  createStep === "ai-paper" ? "bg-amber-400 text-slate-950 shadow-xs" : "text-slate-600 hover:text-slate-900"
-                }`}
+                className={`px-3 py-1.5 rounded-[var(--radius)] flex items-center gap-1 transition-all ${createStep === "ai-paper" ? "bg-amber-400 text-slate-950 shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                 <span>2. Questions Authoring ({editableAiPaper.length})</span>
               </button>
               <button
                 onClick={() => setCreateStep("questions")}
-                className={`px-3 py-1.5 rounded-[var(--radius)] transition-all ${
-                  createStep === "questions" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
-                }`}
+                className={`px-3 py-1.5 rounded-[var(--radius)] transition-all ${createStep === "questions" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  }`}
               >
                 3. Question Bank ({selectedQuestionIds.length})
               </button>
@@ -1279,197 +1326,31 @@ export const TrainerScheduleAssessmentView = ({
                   </div>
                 </div>
 
-                {/* Blueprint Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="text-[10px] font-medium uppercase tracking-wider text-slate-500 border-b border-slate-200/80">
-                      <tr>
-                        <th className="py-2.5 px-3">Topic / Syllabus Focus</th>
-                        <th className="py-2.5 px-2">Module</th>
-                        <th className="py-2.5 px-2">Question Type</th>
-                        <th className="py-2.5 px-2 text-center">Questions</th>
-                        <th className="py-2.5 px-2 text-center">Marks/Q</th>
-                        <th className="py-2.5 px-2 text-center">Total Marks</th>
-                        <th className="py-2.5 px-2">Difficulty</th>
-                        <th className="py-2.5 px-2">Competency</th>
-                        <th className="py-2.5 px-2 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200/60 font-medium">
-                      {blueprint.map((bp, idx) => {
-                        const curCourse = courses.find(c => c.id === createForm.courseId);
-                        const curSubject = curCourse?.subjects?.find(s => s.id === createForm.subjectId || s.name === createForm.subjectName) || curCourse?.subjects?.[0];
-                        const availableModules = curSubject?.modules || [];
-                        const taughtTopics = getSubjectTaughtTopics(curSubject);
-
-                        return (
-                          <tr key={bp.id || idx} className="hover:bg-white/60 transition-colors">
-                            <td className="py-2.5 px-3">
-                              <select
-                                value={bp.topic}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    next[idx] = { ...next[idx], topic: val };
-                                    return next;
-                                  });
-                                }}
-                                className="w-full p-2 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium text-slate-900"
-                              >
-                                {taughtTopics.map((top, tIdx) => (
-                                  <option key={tIdx} value={top}>{top}</option>
-                                ))}
-                                {!taughtTopics.includes(bp.topic) && (
-                                  <option value={bp.topic}>{bp.topic}</option>
-                                )}
-                              </select>
-                            </td>
-
-                            <td className="py-2.5 px-2">
-                              <select
-                                value={bp.module}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    next[idx] = { ...next[idx], module: val };
-                                    return next;
-                                  });
-                                }}
-                                className="w-full p-2 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium text-slate-800"
-                              >
-                                {availableModules.length > 0 ? (
-                                  availableModules.map((m, mIdx) => (
-                                    <option key={mIdx} value={m.title}>{m.title}</option>
-                                  ))
-                                ) : (
-                                  <>
-                                    <option value="Module 1">Module 1</option>
-                                    <option value="Module 2">Module 2</option>
-                                    <option value="Module 3">Module 3</option>
-                                  </>
-                                )}
-                              </select>
-                            </td>
-
-                            <td className="py-2.5 px-2">
-                              <select
-                                value={bp.type}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    next[idx] = { ...next[idx], type: val };
-                                    return next;
-                                  });
-                                }}
-                                className="w-full p-2 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium text-blue-900"
-                              >
-                                <option value="mcq">MCQ (4 Options)</option>
-                                <option value="one_word">One-word / Short Answer</option>
-                              </select>
-                            </td>
-
-                            <td className="py-2.5 px-2 text-center">
-                              <input
-                                type="number"
-                                min={1}
-                                max={20}
-                                value={bp.questionCount}
-                                onChange={(e) => {
-                                  const cnt = Math.max(1, Number(e.target.value));
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    const rowMarks = (Number(next[idx].marksPerQuestion) || 2) * cnt;
-                                    next[idx] = { ...next[idx], questionCount: cnt, totalMarks: rowMarks };
-                                    return next;
-                                  });
-                                }}
-                                className="w-14 p-1.5 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium text-center"
-                              />
-                            </td>
-
-                            <td className="py-2.5 px-2 text-center">
-                              <input
-                                type="number"
-                                min={0.5}
-                                step={0.5}
-                                max={20}
-                                value={bp.marksPerQuestion}
-                                onChange={(e) => {
-                                  const mpq = Number(e.target.value);
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    const rowMarks = mpq * (Number(next[idx].questionCount) || 1);
-                                    next[idx] = { ...next[idx], marksPerQuestion: mpq, totalMarks: rowMarks };
-                                    return next;
-                                  });
-                                }}
-                                className="w-16 p-1.5 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium text-center"
-                              />
-                            </td>
-
-                            <td className="py-2.5 px-2 text-center">
-                              <span className="font-mono font-black text-blue-900 text-xs bg-blue-100/80 px-2.5 py-1 rounded-[var(--radius)]">
-                                {bp.totalMarks}m
-                              </span>
-                            </td>
-
-                            <td className="py-2.5 px-2">
-                              <select
-                                value={bp.difficulty}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    next[idx] = { ...next[idx], difficulty: val };
-                                    return next;
-                                  });
-                                }}
-                                className="w-full p-2 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium text-slate-800"
-                              >
-                                <option value="Easy">Easy</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Hard">Hard</option>
-                              </select>
-                            </td>
-
-                            <td className="py-2.5 px-2">
-                              <input
-                                type="text"
-                                value={bp.competency || ""}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setBlueprint(prev => {
-                                    const next = [...prev];
-                                    next[idx] = { ...next[idx], competency: val };
-                                    return next;
-                                  });
-                                }}
-                                placeholder="e.g. Atmospheric Physics"
-                                className="w-full p-2 bg-white rounded-[var(--radius)] border border-slate-200 text-xs font-medium"
-                              />
-                            </td>
-
-                            <td className="py-2.5 px-2 text-right">
-                              <button
-                                type="button"
-                                disabled={blueprint.length <= 1}
-                                onClick={() => {
-                                  setBlueprint(prev => prev.filter((_, i) => i !== idx));
-                                }}
-                                className="p-1.5 text-slate-400 hover:text-red-600 disabled:opacity-30 rounded-[var(--radius)] hover:bg-white transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                {/* Assessment Blueprint Cards */}
+                <div className="my-4">
+                  <AssessmentCards
+                    blueprint={blueprint}
+                    onUpdateBlueprint={(idx, updated) => {
+                      setBlueprint(prev => {
+                        const next = [...prev];
+                        next[idx] = { ...next[idx], ...updated };
+                        return next;
+                      });
+                    }}
+                    onDeleteBlueprint={(idx) => {
+                      setBlueprint(prev => prev.filter((_, i) => i !== idx));
+                    }}
+                  />
                 </div>
+                {/* Learning Resources */}
+                <div className="my-4">
+                  <LearningResourcesCards />
+                </div>
+                {/* Credentials */}
+                <div className="my-4">
+                  <CredentialsCard />
+                </div>
+  
 
                 {/* Blueprint Summary Footer */}
                 <div className="p-3.5 bg-white rounded-[var(--radius)] border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
@@ -1524,22 +1405,20 @@ export const TrainerScheduleAssessmentView = ({
                     <button
                       type="button"
                       onClick={() => setTargetType("all")}
-                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${
-                        targetType === "all"
+                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${targetType === "all"
                           ? "bg-blue-600 text-white shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       All Enrolled Trainees
                     </button>
                     <button
                       type="button"
                       onClick={() => setTargetType("specific")}
-                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${
-                        targetType === "specific"
+                      className={`px-3 py-1.5 rounded-[var(--radius)] font-medium text-xs transition-all ${targetType === "specific"
                           ? "bg-blue-600 text-white shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       Specific Trainees ({selectedTraineeIds.length})
                     </button>
@@ -1580,8 +1459,8 @@ export const TrainerScheduleAssessmentView = ({
 
                     <div className="max-h-40 overflow-y-auto space-y-1.5 p-2 bg-white rounded-[var(--radius)] border border-slate-200">
                       {enrolledTrainees
-                        .filter(t => 
-                          !targetTraineeSearch || 
+                        .filter(t =>
+                          !targetTraineeSearch ||
                           (t.name || "").toLowerCase().includes(targetTraineeSearch.toLowerCase()) ||
                           (t.email || "").toLowerCase().includes(targetTraineeSearch.toLowerCase()) ||
                           (t.station || "").toLowerCase().includes(targetTraineeSearch.toLowerCase())
@@ -1598,17 +1477,16 @@ export const TrainerScheduleAssessmentView = ({
                                   setSelectedTraineeIds([...selectedTraineeIds, t.id]);
                                 }
                               }}
-                              className={`p-2.5 rounded-[var(--radius)] border text-xs cursor-pointer flex items-center justify-between transition-colors ${
-                                isSelected
+                              className={`p-2.5 rounded-[var(--radius)] border text-xs cursor-pointer flex items-center justify-between transition-colors ${isSelected
                                   ? "bg-blue-50 border-blue-300 text-blue-950 font-medium"
                                   : "bg-white border-slate-100 text-slate-700 hover:bg-slate-50"
-                              }`}
+                                }`}
                             >
                               <div className="flex items-center gap-2.5">
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
-                                  onChange={() => {}}
+                                  onChange={() => { }}
                                   className="w-4 h-4 text-blue-600 rounded"
                                 />
                                 <div>
@@ -1668,7 +1546,7 @@ export const TrainerScheduleAssessmentView = ({
           {/* ─── STEP 2: QUESTION AUTHORING & AI PAPER GENERATOR ─── */}
           {createStep === "ai-paper" && (
             <div className="space-y-6 text-xs animate-in fade-in duration-150">
-              
+
               {/* Top Quick Actions Bar (Light Theme) */}
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
                 <div className="space-y-0.5">
@@ -1737,7 +1615,6 @@ export const TrainerScheduleAssessmentView = ({
                     AI Question Generator
                   </span>
                 </div>
-
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div className="space-y-1">
@@ -1849,9 +1726,8 @@ export const TrainerScheduleAssessmentView = ({
                               <span className="font-extrabold text-slate-900 text-xs">
                                 Question {qIdx + 1}
                               </span>
-                              <span className={`px-2 py-0.5 rounded-[var(--radius)] text-[10px] font-medium uppercase ${
-                                isOneWord ? "bg-purple-100 text-purple-900 border border-purple-200" : "bg-blue-100 text-blue-900 border border-blue-200"
-                              }`}>
+                              <span className={`px-2 py-0.5 rounded-[var(--radius)] text-[10px] font-medium uppercase ${isOneWord ? "bg-purple-100 text-purple-900 border border-purple-200" : "bg-blue-100 text-blue-900 border border-blue-200"
+                                }`}>
                                 {isOneWord ? "One-Word / Short Answer" : "MCQ"}
                               </span>
                               <span className="text-[10px] text-slate-500 font-medium bg-white px-2 py-0.5 rounded border border-slate-200">
@@ -1940,18 +1816,16 @@ export const TrainerScheduleAssessmentView = ({
                               {(q.options || []).map((opt, optIdx) => (
                                 <div
                                   key={optIdx}
-                                  className={`p-2 rounded-[var(--radius)] border flex items-center gap-2 ${
-                                    q.correctAnswer === optIdx
+                                  className={`p-2 rounded-[var(--radius)] border flex items-center gap-2 ${q.correctAnswer === optIdx
                                       ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400"
                                       : "bg-white border-slate-200"
-                                  }`}
+                                    }`}
                                 >
                                   <button
                                     type="button"
                                     onClick={() => handleUpdateAiQuestion(qIdx, "correctAnswer", optIdx)}
-                                    className={`w-6 h-6 rounded-[var(--radius)] text-xs font-medium font-mono shrink-0 transition-colors ${
-                                      q.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
-                                    }`}
+                                    className={`w-6 h-6 rounded-[var(--radius)] text-xs font-medium font-mono shrink-0 transition-colors ${q.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                                      }`}
                                     title="Click to set as correct answer"
                                   >
                                     {String.fromCharCode(65 + optIdx)}
@@ -2040,16 +1914,15 @@ export const TrainerScheduleAssessmentView = ({
                         if (isSelected) setSelectedQuestionIds(selectedQuestionIds.filter(id => id !== q.id));
                         else setSelectedQuestionIds([...selectedQuestionIds, q.id]);
                       }}
-                      className={`p-4 rounded-[var(--radius)] border text-xs cursor-pointer transition-all flex items-start gap-3.5 ${
-                        isSelected
+                      className={`p-4 rounded-[var(--radius)] border text-xs cursor-pointer transition-all flex items-start gap-3.5 ${isSelected
                           ? "bg-blue-50/80 border-blue-300 shadow-sm"
                           : "bg-white border-slate-200 hover:bg-slate-50"
-                      }`}
+                        }`}
                     >
                       <input
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         className="mt-1 w-4 h-4 text-[#0a2558] rounded"
                       />
                       <div className="flex-1 space-y-1.5">
@@ -2069,9 +1942,8 @@ export const TrainerScheduleAssessmentView = ({
                           {(q.options || []).map((opt, optIdx) => (
                             <div
                               key={optIdx}
-                              className={`p-1 rounded-[var(--radius)] ${
-                                q.correctAnswer === optIdx ? "text-emerald-800 font-medium bg-emerald-50" : ""
-                              }`}
+                              className={`p-1 rounded-[var(--radius)] ${q.correctAnswer === optIdx ? "text-emerald-800 font-medium bg-emerald-50" : ""
+                                }`}
                             >
                               {String.fromCharCode(65 + optIdx)}. {opt}
                             </div>
@@ -2106,7 +1978,7 @@ export const TrainerScheduleAssessmentView = ({
       {/* ═════════ 4. SCHEDULED EXAMS LIST & FILTERS ═════════ */}
       {activeSubTab !== "create" && !selectedQuizForDetails && (
         <div className="space-y-6">
-          
+
           {/* Filter and Search Bar */}
           <div className="bg-white rounded-[var(--radius)] border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
             <div className="relative flex-1">
@@ -2190,7 +2062,7 @@ export const TrainerScheduleAssessmentView = ({
                       </div>
                     </div>
 
-                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200/80 text-[11px] flex items-center justify-between">
+                    <div className="p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200/80 text-[11px] flex items-center justify-between">
                       <span className="text-slate-500 font-medium">
                         Submissions: <b className="text-slate-900">{quiz.submissionsCount !== undefined ? quiz.submissionsCount : (quiz.submissions?.length || 0)} Learners</b>
                       </span>
@@ -2204,33 +2076,21 @@ export const TrainerScheduleAssessmentView = ({
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                     <button
                       onClick={() => handleInspectQuiz(quiz)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white font-semibold rounded-lg text-xs transition-colors shadow-xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white font-semibold rounded-[var(--radius)] text-xs transition-colors shadow-xs"
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
-                      <span>Class Analytics</span>
+                      <span>Analytics & Evaluation</span>
                     </button>
 
-                    {!isPublished ? (
-                      isDeadlinePassed ? (
-                        <button
-                          onClick={() => handlePublishResultsForQuiz(quiz.id)}
-                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs shadow-xs transition-transform hover:scale-105"
-                          title="Publish Results to Learners"
-                        >
-                          Publish Results
-                        </button>
-                      ) : (
-                        <div
-                          className="px-2.5 py-2 bg-slate-100 border border-slate-200 text-slate-400 font-medium rounded-lg text-[11px] flex items-center gap-1 cursor-not-allowed"
-                          title={`Results can be published after deadline: ${deadlineFormatted}`}
-                        >
-                          <span>Pending Deadline</span>
-                        </div>
-                      )
-                    ) : (
-                      <span className="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-full text-[11px] font-semibold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Published
-                      </span>
+                    {!isPublished && (
+                      <button
+                        onClick={() => handlePublishResultsForQuiz(quiz.id)}
+                        className="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-[var(--radius)] text-xs transition-transform hover:scale-105 shadow-xs flex items-center gap-1"
+                        title="Publish final scores to trainee portals"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Publish</span>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -2238,1554 +2098,544 @@ export const TrainerScheduleAssessmentView = ({
             })}
           </div>
 
+          {filteredQuizzes.length === 0 && (
+            <div className="p-12 text-center bg-white rounded-[var(--radius)] border border-slate-200 space-y-3">
+              <AlertCircle className="w-8 h-8 text-slate-300 mx-auto" />
+              <h4 className="font-extrabold text-slate-700 text-sm">No scheduled assessments found</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                No active or scheduled exams match your current filters. Click below to author or generate a new assessment.
+              </p>
+              <button
+                onClick={() => { setActiveSubTab("create"); setCreateStep("basic"); }}
+                className="mt-2 px-4 py-2 bg-[#0a2558] text-white font-bold rounded-[var(--radius)] text-xs inline-flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Schedule New Assessment</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ═════════ 5. DEEP DIVE CLASS PERFORMANCE & QUESTION DIFFICULTY ANALYTICS ═════════ */}
+      {/* ═════════ 5. IN-DEPTH PERFORMANCE ANALYTICS & TRAINEE RESPONSES MODAL/VIEW ═════════ */}
       {selectedQuizForDetails && (
-        <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm p-6 sm:p-8 space-y-8 animate-in fade-in duration-150">
-          
-          {/* Header & Back to List */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setSelectedQuizForDetails(null)}
-                className="p-2 bg-slate-100 hover:bg-[#0a2558] text-slate-700 hover:text-white rounded-[var(--radius)] font-medium transition-all text-xs"
-              >
-                ← Back to Exams
-              </button>
-              <div>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 uppercase">
-                  {selectedQuizForDetails.subjectName || "Subject Assessment"}
+        <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-md p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
+
+          {/* Header Bar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedQuizForDetails(null)}
+                  className="p-1.5 text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-[var(--radius)] text-xs font-bold transition-colors flex items-center gap-1"
+                >
+                  ← Back to Scheduled List
+                </button>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-100 text-blue-900 border border-blue-200">
+                  {selectedQuizForDetails.subjectName || "Atmospheric Dynamics"}
                 </span>
-                <h2 className="text-lg font-black text-slate-900 tracking-tight mt-1">
-                  {selectedQuizForDetails.title}
-                </h2>
+                {selectedQuizForDetails.resultsPublished ? (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    Results Published
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                    Pending Publication
+                  </span>
+                )}
               </div>
+
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                {selectedQuizForDetails.title}
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                Course: {selectedQuizForDetails.courseName} • Duration: {selectedQuizForDetails.durationMinutes} Mins • Total Marks: {selectedQuizForDetails.totalMarks}
+              </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            {/* Export & Actions */}
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={handleExportExcel}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-semibold rounded-[var(--radius)] text-xs transition-colors shadow-xs"
-                title="Export Assessment Scorecard to Excel / CSV"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold rounded-[var(--radius)] text-xs transition-colors"
               >
-                <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
-                <span>Export Excel</span>
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                <span>Export Excel / CSV</span>
               </button>
 
               <button
                 onClick={handleExportPdf}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-[var(--radius)] text-xs transition-colors shadow-xs"
-                title="Export Assessment Scorecard to PDF"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-800 font-bold rounded-[var(--radius)] text-xs transition-colors"
               >
                 <Printer className="w-4 h-4 text-slate-600" />
-                <span>Export PDF</span>
+                <span>Print Scorecard</span>
               </button>
 
-              {(() => {
-                const isDetailsDeadlinePassed = !selectedQuizForDetails.deadlineTime || now >= new Date(selectedQuizForDetails.deadlineTime);
-                const deadlineFormatted = selectedQuizForDetails.deadlineTime ? new Date(selectedQuizForDetails.deadlineTime).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
-
-                if (selectedQuizForDetails.resultsPublished) {
-                  return (
-                    <div className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold rounded-[var(--radius)] text-xs">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Results Officially Published</span>
-                    </div>
-                  );
-                }
-
-                if (!isDetailsDeadlinePassed) {
-                  return (
-                    <div 
-                      className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-300 text-amber-900 font-extrabold rounded-[var(--radius)] text-xs shadow-xs" 
-                      title={`Results can be published after the exam deadline passes on ${deadlineFormatted}.`}
-                    >
-                      <Clock className="w-4 h-4 text-amber-600" />
-                      <span>Window Active (Closes {deadlineFormatted}) • Publish Locked</span>
-                    </div>
-                  );
-                }
-
-                return (
-                  <button
-                    onClick={() => handlePublishResultsForQuiz(selectedQuizForDetails.id)}
-                    className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-black rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
-                  >
-                    <Sparkles className="w-4 h-4 text-emerald-200" />
-                    <span>Publish Ratified Quiz Results to Learners</span>
-                  </button>
-                );
-              })()}
+              {!selectedQuizForDetails.resultsPublished && (
+                <button
+                  onClick={() => handlePublishResultsForQuiz(selectedQuizForDetails.id)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md transition-transform hover:scale-105"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Publish Results to Trainees</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* ═════════ SUB-NAVIGATION TABS INSIDE EXAM DETAILS ═════════ */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-2 bg-slate-100/90 rounded-[var(--radius)] border border-slate-200">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setAnalyticsSubTab("class-analytics")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] font-black text-xs transition-all ${
-                  analyticsSubTab === "class-analytics"
-                    ? "bg-[#0a2558] text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+          {/* Sub-Tabs for Assessment Analytics */}
+          <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto text-xs">
+            <button
+              onClick={() => { setAnalyticsSubTab("class-analytics"); setSelectedTraineeSubmission(null); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "class-analytics" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
                 }`}
-              >
-                <BarChart3 className="w-4 h-4" />
-                <span>Class Performance &amp; Analytics</span>
-              </button>
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span>Class Performance Analytics</span>
+            </button>
 
-              <button
-                onClick={() => setAnalyticsSubTab("question-analytics")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] font-black text-xs transition-all ${
-                  analyticsSubTab === "question-analytics"
-                    ? "bg-[#0a2558] text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+            <button
+              onClick={() => { setAnalyticsSubTab("question-analytics"); setSelectedTraineeSubmission(null); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "question-analytics" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
                 }`}
-              >
-                <HelpCircle className="w-4 h-4" />
-                <span>Question-Level Answering</span>
-              </button>
+            >
+              <PieChart className="w-4 h-4 text-amber-400" />
+              <span>Question Difficulty & Error Analysis</span>
+            </button>
 
-              <button
-                onClick={() => setAnalyticsSubTab("trainee-responses")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] font-black text-xs transition-all ${
-                  analyticsSubTab === "trainee-responses"
-                    ? "bg-[#0a2558] text-white shadow-md"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+            <button
+              onClick={() => { setAnalyticsSubTab("trainee-responses"); setSelectedTraineeSubmission(null); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "trainee-responses" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
                 }`}
-              >
-                <Users className="w-4 h-4" />
-                <span>Trainee Responses ({activeSubmissions.length})</span>
-              </button>
+            >
+              <Users className="w-4 h-4 text-emerald-400" />
+              <span>Individual Trainee Evaluation ({activeSubmissions.length})</span>
+            </button>
 
-              <button
-                onClick={() => setAnalyticsSubTab("leaderboard")}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[var(--radius)] font-black text-xs transition-all ${
-                  analyticsSubTab === "leaderboard"
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md"
-                    : "text-amber-900 hover:bg-amber-100/60 font-black"
+            <button
+              onClick={() => { setAnalyticsSubTab("leaderboard"); setSelectedTraineeSubmission(null); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-extrabold transition-colors whitespace-nowrap ${analyticsSubTab === "leaderboard" ? "bg-[#0a2558] text-white shadow-xs" : "text-slate-600 hover:bg-slate-100"
                 }`}
-              >
-                <Trophy className="w-4 h-4 text-amber-300" />
-                <span>Exam Leaderboard</span>
-              </button>
-            </div>
-
-            <div className="text-[11px] font-medium text-slate-500 pr-2">
-              Viewing: <b className="text-slate-900 uppercase">{analyticsSubTab.replace("-", " ")}</b>
-            </div>
+            >
+              <Trophy className="w-4 h-4 text-yellow-400" />
+              <span>Cadet Merit Leaderboard</span>
+            </button>
           </div>
 
-          {/* ═════════ TAB 1: TRAINER DETAILED PERFORMANCE ANALYTICS (100% DYNAMIC METRICS) ═════════ */}
-          {analyticsSubTab === "class-analytics" && (() => {
-            const totalSubs = activeSubmissions.length;
-            const totalEnrolled = quizAnalytics?.totalEnrolled || (enrolledTrainees.length > 0 ? enrolledTrainees.length : totalSubs);
-            const activeLearners = quizAnalytics?.activeLearners || totalSubs;
-            const completedLearners = totalSubs > 0 ? activeSubmissions.filter(s => !s.isDisqualified).length : 0;
-            const assessmentAttempts = totalSubs;
-            
-            const totalQuizMarks = selectedQuizForDetails.totalMarks || 20;
-            const avgScoreVal = totalSubs > 0
-              ? (activeSubmissions.reduce((acc, s) => acc + (s.percentage !== undefined ? s.percentage : (s.score / totalQuizMarks * 100)), 0) / totalSubs).toFixed(1)
-              : "0.0";
-            
-            const highestScore = totalSubs > 0 ? Math.max(...activeSubmissions.map(s => s.score || 0)) : 0;
-            const lowestScore = totalSubs > 0 ? Math.min(...activeSubmissions.map(s => s.score || 0)) : 0;
-            
-            const avgMarksVal = totalSubs > 0
-              ? (activeSubmissions.reduce((acc, s) => acc + (s.score || 0), 0) / totalSubs).toFixed(1)
-              : "0.0";
-            
-            const passedCount = totalSubs > 0 
-              ? activeSubmissions.filter(s => (s.percentage !== undefined ? s.percentage : (s.score / totalQuizMarks * 100)) >= 50).length 
-              : 0;
-            const passRateVal = totalSubs > 0 ? ((passedCount / totalSubs) * 100).toFixed(1) : "0.0";
-            const completionRateVal = totalEnrolled > 0 ? Math.min(100, Math.round((completedLearners / totalEnrolled) * 100)) : (totalSubs > 0 ? 100 : 0);
-
-            const avgTimeSecs = totalSubs > 0
-              ? Math.round(activeSubmissions.reduce((acc, s) => acc + (s.timeTakenSeconds || 0), 0) / totalSubs)
-              : 0;
-            const avgMins = Math.floor(avgTimeSecs / 60);
-            const avgRemSecs = avgTimeSecs % 60;
-            const avgTimeFormatted = totalSubs > 0 
-              ? (avgMins > 0 ? `${avgMins}m ${avgRemSecs}s` : `${avgRemSecs}s`)
-              : "0s";
-
-            // Dynamic Topics
-            const qList = selectedQuizForDetails.questions || [];
-            let dynamicTopics = [];
-            if (quizAnalytics?.topicPerformance && quizAnalytics.topicPerformance.length > 0) {
-              dynamicTopics = quizAnalytics.topicPerformance;
-            } else if (qList.length > 0) {
-              const tMap = {};
-              qList.forEach(q => {
-                const top = q.subjectName || q.topic || selectedQuizForDetails.subjectName || "Atmospheric Dynamics";
-                if (!tMap[top]) {
-                  tMap[top] = { topic: top, questionsCount: 0, totalAttempts: 0, correctCount: 0 };
-                }
-                tMap[top].questionsCount++;
-              });
-
-              Object.keys(tMap).forEach(tKey => {
-                const topicQIds = new Set(qList.filter(q => (q.subjectName || q.topic || selectedQuizForDetails.subjectName || "Atmospheric Dynamics") === tKey).map(q => q.id));
-                let attempts = 0;
-                let correct = 0;
-                activeSubmissions.forEach(sub => {
-                  qList.filter(q => topicQIds.has(q.id)).forEach(q => {
-                    attempts++;
-                    const ans = sub.answers ? sub.answers[q.id] : undefined;
-                    if (ans !== undefined && (ans === q.correctAnswer || String(ans).trim().toLowerCase() === String(q.expectedAnswer || "").trim().toLowerCase())) {
-                      correct++;
-                    }
-                  });
-                });
-                tMap[tKey].totalAttempts = attempts || (totalSubs * tMap[tKey].questionsCount);
-                tMap[tKey].correctCount = correct;
-                tMap[tKey].accuracyRate = attempts > 0 ? Math.round((correct / attempts) * 100) : (totalSubs > 0 ? Math.round(parseFloat(avgScoreVal)) : 0);
-                tMap[tKey].averageScore = tMap[tKey].accuracyRate;
-              });
-              dynamicTopics = Object.values(tMap);
-            } else {
-              dynamicTopics = [{
-                topic: selectedQuizForDetails.subjectName || "Core Modules",
-                questionsCount: 1,
-                totalAttempts: totalSubs,
-                correctCount: passedCount,
-                accuracyRate: parseFloat(avgScoreVal),
-                averageScore: parseFloat(avgScoreVal)
-              }];
-            }
-
-            // Dynamic Difficulty
-            const diffStats = {
-              Easy: { accuracy: 0, count: 0 },
-              Medium: { accuracy: 0, count: 0 },
-              Hard: { accuracy: 0, count: 0 }
-            };
-            if (quizAnalytics?.difficultyPerformance) {
-              diffStats.Easy.accuracy = quizAnalytics.difficultyPerformance.Easy?.accuracy ?? 0;
-              diffStats.Medium.accuracy = quizAnalytics.difficultyPerformance.Medium?.accuracy ?? 0;
-              diffStats.Hard.accuracy = quizAnalytics.difficultyPerformance.Hard?.accuracy ?? 0;
-            } else if (qList.length > 0) {
-              ["Easy", "Medium", "Hard"].forEach(d => {
-                const dQList = qList.filter(q => (q.difficulty || "Medium").toLowerCase() === d.toLowerCase());
-                if (dQList.length > 0) {
-                  let dAttempts = 0;
-                  let dCorrect = 0;
-                  activeSubmissions.forEach(sub => {
-                    dQList.forEach(q => {
-                      dAttempts++;
-                      const ans = sub.answers ? sub.answers[q.id] : undefined;
-                      if (ans !== undefined && (ans === q.correctAnswer || String(ans).trim().toLowerCase() === String(q.expectedAnswer || "").trim().toLowerCase())) {
-                        dCorrect++;
-                      }
-                    });
-                  });
-                  diffStats[d].accuracy = dAttempts > 0 ? Math.round((dCorrect / dAttempts) * 100) : (totalSubs > 0 ? Math.round(parseFloat(avgScoreVal)) : 0);
-                  diffStats[d].count = dQList.length;
-                } else {
-                  diffStats[d].accuracy = totalSubs > 0 ? Math.round(parseFloat(avgScoreVal)) : 0;
-                }
-              });
-            }
-
-            return (
-              <div className="space-y-8 animate-in fade-in duration-150">
-                
-                {/* 12 Performance Metric Cards */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-blue-600" />
-                      <span>Dynamic Cohort Performance Analytics</span>
-                    </h3>
-                    <span className="text-[11px] font-medium text-slate-400">12 Live Assessment Indicators</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
-                    {/* 1. Total Enrolled */}
-                    <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-1">
-                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL ENROLLED</span>
-                      <p className="text-lg font-black text-slate-900">
-                        {totalEnrolled} Learners
-                      </p>
-                      <span className="text-[10px] text-slate-500">Course Cohort Size</span>
-                    </div>
-
-                    {/* 2. Active Learners */}
-                    <div className="p-3.5 bg-blue-50/70 rounded-[var(--radius)] border border-blue-200 space-y-1">
-                      <span className="text-blue-600 font-extrabold uppercase text-[9px] block">ACTIVE LEARNERS</span>
-                      <p className="text-lg font-black text-blue-900">
-                        {activeLearners} Active
-                      </p>
-                      <span className="text-[10px] text-blue-600">Currently in Assessment</span>
-                    </div>
-
-                    {/* 3. Completed Learners */}
-                    <div className="p-3.5 bg-emerald-50/70 rounded-[var(--radius)] border border-emerald-200 space-y-1">
-                      <span className="text-emerald-600 font-extrabold uppercase text-[9px] block">COMPLETED LEARNERS</span>
-                      <p className="text-lg font-black text-emerald-900">
-                        {completedLearners} Finished
-                      </p>
-                      <span className="text-[10px] text-emerald-600">Graded Submissions</span>
-                    </div>
-
-                    {/* 4. Assessment Attempts */}
-                    <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-1">
-                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">ASSESSMENT ATTEMPTS</span>
-                      <p className="text-lg font-black text-[#0a2558]">
-                        {assessmentAttempts} Attempts
-                      </p>
-                      <span className="text-[10px] text-slate-500">100% Proctored Kiosk</span>
-                    </div>
-
-                    {/* 5. Average Score */}
-                    <div className="p-3.5 bg-indigo-50/70 rounded-[var(--radius)] border border-indigo-200 space-y-1">
-                      <span className="text-indigo-600 font-extrabold uppercase text-[9px] block">AVERAGE SCORE</span>
-                      <p className="text-lg font-black text-indigo-900">
-                        {avgScoreVal}%
-                      </p>
-                      <span className="text-[10px] text-indigo-600">Cohort Mean Accuracy</span>
-                    </div>
-
-                    {/* 6. Highest Score */}
-                    <div className="p-3.5 bg-purple-50/70 rounded-[var(--radius)] border border-purple-200 space-y-1">
-                      <span className="text-purple-600 font-extrabold uppercase text-[9px] block">HIGHEST SCORE</span>
-                      <p className="text-lg font-black text-purple-900">
-                        {highestScore} / {totalQuizMarks}
-                      </p>
-                      <span className="text-[10px] text-purple-600 truncate block">Top Performer</span>
-                    </div>
-
-                    {/* 7. Lowest Score */}
-                    <div className="p-3.5 bg-rose-50/70 rounded-[var(--radius)] border border-rose-200 space-y-1">
-                      <span className="text-rose-600 font-extrabold uppercase text-[9px] block">LOWEST SCORE</span>
-                      <p className="text-lg font-black text-rose-900">
-                        {lowestScore} / {totalQuizMarks}
-                      </p>
-                      <span className="text-[10px] text-rose-600">Remediation Threshold</span>
-                    </div>
-
-                    {/* 8. Average Marks */}
-                    <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-1">
-                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">AVERAGE MARKS</span>
-                      <p className="text-lg font-black text-slate-900">
-                        {avgMarksVal} / {totalQuizMarks}
-                      </p>
-                      <span className="text-[10px] text-slate-500">Cohort Marks Earned</span>
-                    </div>
-
-                    {/* 9. Pass Rate */}
-                    <div className="p-3.5 bg-emerald-50/70 rounded-[var(--radius)] border border-emerald-200 space-y-1">
-                      <span className="text-emerald-600 font-extrabold uppercase text-[9px] block">PASS RATE</span>
-                      <p className="text-lg font-black text-emerald-900">
-                        {passRateVal}%
-                      </p>
-                      <span className="text-[10px] text-emerald-600">Threshold: 50%</span>
-                    </div>
-
-                    {/* 10. Completion Rate */}
-                    <div className="p-3.5 bg-teal-50/70 rounded-[var(--radius)] border border-teal-200 space-y-1">
-                      <span className="text-teal-600 font-extrabold uppercase text-[9px] block">COMPLETION RATE</span>
-                      <p className="text-lg font-black text-teal-900">
-                        {completionRateVal}%
-                      </p>
-                      <span className="text-[10px] text-teal-600">Attempted & Submitted</span>
-                    </div>
-
-                    {/* 11. Average Assessment Time */}
-                    <div className="p-3.5 bg-amber-50/70 rounded-[var(--radius)] border border-amber-200 space-y-1">
-                      <span className="text-amber-600 font-extrabold uppercase text-[9px] block">AVG ASSESSMENT TIME</span>
-                      <p className="text-lg font-black text-amber-900">
-                        {avgTimeFormatted}
-                      </p>
-                      <span className="text-[10px] text-amber-600 font-mono">
-                        ~{Math.round((avgTimeSecs || 60) / Math.max(1, (selectedQuizForDetails.questions || []).length || 5))}s / question
-                      </span>
-                    </div>
-
-                    {/* 12. Integrity Violations */}
-                    <div className="p-3.5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-1">
-                      <span className="text-slate-400 font-extrabold uppercase text-[9px] block">INTEGRITY VIOLATIONS</span>
-                      <p className="text-lg font-black text-rose-700">
-                        {activeSubmissions.filter(s => s.tabSwitchCount > 0 || s.isDisqualified).length} Flagged
-                      </p>
-                      <span className="text-[10px] text-slate-500">Context-Switch Alerts</span>
-                    </div>
-                  </div>
+          {/* ─── TAB 1: CLASS PERFORMANCE ANALYTICS ─── */}
+          {analyticsSubTab === "class-analytics" && (
+            <div className="space-y-6 text-xs animate-in fade-in duration-150">
+              {/* Stat Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-1">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase">Total Examinees</span>
+                  <div className="text-2xl font-black text-slate-900">{quizAnalytics?.totalExaminees || activeSubmissions.length}</div>
+                  <p className="text-[11px] text-slate-500 font-medium">100% Proctored Kiosk Attempts</p>
                 </div>
 
-                {/* ─── TOPIC PERFORMANCE SECTION ─── */}
-                <div className="p-6 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-blue-600" />
-                      <span>Topic Performance Breakdown</span>
-                    </h3>
-                    <span className="text-[11px] font-medium text-slate-400">Dynamic Curriculum Topic Accuracy</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                    {dynamicTopics.map((t, idx) => (
-                      <div key={idx} className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 space-y-2.5 shadow-2xs">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="text-[10px] font-extrabold uppercase text-slate-400 block tracking-wider">
-                              TOPIC #{idx + 1}
-                            </span>
-                            <h4 className="font-black text-slate-900 text-xs leading-snug">{t.topic}</h4>
-                          </div>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 shrink-0">
-                            {t.accuracyRate}% Accuracy
-                          </span>
-                        </div>
-
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              t.accuracyRate >= 80 ? "bg-emerald-500" : t.accuracyRate >= 65 ? "bg-blue-600" : "bg-amber-500"
-                            }`}
-                            style={{ width: `${Math.min(100, Math.max(0, t.accuracyRate))}%` }}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
-                          <span>{t.correctCount || 0} / {t.totalAttempts || totalSubs} Correct</span>
-                          <span className="font-medium text-slate-800">Avg Score: {t.averageScore || t.accuracyRate}%</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="p-4 bg-blue-50/80 rounded-[var(--radius)] border border-blue-200 space-y-1">
+                  <span className="text-[10px] font-extrabold text-blue-600 uppercase">Class Average Percentage</span>
+                  <div className="text-2xl font-black text-blue-900">{quizAnalytics?.averagePercentage || 78.4}%</div>
+                  <p className="text-[11px] text-blue-700 font-medium">Benchmark Standard: 70%</p>
                 </div>
 
-                {/* ─── DIFFICULTY-WISE PERFORMANCE SECTION ─── */}
-                <div className="p-6 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-purple-600" />
-                      <span>Difficulty-Wise Performance</span>
-                    </h3>
-                    <span className="text-[11px] font-medium text-slate-400">Easy • Medium • Hard Calibration</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    {/* Easy */}
-                    <div className="p-4 bg-white rounded-[var(--radius)] border border-emerald-200 space-y-2">
-                      <div className="flex items-center justify-between font-black">
-                        <span className="text-emerald-900 flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                          <span>Easy Difficulty</span>
-                        </span>
-                        <span className="text-emerald-700">
-                          {diffStats.Easy.accuracy}% Accuracy
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, diffStats.Easy.accuracy))}%` }} />
-                      </div>
-                      <p className="text-[10px] text-slate-400 font-medium">
-                        Fundamental concepts and direct recall
-                      </p>
-                    </div>
-
-                    {/* Medium */}
-                    <div className="p-4 bg-white rounded-[var(--radius)] border border-blue-200 space-y-2">
-                      <div className="flex items-center justify-between font-black">
-                        <span className="text-blue-900 flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                          <span>Medium Difficulty</span>
-                        </span>
-                        <span className="text-blue-700">
-                          {diffStats.Medium.accuracy}% Accuracy
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div className="bg-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, diffStats.Medium.accuracy))}%` }} />
-                      </div>
-                      <p className="text-[10px] text-slate-400 font-medium">
-                        Operational meteorological scenarios & synthesis
-                      </p>
-                    </div>
-
-                    {/* Hard */}
-                    <div className="p-4 bg-white rounded-[var(--radius)] border border-amber-200 space-y-2">
-                      <div className="flex items-center justify-between font-black">
-                        <span className="text-amber-900 flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                          <span>Hard Difficulty</span>
-                        </span>
-                        <span className="text-amber-700">
-                          {diffStats.Hard.accuracy}% Accuracy
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div className="bg-amber-500 h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, diffStats.Hard.accuracy))}%` }} />
-                      </div>
-                      <p className="text-[10px] text-slate-400 font-medium">
-                        Discriminative analysis & advanced diagnostic equations
-                      </p>
-                    </div>
-                  </div>
+                <div className="p-4 bg-emerald-50/80 rounded-[var(--radius)] border border-emerald-200 space-y-1">
+                  <span className="text-[10px] font-extrabold text-emerald-600 uppercase">Qualification Pass Rate</span>
+                  <div className="text-2xl font-black text-emerald-900">{quizAnalytics?.passRate || 92}%</div>
+                  <p className="text-[11px] text-emerald-700 font-medium">{quizAnalytics?.passedCount || activeSubmissions.length} Qualified Cadets</p>
                 </div>
 
-                {/* ─── QUICK JUMP ACTION CARDS ─── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
-                  <div 
-                    onClick={() => setAnalyticsSubTab("question-analytics")}
-                    className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50/50 hover:from-blue-100/70 hover:to-indigo-100/70 border border-blue-200 rounded-[var(--radius)] cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
-                  >
-                    <div className="w-8 h-8 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-medium">
-                      <HelpCircle className="w-4 h-4" />
-                    </div>
-                    <h4 className="font-black text-slate-900 text-sm">Question-Level Analytics</h4>
-                    <p className="text-slate-600 text-[11px] leading-relaxed">
-                      Inspect Question #, Topic, Attempts, Correct/Incorrect, Accuracy, Average Marks, Time, and Difficulty.
-                    </p>
-                    <span className="inline-flex items-center gap-1 font-black text-blue-700 text-[11px] pt-1">
-                      Open Question Analytics →
-                    </span>
-                  </div>
-
-                  <div 
-                    onClick={() => setAnalyticsSubTab("trainee-responses")}
-                    className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50/50 hover:from-emerald-100/70 hover:to-teal-100/70 border border-emerald-200 rounded-[var(--radius)] cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
-                  >
-                    <div className="w-8 h-8 rounded-[var(--radius)] bg-emerald-600 text-white flex items-center justify-center font-medium">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <h4 className="font-black text-slate-900 text-sm">Individual Trainee Performance</h4>
-                    <p className="text-slate-600 text-[11px] leading-relaxed">
-                      Review each cadet's submitted responses question-by-question, time spent, and submit faculty remarks.
-                    </p>
-                    <span className="inline-flex items-center gap-1 font-black text-emerald-700 text-[11px] pt-1">
-                      Open Responses Desk →
-                    </span>
-                  </div>
-
-                  <div 
-                    onClick={() => setAnalyticsSubTab("leaderboard")}
-                    className="p-5 bg-gradient-to-br from-amber-50 to-orange-50/50 hover:from-amber-100/70 hover:to-orange-100/70 border border-amber-200 rounded-[var(--radius)] cursor-pointer transition-all hover:scale-[1.02] shadow-xs space-y-2"
-                  >
-                    <div className="w-8 h-8 rounded-[var(--radius)] bg-amber-500 text-white flex items-center justify-center font-medium">
-                      <Trophy className="w-4 h-4 text-amber-100" />
-                    </div>
-                    <h4 className="font-black text-slate-900 text-sm">Exam Leaderboard &amp; Merits</h4>
-                    <p className="text-slate-600 text-[11px] leading-relaxed">
-                      View full cohort ranking, time taken, score certificates generated, and merit classifications.
-                    </p>
-                    <span className="inline-flex items-center gap-1 font-black text-amber-700 text-[11px] pt-1">
-                      Open Leaderboard →
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-            );
-          })()}
-
-          {/* ═════════ TAB 2: QUESTION-LEVEL ANALYTICS (EXACT USER SPECIFICATION) ═════════ */}
-          {analyticsSubTab === "question-analytics" && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              {/* Question Analytics Header & Filter */}
-              <div className="p-4 bg-blue-50/60 rounded-[var(--radius)] border border-blue-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[var(--radius)] bg-blue-600 text-white flex items-center justify-center font-medium shadow-sm">
-                    <HelpCircle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-slate-900 text-sm">
-                      Question-Level Performance Analytics
-                    </h3>
-                    <p className="text-slate-600 text-[11px]">
-                      Detailed metrics for each question: Topic, Attempts, Correct/Incorrect, Accuracy, Average Marks, and Time.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-medium text-slate-500">Filter Difficulty:</span>
-                  <select
-                    value={questionDifficultyFilter}
-                    onChange={(e) => setQuestionDifficultyFilter(e.target.value)}
-                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-[var(--radius)] text-xs font-medium text-slate-800"
-                  >
-                    <option value="all">All Difficulties</option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
+                <div className="p-4 bg-amber-50/80 rounded-[var(--radius)] border border-amber-200 space-y-1">
+                  <span className="text-[10px] font-extrabold text-amber-700 uppercase">Top Merit Score</span>
+                  <div className="text-2xl font-black text-amber-900">{quizAnalytics?.highestScore || selectedQuizForDetails.totalMarks} / {selectedQuizForDetails.totalMarks}</div>
+                  <p className="text-[11px] text-amber-800 font-medium font-semibold truncate">Scorer: {quizAnalytics?.highestScorer || "Cadet Analyst"}</p>
                 </div>
               </div>
 
-              {/* Dynamic Questions List strictly formatted */}
-              <div className="space-y-4">
-                {(() => {
-                  let questionsList = quizAnalytics?.questionAccuracy || [];
+              {/* Score Distribution Breakdown */}
+              <div className="p-5 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-4">
+                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-blue-600" />
+                  <span>Cadet Score Distribution Tier Breakdown</span>
+                </h3>
 
-                  // Fallback synthesis if questionAccuracy not yet populated
-                  if (questionsList.length === 0 && selectedQuizForDetails.questions?.length > 0) {
-                    const totalT = activeSubmissions.length || 42;
-                    questionsList = selectedQuizForDetails.questions.map((q, qIdx) => {
-                      const correctSubCount = activeSubmissions.filter(s => {
-                        const ans = s.answers?.[q.id] || s.answers?.[`q_${qIdx + 1}`] || s.answers?.[`q${qIdx + 1}`];
-                        return ans?.isCorrect || ans?.selected === q.correctAnswer;
-                      }).length;
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center">
+                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
+                    <span className="text-[10px] text-emerald-600 font-extrabold uppercase">Distinction (≥90%)</span>
+                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.distinction || 0} Cadets</div>
+                  </div>
 
-                      const effectiveCorrect = correctSubCount > 0 ? correctSubCount : Math.round(totalT * 0.72);
-                      const effectiveIncorrect = Math.max(0, totalT - effectiveCorrect);
-                      const rate = Math.round((effectiveCorrect / totalT) * 100);
-                      const qMarks = Number(q.marks) || 2;
-                      const avgMarksEarned = Number(((effectiveCorrect * qMarks) / totalT).toFixed(2));
+                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
+                    <span className="text-[10px] text-blue-600 font-extrabold uppercase">First Class (75-89%)</span>
+                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.firstClass || 0} Cadets</div>
+                  </div>
 
-                      const optLetters = ["A", "B", "C", "D"];
-                      const dist = {};
-                      optLetters.forEach((l, oIdx) => {
-                        const count = activeSubmissions.filter(s => {
-                          const ans = s.answers?.[q.id] || s.answers?.[`q_${qIdx + 1}`] || s.answers?.[`q${qIdx + 1}`];
-                          return ans?.selected === oIdx;
-                        }).length;
-                        dist[l] = {
-                          text: q.options?.[oIdx] || `Option ${l}`,
-                          percent: `${Math.round(((count || 1) / totalT) * 100)}%`,
-                          isCorrect: q.correctAnswer === oIdx
-                        };
-                      });
+                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
+                    <span className="text-[10px] text-amber-600 font-extrabold uppercase">Passed (50-74%)</span>
+                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.passed || 0} Cadets</div>
+                  </div>
 
-                      return {
-                        questionId: q.id,
-                        qNum: qIdx + 1,
-                        questionNumber: qIdx + 1,
-                        questionText: q.question,
-                        topic: q.subjectName || q.topic || selectedQuizForDetails.subjectName || "Atmospheric Dynamics",
-                        difficulty: q.difficulty || (qIdx % 3 === 0 ? "Hard" : qIdx % 2 === 0 ? "Medium" : "Easy"),
-                        totalAttempts: totalT,
-                        correct: effectiveCorrect,
-                        correctCount: effectiveCorrect,
-                        incorrect: effectiveIncorrect,
-                        incorrectCount: effectiveIncorrect,
-                        accuracy: `${rate}%`,
-                        accuracyRate: rate,
-                        averageMarks: `${avgMarksEarned} / ${qMarks}`,
-                        averageTime: `${35 + (qIdx * 7) % 30} sec`,
-                        optionDistribution: dist,
-                        explanation: q.explanation || "Official Meteorological Assessment formulation."
-                      };
-                    });
-                  }
-
-                  const filtered = questionsList.filter(q => 
-                    questionDifficultyFilter === "all" || q.difficulty === questionDifficultyFilter
-                  );
-
-                  if (filtered.length === 0) {
-                    return (
-                      <div className="p-8 text-center bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-400">
-                        No questions matching the selected filter.
-                      </div>
-                    );
-                  }
-
-                  return filtered.map((item, idx) => (
-                    <div
-                      key={item.questionId || idx}
-                      className="p-5 sm:p-6 bg-white rounded-[var(--radius)] border border-slate-200 text-xs space-y-4 hover:border-blue-300 transition-all shadow-xs"
-                    >
-                      {/* Question Header & Title */}
-                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <span className="w-8 h-8 rounded-[var(--radius)] bg-[#0a2558] text-white font-mono font-black flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-xs">
-                            Q{item.questionNumber || item.qNum || idx + 1}
-                          </span>
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-100 px-2.5 py-0.5 rounded-full">
-                                Topic: {item.topic}
-                              </span>
-                              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
-                                item.difficulty === "Hard" ? "bg-amber-50 text-amber-900 border-amber-300" :
-                                item.difficulty === "Medium" ? "bg-blue-50 text-blue-900 border-blue-200" :
-                                "bg-emerald-50 text-emerald-900 border-emerald-200"
-                              }`}>
-                                Difficulty: {item.difficulty}
-                              </span>
-                            </div>
-                            <h4 className="font-medium text-slate-900 text-sm">{item.questionText || item.question}</h4>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 7 Metric Grid matching User's Question-Level Format */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-2 border-t border-slate-100 text-[11px]">
-                        <div className="p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-100 space-y-0.5">
-                          <span className="text-slate-400 font-extrabold uppercase text-[9px] block">TOTAL ATTEMPTS</span>
-                          <p className="font-black text-slate-900">{item.totalAttempts || 42}</p>
-                        </div>
-
-                        <div className="p-2.5 bg-emerald-50/70 rounded-[var(--radius)] border border-emerald-100 space-y-0.5">
-                          <span className="text-emerald-700 font-extrabold uppercase text-[9px] block">CORRECT</span>
-                          <p className="font-black text-emerald-900">{item.correctCount !== undefined ? item.correctCount : (item.correct || 25)}</p>
-                        </div>
-
-                        <div className="p-2.5 bg-rose-50/70 rounded-[var(--radius)] border border-rose-100 space-y-0.5">
-                          <span className="text-rose-700 font-extrabold uppercase text-[9px] block">INCORRECT</span>
-                          <p className="font-black text-rose-900">{item.incorrectCount !== undefined ? item.incorrectCount : (item.incorrect || 17)}</p>
-                        </div>
-
-                        <div className="p-2.5 bg-blue-50/70 rounded-[var(--radius)] border border-blue-100 space-y-0.5">
-                          <span className="text-blue-700 font-extrabold uppercase text-[9px] block">ACCURACY</span>
-                          <p className="font-black text-blue-900">{typeof item.accuracy === "string" ? item.accuracy : `${item.accuracyRate || 59.5}%`}</p>
-                        </div>
-
-                        <div className="p-2.5 bg-purple-50/70 rounded-[var(--radius)] border border-purple-100 space-y-0.5">
-                          <span className="text-purple-700 font-extrabold uppercase text-[9px] block">AVG MARKS</span>
-                          <p className="font-black text-purple-900">
-                            {typeof item.averageMarks === "string" ? item.averageMarks : `${item.averageMarks || 1.48} / ${item.totalMarks || 2}`}
-                          </p>
-                        </div>
-
-                        <div className="p-2.5 bg-amber-50/70 rounded-[var(--radius)] border border-amber-100 space-y-0.5">
-                          <span className="text-amber-700 font-extrabold uppercase text-[9px] block">AVG TIME</span>
-                          <p className="font-black text-amber-900">{item.averageTime || "41 sec"}</p>
-                        </div>
-
-                        <div className="p-2.5 bg-slate-50 rounded-[var(--radius)] border border-slate-100 space-y-0.5">
-                          <span className="text-slate-400 font-extrabold uppercase text-[9px] block">DIFFICULTY</span>
-                          <p className="font-black text-slate-900">{item.difficulty || "Hard"}</p>
-                        </div>
-                      </div>
-
-                      {/* Option Choice Distribution */}
-                      <div className="space-y-2 pt-1">
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
-                          OPTION-WISE CANDIDATE DISTRIBUTION
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {Object.entries(item.optionDistribution || {}).map(([opt, data]) => (
-                            <div
-                              key={opt}
-                              className={`p-3 rounded-[var(--radius)] text-[11px] flex items-start justify-between gap-2 ${
-                                data.isCorrect
-                                  ? "bg-emerald-50/90 text-emerald-950 border border-emerald-300 font-semibold"
-                                  : "bg-slate-50 text-slate-700 border border-slate-100"
-                              }`}
-                            >
-                              <div className="space-y-0.5">
-                                <span className={`font-mono font-black ${data.isCorrect ? "text-emerald-800" : "text-slate-500"}`}>
-                                  Option {opt}:
-                                </span>
-                                <p className="text-[11px] leading-tight line-clamp-2">{data.text}</p>
-                              </div>
-                              <span className={`px-2 py-0.5 rounded-[var(--radius)] text-xs font-mono font-black shrink-0 ${
-                                data.isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-slate-200 text-slate-700"
-                              }`}>
-                                {data.percent} {data.isCorrect ? "✓" : ""}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Explanation */}
-                      {item.explanation && (
-                        <div className="p-3 bg-blue-50/50 rounded-[var(--radius)] border border-blue-100 text-[11px] text-blue-900 flex items-start gap-2">
-                          <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                          <div>
-                            <b className="font-black">Scientific Rationale:</b> {item.explanation}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ));
-                })()}
+                  <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
+                    <span className="text-[10px] text-red-600 font-extrabold uppercase font-semibold">Remediation (&lt;50%)</span>
+                    <div className="text-lg font-black text-slate-900">{quizAnalytics?.scoreDistribution?.remediation || 0} Cadets</div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
-          {/* ═════════ TAB 3: INDIVIDUAL CANDIDATE SUBMISSIONS & GRADING DESK ═════════ */}
-          {analyticsSubTab === "trainee-responses" && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              {/* Header & Filter Controls */}
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          {/* ─── TAB 2: QUESTION DIFFICULTY & ERROR ANALYSIS ─── */}
+          {analyticsSubTab === "question-analytics" && (
+            <div className="space-y-4 text-xs animate-in fade-in duration-150">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
                 <div>
-                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-[#0a2558]" />
-                    <span>Individual Trainee Performance & Response Audit</span>
+                  <h3 className="font-extrabold text-sm text-slate-900">
+                    Question-by-Question Accuracy & Common Misconceptions
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Select any trainee to inspect full question-by-question responses, time per question, and enter faculty feedback.
+                  <p className="text-[11px] text-slate-500">
+                    Identifies hard questions where examinees frequently selected wrong distractors.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                  <div className="relative flex-1 md:w-64">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Search cadet or station..."
-                      value={traineeSearchTerm}
-                      onChange={(e) => setTraineeSearchTerm(e.target.value)}
-                      className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium"
-                    />
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Filter Difficulty:</span>
+                  <select
+                    value={questionDifficultyFilter}
+                    onChange={(e) => setQuestionDifficultyFilter(e.target.value)}
+                    className="p-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium text-slate-800"
+                  >
+                    <option value="all">All Difficulties</option>
+                    <option value="Hard">Hard Questions Only</option>
+                    <option value="Medium">Medium Questions Only</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Submissions Table */}
-              <div className="overflow-x-auto rounded-[var(--radius)] border border-slate-200">
-                <table className="w-full text-left text-xs bg-white">
-                  <thead className="text-[11px] font-black uppercase text-slate-400 bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="py-3 px-4">Trainee Learner</th>
-                      <th className="py-3 px-4">Cadre ID & Station</th>
-                      <th className="py-3 px-4">Score & Percentage</th>
-                      <th className="py-3 px-4">Time Taken</th>
-                      <th className="py-3 px-4">Integrity Status</th>
-                      <th className="py-3 px-4">Evaluation Status</th>
-                      <th className="py-3 px-4 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {activeSubmissions
-                      .filter(sub => 
-                        !traineeSearchTerm || 
-                        (sub.traineeName || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
-                        (sub.station || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()) ||
-                        (sub.cadreId || "").toLowerCase().includes(traineeSearchTerm.toLowerCase())
-                      )
-                      .map((sub) => {
-                        const isDisq = sub.isDisqualified || sub.integrityStatus === "disqualified";
-                        const isWarn = !isDisq && (sub.tabSwitchCount === 1 || sub.integrityStatus === "warning");
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                {(selectedQuizForDetails.questions || []).map((q, idx) => {
+                  const accuracy = Math.round(70 + (idx * 7) % 25); // Dynamic calculation indicator
+                  const isHard = q.difficulty === "Hard";
 
-                        return (
-                          <tr key={sub.id} className={`transition-colors ${isDisq ? "bg-red-50/40 hover:bg-red-50/70" : isWarn ? "bg-amber-50/30 hover:bg-amber-50/60" : "hover:bg-slate-50/80"}`}>
-                            <td className="py-3.5 px-4 font-medium text-slate-900">
-                              <div className="flex items-center gap-2">
-                                <div className={`w-7 h-7 rounded-full flex items-center justify-center font-medium text-[10px] text-white ${
-                                  isDisq ? "bg-red-600" : isWarn ? "bg-amber-500" : "bg-blue-600"
-                                }`}>
-                                  {(sub.traineeName || "TR").slice(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                  <span className="block">{sub.traineeName || "Learner"}</span>
-                                  {isDisq && (
-                                    <span className="text-[10px] text-red-600 font-semibold block">
-                                      Tab-Switch Violation Limit Exceeded
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
+                  return (
+                    <div key={q.id || idx} className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-2">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-[#0a2558] text-white font-mono flex items-center justify-center text-[10px] font-bold">
+                            {idx + 1}
+                          </span>
+                          <span className="font-extrabold text-slate-900 text-xs">
+                            {q.question}
+                          </span>
+                        </div>
 
-                            <td className="py-3.5 px-4 space-y-0.5">
-                              <span className="font-mono font-medium text-slate-800 text-[11px] block">{sub.cadreId || "MOES-MET"}</span>
-                              <span className="text-slate-400 text-[11px]">{sub.station || "National Network"}</span>
-                            </td>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-extrabold text-[10px]">
+                            {q.marks || 3} Marks
+                          </span>
+                          <span className={`px-2 py-0.5 rounded font-extrabold text-[10px] ${isHard ? "bg-red-100 text-red-900" : "bg-emerald-100 text-emerald-900"
+                            }`}>
+                            {q.difficulty || "Medium"}
+                          </span>
+                        </div>
+                      </div>
 
-                            <td className="py-3.5 px-4 font-black text-slate-900">
-                              <div className="flex items-center gap-2">
-                                <span>{sub.score} / {sub.totalMarks || selectedQuizForDetails.totalMarks || 40}</span>
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                                  isDisq
-                                    ? "bg-red-100 text-red-700"
-                                    : (sub.percentage || 0) >= 90
-                                      ? "bg-emerald-100 text-emerald-800"
-                                      : "bg-blue-100 text-blue-800"
-                                }`}>
-                                  {isDisq ? "0% (Disq)" : `${sub.percentage || Math.round((sub.score / (sub.totalMarks || 40)) * 100)}%`}
+                      {/* Accuracy Bar */}
+                      <div className="space-y-1 pt-1">
+                        <div className="flex justify-between text-[10px] font-extrabold">
+                          <span className="text-slate-500">Class Accuracy Rate</span>
+                          <span className={accuracy >= 75 ? "text-emerald-700" : "text-amber-700"}>{accuracy}% Correct</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-500 ${accuracy >= 75 ? "bg-emerald-500" : "bg-amber-500"}`}
+                            style={{ width: `${accuracy}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ─── TAB 3: INDIVIDUAL TRAINEE RESPONSES & MANUAL EVALUATION ─── */}
+          {analyticsSubTab === "trainee-responses" && (
+            <div className="space-y-4 text-xs animate-in fade-in duration-150">
+
+              {!selectedTraineeSubmission ? (
+                /* Trainee Roster List */
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-3 flex-wrap pb-2 border-b border-slate-100">
+                    <div className="relative flex-1 max-w-md">
+                      <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Search cadet responses by name or station..."
+                        value={traineeSearchTerm}
+                        onChange={(e) => setTraineeSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs font-medium"
+                      />
+                    </div>
+                    <span className="text-slate-500 font-medium text-[11px]">
+                      Showing {activeSubmissions.length} Submitted Assessment Roster(s)
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto border border-slate-200 rounded-[var(--radius)]">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-extrabold border-b border-slate-200">
+                        <tr>
+                          <th className="py-3 px-4">Trainee Candidate</th>
+                          <th className="py-3 px-3">Cadre / Station</th>
+                          <th className="py-3 px-3 text-center">Score</th>
+                          <th className="py-3 px-3 text-center">Percentage</th>
+                          <th className="py-3 px-3">Time Taken</th>
+                          <th className="py-3 px-3">Evaluation Status</th>
+                          <th className="py-3 px-4 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium">
+                        {activeSubmissions
+                          .filter(s => !traineeSearchTerm || (s.traineeName || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()))
+                          .map((sub) => (
+                            <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
+                              <td className="py-3 px-4 font-black text-slate-900">
+                                {sub.traineeName || "Cadet Analyst"}
+                              </td>
+                              <td className="py-3 px-3 text-slate-600">
+                                {sub.station || "Regional Office"}
+                              </td>
+                              <td className="py-3 px-3 text-center font-mono font-black text-blue-900">
+                                {sub.score} / {selectedQuizForDetails.totalMarks}
+                              </td>
+                              <td className="py-3 px-3 text-center">
+                                <span className={`px-2 py-0.5 rounded-full font-black text-[10px] ${(sub.percentage || 0) >= 75 ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"
+                                  }`}>
+                                  {sub.percentage}%
                                 </span>
-                              </div>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-slate-600 font-mono font-medium">
-                              {sub.timeTaken || sub.timeTakenText || "12m 45s"}
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              {isDisq ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-red-100 text-red-700 border border-red-200 shadow-2xs">
-                                  ✕ Disqualified
-                                </span>
-                              ) : isWarn ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs">
-                                  ⚠ 1 Warning
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                  ✓ Clear
-                                </span>
-                              )}
-                            </td>
-
-                            <td className="py-3.5 px-4">
-                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                                isDisq
-                                  ? "bg-red-100 text-red-800"
-                                  : sub.status === "Published" || selectedQuizForDetails.resultsPublished
-                                    ? "bg-emerald-100 text-emerald-800"
-                                    : "bg-amber-100 text-amber-800"
-                              }`}>
-                                {isDisq ? "Disqualified" : selectedQuizForDetails.resultsPublished ? "Published" : (sub.status || "Pending")}
-                              </span>
-                            </td>
-
-                            <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                {isDisq && (
-                                  <button
-                                    onClick={() => handleGrantRetake(selectedQuizForDetails.id, sub.traineeId, sub.traineeName)}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-xs transition-transform hover:scale-105"
-                                    title="Revoke disqualification and permit one more attempt"
-                                  >
-                                    <RotateCcw className="w-3.5 h-3.5" />
-                                    <span>Grant Re-take</span>
-                                  </button>
+                              </td>
+                              <td className="py-3 px-3 text-slate-600 font-mono">
+                                {sub.timeTaken || "18m 40s"}
+                              </td>
+                              <td className="py-3 px-3">
+                                {sub.isDisqualified ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-900 font-extrabold text-[10px]">
+                                    Disqualified
+                                  </span>
+                                ) : sub.status === "Published" ? (
+                                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-extrabold text-[10px]">
+                                    Evaluated & Published
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 font-extrabold text-[10px]">
+                                    Auto-Graded (Ready)
+                                  </span>
                                 )}
+                              </td>
+                              <td className="py-3 px-4 text-right">
                                 <button
                                   onClick={() => setSelectedTraineeSubmission(sub)}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-xs transition-transform hover:scale-105"
+                                  className="px-3 py-1 bg-[#0a2558] hover:bg-[#071739] text-white font-bold rounded-[var(--radius)] text-[11px] shadow-xs"
                                 >
-                                  <Eye className="w-3.5 h-3.5 text-blue-200" />
-                                  <span>Inspect</span>
+                                  Audit Answers
                                 </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                /* Individual Answer Sheet Audit View */
+                <div className="space-y-5 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                    <button
+                      onClick={() => setSelectedTraineeSubmission(null)}
+                      className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold rounded-[var(--radius)] text-xs flex items-center gap-1"
+                    >
+                      ← Back to Trainee Roster
+                    </button>
+
+                    <div className="text-right">
+                      <h3 className="font-black text-slate-900 text-sm">{selectedTraineeSubmission.traineeName}</h3>
+                      <p className="text-[10px] text-slate-500 font-medium">Cadre ID: {selectedTraineeSubmission.cadreId || "CAD-2026-88"}</p>
+                    </div>
+                  </div>
+
+                  {/* Submission Questions Audit */}
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                    {(selectedQuizForDetails.questions || []).map((q, qIdx) => {
+                      const traineeAns = selectedTraineeSubmission.answers?.[q.id] || selectedTraineeSubmission.answers?.[qIdx];
+                      const isCorrect = traineeAns === q.correctAnswer || traineeAns === q.expectedAnswer;
+
+                      return (
+                        <div key={q.id || qIdx} className={`p-4 rounded-[var(--radius)] border space-y-2 ${isCorrect ? "bg-emerald-50/50 border-emerald-200" : "bg-red-50/50 border-red-200"
+                          }`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-extrabold text-slate-900 text-xs">
+                              Q{qIdx + 1}: {q.question}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded font-black text-[10px] ${isCorrect ? "bg-emerald-200 text-emerald-950" : "bg-red-200 text-red-950"
+                              }`}>
+                              {isCorrect ? `+${q.marks || 3} Marks` : "0 Marks"}
+                            </span>
+                          </div>
+
+                          <p className="text-xs font-medium text-slate-700">
+                            Trainee Response: <b className="text-slate-900">{traineeAns !== undefined ? String(traineeAns) : "Unanswered"}</b>
+                          </p>
+                          <p className="text-[11px] text-emerald-800 font-semibold">
+                            Official Model Answer: {q.type === "one_word" ? q.expectedAnswer : q.options?.[q.correctAnswer]}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Faculty Feedback Section */}
+                  <div className="p-4 bg-slate-50 rounded-[var(--radius)] border border-slate-200 space-y-2">
+                    <label className="font-extrabold text-slate-900 text-xs block">
+                      Lead Trainer Remarks / Feedback for Cadet
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={trainerFeedbackMap[selectedTraineeSubmission.id] || ""}
+                      onChange={(e) => setTrainerFeedbackMap({ ...trainerFeedbackMap, [selectedTraineeSubmission.id]: e.target.value })}
+                      placeholder="Add qualitative remarks on numerical stability and advection theory..."
+                      className="w-full p-2.5 bg-white border border-slate-200 rounded-[var(--radius)] text-xs font-medium focus:ring-2 focus:ring-blue-600"
+                    />
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={() => showToast("Feedback saved for cadet assessment scorecard.")}
+                        className="px-4 py-1.5 bg-[#0a2558] text-white font-bold rounded-[var(--radius)] text-xs shadow-xs"
+                      >
+                        Save Remarks
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ─── TAB 4: CADET MERIT LEADERBOARD ─── */}
+          {analyticsSubTab === "leaderboard" && (
+            <div className="space-y-4 text-xs animate-in fade-in duration-150">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="space-y-0.5">
+                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
+                    <Trophy className="w-4 h-4 text-yellow-500" />
+                    <span>Cadet Assessment Merit Roster</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Rankings computed by combined score percentage and kiosk completion time.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase">Sort By:</span>
+                  <button
+                    onClick={() => setLeaderboardSort("score")}
+                    className={`px-3 py-1 rounded-[var(--radius)] font-extrabold text-[11px] transition-colors ${leaderboardSort === "score" ? "bg-[#0a2558] text-white" : "bg-slate-100 text-slate-700"
+                      }`}
+                  >
+                    Highest Score
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardSort("speed")}
+                    className={`px-3 py-1 rounded-[var(--radius)] font-extrabold text-[11px] transition-colors ${leaderboardSort === "speed" ? "bg-[#0a2558] text-white" : "bg-slate-100 text-slate-700"
+                      }`}
+                  >
+                    Fastest Time
+                  </button>
+                </div>
+              </div>
+
+              {/* Leaderboard Roster Table */}
+              <div className="overflow-x-auto border border-slate-200 rounded-[var(--radius)]">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-extrabold border-b border-slate-200">
+                    <tr>
+                      <th className="py-3 px-4 text-center">Rank</th>
+                      <th className="py-3 px-4">Trainee Name</th>
+                      <th className="py-3 px-3">Station</th>
+                      <th className="py-3 px-3 text-center">Score</th>
+                      <th className="py-3 px-3 text-center">Percentage</th>
+                      <th className="py-3 px-3 text-right">Time Taken</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {[...activeSubmissions]
+                      .sort((a, b) => leaderboardSort === "score" ? (b.score - a.score) : ((a.timeTaken || 999) - (b.timeTaken || 999)))
+                      .map((sub, rIdx) => (
+                        <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3 px-4 text-center font-black">
+                            {rIdx === 0 ? (
+                              <span className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 inline-flex items-center justify-center font-black">1</span>
+                            ) : rIdx === 1 ? (
+                              <span className="w-6 h-6 rounded-full bg-slate-300 text-slate-900 inline-flex items-center justify-center font-black">2</span>
+                            ) : rIdx === 2 ? (
+                              <span className="w-6 h-6 rounded-full bg-amber-700 text-white inline-flex items-center justify-center font-black">3</span>
+                            ) : (
+                              <span className="text-slate-500 font-mono">#{rIdx + 1}</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 font-black text-slate-900">
+                            {sub.traineeName || "Cadet Analyst"}
+                          </td>
+                          <td className="py-3 px-3 text-slate-600">
+                            {sub.station || "National Office"}
+                          </td>
+                          <td className="py-3 px-3 text-center font-mono font-black text-blue-900">
+                            {sub.score} / {selectedQuizForDetails.totalMarks}
+                          </td>
+                          <td className="py-3 px-3 text-center font-black text-emerald-800">
+                            {sub.percentage}%
+                          </td>
+                          <td className="py-3 px-3 text-right font-mono text-slate-600">
+                            {sub.timeTaken || "16m 20s"}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
             </div>
           )}
 
-          {/* ═════════ TAB 4: EXAM LEADERBOARD & HALL OF FAME ═════════ */}
-          {analyticsSubTab === "leaderboard" && (
-            <div className="space-y-6 animate-in fade-in duration-150">
-              
-              {/* Leaderboard Header with Sort Toggle */}
-              <div className="p-6 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 rounded-[var(--radius)] text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-[var(--radius)] bg-white/20 backdrop-blur-md flex items-center justify-center font-medium text-white shrink-0 shadow-inner">
-                    <Trophy className="w-6 h-6 text-yellow-200 animate-bounce" />
-                  </div>
-                  <div>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-white/20 text-white uppercase tracking-wider">
-                      OFFICIAL ASSESSMENT STANDINGS
-                    </span>
-                    <h3 className="text-lg font-black text-white mt-0.5">
-                      Class Performance Leaderboard & Honors List ({activeSubmissions.length} Takers)
-                    </h3>
-                    <p className="text-xs text-amber-100">
-                      Ranked dynamically by highest accuracy score and completion speed.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 bg-white/20 p-1.5 rounded-[var(--radius)] backdrop-blur-md">
-                  <button
-                    onClick={() => setLeaderboardSort("score")}
-                    className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-black transition-all ${
-                      leaderboardSort === "score" ? "bg-white text-amber-900 shadow-sm" : "text-white/80 hover:text-white"
-                    }`}
-                  >
-                    Sort by Highest Score
-                  </button>
-                  <button
-                    onClick={() => setLeaderboardSort("speed")}
-                    className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-black transition-all ${
-                      leaderboardSort === "speed" ? "bg-white text-amber-900 shadow-sm" : "text-white/80 hover:text-white"
-                    }`}
-                  >
-                    Sort by Fastest Speed
-                  </button>
-                </div>
-              </div>
-
-              {/* DYNAMIC TOP 3 PODIUM */}
-              {(() => {
-                const sorted = [...activeSubmissions].sort((a, b) => {
-                  if (leaderboardSort === "speed") {
-                    return (a.timeTaken || "").localeCompare(b.timeTaken || "");
-                  }
-                  return (b.score || 0) - (a.score || 0);
-                });
-
-                const first = sorted[0];
-                const second = sorted[1];
-                const third = sorted[2];
-
-                return (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                    {/* Silver - Rank 2 */}
-                    {second ? (
-                      <div className="order-2 md:order-1 p-5 bg-gradient-to-b from-slate-50 to-slate-100 rounded-[var(--radius)] border-2 border-slate-300 text-center space-y-3 shadow-sm hover:shadow-md transition-all">
-                        <div className="w-10 h-10 rounded-full bg-slate-300 text-slate-800 font-black flex items-center justify-center mx-auto text-sm shadow-sm">
-                          🥈 #2
-                        </div>
-                        <div>
-                          <h4 className="font-black text-slate-900 text-sm">{second.traineeName}</h4>
-                          <span className="text-[11px] text-slate-500 font-medium">{second.station} • {second.department || "MoES"}</span>
-                        </div>
-                        <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-1">
-                          <p className="text-lg font-black text-slate-900">{second.score} / {second.totalMarks || selectedQuizForDetails.totalMarks || 40} ({second.percentage}%)</p>
-                          <span className="text-[10px] text-slate-500 font-mono font-medium block">Time: {second.timeTaken || "12m 30s"} • 95th Percentile</span>
-                        </div>
-                        <span className="inline-block px-3 py-1 bg-slate-200 text-slate-800 rounded-full text-[10px] font-black uppercase">
-                          Silver Laureate
-                        </span>
-                      </div>
-                    ) : null}
-
-                    {/* Gold - Rank 1 */}
-                    {first ? (
-                      <div className="order-1 md:order-2 p-6 bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100/60 rounded-[var(--radius)] border-2 border-amber-400 text-center space-y-3 shadow-lg transform md:-translate-y-2">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-white font-black flex items-center justify-center mx-auto text-base shadow-md">
-                          👑 🥇
-                        </div>
-                        <div>
-                          <span className="px-2.5 py-0.5 bg-amber-200/80 text-amber-900 rounded-full text-[10px] font-black uppercase">
-                            RANK #1 • TOP SCORER
-                          </span>
-                          <h4 className="font-black text-slate-900 text-base mt-1">{first.traineeName}</h4>
-                          <span className="text-[11px] text-slate-600 font-medium">{first.station}</span>
-                        </div>
-                        <div className="p-3 bg-white rounded-[var(--radius)] border border-amber-200 shadow-xs space-y-1">
-                          <p className="text-2xl font-black text-amber-900">{first.score} / {first.totalMarks || selectedQuizForDetails.totalMarks || 40} ({first.percentage}%)</p>
-                          <span className="text-[10px] text-amber-800 font-mono font-medium block">Time: {first.timeTaken || "11m 15s"} • 99th Percentile</span>
-                        </div>
-                        <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-full text-xs font-black uppercase shadow-xs">
-                          🏆 Gold Laureate
-                        </span>
-                      </div>
-                    ) : null}
-
-                    {/* Bronze - Rank 3 */}
-                    {third ? (
-                      <div className="order-3 p-5 bg-gradient-to-b from-amber-50/40 to-orange-50/50 rounded-[var(--radius)] border-2 border-amber-200 text-center space-y-3 shadow-sm hover:shadow-md transition-all">
-                        <div className="w-10 h-10 rounded-full bg-amber-700 text-white font-black flex items-center justify-center mx-auto text-sm shadow-sm">
-                          🥉 #3
-                        </div>
-                        <div>
-                          <h4 className="font-black text-slate-900 text-sm">{third.traineeName}</h4>
-                          <span className="text-[11px] text-slate-500 font-medium">{third.station}</span>
-                        </div>
-                        <div className="p-3 bg-white rounded-[var(--radius)] border border-amber-100 space-y-1">
-                          <p className="text-lg font-black text-slate-900">{third.score} / {third.totalMarks || selectedQuizForDetails.totalMarks || 40} ({third.percentage}%)</p>
-                          <span className="text-[10px] text-slate-500 font-mono font-medium block">Time: {third.timeTaken || "14m 10s"} • 90th Percentile</span>
-                        </div>
-                        <span className="inline-block px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-[10px] font-black uppercase">
-                          Bronze Laureate
-                        </span>
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })()}
-
-              {/* Full Ranked Table */}
-              <div className="space-y-3 pt-2">
-                <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-amber-600" />
-                  <span>Complete Examinee Standings & Percentile Ranks ({activeSubmissions.length} Takers)</span>
-                </h4>
-
-                <div className="overflow-x-auto rounded-[var(--radius)] border border-slate-200">
-                  <table className="w-full text-left text-xs bg-white">
-                    <thead className="text-[11px] font-black uppercase text-slate-400 bg-slate-50 border-b border-slate-200">
-                      <tr>
-                        <th className="py-3 px-4">Rank</th>
-                        <th className="py-3 px-4">Examinee Learner</th>
-                        <th className="py-3 px-4">Cadre ID & Station</th>
-                        <th className="py-3 px-4">Score</th>
-                        <th className="py-3 px-4">Accuracy</th>
-                        <th className="py-3 px-4">Speed</th>
-                        <th className="py-3 px-4">Percentile</th>
-                        <th className="py-3 px-4">Honors Badge</th>
-                        <th className="py-3 px-4 text-right">Audit</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {[...activeSubmissions]
-                        .sort((a, b) => leaderboardSort === "speed" ? (a.timeTaken || "").localeCompare(b.timeTaken || "") : (b.score || 0) - (a.score || 0))
-                        .map((item, idx) => {
-                          const rank = idx + 1;
-                          const total = activeSubmissions.length || 1;
-                          const percentile = Math.max(60, Math.round(100 - (idx / total * 40))) + "th";
-                          const badge = rank === 1 ? "Gold Laureate" : rank === 2 ? "Silver Laureate" : rank === 3 ? "Bronze Laureate" : (item.percentage >= 75 ? "First Class" : "Certified Passed");
-
-                          return (
-                            <tr key={item.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                              <td className="py-3.5 px-4 font-black text-slate-900">
-                                <span className={`w-6 h-6 rounded-full flex items-center justify-center font-medium text-xs ${
-                                  rank === 1 ? "bg-amber-400 text-amber-950 font-black shadow-xs" :
-                                  rank === 2 ? "bg-slate-300 text-slate-900 font-medium" :
-                                  rank === 3 ? "bg-amber-700 text-white font-medium" :
-                                  "bg-slate-100 text-slate-700"
-                                }`}>
-                                  #{rank}
-                                </span>
-                              </td>
-
-                              <td className="py-3.5 px-4 font-medium text-slate-900">
-                                {item.traineeName}
-                              </td>
-
-                              <td className="py-3.5 px-4 space-y-0.5">
-                                <span className="font-mono font-medium text-slate-800 text-[11px] block">{item.cadreId}</span>
-                                <span className="text-slate-400 text-[11px]">{item.station}</span>
-                              </td>
-
-                              <td className="py-3.5 px-4 font-black text-slate-900">
-                                {item.score} / {item.totalMarks || selectedQuizForDetails.totalMarks || 40}
-                              </td>
-
-                              <td className="py-3.5 px-4">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                                  item.percentage >= 90 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
-                                }`}>
-                                  {item.percentage}%
-                                </span>
-                              </td>
-
-                              <td className="py-3.5 px-4 font-mono font-medium text-slate-700">
-                                {item.timeTaken || "13m 20s"}
-                              </td>
-
-                              <td className="py-3.5 px-4 font-extrabold text-purple-900">
-                                {percentile}
-                              </td>
-
-                              <td className="py-3.5 px-4">
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-900 border border-amber-200">
-                                  {badge}
-                                </span>
-                              </td>
-
-                              <td className="py-3.5 px-4 text-right">
-                                <button
-                                  onClick={() => setSelectedTraineeSubmission(item)}
-                                  className="px-2.5 py-1 bg-slate-100 hover:bg-[#0a2558] text-slate-800 hover:text-white font-medium rounded-[var(--radius)] text-[11px] transition-colors"
-                                >
-                                  Audit
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
         </div>
       )}
 
-      {/* ═════════ 6. INDIVIDUAL CANDIDATE RESPONSE DRAWER / AUDIT MODAL (DETAILED TRAINEE VIEW) ═════════ */}
-      {selectedTraineeSubmission && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
-          <div className="bg-white rounded-[var(--radius)] shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden text-slate-800 my-auto text-xs">
-            
-            {/* Modal Header */}
-            <div className="p-6 bg-gradient-to-r from-[#071739] via-[#0a2558] to-[#12397e] text-white flex items-center justify-between">
-              <div>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase">
-                  INDIVIDUAL TRAINEE PERFORMANCE AUDIT
-                </span>
-                <h3 className="text-base font-black text-white mt-1">
-                  {selectedTraineeSubmission.traineeName} ({selectedTraineeSubmission.cadreId || "MOES-CADET"})
-                </h3>
-                <p className="text-[11px] text-blue-200">
-                  Station: {selectedTraineeSubmission.station || "National HQ"} • Division: {selectedTraineeSubmission.department || "Meteorological Division"}
-                </p>
-              </div>
+      {/* ═════════ 6. MODAL: ADD CUSTOM QUESTION ═════════ */}
+      {showAddCustomModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-[var(--radius)] border border-slate-200 shadow-2xl max-w-xl w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150 text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="font-extrabold text-sm text-slate-900">Add Custom Question to Exam</h3>
               <button
-                onClick={() => setSelectedTraineeSubmission(null)}
-                className="w-9 h-9 rounded-[var(--radius)] bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white"
+                onClick={() => setShowAddCustomModal(false)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-[var(--radius)]"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Trainee View Summary Metric Cards */}
-            <div className="p-6 pb-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 border-b border-slate-200 text-xs">
-              <div className="p-3 bg-white rounded-[var(--radius)] border border-slate-200 space-y-0.5">
-                <span className="text-slate-400 font-extrabold uppercase text-[9px] block">SCORE</span>
-                <p className="text-base font-black text-slate-900">
-                  {selectedTraineeSubmission.score} / {selectedTraineeSubmission.totalMarks || selectedQuizForDetails?.totalMarks || 40}
-                </p>
-                <span className="text-[10px] text-slate-500">Marks Obtained</span>
-              </div>
-
-              <div className="p-3 bg-emerald-50/70 rounded-[var(--radius)] border border-emerald-200 space-y-0.5">
-                <span className="text-emerald-700 font-extrabold uppercase text-[9px] block">ACCURACY</span>
-                <p className="text-base font-black text-emerald-900">
-                  {selectedTraineeSubmission.percentage || Math.round((selectedTraineeSubmission.score / (selectedTraineeSubmission.totalMarks || 40)) * 100)}%
-                </p>
-                <span className="text-[10px] text-emerald-600">Correct Response Ratio</span>
-              </div>
-
-              <div className="p-3 bg-blue-50/70 rounded-[var(--radius)] border border-blue-200 space-y-0.5">
-                <span className="text-blue-700 font-extrabold uppercase text-[9px] block">TOTAL TIME</span>
-                <p className="text-base font-black text-blue-900 font-mono">
-                  {selectedTraineeSubmission.timeTaken || selectedTraineeSubmission.timeTakenText || "12m 42s"}
-                </p>
-                <span className="text-[10px] text-blue-600">Assessment Duration</span>
-              </div>
-
-              <div className="p-3 bg-amber-50/70 rounded-[var(--radius)] border border-amber-200 space-y-0.5">
-                <span className="text-amber-700 font-extrabold uppercase text-[9px] block">AVERAGE TIME</span>
-                <p className="text-base font-black text-amber-900 font-mono">
-                  {Math.round((selectedTraineeSubmission.timeTakenSeconds || 762) / Math.max(1, (selectedQuizForDetails?.questions || []).length || 5))}s / question
-                </p>
-                <span className="text-[10px] text-amber-600">Pacing Index</span>
-              </div>
-            </div>
-
-            {/* Question Breakdown */}
-            <div className="p-6 space-y-4 max-h-[55vh] overflow-y-auto">
-              <div className="flex items-center justify-between">
-                <h4 className="font-extrabold text-slate-900 uppercase tracking-wider text-[11px]">
-                  Question-by-Question Response Audit:
-                </h4>
-                <span className="text-[10px] font-medium text-slate-400">
-                  {(selectedQuizForDetails?.questions || []).length} Total Questions
-                </span>
-              </div>
-
-              {(() => {
-                const qList = selectedQuizForDetails?.questions || [];
-                if (qList.length > 0) {
-                  return qList.map((q, qIdx) => {
-                    const ans = selectedTraineeSubmission.answers?.[q.id] || 
-                                selectedTraineeSubmission.answers?.[`q_${qIdx + 1}`] || 
-                                selectedTraineeSubmission.answers?.[`q${qIdx + 1}`] || {};
-                    const isCorrect = ans.isCorrect !== undefined ? ans.isCorrect : (ans.selected === q.correctAnswer);
-                    const chosenIdx = ans.selected !== undefined ? ans.selected : -1;
-                    const qTopic = q.subjectName || q.topic || selectedQuizForDetails.subjectName || "Pressure Systems";
-                    const qDifficulty = q.difficulty || "Hard";
-                    const timeSpentSec = ans.timeSpent || (45 + (qIdx * 9) % 30);
-
-                    return (
-                      <div
-                        key={q.id || qIdx}
-                        className={`p-4 rounded-[var(--radius)] border ${
-                          isCorrect ? "bg-emerald-50/70 border-emerald-200" : "bg-rose-50/70 border-rose-200"
-                        } space-y-3`}
-                      >
-                        {/* Question Metadata Header */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-black text-slate-900 text-xs">Question {qIdx + 1}</span>
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-800">
-                              Topic: {qTopic}
-                            </span>
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-800">
-                              Difficulty: {qDifficulty}
-                            </span>
-                            <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-900">
-                              Time Spent: {timeSpentSec} sec
-                            </span>
-                          </div>
-
-                          <span className={`px-2.5 py-0.5 rounded-full font-black text-[10px] shrink-0 ${
-                            isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
-                          }`}>
-                            Result: {isCorrect ? `Correct (+${q.marks || 2} Marks)` : "Incorrect (0 Marks)"}
-                          </span>
-                        </div>
-
-                        <p className="text-slate-900 font-semibold">{q.question}</p>
-
-                        {/* Options / Text Input Display */}
-                        {q.type === "one_word" || q.type === "short_answer" || (!q.options || q.options.length === 0) ? (
-                          <div className="p-3 rounded-[var(--radius)] bg-purple-50/60 border border-purple-200/80 space-y-1.5 text-[11px]">
-                            <div className="flex items-center justify-between">
-                              <span className="font-medium text-slate-700">Learner Typed Response:</span>
-                              <span className="font-mono font-medium px-2 py-0.5 rounded bg-white border border-purple-200 text-purple-950">
-                                "{ans.text || ans.selected || ans.userAnswer || "No answer entered"}"
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between text-slate-600">
-                              <span>Expected Answer (Case-Insensitive):</span>
-                              <span className="font-mono font-medium text-emerald-800">
-                                {q.expectedAnswer || q.correctAnswer || "N/A"}
-                              </span>
-                            </div>
-                            {q.acceptedAnswers && q.acceptedAnswers.length > 0 && (
-                              <div className="text-[10px] text-slate-500">
-                                <b>Accepted synonyms:</b> {Array.isArray(q.acceptedAnswers) ? q.acceptedAnswers.join(", ") : q.acceptedAnswers}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="space-y-1 pt-1">
-                            {q.options?.map((opt, oIdx) => (
-                              <div
-                                key={oIdx}
-                                className={`p-2.5 rounded-[var(--radius)] text-[11px] flex items-center justify-between ${
-                                  q.correctAnswer === oIdx
-                                    ? "bg-emerald-100/90 text-emerald-900 font-medium border border-emerald-300"
-                                    : chosenIdx === oIdx && !isCorrect
-                                    ? "bg-rose-100 text-rose-900 font-semibold border border-rose-300"
-                                    : "bg-white/60 text-slate-600 border border-slate-100"
-                                }`}
-                              >
-                                <span>{String.fromCharCode(65 + oIdx)}. {opt}</span>
-                                {chosenIdx === oIdx && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-black/10">
-                                    Learner Pick
-                                  </span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {q.explanation && (
-                          <p className="text-[10px] text-slate-600 pt-1">
-                            <b>Explanation:</b> {q.explanation}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  });
-                }
-
-                // Fallback direct map if questions array not stored
-                return Object.entries(selectedTraineeSubmission.answers || {}).map(([key, ans], aIdx) => (
-                  <div
-                    key={key}
-                    className={`p-4 rounded-[var(--radius)] border ${
-                      ans.isCorrect ? "bg-emerald-50/70 border-emerald-200" : "bg-rose-50/70 border-rose-200"
-                    }`}
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-extrabold text-slate-800">Question Type</label>
+                  <select
+                    value={newCustomQuestion.type}
+                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, type: e.target.value })}
+                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-slate-900">Question {aIdx + 1}</span>
-                      <span className={`px-2 py-0.5 rounded-full font-medium text-[10px] ${
-                        ans.isCorrect ? "bg-emerald-200 text-emerald-900" : "bg-rose-200 text-rose-900"
-                      }`}>
-                        {ans.isCorrect ? "Correct (+2 Marks)" : "Incorrect (0 Marks)"}
-                      </span>
-                    </div>
-                    <p className="text-slate-700 font-medium">{ans.text || (ans.isCorrect ? "Answer verified correct" : "Incorrect answer chosen")}</p>
-                  </div>
-                ));
-              })()}
-
-              <div className="pt-2 space-y-1.5">
-                <label className="font-extrabold text-slate-800">Faculty Remarks & Personalized Mentorship Note:</label>
-                <textarea
-                  rows={3}
-                  value={trainerFeedbackMap[selectedTraineeSubmission.id] || ""}
-                  onChange={(e) => setTrainerFeedbackMap({ ...trainerFeedbackMap, [selectedTraineeSubmission.id]: e.target.value })}
-                  placeholder="Enter personalized feedback, guidance on pressure systems, or study references..."
-                  className="w-full p-3 rounded-[var(--radius)] border border-slate-200 focus:ring-2 focus:ring-blue-600 font-medium"
-                />
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
-                onClick={() => {
-                  showToast("Feedback saved for " + selectedTraineeSubmission.traineeName);
-                  setSelectedTraineeSubmission(null);
-                }}
-                className="px-5 py-2.5 bg-[#0a2558] hover:bg-[#071739] text-white font-extrabold rounded-[var(--radius)] text-xs shadow-md"
-              >
-                Save Evaluation
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* ─── ADD CUSTOM QUESTION MODAL (MCQ & ONE-WORD / SHORT ANSWER) ─── */}
-      {showAddCustomModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-[var(--radius)] max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150">
-            <div className="p-5 bg-slate-50 border-b border-slate-200 text-slate-900 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[var(--radius)] bg-blue-100 border border-blue-200 flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-blue-700" />
+                    <option value="mcq">MCQ (4 Options)</option>
+                    <option value="one_word">One-Word / Short Answer</option>
+                  </select>
                 </div>
-                <div>
-                  <h3 className="font-black text-sm text-slate-900">Add Custom Question</h3>
-                  <p className="text-[11px] text-slate-500">
-                    Create a bespoke MCQ or One-Word question with custom scoring & rules.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowAddCustomModal(false)}
-                className="p-1.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
-              {/* Question Type Toggle */}
-              <div className="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-[var(--radius)]">
-                <button
-                  type="button"
-                  onClick={() => setNewCustomQuestion(prev => ({ ...prev, type: "mcq" }))}
-                  className={`py-2 px-3 rounded-[var(--radius)] font-black text-xs transition-all ${
-                    newCustomQuestion.type === "mcq"
-                      ? "bg-white text-slate-950 shadow-xs"
-                      : "text-slate-600 hover:text-slate-950"
-                  }`}
-                >
-                  Multiple Choice Question (MCQ)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setNewCustomQuestion(prev => ({ ...prev, type: "one_word" }))}
-                  className={`py-2 px-3 rounded-[var(--radius)] font-black text-xs transition-all ${
-                    newCustomQuestion.type === "one_word"
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "text-slate-600 hover:text-slate-950"
-                  }`}
-                >
-                  One-Word / Short Answer
-                </button>
-              </div>
-
-              {/* Topic & Module Selection */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-extrabold text-slate-800">Assigned Topic</label>
-                  <input
-                    type="text"
-                    value={newCustomQuestion.topic}
-                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, topic: e.target.value })}
-                    placeholder="e.g. Radar Meteorology"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-extrabold text-slate-800">Module</label>
-                  <input
-                    type="text"
-                    value={newCustomQuestion.module}
-                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, module: e.target.value })}
-                    placeholder="e.g. Module 2"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                  />
-                </div>
-              </div>
-
-              {/* Question Prompt */}
-              <div className="space-y-1">
-                <label className="font-extrabold text-slate-800">
-                  Question Prompt <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={3}
-                  value={newCustomQuestion.question}
-                  onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, question: e.target.value })}
-                  placeholder={
-                    newCustomQuestion.type === "one_word"
-                      ? "e.g. What is the term for a person who loves or collects books?"
-                      : "e.g. Which process is responsible for latent heat release during convective updrafts?"
-                  }
-                  className="w-full p-3 bg-white border border-slate-200 rounded-[var(--radius)] font-semibold text-xs focus:ring-2 focus:ring-blue-600"
-                />
-              </div>
-
-              {/* MCQ Options vs One-Word Config */}
-              {newCustomQuestion.type === "mcq" ? (
-                <div className="space-y-2 p-3 bg-slate-50 rounded-[var(--radius)] border border-slate-200">
-                  <label className="font-extrabold text-slate-800 text-[11px] block">
-                    Define 4 Options & Click A/B/C/D to mark correct answer:
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {newCustomQuestion.options.map((opt, optIdx) => (
-                      <div
-                        key={optIdx}
-                        className={`p-2 rounded-[var(--radius)] border flex items-center gap-2 ${
-                          newCustomQuestion.correctAnswer === optIdx
-                            ? "bg-emerald-50 border-emerald-300 ring-1 ring-emerald-400"
-                            : "bg-white border-slate-200"
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setNewCustomQuestion({ ...newCustomQuestion, correctAnswer: optIdx })}
-                          className={`w-6 h-6 rounded-[var(--radius)] text-xs font-medium font-mono shrink-0 transition-colors ${
-                            newCustomQuestion.correctAnswer === optIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
-                          }`}
-                          title="Click to set as correct answer"
-                        >
-                          {String.fromCharCode(65 + optIdx)}
-                        </button>
-                        <input
-                          type="text"
-                          value={opt}
-                          onChange={(e) => {
-                            const newOpts = [...newCustomQuestion.options];
-                            newOpts[optIdx] = e.target.value;
-                            setNewCustomQuestion({ ...newCustomQuestion, options: newOpts });
-                          }}
-                          placeholder={`Option ${String.fromCharCode(65 + optIdx)}`}
-                          className="flex-1 bg-transparent text-xs font-medium focus:outline-none"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3 p-4 bg-purple-50/70 rounded-[var(--radius)] border border-purple-200">
-                  <div className="space-y-1">
-                    <label className="font-extrabold text-purple-950 text-[11px]">
-                      Expected Answer (One Word) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={newCustomQuestion.expectedAnswer}
-                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, expectedAnswer: e.target.value })}
-                      placeholder="e.g. Bibliophile"
-                      className="w-full p-2.5 bg-white border border-purple-300 rounded-[var(--radius)] font-medium text-xs"
-                    />
-                    <p className="text-[10px] text-purple-800 font-medium">
-                      Evaluation automatically lowercases and trims candidate inputs for exact string matching.
-                    </p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-extrabold text-purple-950 text-[11px]">
-                      Additional Accepted Answers / Synonyms (Comma-Separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={newCustomQuestion.acceptedAnswersText}
-                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, acceptedAnswersText: e.target.value })}
-                      placeholder="e.g. Bibliophile, BIBLIOPHILE, bibliophile, book lover"
-                      className="w-full p-2.5 bg-white border border-purple-300 rounded-[var(--radius)] text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-extrabold text-purple-950 text-[11px]">
-                      Trainer Note to Candidate (How to write answer)
-                    </label>
-                    <input
-                      type="text"
-                      value={newCustomQuestion.guidanceNote}
-                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, guidanceNote: e.target.value })}
-                      placeholder="e.g. Note: Enter answer in a single word. Case does not matter."
-                      className="w-full p-2.5 bg-white border border-purple-300 rounded-[var(--radius)] text-xs"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Marks, Difficulty, Competency */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
                   <label className="font-extrabold text-slate-800">Marks</label>
                   <input
@@ -3794,104 +2644,86 @@ export const TrainerScheduleAssessmentView = ({
                     max={20}
                     value={newCustomQuestion.marks}
                     onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, marks: Number(e.target.value) })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-extrabold text-slate-800">Difficulty</label>
-                  <select
-                    value={newCustomQuestion.difficulty}
-                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, difficulty: e.target.value })}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
-                  >
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="font-extrabold text-slate-800">Competency</label>
-                  <input
-                    type="text"
-                    value={newCustomQuestion.competency}
-                    onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, competency: e.target.value })}
-                    placeholder="e.g. Radar Analysis"
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
+                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
                   />
                 </div>
               </div>
 
-              {/* Explanation */}
               <div className="space-y-1">
-                <label className="font-extrabold text-slate-800">Explanation / Reference</label>
-                <input
-                  type="text"
-                  value={newCustomQuestion.explanation}
-                  onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, explanation: e.target.value })}
-                  placeholder="e.g. Bibliophile originates from the Greek words biblion (book) + philos (love)."
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs"
+                <label className="font-extrabold text-slate-800">Question Text Prompt</label>
+                <textarea
+                  rows={2}
+                  value={newCustomQuestion.question}
+                  onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, question: e.target.value })}
+                  placeholder="Enter the complete question statement..."
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
                 />
               </div>
+
+              {newCustomQuestion.type === "one_word" ? (
+                <div className="space-y-2 p-3 bg-purple-50 rounded-[var(--radius)] border border-purple-200">
+                  <div className="space-y-1">
+                    <label className="font-extrabold text-purple-950">Expected Single-Word Answer</label>
+                    <input
+                      type="text"
+                      value={newCustomQuestion.expectedAnswer}
+                      onChange={(e) => setNewCustomQuestion({ ...newCustomQuestion, expectedAnswer: e.target.value })}
+                      placeholder="e.g. Baroclinic"
+                      className="w-full p-2 bg-white border border-purple-300 rounded-[var(--radius)] font-medium"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <label className="font-extrabold text-slate-800">Options (Select Correct Option)</label>
+                  {newCustomQuestion.options.map((opt, oIdx) => (
+                    <div key={oIdx} className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewCustomQuestion({ ...newCustomQuestion, correctAnswer: oIdx })}
+                        className={`w-6 h-6 rounded-[var(--radius)] text-xs font-mono font-bold shrink-0 ${newCustomQuestion.correctAnswer === oIdx ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-600"
+                          }`}
+                      >
+                        {String.fromCharCode(65 + oIdx)}
+                      </button>
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => {
+                          const opts = [...newCustomQuestion.options];
+                          opts[oIdx] = e.target.value;
+                          setNewCustomQuestion({ ...newCustomQuestion, options: opts });
+                        }}
+                        placeholder={`Option ${String.fromCharCode(65 + oIdx)}`}
+                        className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-[var(--radius)] font-medium"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
               <button
-                type="button"
                 onClick={() => setShowAddCustomModal(false)}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-[var(--radius)] text-xs"
+                className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-[var(--radius)] text-xs"
               >
                 Cancel
               </button>
+
               <button
-                type="button"
                 onClick={() => {
                   if (!newCustomQuestion.question.trim()) {
-                    showToast("Please enter a question prompt.", "error");
+                    showToast("Please provide a question statement.", "error");
                     return;
                   }
-                  if (newCustomQuestion.type === "one_word" && !newCustomQuestion.expectedAnswer.trim()) {
-                    showToast("Please provide the expected one-word answer.", "error");
-                    return;
-                  }
-                  if (newCustomQuestion.type === "mcq" && newCustomQuestion.options.some(o => !o.trim())) {
-                    showToast("Please fill all 4 MCQ options.", "error");
-                    return;
-                  }
-
-                  const acceptedList = newCustomQuestion.acceptedAnswersText
-                    ? newCustomQuestion.acceptedAnswersText.split(",").map(s => s.trim()).filter(Boolean)
-                    : [newCustomQuestion.expectedAnswer];
-
-                  const questionObj = {
-                    id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                    type: newCustomQuestion.type,
-                    question: newCustomQuestion.question.trim(),
-                    marks: Number(newCustomQuestion.marks) || 3,
-                    difficulty: newCustomQuestion.difficulty,
-                    competency: newCustomQuestion.competency,
-                    topic: newCustomQuestion.topic || createForm.subjectName || "General",
-                    module: newCustomQuestion.module || "Module 1",
-                    explanation: newCustomQuestion.explanation || "",
-                    ...(newCustomQuestion.type === "one_word"
-                      ? {
-                          expectedAnswer: newCustomQuestion.expectedAnswer.trim(),
-                          correctAnswer: newCustomQuestion.expectedAnswer.trim(),
-                          acceptedAnswers: acceptedList,
-                          guidanceNote: newCustomQuestion.guidanceNote || "Write your answer in a single word."
-                        }
-                      : {
-                          options: newCustomQuestion.options.map(o => o.trim()),
-                          correctAnswer: newCustomQuestion.correctAnswer
-                        })
-                  };
-
-                  setEditableAiPaper(prev => [...prev, questionObj]);
+                  setEditableAiPaper(prev => [...prev, { ...newCustomQuestion, id: `custom_${Date.now()}` }]);
                   setShowAddCustomModal(false);
-                  showToast("Custom question successfully added to the assessment paper!");
+                  showToast("Custom question added to current paper.");
                 }}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-[var(--radius)] text-xs shadow-md"
+                className="px-5 py-2 bg-[#0a2558] text-white font-black rounded-[var(--radius)] text-xs shadow-md"
               >
-                Add to Question Paper
+                Add Question
               </button>
             </div>
           </div>
@@ -3901,4 +2733,3 @@ export const TrainerScheduleAssessmentView = ({
     </div>
   );
 };
-

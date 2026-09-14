@@ -642,7 +642,9 @@
         "Atmospheric Dynamics",
         "Synoptic Observations"
       ],
-      "enrolledTraineeIds": [],
+      "enrolledTraineeIds": [
+        "u_trainee_1"
+      ],
       "competenciesGained": [],
       "subjects": [
         {
@@ -3743,7 +3745,7 @@
       "scheduledStartTime": "2026-09-06T09:00:00.000Z",
       "deadlineTime": "2026-09-10T18:00:00.000Z",
       "status": "published",
-      "resultsPublished": false,
+      "resultsPublished": true,
       "isKioskModeRequired": true,
       "isPractice": false,
       "targetTraineeIds": [],
@@ -3833,7 +3835,8 @@
           "correctAnswer": 0,
           "explanation": "Because cyclonic winds rotate counter-clockwise in the Northern Hemisphere, winds in the right-front quadrant blow in the direction of storm motion, creating peak wind stress piling water onshore."
         }
-      ]
+      ],
+      "publishedAt": "2026-09-13T09:18:57.937Z"
     },
     {
       "id": "paper_custom_1789100478380",
@@ -6082,6 +6085,308 @@
     }
   ],
   "quizSubmissions": [
+    {
+      "id": "subm_424782e6",
+      "quizId": "paper_custom_1789111738706",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "courseId": "crs_nwp_101",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "answers": {},
+      "score": 0,
+      "totalMarks": 29,
+      "percentage": 0,
+      "passed": false,
+      "isDisqualified": true,
+      "integrityStatus": "disqualified",
+      "disqualificationReason": "Assessment context exited repeatedly",
+      "timeTakenSeconds": 1,
+      "tabSwitchCount": 2,
+      "submittedAt": "2026-09-13T17:58:50.959Z",
+      "gradedBy": "auto",
+      "resultsPublished": false,
+      "evaluationStatus": "disqualified",
+      "trainerFeedback": "Attempt Disqualified due to repeated context exit violations (Security Rule).",
+      "certificateGenerated": false,
+      "certificateId": null,
+      "adaptiveTrajectory": [
+        "Moderate"
+      ],
+      "difficultyHistory": [
+        {
+          "questionNumber": 1,
+          "difficulty": "Moderate",
+          "topic": "Numerical Weather Prediction & Radar Data Assimilation"
+        }
+      ],
+      "questionAnalysis": [
+        {
+          "questionId": "qb_59f97ef5",
+          "questionNumber": 1,
+          "question": "In terrain-following coordinates (such as the sigma coordinate $\\sigma = p / p_s$), the horizontal pressure gradient force $-\\nabla_p \\Phi$ is split into two terms: $-\\nabla_\\sigma \\Phi - \\frac{R T}{p_s} \\nabla_\\sigma p_s$. What critical numerical issue arises when evaluating this form over steep topography in NWP models?",
+          "type": "mcq",
+          "topic": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "difficulty": "Moderate",
+          "timeSpent": 1,
+          "timeSpentText": "1 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "The two terms are of comparable magnitude and opposite signs over steep slopes, causing catastrophic cancellation and large truncation errors that generate spurious horizontal accelerations.",
+            "The vertical coordinate transformation becomes singular when $\\nabla_\\sigma p_s \\neq 0$, rendering the Jacobian of the transformation non-invertible.",
+            "The Coriolis acceleration decouples from the horizontal velocity components, requiring artificial divergence damping to maintain geostrophic balance.",
+            "The diagnostic equation for geopotential height becomes hyperbolic, preventing the use of standard iterative elliptic solvers."
+          ],
+          "explanation": "Over steeply sloping terrain, the gradient along constant sigma surfaces ($-\\nabla_\\sigma \\Phi$) and the surface pressure correction term ($-RT/p_s \\nabla_\\sigma p_s$) are both very large but have opposite signs. Because finite-difference approximations evaluate these two terms separately, small discretization errors in each term fail to cancel properly, leading to significant truncation errors that produce spurious unphysical winds and pressure forces."
+        },
+        {
+          "questionId": "qb_nwp_104",
+          "questionNumber": 2,
+          "question": "In 4D-Var Data Assimilation, what is the core role of the Adjoint Model?",
+          "type": "MCQ",
+          "topic": "Subject 2: Data Assimilation & Radiance",
+          "difficulty": "Hard",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 4,
+          "options": [
+            "To extrapolate infrared satellite brightness temperatures over desert surfaces",
+            "To integrate sensitivities of the cost function backwards in time to obtain gradient vectors with respect to initial state",
+            "To filter high-frequency tidal oscillations in the stratosphere",
+            "To perform horizontal bi-linear interpolation on irregular grids"
+          ],
+          "explanation": "The adjoint model integrates backward through the assimilation window, computing exact gradients of the observation misfit cost function for minimization."
+        },
+        {
+          "questionId": "qb_9549db97",
+          "questionNumber": 3,
+          "question": "In the context of Adaptive Atmospheric Dynamics & NWP Practice Paper (Numerical Weather Prediction & Radar Data Assimilation), how are boundary layer sub-grid scale turbulent fluxes parameterized?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Via non-local eddy diffusivity and mixing length turbulent closure schemes",
+            "By assuming laminar molecular viscosity everywhere above surface",
+            "Through hardcoded constant horizontal advection constants",
+            "By setting convective available potential energy (CAPE) to zero"
+          ],
+          "explanation": "Planetary boundary layer schemes parameterize vertical sub-grid turbulent fluxes using eddy diffusivity profiles and K-theory."
+        },
+        {
+          "questionId": "qb_43bed1f0",
+          "questionNumber": 4,
+          "question": "Which of the following statements correctly describes the relationship between return types and method overloading in Java?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Easy",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 2,
+          "options": [
+            "Method overloading can be achieved solely by changing the return type of a method.",
+            "Changing only the return type without altering the parameter list causes a compile-time error.",
+            "Overloaded methods are required to return the exact same data type.",
+            "The return type of an overloaded method must always be void."
+          ],
+          "explanation": "In Java, the method signature consists only of the method name and the parameter list; it does not include the return type. Therefore, two methods with identical names and parameter lists but different return types cause a compile-time error because the compiler cannot determine which method to invoke."
+        },
+        {
+          "questionId": "qb_f92fecca",
+          "questionNumber": 5,
+          "question": "What is the primary operational advantage of 4D-Var data assimilation over 3D-Var in Numerical Weather Prediction & Radar Data Assimilation?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Incorporates the forecast model physics equations directly within the assimilation time window",
+            "Completely bypasses background error covariance matrices",
+            "Eliminates the requirement for satellite radiance bias correction",
+            "Restricts observations exclusively to synoptic surface barometers"
+          ],
+          "explanation": "4D-Var propagates observational innovations dynamically through time using tangent linear and adjoint model operators."
+        },
+        {
+          "questionId": "qb_a197da6f",
+          "questionNumber": 6,
+          "question": "What is the primary operational advantage of 4D-Var data assimilation over 3D-Var in Numerical Weather Prediction & Radar Data Assimilation?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Incorporates the forecast model physics equations directly within the assimilation time window",
+            "Completely bypasses background error covariance matrices",
+            "Eliminates the requirement for satellite radiance bias correction",
+            "Restricts observations exclusively to synoptic surface barometers"
+          ],
+          "explanation": "4D-Var propagates observational innovations dynamically through time using tangent linear and adjoint model operators."
+        },
+        {
+          "questionId": "qb_6aad475b",
+          "questionNumber": 7,
+          "question": "Consider a Java class for atmospheric data processing containing two overloaded methods: 'void analyze(int gridPoints)' and 'void analyze(double gridPoints)'. If the call 'analyze(100)' is executed, which method will be invoked?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Easy",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 2,
+          "options": [
+            "analyze(double gridPoints), because integer values are automatically converted to double first.",
+            "analyze(int gridPoints), because it provides an exact match for the integer literal parameter.",
+            "Both methods are executed sequentially.",
+            "A compile-time error occurs due to method ambiguity."
+          ],
+          "explanation": "When resolving overloaded methods, Java's compiler first searches for an exact match for the provided argument types. Since '100' is an integer literal, it matches 'analyze(int gridPoints)' directly without requiring type promotion to double."
+        },
+        {
+          "questionId": "qb_cfb45549",
+          "questionNumber": 8,
+          "question": "What operational signature in satellite EIR imagery indicates rapid intensification during Numerical Weather Prediction & Radar Data Assimilation?",
+          "type": "MCQ",
+          "topic": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+          "difficulty": "Moderate",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Sharp warming of the eye surrounded by a symmetric ring of very cold cloud-top temperatures (CDO)",
+            "Asymmetric elongation of the cirrus outflow canopy into dry air",
+            "Gradual erosion of the eyewall into fractional stratocumulus",
+            "Expansion of positive sea-level pressure anomalies at the core"
+          ],
+          "explanation": "Enhanced convective symmetry with very cold cloud tops around a warm eye signifies strong central pressure drops."
+        },
+        {
+          "questionId": "qb_20f65ee7",
+          "questionNumber": 9,
+          "question": "When discretizing numerical equations for Numerical Weather Prediction (NWP) Dynamics in Subject 1: Governing Equations & Atmospheric Dynamics — Module 1: Navier-Stokes & Primitive Equation Systems, what is the essential stability constraint?",
+          "type": "MCQ",
+          "topic": "Subject 1: Governing Equations & Atmospheric Dynamics",
+          "difficulty": "Moderate",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 0,
+          "expectedAnswer": "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Courant-Friedrichs-Lewy (CFL) numerical criterion (u * dt / dx <= 1)",
+            "Zero horizontal grid spacing across vertical sigma levels",
+            "Elimination of planetary boundary layer drag parameterization",
+            "Fixed time step independent of spatial mesh resolution"
+          ],
+          "explanation": "Explicit integration schemes for Numerical Weather Prediction (NWP) Dynamics require adherence to the CFL condition to prevent non-linear computational instability."
+        },
+        {
+          "questionId": "qb_dwr_101",
+          "questionNumber": 10,
+          "question": "What physical hydrometeor property is directly quantified by Differential Reflectivity (ZDR = 10 * log10(Zh / Zv))?",
+          "type": "MCQ",
+          "topic": "Subject 1: Radar Hardware & Base Products",
+          "difficulty": "Moderate",
+          "timeSpent": 35,
+          "timeSpentText": "35 sec",
+          "attempts": 0,
+          "selectedAnswer": null,
+          "correctAnswer": 1,
+          "acceptedAnswers": [],
+          "guidanceNote": "",
+          "isCorrect": false,
+          "result": "Incorrect",
+          "marksObtained": 0,
+          "totalMarks": 3,
+          "options": [
+            "Total water vapor column density",
+            "Median shape eccentricity/oblateness of falling hydrometeors",
+            "Radial Doppler velocity toward the radar transmitter",
+            "Surface rainfall accumulation rate strictly in mm/hr"
+          ],
+          "explanation": "Large raindrops flatten into oblate spheroids due to aerodynamic drag as they fall, causing Zh > Zv and producing positive ZDR values (e.g. +1 to +4 dB)."
+        }
+      ]
+    },
     {
       "id": "subm_916aabee",
       "quizId": "paper_practice_1789115167806",
@@ -8363,14 +8668,19 @@
       "gradedBy": "auto",
       "certificateGenerated": true,
       "certificateId": "MOES-IMD-CERT-2026-9041",
-      "trainerFeedback": "Flawless score on Dvorak technique and OHC thresholds.",
+      "trainerFeedback": {
+        "note": "Official results ratified and published by Lead Trainer."
+      },
       "answers": {
         "q_comp_01": 0,
         "q_comp_02": 0,
         "q_comp_03": 0,
         "q_comp_04": 0,
         "q_comp_05": 0
-      }
+      },
+      "resultsPublished": true,
+      "evaluationStatus": "published",
+      "publishedAt": "2026-09-13T09:18:57.938Z"
     },
     {
       "id": "subm_sched_02",
@@ -8395,14 +8705,19 @@
       "gradedBy": "auto",
       "certificateGenerated": true,
       "certificateId": "MOES-IMD-CERT-2026-9042",
-      "trainerFeedback": "Strong grasp of surge physics; review OHC thermal thresholds.",
+      "trainerFeedback": {
+        "note": "Official results ratified and published by Lead Trainer."
+      },
       "answers": {
         "q_comp_01": 0,
         "q_comp_02": 0,
         "q_comp_03": 0,
         "q_comp_04": 1,
         "q_comp_05": 0
-      }
+      },
+      "resultsPublished": true,
+      "evaluationStatus": "published",
+      "publishedAt": "2026-09-13T09:18:57.938Z"
     },
     {
       "id": "subm_sched_03",
@@ -8427,14 +8742,19 @@
       "gradedBy": "auto",
       "certificateGenerated": true,
       "certificateId": "MOES-IMD-CERT-2026-9043",
-      "trainerFeedback": "Good application of INSAT water vapor imagery.",
+      "trainerFeedback": {
+        "note": "Official results ratified and published by Lead Trainer."
+      },
       "answers": {
         "q_comp_01": 0,
         "q_comp_02": 0,
         "q_comp_03": 0,
         "q_comp_04": 0,
         "q_comp_05": 1
-      }
+      },
+      "resultsPublished": true,
+      "evaluationStatus": "published",
+      "publishedAt": "2026-09-13T09:18:57.938Z"
     },
     {
       "id": "subm_sched_04",
@@ -8459,14 +8779,19 @@
       "gradedBy": "auto",
       "certificateGenerated": true,
       "certificateId": "MOES-IMD-CERT-2026-9044",
-      "trainerFeedback": "Excellent understanding of RSMC storm scales.",
+      "trainerFeedback": {
+        "note": "Official results ratified and published by Lead Trainer."
+      },
       "answers": {
         "q_comp_01": 1,
         "q_comp_02": 0,
         "q_comp_03": 0,
         "q_comp_04": 0,
         "q_comp_05": 0
-      }
+      },
+      "resultsPublished": true,
+      "evaluationStatus": "published",
+      "publishedAt": "2026-09-13T09:18:57.938Z"
     }
   ],
   "competencyFramework": [
@@ -8939,5 +9264,19 @@
       "topic": "Discretization & Spatial-Temporal Grid Staggering"
     }
   ],
-  "integrityAlerts": []
+  "integrityAlerts": [
+    {
+      "id": "alert_e71d6990",
+      "quizId": "paper_custom_1789111738706",
+      "quizTitle": "Adaptive Atmospheric Dynamics & NWP Practice Paper",
+      "traineeId": "u_trainee_1",
+      "traineeName": "Rahul Sharma",
+      "status": "DISQUALIFIED",
+      "violations": 2,
+      "eventType": "context_switch",
+      "reason": "Assessment context exited repeatedly",
+      "timestamp": "2026-09-13T17:58:50.959Z",
+      "formattedTime": "Sep 13, 2026, 11:28 PM"
+    }
+  ]
 }
