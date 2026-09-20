@@ -75,7 +75,7 @@ export const CourseFeedbackImprovementStudio = ({
           setSelectedCourseId(prev => prev && courseList.some(c => c.id === prev) ? prev : courseList[0].id);
         }
       } catch (err) {
-        console.error("Failed to load feedback telemetry:", err);
+        console.error("Failed to load feedback data:", err);
       } finally {
         setLoading(false);
       }
@@ -235,7 +235,7 @@ export const CourseFeedbackImprovementStudio = ({
       `Recommended Action Items for Faculty:\n` +
       `1. Refine Question #17 and #9 in Question Bank to remove ambiguous distractors.\n` +
       `2. Insert a 5-minute video walkthrough on Nyquist Velocity Unwrapping in Module 1.\n` +
-      `3. Broadcast a clarification bulletin to all cadets enrolled in this track.`;
+      `3. Broadcast a clarification bulletin to all trainees enrolled in this track.`;
 
     setRemediationDraft(plan);
     setIsAiRemediationModalOpen(true);
@@ -258,7 +258,7 @@ export const CourseFeedbackImprovementStudio = ({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-0.5 rounded-full text-[10px] font-black bg-amber-50 border border-amber-200 text-amber-900 uppercase tracking-wider flex items-center gap-1.5 shadow-2xs">
               <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-              Post-Course Quality Telemetry
+              Post-Course Quality Review
             </span>
             <span className="text-xs font-medium text-slate-400">
               Rule 16: Feedback &rarr; Actionable Course Improvement
@@ -345,7 +345,7 @@ export const CourseFeedbackImprovementStudio = ({
               <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider">
                 4-Pillar Quality Breakdown
               </h3>
-              <p className="text-xs text-slate-400">Continuous evaluation telemetry across instructional dimensions</p>
+              <p className="text-xs text-slate-400">Continuous evaluation data across instructional dimensions</p>
             </div>
 
             <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-[var(--radius)]">
@@ -499,7 +499,7 @@ export const CourseFeedbackImprovementStudio = ({
               <MessageSquare className="w-4 h-4 text-indigo-600" />
               <span>Verbatim Trainee Reviews & Suggestions</span>
             </h3>
-            <p className="text-xs text-slate-400">Direct feedback submissions from certified cadets upon course completion</p>
+            <p className="text-xs text-slate-400">Direct feedback submissions from certified trainees upon course completion</p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">

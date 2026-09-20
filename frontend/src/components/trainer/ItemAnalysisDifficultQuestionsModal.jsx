@@ -189,7 +189,7 @@ export const ItemAnalysisDifficultQuestionsModal = ({
   // 2. Action: Send Remedial Broadcast to Learners
   const handleSendRemedialBroadcast = () => {
     setBroadcastSent(true);
-    showToast(`📢 Remedial Clarification Note broadcasted to all ${selectedQuestion.attempts} cadets who attempted Question ${selectedQuestion.questionNumber}!`);
+    showToast(`Remedial Clarification Note broadcasted to all ${selectedQuestion.attempts} trainees who attempted Question ${selectedQuestion.questionNumber}!`);
   };
 
   // 3. Action: AI Generate Clone Practice Questions
@@ -352,7 +352,7 @@ export const ItemAnalysisDifficultQuestionsModal = ({
                       {q.text}
                     </p>
 
-                    {/* Performance Telemetry Bar */}
+                    {/* Performance Activity Bar */}
                     <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-[var(--radius)] border border-slate-100 text-center text-[10px]">
                       <div>
                         <span className="text-slate-400 block font-medium">Attempts</span>
@@ -643,7 +643,7 @@ export const ItemAnalysisDifficultQuestionsModal = ({
                   </div>
 
                   <p className="text-slate-600 text-[11px]">
-                    Synthesize cloned drill questions focused on the same core principle to reinforce learning and re-assess cadets.
+                    Synthesize cloned drill questions focused on the same core principle to reinforce learning and re-assess trainees.
                   </p>
 
                   {clonedQuestions.length > 0 && (

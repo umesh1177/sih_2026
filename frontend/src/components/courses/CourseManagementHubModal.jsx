@@ -90,7 +90,7 @@ export const CourseManagementHubModal = ({
       const newCapacity = parseInt(maxEnrollmentInput) || 50;
       const res = await api.updateCourse(course.id, { maxEnrollment: newCapacity });
       if (res.success) {
-        alert(`✅ Course maximum capacity updated to ${newCapacity} officers.`);
+        alert(`Course maximum capacity updated to ${newCapacity} trainees.`);
         if (onCourseUpdated) onCourseUpdated(res.course);
       }
     } catch (err) {
@@ -106,7 +106,7 @@ export const CourseManagementHubModal = ({
     try {
       const res = await api.removeTraineeFromCourse(course.id, traineeId);
       if (res.success) {
-        alert(`✅ Officer ${traineeName} removed from course enrollment list.`);
+        alert(`Trainee ${traineeName} removed from course enrollment list.`);
         setTrainees(prev => prev.filter(t => t.traineeId !== traineeId && t.id !== traineeId));
         if (onCourseUpdated) onCourseUpdated(res.course);
       }
@@ -253,7 +253,7 @@ export const CourseManagementHubModal = ({
                   />
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  When capacity limit is reached, self-enrollment for cadets is automatically gated.
+                  When capacity limit is reached, self-enrollment for trainees is automatically gated.
                 </p>
               </div>
 
@@ -294,7 +294,7 @@ export const CourseManagementHubModal = ({
                     type="text"
                     value={traineeSearch}
                     onChange={(e) => setTraineeSearch(e.target.value)}
-                    placeholder="Search enrolled cadets..."
+                    placeholder="Search enrolled trainees..."
                     className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs outline-none focus:border-blue-500"
                   />
                 </div>
@@ -305,7 +305,7 @@ export const CourseManagementHubModal = ({
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
                     <tr>
-                      <th className="py-3 px-4">Officer Name & Cadre ID</th>
+                      <th className="py-3 px-4">Trainee Name & Trainee ID</th>
                       <th className="py-3 px-3">Station & Department</th>
                       <th className="py-3 px-3">Progress</th>
                       <th className="py-3 px-3">Avg Quiz Score</th>
@@ -316,7 +316,7 @@ export const CourseManagementHubModal = ({
                     {filteredTrainees.length === 0 ? (
                       <tr>
                         <td colSpan="5" className="py-8 text-center text-slate-400">
-                          No enrolled cadets found matching search.
+                          No enrolled trainees found matching search.
                         </td>
                       </tr>
                     ) : (
@@ -331,7 +331,7 @@ export const CourseManagementHubModal = ({
                               />
                               <div>
                                 <p className="font-medium text-slate-900">{trainee.name}</p>
-                                <p className="text-[10px] text-slate-400 font-mono">{trainee.cadreId || `MOES-CADRE-${1000 + idx}`}</p>
+                                <p className="text-[10px] text-slate-400 font-mono">{trainee.cadreId || `ID-${1000 + idx}`}</p>
                               </div>
                             </div>
                           </td>
@@ -363,7 +363,7 @@ export const CourseManagementHubModal = ({
                             <button
                               onClick={() => handleRemoveTrainee(trainee.traineeId || trainee.id, trainee.name)}
                               className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium rounded-[var(--radius)] text-xs transition-colors flex items-center gap-1 ml-auto"
-                              title="Remove officer from this course"
+                              title="Remove trainee from this course"
                             >
                               <UserX className="w-3.5 h-3.5" />
                               <span>Remove</span>
@@ -513,7 +513,7 @@ export const CourseManagementHubModal = ({
                 <div>
                   <h3 className="text-base font-black text-amber-950">Bulk Course Certificate Generator</h3>
                   <p className="text-xs text-amber-800">
-                    Generate and issue standardized digital accreditation certificates in bulk for all completed cadets and faculty instructors.
+                    Generate and issue standardized digital accreditation certificates in bulk for all completed trainees and faculty instructors.
                   </p>
                 </div>
               </div>

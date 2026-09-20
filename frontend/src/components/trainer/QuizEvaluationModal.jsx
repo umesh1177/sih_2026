@@ -71,7 +71,7 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
       const res = await api.resetDisqualification(quiz?.id, traineeId);
       if (res.success) {
         setSubmissions(prev => prev.filter(s => s.traineeId !== traineeId));
-        alert(`Disqualification cleared for ${traineeName || 'cadet'}. Assessment attempt reopened!`);
+        alert(`Disqualification cleared for ${traineeName || 'trainee'}. Assessment attempt reopened!`);
       } else {
         alert(res.message || "Failed to reset disqualification");
       }
@@ -185,7 +185,7 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
               </div>
               <h3 className="font-semibold text-slate-800 text-sm">No Trainee Submissions Logged Yet</h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
-                When cadets complete and submit this assessment, their answer records, score calculations, and feedback inputs will appear here.
+                When trainees complete and submit this assessment, their answer records, score calculations, and feedback inputs will appear here.
               </p>
             </div>
           ) : (
@@ -195,7 +195,7 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
                   <input
                     type="text"
-                    placeholder="Search candidate by name, station, cadre ID..."
+                    placeholder="Search trainee by name, station, Trainee ID..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-[var(--radius)] text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"
@@ -322,7 +322,7 @@ export const QuizEvaluationModal = ({ quiz, currentUser, onClose, onResultsPubli
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
                             <input
                               type="text"
-                              placeholder="Enter faculty remarks or recommendations for this cadet..."
+                              placeholder="Enter faculty remarks or recommendations for this trainee..."
                               value={feedbackMap[sub.id] || ""}
                               onChange={(e) => setFeedbackMap({ ...feedbackMap, [sub.id]: e.target.value })}
                               className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] text-xs focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"

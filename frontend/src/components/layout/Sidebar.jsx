@@ -53,12 +53,12 @@ export const Sidebar = ({
         { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
         { id: "courses", label: "Course Catalog", icon: BookOpen },
         { id: "trainer-matching", label: "People & Workload", icon: Users },
-        { id: "trainee-performance", label: "Learning Progress", icon: TrendingUp },
+        { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "course-feedback", label: "Governance & Quality", icon: Star },
-        { id: "learning-gaps", label: "Competency & Gaps", icon: ShieldAlert },
+        { id: "learning-gaps", label: "Learning Gaps", icon: ShieldAlert },
         { id: "approvals", label: "User Approvals", icon: UserCheck },
         { id: "announcements", label: "Communication", icon: BellRing },
-        { id: "analytics", label: "Reports & Analytics", icon: BarChart3 },
+        { id: "analytics", label: "Platform Performance", icon: BarChart3 },
         { id: "profile", label: "Professional Profile", icon: FileText },
         { id: "helpdesk", label: "Helpdesk", icon: ShieldCheck }
       ];
@@ -76,7 +76,7 @@ export const Sidebar = ({
       { id: "questions", label: "Question Bank", icon: Layers },
       { id: "certificates", label: "Certificates", icon: Award },
       { id: "profile", label: "Professional Profile", icon: FileText },
-      { id: "analytics", label: "Competency Passport", icon: BarChart3 },
+      { id: "analytics", label: "My Learning Performance", icon: BarChart3 },
       { id: "helpdesk", label: "Helpdesk", icon: ShieldCheck }
     ];
   };

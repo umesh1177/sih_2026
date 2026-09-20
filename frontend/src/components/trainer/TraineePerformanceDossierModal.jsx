@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
-  const [activeDossierTab, setActiveDossierTab] = useState("overview"); // "overview" | "quizzes" | "competencies"
+  const [activeDossierTab, setActiveDossierTab] = useState("overview"); // "overview" | "assessments" | "competencies"
   const [trainerNote, setTrainerNote] = useState("");
   const [savedNotes, setSavedNotes] = useState(trainee?.trainerNotes || []);
 
@@ -59,7 +59,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto relative">
         
-        {/* ═════════ HEADER: CADET PROFILE CARD (LIGHT THEME) ═════════ */}
+        {/* ═════════ HEADER: TRAINEE PROFILE CARD ═════════ */}
         <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shrink-0">
           
           <div className="flex items-center gap-4">
@@ -86,7 +86,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                 {trainee.cadreId && (
                   <span className="flex items-center gap-1 font-mono">
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                    <span>ID: {trainee.cadreId}</span>
+                    <span>Trainee ID: {trainee.cadreId}</span>
                   </span>
                 )}
                 {trainee.station && (
@@ -165,10 +165,10 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
               <div className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-full">
-                      CURRENT ENROLLED PROGRAM
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-full">
+                      Enrolled Program
                     </span>
-                    <h3 className="font-black text-slate-900 text-base mt-1.5">
+                    <h3 className="font-semibold text-slate-900 text-base mt-1.5">
                       {trainee.courseTitle || "Specialized Training Track"}
                     </h3>
                     <p className="text-slate-500 text-xs font-medium">
@@ -177,7 +177,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-2xl font-black text-blue-700">{progressPercentage}%</span>
+                    <span className="text-2xl font-bold text-blue-700">{progressPercentage}%</span>
                     <p className="text-[11px] font-medium text-slate-400">Overall Completion</p>
                   </div>
                 </div>
@@ -200,35 +200,35 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
               {/* 4 Metric Summary Tiles */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-black uppercase text-slate-400">QUIZZES TAKEN</span>
-                  <p className="text-xl font-black text-slate-900 mt-1">{submissions.length}</p>
+                  <span className="text-[10px] font-medium uppercase text-slate-400 tracking-wider">Assessments Taken</span>
+                  <p className="text-xl font-bold text-slate-900 mt-1">{submissions.length}</p>
                 </div>
 
                 <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-black uppercase text-slate-400">ACCURACY RATE</span>
-                  <p className="text-xl font-black text-emerald-600 mt-1">{avgQuizScore}%</p>
+                  <span className="text-[10px] font-medium uppercase text-slate-400 tracking-wider">Average Score</span>
+                  <p className="text-xl font-bold text-emerald-600 mt-1">{avgQuizScore}%</p>
                 </div>
 
                 <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-black uppercase text-slate-400">TRAINING STATUS</span>
-                  <p className="text-xl font-black text-blue-700 mt-1">{trainee.status || "Active"}</p>
+                  <span className="text-[10px] font-medium uppercase text-slate-400 tracking-wider">Status</span>
+                  <p className="text-xl font-bold text-blue-700 mt-1">{trainee.status || "Active"}</p>
                 </div>
 
                 <div className="p-4 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-black uppercase text-slate-400">VERIFIED SKILLS</span>
-                  <p className="text-xl font-black text-purple-700 mt-1">{trainee.skills?.length || 0} Units</p>
+                  <span className="text-[10px] font-medium uppercase text-slate-400 tracking-wider">Verified Skills</span>
+                  <p className="text-xl font-bold text-purple-700 mt-1">{trainee.skills?.length || 0} Units</p>
                 </div>
               </div>
 
               {/* Trainer Notes & Qualitative Audit */}
               <div className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-3">
-                <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <h4 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-blue-600" />
-                  <span>Lead Trainer Evaluation Notes & Remarks</span>
+                  <span>Trainer Notes & Remarks</span>
                 </h4>
 
                 {savedNotes.length === 0 ? (
-                  <p className="text-slate-400 text-xs py-2">No confidential trainer remarks logged yet for this cadet.</p>
+                  <p className="text-slate-400 text-xs py-2">No trainer remarks added yet for this trainee.</p>
                 ) : (
                   <div className="space-y-2">
                     {savedNotes.map((note, idx) => (
@@ -243,7 +243,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                 <div className="flex items-center gap-2 pt-2">
                   <input
                     type="text"
-                    placeholder="Add confidential trainer remark for this cadet..."
+                    placeholder="Add trainer note for this trainee..."
                     value={trainerNote}
                     onChange={(e) => setTrainerNote(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddNote())}
@@ -275,7 +275,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
               ) : (
                 <div className="overflow-x-auto bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-[11px] font-black uppercase text-slate-400 border-b border-slate-100">
+                    <thead className="bg-slate-50 text-[11px] font-semibold uppercase text-slate-400 border-b border-slate-100">
                       <tr>
                         <th className="py-3.5 px-4">Assessment Title</th>
                         <th className="py-3.5 px-4">Score</th>
@@ -304,7 +304,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                             {sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString() : "—"}
                           </td>
                           <td className="py-3.5 px-4 text-right">
-                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase ${
                               (sub.percentage || 0) >= 90
                                 ? "bg-amber-100 text-amber-900 border border-amber-300"
                                 : (sub.percentage || 0) >= 50
@@ -327,7 +327,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
           {activeDossierTab === "competencies" && (
             <div className="space-y-6 animate-in fade-in duration-150">
               <div className="p-5 bg-white rounded-[var(--radius)] border border-slate-200 shadow-sm space-y-4">
-                <h4 className="font-extrabold text-slate-900 text-sm">Verified Skills & Knowledge Areas</h4>
+                <h4 className="font-semibold text-slate-900 text-sm">Verified Skills & Knowledge Areas</h4>
                 {(!trainee.skills || trainee.skills.length === 0) ? (
                   <p className="text-slate-400 text-xs">No specific skill tags mapped yet.</p>
                 ) : (
@@ -343,7 +343,7 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
                 <div className="pt-4 border-t border-slate-100">
                   <h5 className="font-semibold text-slate-800 text-xs">Learner Biography / Background</h5>
                   <p className="text-xs text-slate-600 leading-relaxed mt-1">
-                    {trainee.bio || "No biography provided in profile dossier."}
+                    {trainee.bio || "No biography provided."}
                   </p>
                 </div>
               </div>

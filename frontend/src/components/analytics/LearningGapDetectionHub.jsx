@@ -614,19 +614,19 @@ export const LearningGapDetectionHub = ({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-3 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 border border-rose-200 text-rose-700 uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldAlert className="w-3 h-3 text-rose-600" />
-                Adaptive Recommendation Engine
+                Adaptive Practice Engine
               </span>
               <span className="text-xs font-normal text-slate-400">
-                Rule 10: Topic Accuracy &lt; {gapThreshold}% Trigger
+                Threshold: &lt; {gapThreshold}%
               </span>
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
-              Automated Learning Gap Detection & Remediation
+              Learning Gaps
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-              When recurring accuracy falls below the configured threshold of {gapThreshold}%, the system automatically isolates the cognitive gap and provisions targeted AI Module Summaries, Subject Materials, and Adaptive Practice Quizzes.
+              Track learning gaps, accuracy levels and recommended practice actions. Topics below {gapThreshold}% trigger recommended remediation steps.
             </p>
           </div>
 

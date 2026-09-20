@@ -678,7 +678,7 @@ export const TrainerScheduleAssessmentView = ({
     try {
       const res = await api.resetDisqualification(quizId, traineeId);
       if (res.success) {
-        showToast(`Disqualification revoked for ${traineeName || 'cadet'}. Assessment attempt reopened!`);
+        showToast(`Disqualification revoked for ${traineeName || 'trainee'}. Assessment attempt reopened!`);
         if (selectedQuizForDetails) {
           handleInspectQuiz(selectedQuizForDetails);
         }
@@ -759,7 +759,7 @@ export const TrainerScheduleAssessmentView = ({
         setSelectedQuizForDetails(prev => ({ ...prev, resultsPublished: true }));
       }
       setActiveSubmissions(prev => prev.map(s => ({ ...s, status: "Published" })));
-      showToast("Results published! Scores are now visible on cadet portals.");
+      showToast("Results published! Scores are now visible on trainee portals.");
     } catch (err) {
       showToast("Publish error: " + err.message, "error");
     }
@@ -2268,7 +2268,7 @@ export const TrainerScheduleAssessmentView = ({
                 }`}
             >
               <Trophy className="w-4 h-4 text-yellow-400" />
-              <span>Cadet Merit Leaderboard</span>
+              <span>Trainee Leaderboard</span>
             </button>
           </div>
 
@@ -2292,13 +2292,13 @@ export const TrainerScheduleAssessmentView = ({
                 <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 space-y-1">
                   <span className="text-[10px] font-semibold text-emerald-600 uppercase">Qualification Pass Rate</span>
                   <div className="text-2xl font-bold text-emerald-900">{quizAnalytics?.passRate || 92}%</div>
-                  <p className="text-[11px] text-emerald-700 font-medium">{quizAnalytics?.passedCount || activeSubmissions.length} Qualified Cadets</p>
+                  <p className="text-[11px] text-emerald-700 font-medium">{quizAnalytics?.passedCount || activeSubmissions.length} Qualified Trainees</p>
                 </div>
 
                 <div className="p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 space-y-1">
                   <span className="text-[10px] font-semibold text-amber-700 uppercase">Top Merit Score</span>
                   <div className="text-2xl font-bold text-amber-900">{quizAnalytics?.highestScore || selectedQuizForDetails.totalMarks} / {selectedQuizForDetails.totalMarks}</div>
-                  <p className="text-[11px] text-amber-800 font-medium truncate">Scorer: {quizAnalytics?.highestScorer || "Cadet Analyst"}</p>
+                  <p className="text-[11px] text-amber-800 font-medium truncate">Scorer: {quizAnalytics?.highestScorer || "Top Trainee"}</p>
                 </div>
               </div>
 
@@ -2306,28 +2306,28 @@ export const TrainerScheduleAssessmentView = ({
               <div className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-4">
                 <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-blue-600" />
-                  <span>Cadet Score Distribution Tier Breakdown</span>
+                  <span>Score Distribution Tier Breakdown</span>
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center">
                   <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
                     <span className="text-[10px] text-emerald-600 font-semibold uppercase">Distinction (≥90%)</span>
-                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.distinction || 0} Cadets</div>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.distinction || 0} Trainees</div>
                   </div>
 
                   <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
                     <span className="text-[10px] text-blue-600 font-semibold uppercase">First Class (75-89%)</span>
-                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.firstClass || 0} Cadets</div>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.firstClass || 0} Trainees</div>
                   </div>
 
                   <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
                     <span className="text-[10px] text-amber-600 font-semibold uppercase">Passed (50-74%)</span>
-                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.passed || 0} Cadets</div>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.passed || 0} Trainees</div>
                   </div>
 
                   <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 space-y-1">
                     <span className="text-[10px] text-red-600 font-semibold uppercase">Remediation Required (&lt;50%)</span>
-                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.remediation || 0} Cadets</div>
+                    <div className="text-lg font-bold text-slate-900">{quizAnalytics?.scoreDistribution?.remediation || 0} Trainees</div>
                   </div>
                 </div>
               </div>
@@ -2372,7 +2372,7 @@ export const TrainerScheduleAssessmentView = ({
           {analyticsSubTab === "trainee-responses" && (
             <div className="space-y-4 text-xs animate-in fade-in duration-150">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 className="font-semibold text-sm text-slate-900">Cadet Responses & Individual Audit</h3>
+                <h3 className="font-semibold text-sm text-slate-900">Trainee Responses & Individual Audit</h3>
                 <div className="relative">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-2 text-slate-400" />
                   <input
@@ -2389,7 +2389,7 @@ export const TrainerScheduleAssessmentView = ({
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                      <th className="p-3">Cadet / Trainee</th>
+                      <th className="p-3">Trainee</th>
                       <th className="p-3">Station</th>
                       <th className="p-3">Score</th>
                       <th className="p-3">Percentage</th>
@@ -2402,7 +2402,7 @@ export const TrainerScheduleAssessmentView = ({
                       .filter(s => !traineeSearchTerm || (s.traineeName || "").toLowerCase().includes(traineeSearchTerm.toLowerCase()))
                       .map((sub) => (
                         <tr key={sub.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="p-3 font-semibold text-slate-900">{sub.traineeName || "Cadet"}</td>
+                          <td className="p-3 font-semibold text-slate-900">{sub.traineeName || "Trainee"}</td>
                           <td className="p-3 text-slate-500">{sub.station || "HQ"}</td>
                           <td className="p-3 font-mono font-semibold text-blue-900">{sub.score} / {selectedQuizForDetails.totalMarks}</td>
                           <td className="p-3 font-semibold text-slate-900">{sub.percentage}%</td>
