@@ -564,6 +564,15 @@ export const getQuizAnalytics = (req, res) => {
 export const getTraineeAnalytics = (req, res) => {
   try {
     const { traineeId } = req.params;
+
+    // Role-based access control: Trainees can only view their own analytics
+    if (req.user && req.user.role === 'trainee' && req.user.id !== traineeId) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Trainees can only view their own performance analytics."
+      });
+    }
+
     const submissions = db.getSubmissionsForTrainee(traineeId);
     const courses = db.getCourses().filter(c => (c.enrolledTraineeIds || []).includes(traineeId));
 
@@ -646,7 +655,7 @@ export const publishQuizResults = (req, res) => {
     }
     return res.json({
       success: true,
-      message: `Results published successfully for ${result.updatedCount} cadet submission(s)! Trainees can now view their scores and answer breakdowns.`,
+      message: `Results published successfully for ${result.updatedCount} trainee submission(s)! Trainees can now view their scores and answer breakdowns.`,
       result
     });
   } catch (err) {

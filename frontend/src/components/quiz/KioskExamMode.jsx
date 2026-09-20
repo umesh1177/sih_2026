@@ -500,7 +500,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     // 4. Mouse boundary tracking (Moving out of window to second screen / browser chrome)
     const handleMouseLeave = () => {
       setIsMouseOutOfBounds(true);
-      setRecentSecurityAlert("⚠️ Notice: Cursor exited examination boundary!");
+      setRecentSecurityAlert("Notice: Cursor exited examination boundary!");
     };
     const handleMouseEnter = () => {
       setIsMouseOutOfBounds(false);
@@ -509,24 +509,24 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     // 5. Disable Right-Click Context Menu
     const handleContextMenu = (e) => {
       e.preventDefault();
-      setRecentSecurityAlert("🚫 Right-Click Inspection is Disabled in Kiosk Exam Mode");
+      setRecentSecurityAlert("Right-Click Inspection is Disabled in Kiosk Exam Mode");
       return false;
     };
 
     // 6. Disable Copy, Cut, Paste
     const handleCopy = (e) => {
       e.preventDefault();
-      setRecentSecurityAlert("🚫 Text Copy is Disabled during Examination");
+      setRecentSecurityAlert("Text Copy is Disabled during Examination");
       return false;
     };
     const handleCut = (e) => {
       e.preventDefault();
-      setRecentSecurityAlert("🚫 Clipboard Cut is Disabled in Kiosk Mode");
+      setRecentSecurityAlert("Clipboard Cut is Disabled in Kiosk Mode");
       return false;
     };
     const handlePaste = (e) => {
       e.preventDefault();
-      setRecentSecurityAlert("🚫 Pasting Content is Blocked in Kiosk Mode");
+      setRecentSecurityAlert("Pasting Content is Blocked in Kiosk Mode");
       return false;
     };
 
@@ -555,7 +555,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (code.startsWith("F") && !isNaN(Number(code.slice(1)))) {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert(`⚠️ Function Key ${code} is Blocked by Exam Security`);
+        setRecentSecurityAlert(`Function Key ${code} is Blocked by Exam Security`);
         return false;
       }
 
@@ -563,7 +563,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (isCtrl && isShift && (key.toLowerCase() === "i" || key.toLowerCase() === "j" || key.toLowerCase() === "c")) {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert("🚫 DevTools Shortcut Intercepted and Blocked");
+        setRecentSecurityAlert("DevTools Shortcut Intercepted and Blocked");
         return false;
       }
 
@@ -571,7 +571,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (isCtrl && key.toLowerCase() === "u") {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert("🚫 View Source is Prohibited");
+        setRecentSecurityAlert("View Source is Prohibited");
         return false;
       }
 
@@ -579,7 +579,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (isCtrl && key.toLowerCase() === "p") {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert("🚫 Printing is Disabled in Kiosk Exam");
+        setRecentSecurityAlert("Printing is Disabled in Kiosk Exam");
         return false;
       }
 
@@ -587,7 +587,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (isCtrl && key.toLowerCase() === "s") {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert("🚫 Save Page is Disabled");
+        setRecentSecurityAlert("Save Page is Disabled");
         return false;
       }
 
@@ -595,7 +595,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (isCtrl && key.toLowerCase() === "r") {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert("🚫 Page Refresh is Blocked");
+        setRecentSecurityAlert("Page Refresh is Blocked");
         return false;
       }
 
@@ -603,18 +603,18 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
       if (isCtrl && ["c", "v", "x", "a"].includes(key.toLowerCase()) && e.target.tagName !== "INPUT") {
         e.preventDefault();
         e.stopPropagation();
-        setRecentSecurityAlert("🚫 Clipboard Action Disabled");
+        setRecentSecurityAlert("Clipboard Action Disabled");
         return false;
       }
 
       // Detect Windows / Command Key
       if (key === "Meta" || key === "OS") {
-        setRecentSecurityAlert("⚠️ System Key Detected — Keep Focus on Exam");
+        setRecentSecurityAlert("System Key Detected — Keep Focus on Exam");
       }
 
       // Detect Escape (Attempting to leave fullscreen)
       if (key === "Escape") {
-        setRecentSecurityAlert("⚠️ Warning: Escape Key Pressed");
+        setRecentSecurityAlert("Warning: Escape Key Pressed");
       }
     };
 
@@ -628,7 +628,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
     // 11. Browser Back Button Trap (Popstate)
     const handlePopState = (e) => {
       window.history.pushState(null, "", window.location.href);
-      setRecentSecurityAlert("⚠️ Navigation Disabled during Assessment");
+      setRecentSecurityAlert("Navigation Disabled during Assessment");
     };
     window.history.pushState(null, "", window.location.href);
 
@@ -1180,7 +1180,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               : "bg-emerald-50 text-emerald-800 border-emerald-200"
           }`}>
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{tabSwitchCount === 0 ? "✓ Integrity 100%" : `⚠ ${tabSwitchCount} / 2 Warnings`}</span>
+            <span>{tabSwitchCount === 0 ? "Integrity 100%" : `${tabSwitchCount} / 2 Warnings`}</span>
           </div>
 
           <button
@@ -1203,23 +1203,23 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             Proctored Session
           </span>
           <span className="text-slate-600 font-semibold text-[11px]">
-            {quiz?.courseName || quiz?.title || "National Examination"}
+            {quiz?.courseName || quiz?.title || "Assessment"}
           </span>
         </div>
 
         {/* Security telemetry indicators */}
         <div className="flex items-center gap-2 text-[10px] font-medium text-slate-500 flex-wrap">
-          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-emerald-700">
-            🛡️ Focus Locked
+          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-emerald-700 font-medium">
+            Focus Locked
           </span>
-          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
-            🚫 Clipboard & Context Menu Blocked
+          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-medium">
+            Clipboard & Context Menu Blocked
           </span>
-          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-purple-700">
-            ⌨️ DevTools/Shortcuts Shielded
+          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-purple-700 font-medium">
+            DevTools / Shortcuts Shielded
           </span>
           <span className="font-mono text-slate-600 pl-1 border-l border-slate-300">
-            Cadre ID: <b className="text-slate-800">{currentUser?.cadreId || "MOES-MET-2026"}</b>
+            Cadre ID: <b className="text-slate-800">{currentUser?.cadreId || "CC-MET-2026"}</b>
           </span>
         </div>
       </div>

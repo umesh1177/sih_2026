@@ -158,7 +158,7 @@ const navigateToTab = (tab) => {
           });
         }
       } else {
-        alert("❌ " + (res.message || "Enrollment failed. Administrative approval is required."));
+        alert(res.message || "Enrollment failed. Administrative approval is required.");
       }
     } catch (err) {
       console.error("Enrollment failed:", err);
@@ -454,7 +454,7 @@ const navigateToTab = (tab) => {
                 <div className="bg-white rounded-[var(--radius)] p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
                     <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
-                      Assessment Operations & Kiosk Scheduling
+                      Assessments
                     </h1>
                     <p className="text-xs text-slate-500 mt-0.5">
                       Create timed MCQ evaluations with strict start windows, pass marks, and automated grading.

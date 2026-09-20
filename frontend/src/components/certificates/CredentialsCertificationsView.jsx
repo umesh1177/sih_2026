@@ -48,20 +48,20 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
 
         const list = [];
         
-        // 1. Direct user certificates on profile (e.g. issued by Admin or manually added)
+        // 1. Direct user certificates on profile
         if (currentUser?.certificates && Array.isArray(currentUser.certificates)) {
           currentUser.certificates.forEach((c, idx) => {
-            const certId = c.credentialId || c.id || `MOES-CERT-${idx + 1}`;
+            const certId = c.credentialId || c.id || `CC-CERT-${idx + 1}`;
             const pct = c.finalScore || (c.grade && typeof c.grade === "string" && c.grade.includes("%") ? parseInt(c.grade.replace(/\D/g, "")) : 100);
             const isDist = (c.performanceCategory || c.grade || "").toLowerCase().includes("distinction") || pct >= 90;
             list.push({
               id: certId,
-              title: c.title || "Capacity Building Accreditation",
+              title: c.title || "Course Completion Certificate",
               category: "general",
-              division: c.issuer || "Ministry of Earth Sciences Training Directorate",
+              division: c.issuer || "Capacity Connect",
               issuedTo: currentUser.name || "Trainee",
               issueDate: c.year || "2026",
-              expiryDate: "Lifetime Verified",
+              expiryDate: "Verified",
               grade: c.performanceCategory ? `${c.performanceCategory} (${pct}%)` : (c.grade || "Verified Credential"),
               isDistinction: isDist,
               credentialUrl: c.verificationUrl || `${window.location.origin}/?verify=${certId}`,
@@ -73,7 +73,7 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
                 percentage: pct,
                 performanceCategory: c.performanceCategory,
                 grade: c.grade,
-                issuer: c.issuer,
+                issuer: c.issuer || "Capacity Connect",
                 submittedAt: c.issuedAt || new Date().toISOString()
               }
             });
@@ -85,7 +85,7 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
           subRes.submissions
             .filter(s => s.certificateGenerated || s.passed || (s.percentage >= 60))
             .forEach(s => {
-              const certId = s.certificateId || `MOES-CERT-${s.id}`;
+              const certId = s.certificateId || `CC-CERT-${s.id}`;
               const exists = list.some(item => item.id === certId || item.title === s.quizTitle);
               if (!exists) {
                 const isDist = (s.percentage || 0) >= 90;
@@ -93,10 +93,10 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
                   id: certId,
                   title: s.quizTitle || "Subject Assessment Certification",
                   category: (s.quizTitle || "").toLowerCase().includes("radar") ? "radar" : (s.quizTitle || "").toLowerCase().includes("sat") ? "satellite" : "nwp",
-                  division: "Ministry of Earth Sciences / IMD Central Examination Cell",
+                  division: "Capacity Connect Training Directorate",
                   issuedTo: s.traineeName || currentUser?.name || "Trainee",
                   issueDate: new Date(s.submittedAt || Date.now()).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
-                  expiryDate: "Lifetime Verified",
+                  expiryDate: "Verified",
                   grade: isDist ? `Distinction (${s.percentage}%)` : `Passed (${s.percentage}%)`,
                   score: `${s.score}/${s.totalMarks}`,
                   isDistinction: isDist,
@@ -160,26 +160,26 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
         <div className="space-y-2 max-w-2xl z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-medium border border-blue-200">
             <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
-            <span>Official Digital Credential Registry</span>
+            <span>Learning & Competency Verification</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-            Certified Professional Accreditations
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+            My Certificates
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-            Cryptographically verified competency certifications issued under the National Capacity Building Program.
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
+            View your completed courses, earned certificates and verified competencies.
           </p>
         </div>
 
-        {/* Officer Verification Stamp */}
+        {/* Learner Verification Stamp */}
         <div className="bg-slate-50 border border-slate-200 rounded-[var(--radius)] p-4 flex items-center gap-3.5 shrink-0 shadow-xs z-10">
-          <div className="w-12 h-12 rounded-[var(--radius)] bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center font-black text-xl shadow-xs">
+          <div className="w-12 h-12 rounded-[var(--radius)] bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center font-bold text-xl shadow-xs">
             <Award className="w-7 h-7 text-blue-700" />
           </div>
           <div>
-            <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Accredited Officer</p>
-            <p className="font-extrabold text-sm text-slate-900">{currentUser?.name || "Trainee"}</p>
+            <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Learner</p>
+            <p className="font-bold text-sm text-slate-900">{currentUser?.name || "Trainee"}</p>
             <p className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Digital Signature Verified
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Verified Learner
             </p>
           </div>
         </div>
@@ -193,8 +193,8 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
             <Award className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-2xl font-black text-slate-900">{certificates.length}</p>
-            <p className="text-xs font-medium text-slate-500">Verified Credentials</p>
+            <p className="text-2xl font-bold text-slate-900">{certificates.length}</p>
+            <p className="text-xs font-medium text-slate-500">Certificates Earned</p>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
             <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
           </div>
           <div>
-            <p className="text-2xl font-black text-amber-800">{distinctionCount}</p>
+            <p className="text-2xl font-bold text-amber-800">{distinctionCount}</p>
             <p className="text-xs font-medium text-slate-500">Distinction Honors (90%+)</p>
           </div>
         </div>
@@ -213,8 +213,8 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
             <Layers className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-2xl font-black text-slate-900">{totalSkillsCount}</p>
-            <p className="text-xs font-medium text-slate-500">Competencies Cleared</p>
+            <p className="text-2xl font-bold text-slate-900">{totalSkillsCount}</p>
+            <p className="text-xs font-medium text-slate-500">Competencies Verified</p>
           </div>
         </div>
 
@@ -223,8 +223,8 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-2xl font-black text-purple-900">{certificates.length > 0 ? "Tier-1" : "Initial"}</p>
-            <p className="text-xs font-medium text-slate-500">Accreditation Standing</p>
+            <p className="text-2xl font-bold text-purple-900">{certificates.length > 0 ? "Completed" : "In Progress"}</p>
+            <p className="text-xs font-medium text-slate-500">Learning Standing</p>
           </div>
         </div>
 
@@ -393,7 +393,7 @@ export const CredentialsCertificationsView = ({ currentUser, onOpenCertificate, 
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-[var(--radius)] text-xs shadow-sm transition-transform hover:scale-[1.02]"
                   >
                     <Award className="w-4 h-4 text-amber-300" />
-                    <span>View Official Certificate</span>
+                    <span>View Certificate</span>
                     <ArrowUpRight className="w-3.5 h-3.5 text-blue-200 ml-0.5" />
                   </button>
                 </div>

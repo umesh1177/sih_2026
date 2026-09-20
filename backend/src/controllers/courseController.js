@@ -56,7 +56,7 @@ export const enrollCourse = (req, res) => {
     if ((existingCourse.enrolledTraineeIds || []).length >= maxCapacity && !existingCourse.enrolledTraineeIds?.includes(traineeId)) {
       return res.status(400).json({
         success: false,
-        message: `Course batch capacity limit (${maxCapacity} cadets) has been reached. Please contact administration for waitlist.`
+        message: `Course batch capacity limit (${maxCapacity} trainees) has been reached. Please contact administration for waitlist.`
       });
     }
 

@@ -297,7 +297,7 @@ export const LearningGapDetectionHub = ({
   const isTrainee = currentUser?.role === "trainee" && !isAdmin;
 
   const [gapThreshold, setGapThreshold] = useState(() => {
-    const saved = localStorage.getItem("moes_gap_threshold");
+    const saved = localStorage.getItem("cc_gap_threshold");
     return saved ? Number(saved) : DEFAULT_GAP_THRESHOLD;
   });
 
@@ -311,7 +311,7 @@ export const LearningGapDetectionHub = ({
   const [selectedTopicKey, setSelectedTopicKey] = useState("Radar Interpretation");
   const [activeModal, setActiveModal] = useState(null);
   const [retestedScores, setRetestedScores] = useState(() => {
-    const saved = localStorage.getItem("moes_retested_topics");
+    const saved = localStorage.getItem("cc_retested_topics");
     return saved ? JSON.parse(saved) : {};
   });
 
@@ -376,7 +376,7 @@ export const LearningGapDetectionHub = ({
 
       } catch (err) {
         console.error("Failed loading data in LearningGapDetectionHub:", err);
-      } font-normal; {
+      } finally {
         setLoading(false);
       }
     };
@@ -588,12 +588,12 @@ export const LearningGapDetectionHub = ({
   const handleSimulateRetestImprovement = (topicKey) => {
     const updated = { ...retestedScores, [topicKey]: 88 };
     setRetestedScores(updated);
-    localStorage.setItem("moes_retested_topics", JSON.stringify(updated));
+    localStorage.setItem("cc_retested_topics", JSON.stringify(updated));
     showToast(`Remediation Success! Retest score for ${topicKey} improved to 88% — Learning Gap CLOSED!`);
   };
 
   const handleAssignRemediation = (topicKey) => {
-    const targetName = selectedTraineeObj ? selectedTraineeObj.name : "All Enrolled Officers";
+    const targetName = selectedTraineeObj ? selectedTraineeObj.name : "All Enrolled Trainees";
     showToast(`Prescribed Targeted Remediation Path for "${topicKey}" assigned to ${targetName}!`);
   };
 
@@ -622,11 +622,13 @@ export const LearningGapDetectionHub = ({
             </div>
             
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
-              Learning Gaps
+              {isTrainee ? "My Learning Gaps" : "Learning Gaps"}
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-              Track learning gaps, accuracy levels and recommended practice actions. Topics below {gapThreshold}% trigger recommended remediation steps.
+              {isTrainee 
+                ? `Track your diagnosed topic deficits, accuracy levels and targeted practice recommendations. Topics below ${gapThreshold}% trigger recommended remediation steps.`
+                : `Track learning gaps, accuracy levels and recommended practice actions across courses and learners. Topics below ${gapThreshold}% trigger recommended remediation steps.`}
             </p>
           </div>
 
@@ -642,7 +644,7 @@ export const LearningGapDetectionHub = ({
             <button
               onClick={() => {
                 setRetestedScores({});
-                localStorage.removeItem("moes_retested_topics");
+                localStorage.removeItem("cc_retested_topics");
                 showToast("All topic gap telemetry reset to live evaluation baselines.");
               }}
               className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 font-normal rounded-[var(--radius)] text-xs border border-slate-200"
@@ -671,22 +673,24 @@ export const LearningGapDetectionHub = ({
               </select>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs">
-              <Users className="w-4 h-4 text-purple-600 shrink-0" />
-              <span className="font-normal text-slate-500">Learner:</span>
-              <select
-                value={selectedTraineeId}
-                onChange={(e) => setSelectedTraineeId(e.target.value)}
-                className="bg-transparent font-semibold text-slate-800 focus:outline-hidden cursor-pointer max-w-[220px] truncate"
-              >
-                <option value="all">All Enrolled Officers ({traineesList.length || 8})</option>
-                {traineesList.map(t => (
-                  <option key={t.traineeId || t.id} value={t.traineeId || t.id}>
-                    {t.name} ({t.cadreId || t.department || "Officer"})
-                  </option>
-                ))}
-              </select>
-            </div>
+            {!isTrainee && (
+              <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-[var(--radius)] border border-slate-200 text-xs">
+                <Users className="w-4 h-4 text-purple-600 shrink-0" />
+                <span className="font-normal text-slate-500">Learner:</span>
+                <select
+                  value={selectedTraineeId}
+                  onChange={(e) => setSelectedTraineeId(e.target.value)}
+                  className="bg-transparent font-semibold text-slate-800 focus:outline-hidden cursor-pointer max-w-[220px] truncate"
+                >
+                  <option value="all">All Enrolled Trainees ({traineesList.length || 8})</option>
+                  {traineesList.map(t => (
+                    <option key={t.traineeId || t.id} value={t.traineeId || t.id}>
+                      {t.name} ({t.cadreId || t.department || "Trainee"})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {(selectedCourseId !== "all" || selectedTraineeId !== "all") && (
               <button
@@ -704,7 +708,12 @@ export const LearningGapDetectionHub = ({
           <div className="text-xs font-normal text-slate-500 flex items-center gap-2">
             <span>Diagnostic Scope:</span>
             <span className="px-2.5 py-0.5 rounded-[var(--radius)] bg-blue-100 text-blue-900 font-semibold">
-              {selectedTraineeObj ? `Officer: ${selectedTraineeObj.name}` : (selectedCourseId !== "all" ? "Single Course" : "National Organization Cohort")}
+              {isTrainee 
+                ? "Personal Assessment Analysis" 
+                : (selectedTraineeObj 
+                    ? `Trainee: ${selectedTraineeObj.name}` 
+                    : (selectedCourseId !== "all" ? "Filtered Course" : "All Enrolled Trainees"))
+              }
             </span>
           </div>
         </div>
@@ -1290,7 +1299,7 @@ export const LearningGapDetectionHub = ({
               <button
                 onClick={() => {
                   setGapThreshold(DEFAULT_GAP_THRESHOLD);
-                  localStorage.setItem("moes_gap_threshold", String(DEFAULT_GAP_THRESHOLD));
+                  localStorage.setItem("cc_gap_threshold", String(DEFAULT_GAP_THRESHOLD));
                   setActiveModal(null);
                   showToast(`Threshold reset to default ${DEFAULT_GAP_THRESHOLD}%.`);
                 }}
@@ -1301,7 +1310,7 @@ export const LearningGapDetectionHub = ({
 
               <button
                 onClick={() => {
-                  localStorage.setItem("moes_gap_threshold", String(gapThreshold));
+                  localStorage.setItem("cc_gap_threshold", String(gapThreshold));
                   setActiveModal(null);
                   showToast(`Saved gap detection threshold at ${gapThreshold}%.`);
                 }}

@@ -18,9 +18,9 @@ const realisticUsers = [
     cadreId: "MOES-ADM-2026-0001",
     phone: "+91 11 2461 1068",
     status: "approved",
-    bio: "Director General of IMD and Head of MoES capacity building initiative. 28+ years in atmospheric science.",
+    bio: "Director General of IMD and Head of capacity building initiative. 28+ years in atmospheric science.",
     qualifications: ["Ph.D. Meteorology (IIT Delhi)", "M.Sc. Physics (IIT Roorkee)"],
-    skills: ["Atmospheric Dynamics", "Tropical Cyclone Warning", "National Disaster Policy", "NWP Verification"],
+    skills: ["Atmospheric Dynamics", "Tropical Cyclone Warning", "Early Warning Policy", "NWP Verification"],
     interests: ["Cyclone Forecasting", "Nowcasting", "Early Warning Systems"],
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-10T09:00:00.000Z"
@@ -40,7 +40,7 @@ const realisticUsers = [
     qualifications: ["Ph.D. in Atmospheric Sciences (IIT Delhi)", "M.Sc. Meteorology (Pune University)"],
     skills: ["WRF Modeling", "Data Assimilation 4D-Var", "High Performance Computing", "Boundary Layer Physics"],
     status: "approved",
-    bio: "Lead trainer for global and regional NWP models with 18+ years of operational weather forecasting experience at MoES.",
+    bio: "Lead trainer for global and regional NWP models with 18+ years of operational weather forecasting experience.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-12T10:30:00.000Z"
   },
@@ -98,7 +98,7 @@ const realisticUsers = [
     qualifications: ["M.Sc. Physics (University of Rajasthan)", "Advanced PG Diploma in Meteorology (IMD Pune)"],
     experience: ["2 years as Trainee Scientific Assistant at IMD Jaipur Field Station."],
     certificates: [
-      { title: "Basic Meteorological Forecaster (BMF)", issuer: "IMD Training Centre Pune", year: "2024" }
+      { id: "CERT-CC-2026-101", title: "Advanced Numerical Weather Prediction (NWP)", issuer: "Capacity Connect", year: "2026", grade: "Distinction (90%)", finalScore: 90, performanceCategory: "Distinction" }
     ],
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-20T10:00:00.000Z"
@@ -118,7 +118,9 @@ const realisticUsers = [
     skills: ["Radar Data Interpretation", "Dvorak Technique", "Weather Chart Analysis"],
     qualifications: ["B.Tech Atmospheric Technology (CUSAT Cochin)"],
     experience: ["3 years in Coastal Weather Observation & Radar Monitoring."],
-    certificates: [{ title: "Radar Meteorology Fundamentals", issuer: "MoES IMD", year: "2024" }],
+    certificates: [
+      { id: "CERT-CC-2026-102", title: "Doppler Weather Radar (DWR) Operations", issuer: "Capacity Connect", year: "2026", grade: "Distinction (93%)", finalScore: 93, performanceCategory: "Distinction" }
+    ],
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-22T12:00:00.000Z"
   },
@@ -137,7 +139,9 @@ const realisticUsers = [
     skills: ["GIS for Disaster Management", "BHUVAN Portal", "AWS Station Maintenance"],
     qualifications: ["M.Sc. Meteorology (University of Calcutta)", "PGDM (IMD Pune 2024)"],
     experience: ["1.5 years at Alipore Met Office, cyclone watch roster duty."],
-    certificates: [{ title: "Cyclone Warning Forecaster", issuer: "RSMC Kolkata", year: "2024" }],
+    certificates: [
+      { id: "CERT-CC-2026-103", title: "Tropical Cyclone Forecasting & Storm Surge", issuer: "Capacity Connect", year: "2026", grade: "Merit (80%)", finalScore: 80, performanceCategory: "Merit" }
+    ],
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-24T09:30:00.000Z"
   },
@@ -156,7 +160,9 @@ const realisticUsers = [
     skills: ["DWR Product Analysis", "Python Scripting", "WRF Preprocessing"],
     qualifications: ["M.Sc. Applied Physics (Anna University)", "IMD Radar Certification"],
     experience: ["2 years operating Chennai S-Band Doppler Radar."],
-    certificates: [{ title: "Doppler Radar Operations", issuer: "IMD Pune", year: "2024" }],
+    certificates: [
+      { id: "CERT-CC-2026-104", title: "Doppler Weather Radar (DWR) Operations", issuer: "Capacity Connect", year: "2026", grade: "Pass (70%)", finalScore: 70, performanceCategory: "Pass" }
+    ],
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-25T11:00:00.000Z"
   },
@@ -175,7 +181,7 @@ const realisticUsers = [
     skills: ["FASAL Advisory Systems", "MEGHDOOT Portal", "Crop Yield Forecasting"],
     qualifications: ["M.Sc. Agrometeorology (MPKV Rahuri)"],
     experience: ["2 years preparing block-level agromet bulletins."],
-    certificates: [{ title: "Agrometeorological Forecaster", issuer: "MoES Pune", year: "2024" }],
+    certificates: [],
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-26T14:15:00.000Z"
   },
@@ -194,7 +200,9 @@ const realisticUsers = [
     skills: ["Multi-Spectral RGB", "Sounder Profile Analysis", "QGIS"],
     qualifications: ["M.Sc. Geoinformatics (Osmania University)"],
     experience: ["2 years in satellite data reception and image preprocessing."],
-    certificates: [{ title: "INSAT-3DR Satellite Operations", issuer: "SAC ISRO", year: "2024" }],
+    certificates: [
+      { id: "CERT-CC-2026-106", title: "INSAT-3DR Satellite Meteorology", issuer: "Capacity Connect", year: "2026", grade: "Merit (77%)", finalScore: 77, performanceCategory: "Merit" }
+    ],
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-27T08:45:00.000Z"
   },
@@ -232,7 +240,9 @@ const realisticUsers = [
     skills: ["Western Ghats Precipitation Tracking", "AWS Networking", "WRF Validation"],
     qualifications: ["M.Tech Atmospheric Science (CUSAT)"],
     experience: ["2 years tracking monsoon onset over Kerala."],
-    certificates: [{ title: "Monsoon Meteorology Specialist", issuer: "IMD Pune", year: "2024" }],
+    certificates: [
+      { id: "CERT-CC-2026-108", title: "Indian Summer Monsoon Dynamics", issuer: "Capacity Connect", year: "2026", grade: "Pass (63%)", finalScore: 63, performanceCategory: "Pass" }
+    ],
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250",
     createdAt: "2025-01-29T12:00:00.000Z"
   },
@@ -257,8 +267,9 @@ const realisticUsers = [
   }
 ];
 
-// Standardized Question Bank
+// Rich Question Bank across 5 major subject domains
 const standardQuestions = [
+  // --- NWP & Dynamics (crs_nwp_101) ---
   {
     id: "qb_nwp_101",
     subjectId: "sub_nwp_01",
@@ -275,6 +286,7 @@ const standardQuestions = [
     marks: 3,
     type: "MCQ",
     difficulty: "Medium",
+    topic: "Atmospheric Dynamics",
     explanation: "Sigma terrain-following coordinates normalize surface pressure variations, mapping complex mountain topography cleanly onto a horizontal computational plane σ = 1."
   },
   {
@@ -293,6 +305,7 @@ const standardQuestions = [
     marks: 3,
     type: "MCQ",
     difficulty: "Hard",
+    topic: "Numerical Prediction",
     explanation: "The Arakawa C-grid evaluates divergence and pressure gradients over minimum grid distance Δx, preventing false 2Δx computational checkerboard modes."
   },
   {
@@ -311,6 +324,7 @@ const standardQuestions = [
     marks: 2,
     type: "MCQ",
     difficulty: "Easy",
+    topic: "Numerical Prediction",
     explanation: "The CFL condition requires that the numerical domain of dependence completely contains the physical domain of dependence (C ≤ 1 for explicit stability)."
   },
   {
@@ -329,6 +343,7 @@ const standardQuestions = [
     marks: 4,
     type: "MCQ",
     difficulty: "Hard",
+    topic: "Numerical Prediction",
     explanation: "The adjoint model integrates backward through the assimilation window, computing exact gradients of the observation misfit cost function for minimization."
   },
   {
@@ -347,8 +362,11 @@ const standardQuestions = [
     marks: 3,
     type: "MCQ",
     difficulty: "Medium",
+    topic: "Satellite Data Assimilation",
     explanation: "Direct assimilation of radiances using Fast Radiative Transfer models (RTTOV/CRTM) avoids non-linear retrieval error correlation and ensures consistency with model physics."
   },
+
+  // --- Radar & Polarimetry (crs_dwr_102) ---
   {
     id: "qb_dwr_101",
     subjectId: "sub_dwr_01",
@@ -365,6 +383,7 @@ const standardQuestions = [
     marks: 3,
     type: "MCQ",
     difficulty: "Medium",
+    topic: "Radar Interpretation",
     explanation: "Large raindrops flatten into oblate spheroids due to aerodynamic drag as they fall, causing Zh > Zv and producing positive ZDR values (e.g. +1 to +4 dB)."
   },
   {
@@ -383,6 +402,7 @@ const standardQuestions = [
     marks: 3,
     type: "MCQ",
     difficulty: "Medium",
+    topic: "Radar Interpretation",
     explanation: "The Doppler Dilemma states that increasing pulse repetition frequency (PRF) extends Vmax but simultaneously reduces unambiguous range Rmax."
   },
   {
@@ -401,8 +421,30 @@ const standardQuestions = [
     marks: 4,
     type: "MCQ",
     difficulty: "Hard",
+    topic: "Radar Interpretation",
     explanation: "A hook echo wrapping around the storm rear flank downdraft alongside adjacent inbound and outbound radial velocity maxima confirms strong rotating mesocyclonic updraft."
   },
+  {
+    id: "qb_dwr_104",
+    subjectId: "sub_dwr_02",
+    subjectName: "Subject 2: Severe Storm Signatures",
+    module: "Module 2: Hail Detection & Microbursts",
+    question: "Which dual-pol signature uniquely separates large tumbling hailstones from torrential rain?",
+    options: [
+      "Very high reflectivity (>55 dBZ) paired with near-zero Differential Reflectivity (ZDR ≈ 0 dB)",
+      "Negative reflectivity with high correlation coefficient",
+      "Extremely positive ZDR (>5.0 dB) with zero reflectivity",
+      "Infinite specific differential phase KDP"
+    ],
+    correctAnswer: 0,
+    marks: 3,
+    type: "MCQ",
+    difficulty: "Medium",
+    topic: "Radar Interpretation",
+    explanation: "Tumbling hailstones present no preferred orientation to the radar beam, resulting in isotropic scattering (ZDR ≈ 0 dB) despite extremely high total reflectivity (>55 dBZ)."
+  },
+
+  // --- Tropical Cyclones & Storm Surge (crs_cyc_103) ---
   {
     id: "qb_cyc_101",
     subjectId: "sub_cyc_01",
@@ -419,6 +461,7 @@ const standardQuestions = [
     marks: 3,
     type: "MCQ",
     difficulty: "Medium",
+    topic: "Cyclone Tracking",
     explanation: "A symmetrical cold CDO surrounding a warm eye indicates vigorous eyewall convection, low central pressure, and severe cyclonic intensity (T4.0 - T6.5)."
   },
   {
@@ -437,11 +480,111 @@ const standardQuestions = [
     marks: 2,
     type: "MCQ",
     difficulty: "Easy",
+    topic: "Cyclone Tracking",
     explanation: "In the Northern Hemisphere, cyclonic rotation is counter-clockwise. The forward translation speed adds directly to rotational winds in the right-front quadrant, maximizing wind stress and storm surge."
+  },
+  {
+    id: "qb_cyc_103",
+    subjectId: "sub_cyc_02",
+    subjectName: "Subject 2: Storm Surge Modeling & Coastal Impact",
+    module: "Module 3: ADCIRC Storm Surge Model",
+    question: "How does shallow coastal bathymetry (such as the northern Bay of Bengal shelf) amplify peak storm surge heights?",
+    options: [
+      "It prevents sea surface water from returning via deep gravitational undertow, piling water against the coast",
+      "It suppresses surface wind stress completely",
+      "It eliminates astronomical tide interaction",
+      "It converts cyclonic vortex momentum into seismic waves"
+    ],
+    correctAnswer: 0,
+    marks: 3,
+    type: "MCQ",
+    difficulty: "Medium",
+    topic: "Cyclone Tracking",
+    explanation: "Shallow continental shelves restrict deep barotropic return flow, forcing wind-driven surface waters to pile up rapidly against the coastline."
+  },
+
+  // --- Satellite Meteorology (crs_sat_104) ---
+  {
+    id: "qb_sat_101",
+    subjectId: "sub_sat_01",
+    subjectName: "Subject 1: INSAT-3DR Imager Channels & Cloud Classification",
+    module: "Module 1: 6-Channel Imager Products",
+    question: "Which channel on the INSAT-3DR imager is most effective for distinguishing daytime low-level water fog from snow and ice clouds?",
+    options: [
+      "Shortwave Infrared (SWIR 1.6 µm)",
+      "Thermal Infrared 1 (TIR-1 10.8 µm)",
+      "Visible (VIS 0.65 µm)",
+      "Water Vapor (WV 6.7 µm)"
+    ],
+    correctAnswer: 0,
+    marks: 3,
+    type: "MCQ",
+    difficulty: "Medium",
+    topic: "Satellite Data",
+    explanation: "Ice crystals absorb strongly at 1.6 µm (appearing very dark in SWIR), while liquid water droplets reflect solar SWIR strongly (appearing bright)."
+  },
+  {
+    id: "qb_sat_102",
+    subjectId: "sub_sat_02",
+    subjectName: "Subject 2: Sounder Products & Derived Parameters",
+    module: "Module 2: Sounder Profiles & Lifted Index",
+    question: "How does the INSAT-3DR 19-channel sounder derive vertical Convective Available Potential Energy (CAPE)?",
+    options: [
+      "By integrating the temperature and moisture soundings from surface to equilibrium level",
+      "By measuring surface radar backscatter",
+      "By direct optical counting of lightning flashes",
+      "By calculating ocean surface salinity gradients"
+    ],
+    correctAnswer: 0,
+    marks: 3,
+    type: "MCQ",
+    difficulty: "Hard",
+    topic: "Satellite Data",
+    explanation: "The atmospheric sounder retrieves vertical profiles of temperature T(p) and dewpoint Td(p), allowing numerical integration of buoyant parcel ascent energy (CAPE)."
+  },
+
+  // --- Monsoon Dynamics & Climate (crs_cli_106) ---
+  {
+    id: "qb_cli_101",
+    subjectId: "sub_cli_01",
+    subjectName: "Subject 1: Monsoon Dynamics & Variability",
+    module: "Module 1: ISM Onset & Active-Break Cycles",
+    question: "During a 'Break Monsoon' phase over India, where does the main axis of the Monsoon Trough shift?",
+    options: [
+      "Northward towards the foothills of the Himalayas",
+      "Southward into the central Arabian Sea",
+      "Eastward over the Andaman Sea",
+      "Westward over the Thar Desert"
+    ],
+    correctAnswer: 0,
+    marks: 2,
+    type: "MCQ",
+    difficulty: "Easy",
+    topic: "Hydro Meteorology",
+    explanation: "During break spells, the monsoon trough shifts to the Himalayan foothills, causing rainfall suppression over central India and intense orographic precipitation along Himalayan catchments."
+  },
+  {
+    id: "qb_cli_102",
+    subjectId: "sub_cli_01",
+    subjectName: "Subject 1: Monsoon Dynamics & Variability",
+    module: "Module 2: Teleconnections ENSO & IOD",
+    question: "What sea surface temperature pattern defines a Positive Indian Ocean Dipole (+IOD)?",
+    options: [
+      "Anomalously warm SST in the western Indian Ocean and cool SST in the eastern equatorial Indian Ocean",
+      "Uniform warming across the entire Bay of Bengal",
+      "Cool SST near Madagascar and warm SST off Sumatra",
+      "Strong negative thermocline tilt in the eastern Pacific"
+    ],
+    correctAnswer: 0,
+    marks: 3,
+    type: "MCQ",
+    difficulty: "Medium",
+    topic: "Hydro Meteorology",
+    explanation: "A positive IOD features warmer waters near the African coast (western pole) and cooler waters near Sumatra/Indonesia, which favors enhanced Indian summer monsoon rainfall."
   }
 ];
 
-// Standardized Quizzes
+// Standardized Quizzes linked to real course IDs
 const standardQuizzes = [
   {
     id: "quiz_nwp_01",
@@ -457,7 +600,7 @@ const standardQuizzes = [
     passMarks: 15,
     durationMinutes: 30,
     scheduledStartTime: "2026-02-10T10:00:00.000Z",
-    deadlineTime: "2026-02-28T18:00:00.000Z",
+    deadlineTime: "2026-03-30T18:00:00.000Z",
     status: "published",
     isKioskModeRequired: true,
     resultsPublished: true,
@@ -471,15 +614,15 @@ const standardQuizzes = [
       standardQuestions[5],
       standardQuestions[6],
       standardQuestions[7],
-      standardQuestions[8],
-      standardQuestions[9]
+      standardQuestions[9],
+      standardQuestions[10]
     ]
   },
   {
     id: "quiz_dwr_02",
     title: "#29 Doppler Weather Radar Polarimetric Classification",
-    courseId: "crs_dwr_201",
-    courseName: "Doppler Weather Radar (DWR) Operations & Polarimetric Nowcasting",
+    courseId: "crs_dwr_102",
+    courseName: "Doppler Weather Radar (DWR) Operational Data Interpretation & Nowcasting",
     subjectId: "sub_dwr_01",
     subjectName: "Subject 1: Radar Hardware & Base Products",
     trainerId: "u_trainer_2",
@@ -489,7 +632,7 @@ const standardQuizzes = [
     passMarks: 15,
     durationMinutes: 30,
     scheduledStartTime: "2026-02-12T11:00:00.000Z",
-    deadlineTime: "2026-03-05T18:00:00.000Z",
+    deadlineTime: "2026-03-31T18:00:00.000Z",
     status: "published",
     isKioskModeRequired: true,
     resultsPublished: true,
@@ -498,22 +641,22 @@ const standardQuizzes = [
       standardQuestions[5],
       standardQuestions[6],
       standardQuestions[7],
+      standardQuestions[8],
       standardQuestions[0],
       standardQuestions[1],
-      standardQuestions[2],
-      standardQuestions[8],
       standardQuestions[9],
-      standardQuestions[3],
-      standardQuestions[4]
+      standardQuestions[10],
+      standardQuestions[2],
+      standardQuestions[3]
     ]
   },
   {
     id: "quiz_cyc_03",
     title: "#28 Tropical Cyclone Track Prediction & RSMC Operations",
-    courseId: "crs_cyc_301",
-    courseName: "Tropical Cyclone Warning Systems & RSMC Operational Protocols",
+    courseId: "crs_cyc_103",
+    courseName: "Tropical Cyclone Forecasting, Track Prediction & Storm Surge Modeling",
     subjectId: "sub_cyc_01",
-    subjectName: "Subject 1: Cyclogenesis & Dvorak Technique",
+    subjectName: "Subject 1: Tropical Cyclone Dynamics & Intensification",
     trainerId: "u_trainer_3",
     trainerName: "Dr. Rajiv Roy",
     department: "Cyclone Warning Division, Regional Meteorological Centre Kolkata",
@@ -521,34 +664,113 @@ const standardQuizzes = [
     passMarks: 15,
     durationMinutes: 30,
     scheduledStartTime: "2026-02-15T09:30:00.000Z",
-    deadlineTime: "2026-03-10T18:00:00.000Z",
+    deadlineTime: "2026-03-31T18:00:00.000Z",
     status: "published",
     isKioskModeRequired: true,
-    resultsPublished: false,
+    resultsPublished: true,
+    publishedAt: "2026-02-22T10:00:00.000Z",
     questions: [
-      standardQuestions[8],
       standardQuestions[9],
+      standardQuestions[10],
+      standardQuestions[11],
       standardQuestions[5],
       standardQuestions[7],
       standardQuestions[0],
       standardQuestions[2],
       standardQuestions[3],
+      standardQuestions[12],
+      standardQuestions[13]
+    ]
+  },
+  {
+    id: "quiz_sat_04",
+    title: "#27 INSAT-3DR Multispectral Imagery & Sounder Analysis",
+    courseId: "crs_sat_104",
+    courseName: "INSAT-3DR & INSAT-3DS Satellite Meteorology & Product Interpretation",
+    subjectId: "sub_sat_01",
+    subjectName: "Subject 1: INSAT-3DR Imager Channels & Cloud Classification",
+    trainerId: "u_trainer_2",
+    trainerName: "Dr. Sunita Kulkarni",
+    department: "Radar & Satellite Meteorology Division, Pune",
+    totalMarks: 30,
+    passMarks: 15,
+    durationMinutes: 30,
+    scheduledStartTime: "2026-02-20T10:00:00.000Z",
+    deadlineTime: "2026-04-05T18:00:00.000Z",
+    status: "published",
+    isKioskModeRequired: true,
+    resultsPublished: true,
+    publishedAt: "2026-02-28T16:00:00.000Z",
+    questions: [
+      standardQuestions[12],
+      standardQuestions[13],
+      standardQuestions[0],
       standardQuestions[4],
+      standardQuestions[5],
+      standardQuestions[9],
+      standardQuestions[14],
+      standardQuestions[15],
       standardQuestions[1],
-      standardQuestions[6]
+      standardQuestions[7]
+    ]
+  },
+  {
+    id: "quiz_cli_05",
+    title: "#26 Indian Summer Monsoon Dynamics & Climate Indices",
+    courseId: "crs_cli_106",
+    courseName: "Indian Summer Monsoon Dynamics, Climate Variability & Long-Range Forecasting",
+    subjectId: "sub_cli_01",
+    subjectName: "Subject 1: Monsoon Dynamics & Variability",
+    trainerId: "u_trainer_1",
+    trainerName: "Dr. Amit Sengupta",
+    department: "Numerical Weather Prediction Division, New Delhi",
+    totalMarks: 30,
+    passMarks: 15,
+    durationMinutes: 30,
+    scheduledStartTime: "2026-02-25T11:00:00.000Z",
+    deadlineTime: "2026-04-10T18:00:00.000Z",
+    status: "published",
+    isKioskModeRequired: true,
+    resultsPublished: false,
+    questions: [
+      standardQuestions[14],
+      standardQuestions[15],
+      standardQuestions[0],
+      standardQuestions[2],
+      standardQuestions[9],
+      standardQuestions[10],
+      standardQuestions[12],
+      standardQuestions[5],
+      standardQuestions[1],
+      standardQuestions[3]
     ]
   }
 ];
 
-const makeSubmission = (quiz, trainee, answersObj, timeSec, tabSwitches = 0, resultsPub = true, fb = "") => {
+const makeSubmission = (quiz, trainee, answersObj, timeSec, tabSwitches = 0, resultsPub = true, fb = "", daysAgo = 10) => {
   let score = 0;
+  const questionAnalysis = [];
+
   quiz.questions.forEach(q => {
-    if (answersObj[q.id] === q.correctAnswer) {
+    const chosen = answersObj[q.id];
+    const isCorrect = chosen === q.correctAnswer;
+    if (isCorrect) {
       score += q.marks;
     }
+    questionAnalysis.push({
+      questionId: q.id,
+      topic: q.topic || "Operational Meteorology",
+      difficulty: q.difficulty || "Medium",
+      marks: q.marks,
+      isCorrect,
+      selectedAnswer: chosen !== undefined ? chosen : null,
+      correctAnswer: q.correctAnswer
+    });
   });
+
   const pct = Math.round((score / quiz.totalMarks) * 100);
   const passed = score >= quiz.passMarks;
+  const perfCategory = pct >= 85 ? "Excellent" : pct >= 70 ? "Good" : pct >= 50 ? "Needs Improvement" : "Poor";
 
   return {
     id: `sub_${quiz.id}_${trainee.id}`,
@@ -556,6 +778,7 @@ const makeSubmission = (quiz, trainee, answersObj, timeSec, tabSwitches = 0, res
     quizTitle: quiz.title,
     courseId: quiz.courseId,
     courseName: quiz.courseName,
+    subject: quiz.subjectName,
     trainerName: quiz.trainerName,
     traineeId: trainee.id,
     traineeName: trainee.name,
@@ -570,29 +793,81 @@ const makeSubmission = (quiz, trainee, answersObj, timeSec, tabSwitches = 0, res
     totalMarks: quiz.totalMarks,
     percentage: pct,
     passed,
+    performanceCategory: perfCategory,
     timeTakenSeconds: timeSec,
     timeTakenText: `${Math.floor(timeSec / 60)}m ${timeSec % 60}s`,
     tabSwitchCount: tabSwitches,
     resultsPublished: resultsPub,
     evaluationStatus: resultsPub ? "published" : "pending_publish",
-    trainerFeedback: fb || (passed ? "Commendable operational performance." : "Requires revision of basic physics equations."),
-    submittedAt: new Date(Date.now() - Math.floor(Math.random() * 5 + 1) * 86400000).toISOString(),
-    certificateGenerated: passed,
-    certificateId: passed ? `MOES-IMD-CERT-2026-${Math.floor(1000 + Math.random() * 9000)}` : null
+    trainerFeedback: fb || (passed ? "Commendable operational performance." : "Requires revision of core physics derivations."),
+    submittedAt: new Date(Date.now() - daysAgo * 86400000).toISOString(),
+    certificateGenerated: passed && resultsPub,
+    certificateId: passed && resultsPub ? `CERT-CC-2026-${Math.floor(1000 + Math.random() * 9000)}` : null,
+    questionAnalysis
   };
 };
 
 const trainees = realisticUsers.filter(u => u.role === "trainee" && u.status === "approved");
 
-const q1Answers = {
-  u_trainee_1: { qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 0, qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 0, qb_cyc_101: 1, qb_cyc_102: 1 },
-  u_trainee_2: { qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 0, qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_cyc_101: 1, qb_cyc_102: 1 },
-  u_trainee_3: { qb_nwp_101: 0, qb_nwp_102: 0, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 0, qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_cyc_101: 1, qb_cyc_102: 1 },
-  u_trainee_4: { qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 0, qb_nwp_105: 0, qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_cyc_101: 1, qb_cyc_102: 0 },
-  u_trainee_5: { qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 0, qb_nwp_104: 1, qb_nwp_105: 1, qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_cyc_101: 1, qb_cyc_102: 1 },
-  u_trainee_6: { qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 2, qb_dwr_101: 0, qb_dwr_102: 0, qb_dwr_103: 1, qb_cyc_101: 0, qb_cyc_102: 1 },
-  u_trainee_7: { qb_nwp_101: 1, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 0, qb_nwp_105: 0, qb_dwr_101: 1, qb_dwr_102: 2, qb_dwr_103: 1, qb_cyc_101: 1, qb_cyc_102: 1 },
-  u_trainee_8: { qb_nwp_101: 0, qb_nwp_102: 0, qb_nwp_103: 0, qb_nwp_104: 1, qb_nwp_105: 0, qb_dwr_101: 0, qb_dwr_102: 0, qb_dwr_103: 0, qb_cyc_101: 1, qb_cyc_102: 1 }
+// Answer profiles with varied scores:
+// Trainee 1: 90%, Trainee 2: 93%, Trainee 3: 80%, Trainee 4: 70%, Trainee 5: 60%, Trainee 6: 77%, Trainee 7: 53%, Trainee 8: 63%
+const answerProfiles = {
+  u_trainee_1: {
+    qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 0,
+    qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_dwr_104: 0,
+    qb_cyc_101: 1, qb_cyc_102: 1, qb_cyc_103: 0,
+    qb_sat_101: 0, qb_sat_102: 0,
+    qb_cli_101: 0, qb_cli_102: 0
+  },
+  u_trainee_2: {
+    qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 0,
+    qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_dwr_104: 0,
+    qb_cyc_101: 1, qb_cyc_102: 1, qb_cyc_103: 0,
+    qb_sat_101: 0, qb_sat_102: 0,
+    qb_cli_101: 0, qb_cli_102: 0
+  },
+  u_trainee_3: {
+    qb_nwp_101: 0, qb_nwp_102: 0, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 0,
+    qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 0, qb_dwr_104: 0,
+    qb_cyc_101: 1, qb_cyc_102: 1, qb_cyc_103: 0,
+    qb_sat_101: 0, qb_sat_102: 1,
+    qb_cli_101: 0, qb_cli_102: 0
+  },
+  u_trainee_4: {
+    qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 0, qb_nwp_105: 0,
+    qb_dwr_101: 1, qb_dwr_102: 2, qb_dwr_103: 1, qb_dwr_104: 0,
+    qb_cyc_101: 0, qb_cyc_102: 1, qb_cyc_103: 0,
+    qb_sat_101: 1, qb_sat_102: 0,
+    qb_cli_101: 1, qb_cli_102: 0
+  },
+  u_trainee_5: {
+    qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 0, qb_nwp_104: 0, qb_nwp_105: 1,
+    qb_dwr_101: 0, qb_dwr_102: 0, qb_dwr_103: 0, qb_dwr_104: 1,
+    qb_cyc_101: 1, qb_cyc_102: 1, qb_cyc_103: 0,
+    qb_sat_101: 0, qb_sat_102: 0,
+    qb_cli_101: 0, qb_cli_102: 1
+  },
+  u_trainee_6: {
+    qb_nwp_101: 0, qb_nwp_102: 1, qb_nwp_103: 1, qb_nwp_104: 1, qb_nwp_105: 2,
+    qb_dwr_101: 1, qb_dwr_102: 0, qb_dwr_103: 1, qb_dwr_104: 0,
+    qb_cyc_101: 1, qb_cyc_102: 0, qb_cyc_103: 0,
+    qb_sat_101: 0, qb_sat_102: 0,
+    qb_cli_101: 0, qb_cli_102: 0
+  },
+  u_trainee_7: {
+    qb_nwp_101: 1, qb_nwp_102: 0, qb_nwp_103: 1, qb_nwp_104: 0, qb_nwp_105: 1,
+    qb_dwr_101: 0, qb_dwr_102: 1, qb_dwr_103: 0, qb_dwr_104: 1,
+    qb_cyc_101: 0, qb_cyc_102: 1, qb_cyc_103: 1,
+    qb_sat_101: 1, qb_sat_102: 1,
+    qb_cli_101: 0, qb_cli_102: 0
+  },
+  u_trainee_8: {
+    qb_nwp_101: 0, qb_nwp_102: 0, qb_nwp_103: 0, qb_nwp_104: 1, qb_nwp_105: 0,
+    qb_dwr_101: 0, qb_dwr_102: 0, qb_dwr_103: 1, qb_dwr_104: 0,
+    qb_cyc_101: 1, qb_cyc_102: 1, qb_cyc_103: 0,
+    qb_sat_101: 0, qb_sat_102: 1,
+    qb_cli_101: 0, qb_cli_102: 1
+  }
 };
 
 const quiz1Submissions = trainees.map((t, idx) => {
@@ -607,18 +882,32 @@ const quiz1Submissions = trainees.map((t, idx) => {
     "Satisfactory performance. Continue regular practice on sigma coordinates.",
     "Passed successfully. Focus further on velocity de-aliasing and staggered grid physics."
   ];
-  return makeSubmission(standardQuizzes[0], t, q1Answers[t.id] || q1Answers.u_trainee_1, times[idx % times.length], 0, true, fbs[idx % fbs.length]);
+  return makeSubmission(standardQuizzes[0], t, answerProfiles[t.id] || answerProfiles.u_trainee_1, times[idx % times.length], 0, true, fbs[idx % fbs.length], 30 - idx * 2);
 });
 
-const quiz2Submissions = trainees.slice(0, 6).map((t, idx) => {
-  return makeSubmission(standardQuizzes[1], t, q1Answers[t.id] || q1Answers.u_trainee_1, 750 + idx * 40, 0, true, "Strong polarimetric classification skill.");
+const quiz2Submissions = trainees.slice(0, 7).map((t, idx) => {
+  return makeSubmission(standardQuizzes[1], t, answerProfiles[t.id] || answerProfiles.u_trainee_1, 750 + idx * 40, 0, true, "Strong polarimetric classification skill.", 24 - idx * 2);
 });
 
-const quiz3Submissions = trainees.slice(0, 5).map((t, idx) => {
-  return makeSubmission(standardQuizzes[2], t, q1Answers[t.id] || q1Answers.u_trainee_1, 800 + idx * 30, 0, false, "Pending trainer final review.");
+const quiz3Submissions = trainees.slice(0, 6).map((t, idx) => {
+  return makeSubmission(standardQuizzes[2], t, answerProfiles[t.id] || answerProfiles.u_trainee_1, 800 + idx * 30, 0, true, "Good cyclone track interpretation.", 18 - idx * 2);
 });
 
-const allSubmissions = [...quiz1Submissions, ...quiz2Submissions, ...quiz3Submissions];
+const quiz4Submissions = trainees.slice(0, 6).map((t, idx) => {
+  return makeSubmission(standardQuizzes[3], t, answerProfiles[t.id] || answerProfiles.u_trainee_1, 820 + idx * 25, 0, true, "Solid interpretation of INSAT imager products.", 12 - idx * 2);
+});
+
+const quiz5Submissions = trainees.slice(0, 5).map((t, idx) => {
+  return makeSubmission(standardQuizzes[4], t, answerProfiles[t.id] || answerProfiles.u_trainee_1, 790 + idx * 35, 0, false, "Pending trainer final review.", 5 - idx);
+});
+
+const allSubmissions = [
+  ...quiz1Submissions,
+  ...quiz2Submissions,
+  ...quiz3Submissions,
+  ...quiz4Submissions,
+  ...quiz5Submissions
+];
 
 let existingDb = {};
 try {
@@ -627,10 +916,20 @@ try {
   existingDb = {};
 }
 
+// Enroll trainees across all courses so courses and quizzes match properly
 const updatedCourses = (existingDb.courses || []).map((c, idx) => {
+  let enrolled = [];
+  if (c.id === "crs_nwp_101") enrolled = ["u_trainee_1", "u_trainee_2", "u_trainee_3", "u_trainee_4", "u_trainee_6", "u_trainee_8"];
+  else if (c.id === "crs_dwr_102") enrolled = ["u_trainee_1", "u_trainee_2", "u_trainee_4", "u_trainee_6", "u_trainee_7"];
+  else if (c.id === "crs_cyc_103") enrolled = ["u_trainee_1", "u_trainee_2", "u_trainee_3", "u_trainee_5", "u_trainee_8"];
+  else if (c.id === "crs_sat_104") enrolled = ["u_trainee_1", "u_trainee_2", "u_trainee_4", "u_trainee_6", "u_trainee_7"];
+  else if (c.id === "crs_cli_106") enrolled = ["u_trainee_1", "u_trainee_3", "u_trainee_5", "u_trainee_7", "u_trainee_8"];
+  else if (c.id === "crs_agro_105") enrolled = ["u_trainee_1", "u_trainee_5", "u_trainee_7"];
+  else enrolled = ["u_trainee_1", "u_trainee_2", "u_trainee_3"];
+
   return {
     ...c,
-    enrolledTraineeIds: ["u_trainee_1", "u_trainee_2", "u_trainee_3", "u_trainee_4", "u_trainee_5"].slice(0, (idx % 3) + 2)
+    enrolledTraineeIds: enrolled
   };
 });
 
