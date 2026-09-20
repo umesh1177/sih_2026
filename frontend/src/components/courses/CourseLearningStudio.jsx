@@ -2112,7 +2112,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                  <span>AI Summary ✨</span>
+                  <span>AI Summary</span>
                 </button>
 
                 {/* Tab 3: Practice Quiz */}

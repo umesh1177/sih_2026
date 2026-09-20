@@ -44,7 +44,7 @@ import { api } from "../services/api";
 
 const CATEGORY_TABS = [
   { id: "All", label: "All Curricula", keywords: [] },
-  { id: "Recent", label: "Recent Courses 🚀", keywords: [] },
+  { id: "Recent", label: "Recent Courses", keywords: [] },
   { id: "Atmospheric", label: "Atmospheric & NWP Modeling", keywords: ["atmospheric", "nwp", "numerical", "wrf", "gfs", "dynamics", "modeling"] },
   { id: "Radar", label: "Radar & Remote Sensing", keywords: ["radar", "dwr", "doppler", "remote sensing", "polarimetric", "nowcasting"] },
   { id: "Cyclone", label: "Cyclone & Marine Meteorology", keywords: ["cyclone", "storm surge", "marine", "tropical", "ocean", "adcirc"] },

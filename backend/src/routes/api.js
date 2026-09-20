@@ -91,4 +91,8 @@ router.post("/admin/users/:id/verify", requireAuth, requireRole("admin"), adminC
 router.post("/announcements", requireAuth, requireRole("admin"), adminController.publishAnnouncement);
 router.delete("/announcements/:id", requireAuth, requireRole("admin"), adminController.deleteAnnouncement);
 
+// --- PROTECTED: Helpdesk Support System ---
+router.get("/helpdesk/tickets", requireAuth, adminController.getHelpdeskTickets);
+router.post("/helpdesk/tickets", requireAuth, adminController.createHelpdeskTicket);
+
 export default router;

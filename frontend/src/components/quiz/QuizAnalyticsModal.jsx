@@ -143,11 +143,12 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
         <div className="flex border-b border-slate-200 my-4 text-xs font-semibold gap-2">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`pb-2.5 px-4 border-b-2 font-medium transition-colors ${
+            className={`pb-2.5 px-4 border-b-2 font-medium transition-colors flex items-center gap-1.5 ${
               activeTab === "overview" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
-            📊 Score & Pass Distribution
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Score & Pass Distribution</span>
           </button>
           <button
             onClick={() => setActiveTab("rankings")}
@@ -157,7 +158,7 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
           >
             <span>Trainee Leaderboard ({rankings.length})</span>
             {disqualifiedCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 text-[10px] font-black">
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 text-[10px] font-semibold">
                 {disqualifiedCount} Disq
               </span>
             )}
@@ -172,10 +173,10 @@ export const QuizAnalyticsModal = ({ quizId, isOpen, onClose }) => {
           </button>
           <button
             onClick={() => setIsItemAnalysisOpen(true)}
-            className="ml-auto pb-1 px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-[var(--radius)] text-xs font-black transition-all flex items-center gap-1.5 shadow-2xs hover:scale-105"
+            className="ml-auto pb-1 px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 shadow-2xs hover:scale-105"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-            <span>⚠ Weak Questions Item Analysis (Rule 11)</span>
+            <span>Item Analysis & Difficult Questions</span>
           </button>
         </div>
 

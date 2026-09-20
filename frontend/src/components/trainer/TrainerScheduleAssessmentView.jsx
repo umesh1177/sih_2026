@@ -1056,7 +1056,7 @@ export const TrainerScheduleAssessmentView = ({
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-blue-50/80 to-transparent pointer-events-none" />
 
-        <div className="space-y-2 z-10">
+        {/* <div className="space-y-2 z-10">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-900 font-semibold text-xs border border-blue-200/60">
               Examination Cell & Assessment Operations
@@ -1070,7 +1070,7 @@ export const TrainerScheduleAssessmentView = ({
           <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium leading-relaxed">
             Schedule multi-subject evaluations, balance timetables across modules, drill down through Course ➔ Subject ➔ Assessment ➔ Trainee, and audit responses with automated precision.
           </p>
-        </div>
+        </div> */}
 
         {/* Global Action Hub */}
         <div className="flex items-center gap-3 flex-wrap z-10 shrink-0">

@@ -30,6 +30,7 @@ class DatabaseStore {
         this.feedbacks = saved.feedbacks || [...initialData.feedbacks];
         this.moduleProgress = saved.moduleProgress || {};
         this.contentLibrary = this._sanitizeContentLibrary(saved.contentLibrary || this._generateInitialContentLibrary());
+        this.helpdeskTickets = saved.helpdeskTickets || this._generateInitialHelpdeskTickets();
         this.integrityAlerts = saved.integrityAlerts || [];
         this._persist();
         console.log("✅ Database loaded from db.json");
@@ -49,6 +50,7 @@ class DatabaseStore {
     this.feedbacks = [...initialData.feedbacks];
     this.moduleProgress = {};
     this.contentLibrary = this._generateInitialContentLibrary();
+    this.helpdeskTickets = this._generateInitialHelpdeskTickets();
     this.integrityAlerts = [];
   }
 
@@ -66,6 +68,7 @@ class DatabaseStore {
         feedbacks: this.feedbacks,
         moduleProgress: this.moduleProgress,
         contentLibrary: this.contentLibrary,
+        helpdeskTickets: this.helpdeskTickets || [],
         integrityAlerts: this.integrityAlerts || []
       };
       fs.writeFileSync(DB_FILE, JSON.stringify(state, null, 2), "utf-8");
@@ -2279,6 +2282,111 @@ class DatabaseStore {
     this.feedbacks.push(newFb);
     this._persist();
     return newFb;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // HELPDESK TICKETS
+  // ══════════════════════════════════════════════════════════════════════
+  getHelpdeskTickets() {
+    return this.helpdeskTickets || [];
+  }
+
+  createHelpdeskTicket(ticketData) {
+    if (!Array.isArray(this.helpdeskTickets)) this.helpdeskTickets = [];
+    const newTicket = {
+      id: `tk_${uuidv4().substring(0, 8)}`,
+      subject: ticketData.subject || "Support Inquiry",
+      category: ticketData.category || "Technical & LMS Query",
+      priority: ticketData.priority || "Medium",
+      status: "Open",
+      submittedBy: ticketData.submittedBy || "Officer Trainee",
+      submittedByEmail: ticketData.submittedByEmail || "officer@imd.gov.in",
+      station: ticketData.station || "IMD Headquarters",
+      description: ticketData.description || "",
+      responses: [],
+      createdAt: new Date().toISOString()
+    };
+    this.helpdeskTickets.unshift(newTicket);
+    this._persist();
+    return newTicket;
+  }
+
+  _generateInitialHelpdeskTickets() {
+    return [
+      {
+        id: "tk_nwp_101",
+        subject: "WRF v4.5 Domain 2 Nesting Boundary Configuration Query",
+        category: "Technical & LMS Query",
+        priority: "High",
+        status: "In Progress",
+        submittedBy: "Rahul Sharma (Scientist 'B')",
+        submittedByEmail: "rahul.sharma@imd.gov.in",
+        station: "MC Jaipur, Rajasthan",
+        description: "Requesting guidance on WPS geogrid boundary definition for 3km high-resolution domain nesting over Western Rajasthan desert region.",
+        responses: [
+          { author: "Dr. Amit Sengupta (NWP Division)", text: "Reviewed your geogrid configuration. Ensure parent_ratio is set to 3 for Domain 2 and use MODIS 21-category landuse tables.", createdAt: "2025-02-18T14:30:00.000Z" }
+        ],
+        createdAt: "2025-02-18T10:15:00.000Z"
+      },
+      {
+        id: "tk_dwr_102",
+        subject: "S-Band Doppler Weather Radar Reflectivity Ingestion Latency",
+        category: "Data Sync & Telemetry",
+        priority: "Urgent",
+        status: "Open",
+        submittedBy: "Vikram Malhotra (SA Grade-I)",
+        submittedByEmail: "vikram.m@imd.gov.in",
+        station: "RMC Meenambakkam, Chennai",
+        description: "Observed intermittent 12-minute transmission latency in dual-pol reflectivity product push from Chennai S-Band radar to HQ central server.",
+        responses: [],
+        createdAt: "2025-02-20T08:45:00.000Z"
+      },
+      {
+        id: "tk_cert_103",
+        subject: "Digital Certificate Name Spelling Correction Request",
+        category: "Certification & Cadre",
+        priority: "Low",
+        status: "Resolved",
+        submittedBy: "Priya Varma (Scientist 'B')",
+        submittedByEmail: "priya.varma@imd.gov.in",
+        station: "CWC Visakhapatnam",
+        description: "Please update official middle name spelling on Doppler Weather Radar Systems Specialist digital certificate PDF.",
+        responses: [
+          { author: "IMD Cadre Cell", text: "Certificate regenerated with correct name spelling and re-issued on your profile tab.", createdAt: "2025-02-15T11:00:00.000Z" }
+        ],
+        createdAt: "2025-02-14T09:20:00.000Z"
+      },
+      {
+        id: "tk_ksk_104",
+        subject: "Kiosk Mode Exam Access Code Dispatch Inquiry",
+        category: "Assessment Kiosk",
+        priority: "Medium",
+        status: "Resolved",
+        submittedBy: "Arjun Bose (Scientist 'B')",
+        submittedByEmail: "arjun.bose@imd.gov.in",
+        station: "RMC Alipore, Kolkata",
+        description: "Enquiring about kiosk access passcodes for upcoming Tropical Cyclogenesis & Dvorak technique assessment.",
+        responses: [
+          { author: "Examination Cell", text: "Kiosk examination access token dispatched to your registered MoES email address.", createdAt: "2025-02-19T16:00:00.000Z" }
+        ],
+        createdAt: "2025-02-19T12:00:00.000Z"
+      },
+      {
+        id: "tk_sat_105",
+        subject: "INSAT-3DR Sounder 19-Channel NetCDF Format Access",
+        category: "Data Sync & Telemetry",
+        priority: "Medium",
+        status: "In Progress",
+        submittedBy: "Meena Reddy (SA Grade-I)",
+        submittedByEmail: "meena.reddy@imd.gov.in",
+        station: "MC Hyderabad, Telangana",
+        description: "Need technical access permission to download raw 19-channel sounder radiances for regional humidity profiles.",
+        responses: [
+          { author: "Satellite Met Division", text: "Dataset access token granted for IMD internal research roster.", createdAt: "2025-02-21T09:30:00.000Z" }
+        ],
+        createdAt: "2025-02-21T07:10:00.000Z"
+      }
+    ];
   }
 }
 

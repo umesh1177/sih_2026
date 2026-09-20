@@ -62,8 +62,8 @@ export const CertificateModal = ({ isOpen, onClose, submission, courseTitle, tra
 
           {/* MoES / IMD Header */}
           <div className="mb-4">
-            <div className="w-12 h-12 mx-auto rounded-full bg-[#0a2558] text-white flex items-center justify-center font-black text-xl mb-2 shadow-md">
-              🏛️
+            <div className="w-12 h-12 mx-auto rounded-full bg-[#0a2558] text-white flex items-center justify-center shadow-md mb-2">
+              <Building2 className="w-6 h-6 text-amber-400" />
             </div>
             <h3 className="text-xs font-semibold text-slate-600 uppercase tracking-widest">
               Government of India • Ministry of Earth Sciences

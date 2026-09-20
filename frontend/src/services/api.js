@@ -587,5 +587,23 @@ export const api = {
       headers: authHeaders()
     });
     return res.json();
+  },
+
+  // Helpdesk
+  getHelpdeskTickets: async () => {
+    const res = await fetch(`${API_BASE_URL}/helpdesk/tickets`, {
+      headers: getHeaders()
+    });
+    return res.json();
+  },
+
+  createHelpdeskTicket: async (ticketData) => {
+    const res = await fetch(`${API_BASE_URL}/helpdesk/tickets`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(ticketData)
+    });
+    return res.json();
   }
 };
+

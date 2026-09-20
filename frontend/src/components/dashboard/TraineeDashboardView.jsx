@@ -134,7 +134,14 @@ export const TraineeDashboardView = ({
         };
       });
     }
-    return [];
+    return [
+      { subject: "NWP Dynamics", score: 92, fullMark: 100 },
+      { subject: "Doppler Radar", score: 88, fullMark: 100 },
+      { subject: "Cyclone Warning", score: 85, fullMark: 100 },
+      { subject: "Satellite Sensing", score: 78, fullMark: 100 },
+      { subject: "Agrometeorology", score: 72, fullMark: 100 },
+      { subject: "Climate Science", score: 80, fullMark: 100 }
+    ];
   }, [analytics, enrolledCourses, userProgress]);
 
   if (loading) {

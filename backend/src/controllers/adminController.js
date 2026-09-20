@@ -210,3 +210,22 @@ export const deleteAnnouncement = (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+export const getHelpdeskTickets = (req, res) => {
+  try {
+    const tickets = db.getHelpdeskTickets();
+    return res.json({ success: true, count: tickets.length, tickets });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const createHelpdeskTicket = (req, res) => {
+  try {
+    const ticket = db.createHelpdeskTicket(req.body);
+    return res.status(201).json({ success: true, message: "Support ticket submitted successfully!", ticket });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+

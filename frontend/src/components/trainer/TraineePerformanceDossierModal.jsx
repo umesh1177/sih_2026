@@ -57,13 +57,13 @@ export const TraineePerformanceDossierModal = ({ trainee, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 z-50 animate-in fade-in duration-150 overflow-y-auto font-sans">
-      <div className="bg-white rounded-[var(--radius)] shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto">
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden text-slate-800 my-auto relative">
         
         {/* ═════════ HEADER: CADET PROFILE CARD (LIGHT THEME) ═════════ */}
         <div className="p-6 bg-white border-b border-slate-200 text-slate-900 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shrink-0">
           
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[var(--radius)] bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black text-2xl shadow-xs shrink-0">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-semibold text-2xl shadow-xs shrink-0">
               {trainee.name?.split(" ").map(n => n[0]).join("") || "TR"}
             </div>
 

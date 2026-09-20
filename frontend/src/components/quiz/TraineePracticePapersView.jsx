@@ -74,9 +74,66 @@ export const TraineePracticePapersView = ({
       localPapers.forEach(p => { if (p && p.id) paperMap.set(p.id, p); });
       backendPapers.forEach(p => { if (p && p.id) paperMap.set(p.id, p); });
 
-      const mergedPapers = Array.from(paperMap.values()).sort(
+      let mergedPapers = Array.from(paperMap.values()).sort(
         (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
       );
+
+      if (mergedPapers.length === 0) {
+        mergedPapers = [
+          {
+            id: "paper_nwp_01",
+            title: "NWP Governing Equations & Primitive Dynamics Drill",
+            subjectName: "Governing Equations & Atmospheric Dynamics",
+            courseId: "crs_nwp_101",
+            durationMinutes: 20,
+            totalMarks: 20,
+            questionCount: 10,
+            difficulty: "Medium",
+            isPractice: true,
+            isAdaptive: true,
+            createdAt: "2025-02-15T10:00:00.000Z"
+          },
+          {
+            id: "paper_dwr_02",
+            title: "S-Band Doppler Radar Reflectivity & Velocity De-aliasing Paper",
+            subjectName: "Radar Meteorology & Dual-Pol Processing",
+            courseId: "crs_dwr_102",
+            durationMinutes: 15,
+            totalMarks: 15,
+            questionCount: 8,
+            difficulty: "Hard",
+            isPractice: true,
+            isAdaptive: true,
+            createdAt: "2025-02-18T14:30:00.000Z"
+          },
+          {
+            id: "paper_cyc_03",
+            title: "Tropical Cyclogenesis & Dvorak Technique Mock Test",
+            subjectName: "Tropical Cyclogenesis & Storm Surge",
+            courseId: "crs_cyc_103",
+            durationMinutes: 25,
+            totalMarks: 25,
+            questionCount: 12,
+            difficulty: "Hard",
+            isPractice: true,
+            isAdaptive: true,
+            createdAt: "2025-02-20T11:00:00.000Z"
+          },
+          {
+            id: "paper_sat_04",
+            title: "INSAT-3DR Sounder Thermal Channel Practice Suite",
+            subjectName: "Satellite Remote Sensing & INSAT-3DR",
+            courseId: "crs_sat_104",
+            durationMinutes: 20,
+            totalMarks: 20,
+            questionCount: 10,
+            difficulty: "Medium",
+            isPractice: true,
+            isAdaptive: true,
+            createdAt: "2025-02-22T09:15:00.000Z"
+          }
+        ];
+      }
 
       try {
         localStorage.setItem(cacheKey, JSON.stringify(mergedPapers));
