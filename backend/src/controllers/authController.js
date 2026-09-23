@@ -61,15 +61,39 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role, department, designation, qualifications, experience, interests, skills, specialization, certificates, bio } = req.body;
+    const {
+      name,
+      salutation,
+      email,
+      password,
+      role,
+      department,
+      designation,
+      station,
+      zone,
+      cadreId,
+      employeeId,
+      phone,
+      highestDegree,
+      university,
+      qualifications,
+      experienceYears,
+      experience,
+      batchYear,
+      interests,
+      skills,
+      specialization,
+      certificates,
+      bio
+    } = req.body;
     
     if (!email || !name) {
-      return res.status(400).json({ success: false, message: "Name and Email are required" });
+      return res.status(400).json({ success: false, message: "Full Name and Official Email are required" });
     }
 
     const existing = db.findUserByEmail(email);
     if (existing) {
-      return res.status(400).json({ success: false, message: "User with this email already exists. Please login." });
+      return res.status(400).json({ success: false, message: "User with this official email already exists. Please login." });
     }
 
     // Hash password if provided
@@ -78,20 +102,33 @@ export const register = async (req, res) => {
       passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     }
 
+    const fullName = salutation && !name.startsWith(salutation) ? `${salutation} ${name}` : name;
+    const generatedCadreId = cadreId || `IMD-MET-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     const newUser = db.createUser({
-      name,
+      name: fullName,
+      salutation: salutation || "",
       email,
       passwordHash,
       role: role || "trainee",
-      department,
-      designation,
-      qualifications,
-      experience,
-      interests: Array.isArray(interests) ? interests : (interests ? interests.split(",").map(s => s.trim()) : []),
-      skills: Array.isArray(skills) ? skills : (skills ? skills.split(",").map(s => s.trim()) : []),
-      specialization: Array.isArray(specialization) ? specialization : (specialization ? specialization.split(",").map(s => s.trim()) : []),
+      department: department || "Numerical Weather Prediction (NWP) Division",
+      designation: designation || (role === "trainer" ? "Scientist 'F' (Senior Faculty)" : "Scientist 'B' (Trainee)"),
+      station: station || "National Weather Forecasting Centre, IMD HQ New Delhi",
+      zone: zone || "HQ & National Centers (New Delhi)",
+      cadreId: generatedCadreId,
+      employeeId: employeeId || `EMP-${Math.floor(10000 + Math.random() * 90000)}`,
+      phone: phone || "",
+      highestDegree: highestDegree || "M.Sc. in Meteorology / Atmospheric Physics",
+      university: university || "Central Training Institute (CTI Pune) & IMD",
+      qualifications: qualifications || (highestDegree ? `${highestDegree} (${university || 'IMD / MoES'})` : "M.Sc. Atmospheric Sciences"),
+      experienceYears: experienceYears || (role === "trainer" ? 10 : 1),
+      experience: experience || `${experienceYears || (role === "trainer" ? '10' : '1')} years in meteorological operations`,
+      batchYear: batchYear || "Batch 2026 (Foundational & In-Service)",
+      interests: Array.isArray(interests) ? interests : (interests ? interests.split(",").map(s => s.trim()) : ["Synoptic Meteorology", "NWP Models"]),
+      skills: Array.isArray(skills) ? skills : (skills ? skills.split(",").map(s => s.trim()) : ["Weather Forecasting", "Satellite Interpretation"]),
+      specialization: Array.isArray(specialization) ? specialization : (specialization ? [specialization] : ["Numerical Weather Prediction & Data Assimilation"]),
       certificates: certificates || [],
-      bio: bio || "",
+      bio: bio || `Official scientific officer serving at ${department || 'IMD'}.`,
       status: role === "admin" ? "approved" : "pending"
     });
 

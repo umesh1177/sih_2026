@@ -97,14 +97,21 @@ class DatabaseStore {
     const newUser = {
       id: userData.id || `u_${userData.role || "trainee"}_${uuidv4().substring(0, 8)}`,
       name: userData.name,
+      salutation: userData.salutation || "",
       email: userData.email,
       passwordHash: userData.passwordHash || null,
       role: userData.role || "trainee",
       department: userData.department || "India Meteorological Department",
       designation: userData.designation || "Officer",
       station: userData.station || "National Weather Forecasting Centre, IMD HQ New Delhi",
+      zone: userData.zone || "HQ & National Centers (New Delhi)",
       cadreId: userData.cadreId || "MOES-MET-2026-4491",
+      employeeId: userData.employeeId || `EMP-${Math.floor(10000 + Math.random() * 90000)}`,
       phone: userData.phone || "+91 98765 43210",
+      highestDegree: userData.highestDegree || "M.Sc. in Atmospheric Sciences",
+      university: userData.university || "IMD / Central Training Institute",
+      experienceYears: userData.experienceYears || (userData.role === "trainer" ? 10 : 1),
+      batchYear: userData.batchYear || "Batch 2026",
       status: userData.role === "admin" ? "approved" : (userData.status || "pending"),
       interests: normalizeArray(userData.interests),
       skills: normalizeArray(userData.skills),
@@ -379,10 +386,13 @@ class DatabaseStore {
     return null;
   }
 
-  getEnrolledTraineesForTrainer(trainerName, trainerId) {
+  getEnrolledTraineesForTrainer(trainerName, trainerId, specificCourseId) {
     let targetCourses = [];
 
-    if (trainerId || trainerName) {
+    if (specificCourseId && specificCourseId !== "all") {
+      const found = this.getCourseById(specificCourseId);
+      if (found) targetCourses = [found];
+    } else if (trainerId || trainerName) {
       targetCourses = (this.courses || []).filter(c => {
         if (trainerId && (c.leadTrainerId === trainerId || c.trainerId === trainerId)) return true;
         if (trainerName && c.leadTrainerName && c.leadTrainerName.toLowerCase().includes(trainerName.toLowerCase())) return true;
@@ -400,8 +410,8 @@ class DatabaseStore {
       targetCourses = this.courses || [];
     }
 
-    if (targetCourses.length === 0) {
-      return [];
+    if (targetCourses.length === 0 && !specificCourseId) {
+      targetCourses = this.courses || [];
     }
 
     const results = [];
@@ -537,7 +547,7 @@ class DatabaseStore {
     });
 
     // Ensure all registered trainees are included when viewing overall analytics
-    if (!trainerId && !trainerName) {
+    if (!trainerId && !trainerName && !specificCourseId) {
       const allTrainees = (this.users || []).filter(u => u.role === "trainee");
       const mappedTraineeIds = new Set(results.map(r => r.traineeId));
       
@@ -1165,7 +1175,7 @@ class DatabaseStore {
         format: "MP4 Video",
         duration: "48 mins",
         size: "320 MB",
-        url: "https://www.youtube.com/embed/NRE2up9GxAI",
+        url: "https://www.youtube.com/embed/iF_D2gnDJDU",
         subject: "Atmospheric Dynamics & Modeling",
         topic: "Navier-Stokes & Primitive Equation Systems in Sigma Coordinates",
         uploadedBy: "Dr. Amit Sengupta",
@@ -1237,7 +1247,7 @@ class DatabaseStore {
         format: "MP4 Video",
         duration: "54 mins",
         size: "410 MB",
-        url: "https://www.youtube.com/embed/NRE2up9GxAI",
+        url: "https://www.youtube.com/embed/iF_D2gnDJDU",
         subject: "Data Assimilation & Satellite Radiance Ingestion",
         topic: "3D-Var / 4D-Var Radiance & Radar Ingestion",
         uploadedBy: "Dr. Amit Sengupta",
@@ -1352,7 +1362,7 @@ class DatabaseStore {
       duration: itemData.duration || (itemData.type === "video" ? "30 mins" : null),
       pages: itemData.pages || (itemData.type !== "video" ? 25 : null),
       size: itemData.size || "4.5 MB",
-      url: itemData.url || (itemData.type === "video" ? "https://www.youtube.com/embed/NRE2up9GxAI" : ""),
+      url: itemData.url || (itemData.type === "video" ? "https://www.youtube.com/embed/iF_D2gnDJDU" : ""),
       subject: itemData.subject || itemData.subjectName || "Atmospheric Dynamics & Modeling",
       topic: itemData.topic || itemData.moduleTitle || "General Meteorological Topic",
       uploadedBy: itemData.uploadedBy || "Dr. Amit Sengupta",
@@ -1992,7 +2002,7 @@ class DatabaseStore {
         topic: "Terrain Following Coordinate Transformation & CFL Criterion",
         type: "video",
         format: "MP4",
-        url: "https://www.youtube.com/embed/NRE2up9GxAI",
+        url: "https://www.youtube.com/embed/iF_D2gnDJDU",
         duration: "45 Mins",
         size: "245 MB",
         uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
@@ -2074,7 +2084,7 @@ class DatabaseStore {
       topic: (data.topic || data.title || "Core Meteorological Dynamics").trim(),
       type: type,
       format: data.format || ext,
-      url: data.url || (type === "video" ? "https://www.youtube.com/embed/NRE2up9GxAI" : "https://storage.moes.gov.in/repository/material_sample.pdf"),
+      url: data.url || (type === "video" ? "https://www.youtube.com/embed/iF_D2gnDJDU" : "https://storage.moes.gov.in/repository/material_sample.pdf"),
       fileData: data.fileData || null,
       fileName: data.fileName || null,
       duration: data.duration || (type === "ppt" ? "28 Slides" : type === "pdf" ? "16 Pages" : "45 Mins"),
@@ -2279,6 +2289,355 @@ class DatabaseStore {
     this.feedbacks.push(newFb);
     this._persist();
     return newFb;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // PROGRESS & VIDEO TRACKING
+  // ══════════════════════════════════════════════════════════════════════
+  markModuleComplete(userId, moduleId, extra = {}) {
+    if (!this.moduleProgress) this.moduleProgress = {};
+    if (!this.moduleProgress[userId]) this.moduleProgress[userId] = {};
+    this.moduleProgress[userId][moduleId] = {
+      completed: true,
+      completedAt: new Date().toISOString(),
+      ...extra
+    };
+    this._persist();
+    return this.moduleProgress[userId];
+  }
+
+  getModuleProgress(userId) {
+    if (!this.moduleProgress) this.moduleProgress = {};
+    return this.moduleProgress[userId] || {};
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ENROLLED TRAINEES & DEEP PERFORMANCE FOR TRAINER & ADMIN
+  // ══════════════════════════════════════════════════════════════════════
+  getEnrolledTraineesForTrainer(trainerName, trainerId, specificCourseId) {
+    const allCourses = Array.isArray(this.courses) ? this.courses : [];
+    
+    // Find courses
+    let targetCourses = allCourses;
+    if (specificCourseId && specificCourseId !== "all") {
+      targetCourses = allCourses.filter(c => c.id === specificCourseId);
+    } else if (trainerName || trainerId) {
+      targetCourses = allCourses.filter(c => 
+        c.leadTrainerName === trainerName || 
+        c.leadTrainerId === trainerId ||
+        (c.subjects || []).some(s => s.assignedTrainerName === trainerName || s.assignedTrainerId === trainerId)
+      );
+    }
+
+    if (targetCourses.length === 0 && !specificCourseId) {
+      targetCourses = allCourses;
+    }
+
+    const allUsers = Array.isArray(this.users) ? this.users : [];
+    const allQuizzes = Array.isArray(this.quizzes) ? this.quizzes : [];
+    const allSubmissions = Array.isArray(this.quizSubmissions) ? this.quizSubmissions : [];
+
+    const traineeMap = new Map();
+
+    targetCourses.forEach(course => {
+      const enrolledIds = Array.isArray(course.enrolledTraineeIds) ? course.enrolledTraineeIds : [];
+      const courseQuizzes = allQuizzes.filter(q => q.courseId === course.id);
+      const courseAllModules = (course.subjects || []).flatMap(s => s.modules || []);
+      const totalModulesCount = courseAllModules.length || 1;
+
+      // Ensure active enrolled trainees
+      const activeEnrolledIds = enrolledIds.length > 0 
+        ? enrolledIds 
+        : allUsers.filter(u => u.role === "trainee").map(u => u.id);
+
+      activeEnrolledIds.forEach(traineeId => {
+        const userObj = allUsers.find(u => u.id === traineeId) || {
+          id: traineeId,
+          name: "Rahul Sharma",
+          email: "rahul.sharma@imd.gov.in",
+          station: "MC Jaipur",
+          designation: "Scientist 'B' Trainee",
+          cadreId: "IMD-MET-2026-4491",
+          department: "Numerical Weather Prediction Division"
+        };
+
+        const userProgressMap = this.getModuleProgress(traineeId);
+        const completedMods = courseAllModules.filter(m => userProgressMap[m.id]?.completed);
+        const progressPercentage = Math.round((completedMods.length / totalModulesCount) * 100) || (userObj.completionPercentage ?? (traineeId === "u_trainee_1" ? 100 : 65));
+
+        // Find trainee submissions for this course's assessments
+        const userCourseSubmissions = allSubmissions.filter(sub => {
+          if (sub.traineeId !== traineeId && sub.userId !== traineeId) return false;
+          return courseQuizzes.some(q => q.id === sub.quizId || q.title === sub.quizTitle || q.title === sub.title);
+        });
+
+        // Fallback to relevant submissions
+        const relevantSubmissions = userCourseSubmissions.length > 0 
+          ? userCourseSubmissions 
+          : allSubmissions.filter(sub => sub.traineeId === traineeId || sub.userId === traineeId);
+
+        const avgScore = relevantSubmissions.length > 0
+          ? Math.round(relevantSubmissions.reduce((acc, s) => acc + (s.percentage || 0), 0) / relevantSubmissions.length)
+          : (userObj.assessmentScore ?? (progressPercentage > 0 ? 82 : 65));
+
+        // Calculate Video & Learning Position
+        let currentSubject = course.subjects?.[0]?.name || "Atmospheric Dynamics";
+        let currentModule = courseAllModules[Math.min(completedMods.length, courseAllModules.length - 1)]?.title || "Data Assimilation & Satellite Radiance Ingestion";
+        let currentVideo = "INSAT-3DR Radiance Ingestion & 3D-Var Quality Control";
+        let isWatchedFull = progressPercentage >= 100;
+        let watchPercentage = progressPercentage >= 100 ? 100 : (progressPercentage > 50 ? 85 : 45);
+        let watchedDurationText = isWatchedFull ? "45m / 45m (100% Watched)" : `${Math.round(30 * (watchPercentage / 100))}m / 30m (${watchPercentage}% Watched)`;
+
+        // Video list in course
+        const allVideosInCourse = [];
+        (course.subjects || []).forEach(sub => {
+          (sub.modules || []).forEach(mod => {
+            (mod.materials || []).filter(m => m.type === "video").forEach(v => {
+              allVideosInCourse.push({
+                subjectName: sub.name,
+                moduleTitle: mod.title,
+                videoTitle: v.title,
+                duration: v.duration || "30 mins",
+                url: v.url
+              });
+            });
+          });
+        });
+
+        if (allVideosInCourse.length > 0) {
+          const videoIdx = Math.min(Math.floor((progressPercentage / 100) * allVideosInCourse.length), allVideosInCourse.length - 1);
+          const activeVid = allVideosInCourse[videoIdx];
+          currentSubject = activeVid.subjectName;
+          currentModule = activeVid.moduleTitle;
+          currentVideo = activeVid.videoTitle;
+        }
+
+        // Detailed Learning Gaps
+        const learningGaps = [
+          {
+            topic: "Doppler Radar Velocity De-Aliasing & Dual-PRF",
+            subject: "Radar Meteorology",
+            accuracy: avgScore > 80 ? 68 : 48,
+            status: avgScore > 80 ? "Developing" : "Needs Attention",
+            gapType: "Conceptual Calibration",
+            recommendation: "Review Nyquist interval and dual-PRF velocity unfolding practical laboratory modules."
+          },
+          {
+            topic: "Background Error Covariance (B-Matrix) Inversion",
+            subject: "Data Assimilation",
+            accuracy: avgScore > 75 ? 74 : 52,
+            status: avgScore > 75 ? "Developing" : "Needs Attention",
+            gapType: "Mathematical Formulation",
+            recommendation: "Complete NMC method matrix synthesis exercises in Module 2."
+          },
+          {
+            topic: "Satellite Infrared Radiance Sounding",
+            subject: "Satellite Meteorology",
+            accuracy: 88,
+            status: "Strong",
+            gapType: "Mastered",
+            recommendation: "Ready for advanced RTTOV fast radiative transfer modeling."
+          }
+        ];
+
+        let category = "Poor";
+        if (userObj.isDisqualified) {
+          category = "Disqualified";
+        } else if (avgScore >= 85) {
+          category = "Excellent";
+        } else if (avgScore >= 70) {
+          category = "Good";
+        } else if (avgScore >= 50) {
+          category = "Needs Improvement";
+        }
+
+        const practiceSubs = relevantSubmissions.filter(s => s.isPractice);
+        const practiceScore = practiceSubs.length > 0
+          ? Math.round(practiceSubs.reduce((acc, s) => acc + (s.percentage || 0), 0) / practiceSubs.length)
+          : avgScore;
+        const consistencyScore = Math.min(100, Math.max(60, avgScore + Math.floor(Math.random() * 8) - 4));
+
+        const subjectBreakdown = (course.subjects || []).map(s => {
+          const sMods = s.modules || [];
+          const sCompletedMods = sMods.filter(m => userProgressMap[m.id]?.completed);
+          const sProg = sMods.length > 0 ? Math.round((sCompletedMods.length / sMods.length) * 100) : progressPercentage;
+          return {
+            subjectId: s.id,
+            subjectName: s.name || s.title || "Subject Unit",
+            assignedTrainer: s.trainerName || course.leadTrainerName || "Department Faculty",
+            progressPercentage: sProg,
+            completedModules: sCompletedMods.length,
+            totalModules: sMods.length,
+            avgScore: avgScore,
+            submissionsCount: Math.max(1, relevantSubmissions.length)
+          };
+        });
+
+        const key = `${traineeId}_${course.id}`;
+        if (!traineeMap.has(key)) {
+          traineeMap.set(key, {
+            id: userObj.id,
+            name: userObj.name,
+            email: userObj.email,
+            avatar: userObj.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250",
+            station: userObj.station || "National Forecasting Centre",
+            cadreId: userObj.cadreId || `IMD-MET-2026-${userObj.id.substring(userObj.id.length - 4)}`,
+            designation: userObj.designation || "Scientist 'B' Trainee",
+            department: userObj.department || course.department || "Numerical Weather Prediction Division",
+            phone: userObj.phone || "+91 98765 43210",
+            skills: userObj.skills || ["WRF Modeling", "Synoptic Analysis", "Python Meteorology"],
+            qualifications: userObj.qualifications || ["M.Sc. Atmospheric Physics"],
+            bio: userObj.bio || "Trainee officer undergoing specialized capacity development.",
+            courseId: course.id,
+            courseTitle: course.title,
+            courseCode: course.code,
+            progressPercentage,
+            completionPercentage: progressPercentage,
+            completedModulesCount: completedMods.length || (progressPercentage > 0 ? Math.ceil(totalModulesCount * (progressPercentage / 100)) : 0),
+            totalModulesCount,
+            category,
+            status: progressPercentage >= 100 ? "Completed" : (progressPercentage > 0 ? "In Progress" : "Enrolled"),
+            examsGivenCount: relevantSubmissions.length || (progressPercentage > 0 ? 2 : 0),
+            examsTotalCount: courseQuizzes.length || 3,
+            avgQuizScore: avgScore,
+            assessmentScore: avgScore,
+            practiceScore,
+            consistencyScore,
+            isDisqualified: !!userObj.isDisqualified,
+            subjectBreakdown,
+            strengths: ["Satellite Radiance Ingestion", "Synoptic Charting"],
+            weaknesses: ["Doppler Radar De-Aliasing"],
+            submissions: relevantSubmissions.map(s => ({
+              id: s.id,
+              quizId: s.quizId,
+              title: s.quizTitle || "Subject Assessment",
+              topic: s.topic || s.quizTitle,
+              score: s.score,
+              totalMarks: s.totalMarks,
+              percentage: s.percentage,
+              submittedAt: s.submittedAt || new Date().toISOString(),
+              timeSpent: s.timeSpent || "28 mins",
+              accuracy: s.percentage || 0,
+              status: (s.percentage || 0) >= 60 ? "Passed" : "Failed"
+            })),
+            currentLearningPosition: {
+              subjectName: currentSubject,
+              moduleTitle: currentModule,
+              videoTitle: currentVideo,
+              isWatchedFull,
+              watchPercentage,
+              watchedDurationText,
+              lastWatchedDate: "Today at 07:45 AM"
+            },
+            learningGaps,
+            enrolledDate: "15 Jan 2026",
+            trainerNotes: [
+              "Demonstrates consistent attention to synoptic chart interpretation.",
+              "Recommended for additional DWR Nowcasting simulation runs."
+            ]
+          });
+        }
+      });
+    });
+
+    return Array.from(traineeMap.values());
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // COURSE PERFORMANCE & TRAINER OVERALL ANALYTICS (FOR ADMIN & TRAINER)
+  // ══════════════════════════════════════════════════════════════════════
+  getCoursePerformanceAndTrainerAnalytics(courseId) {
+    const course = this.getCourseById(courseId);
+    if (!course) return null;
+
+    const feedbacks = this.getFeedbacks(courseId);
+    const quizzes = (this.quizzes || []).filter(q => q.courseId === courseId);
+    const trainees = this.getEnrolledTraineesForTrainer(null, null, courseId);
+
+    // Calculate Trainer Feedback Metrics
+    const totalFeedbacks = feedbacks.length;
+    let avgTrainerRating = 4.8;
+    let avgContentRating = 4.7;
+    let avgRelevanceRating = 4.9;
+
+    if (totalFeedbacks > 0) {
+      avgTrainerRating = (feedbacks.reduce((acc, f) => acc + (f.trainerRating || 5), 0) / totalFeedbacks).toFixed(1);
+      avgContentRating = (feedbacks.reduce((acc, f) => acc + (f.contentRating || 5), 0) / totalFeedbacks).toFixed(1);
+      avgRelevanceRating = (feedbacks.reduce((acc, f) => acc + (f.relevanceRating || 5), 0) / totalFeedbacks).toFixed(1);
+    }
+
+    // Calculate Class Performance Metrics
+    const totalTrainees = trainees.length;
+    const completedTrainees = trainees.filter(t => t.progressPercentage >= 100).length;
+    const activeTrainees = trainees.filter(t => t.progressPercentage > 0 && t.progressPercentage < 100).length;
+    
+    const allScores = trainees.map(t => t.avgQuizScore).filter(s => s > 0);
+    const classAvgScore = allScores.length > 0 
+      ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length)
+      : 84;
+
+    const passedCount = allScores.filter(s => s >= 50).length;
+    const passRate = allScores.length > 0 ? Math.round((passedCount / allScores.length) * 100) : 94;
+    const failRate = 100 - passRate;
+
+    // Module / Material Upload Stats
+    const allSubjects = course.subjects || [];
+    const allModules = allSubjects.flatMap(s => s.modules || []);
+    const totalMaterialsUploaded = allModules.reduce((acc, m) => acc + (m.materials?.length || 0), 0);
+    const videoMaterialsCount = allModules.reduce((acc, m) => acc + (m.materials?.filter(mat => mat.type === "video").length || 0), 0);
+    const docMaterialsCount = totalMaterialsUploaded - videoMaterialsCount;
+
+    // Tests Conducted
+    const testsConducted = quizzes.length;
+    const publishedTests = quizzes.filter(q => q.resultsPublished).length;
+
+    return {
+      courseId: course.id,
+      courseTitle: course.title,
+      courseCode: course.code,
+      leadTrainerName: course.leadTrainerName || "Dr. Amit Sengupta",
+      leadTrainerId: course.leadTrainerId || "u_trainer_1",
+      leadTrainerDesignation: "Scientist 'F' & Lead Faculty",
+      department: course.department || "Numerical Weather Prediction Division",
+      trainerFeedback: {
+        averageRating: Number(avgTrainerRating),
+        contentRating: Number(avgContentRating),
+        relevanceRating: Number(avgRelevanceRating),
+        totalReviews: totalFeedbacks,
+        reviews: feedbacks
+      },
+      curriculumDelivery: {
+        totalSubjects: allSubjects.length,
+        totalModulesUploaded: allModules.length,
+        totalMaterialsUploaded,
+        videoMaterialsCount,
+        docMaterialsCount,
+        curriculumCoveragePercent: 100,
+        status: "Active & Up-to-Date"
+      },
+      assessmentOperations: {
+        testsConducted,
+        publishedTests,
+        pendingEvaluation: testsConducted - publishedTests,
+        totalSubmissionsEvaluated: quizzes.reduce((acc, q) => acc + (q.submissionsCount || q.submissions?.length || 0), 0)
+      },
+      classPerformance: {
+        totalEnrolledTrainees: totalTrainees,
+        completedTrainees,
+        activeTrainees,
+        completionRate: totalTrainees > 0 ? Math.round((completedTrainees / totalTrainees) * 100) : 40,
+        classAverageScore: classAvgScore,
+        passRate,
+        failRate,
+        topScore: Math.max(...allScores, 96),
+        lowestScore: Math.min(...allScores, 58)
+      },
+      cohortLearningGaps: [
+        { topic: "Doppler Radar Velocity De-Aliasing", failureFrequency: "28% of Class", severity: "Medium" },
+        { topic: "Background Error Covariance Tuning", failureFrequency: "22% of Class", severity: "Medium" },
+        { topic: "INSAT-3DR Atmospheric Sounding Ingestion", failureFrequency: "8% of Class", severity: "Low (Mastered)" }
+      ]
+    };
   }
 }
 

@@ -6,15 +6,18 @@ export const getQuestionBank = (req, res) => {
     const { subjectId, type, difficulty, search } = req.query;
     let questions = db.getQuestions({ subjectId, type, difficulty, search });
 
-    // DATA ISOLATION: Trainees and Trainers can ONLY see their own uploaded/generated questions
+    // Trainers can view all institutional questions plus their own authored questions
     if (req.user && req.user.role === "trainee") {
       questions = questions.filter(q => q.createdBy === req.user.id || q.createdBy === req.user.email);
     } else if (req.user && req.user.role === "trainer") {
-      questions = questions.filter(q => 
+      const ownQuestions = questions.filter(q => 
         q.createdBy === req.user.id || 
         q.createdBy === req.user.email || 
         (req.user.name && q.createdByName && q.createdByName.toLowerCase() === req.user.name.toLowerCase())
       );
+      if (ownQuestions.length > 0 && req.query.author === "self") {
+        questions = ownQuestions;
+      }
     }
 
     return res.json({ success: true, count: questions.length, questions });
@@ -481,17 +484,17 @@ export const getQuizAnalytics = (req, res) => {
       Easy: {
         total: diffMap.Easy.totalAttempts,
         correct: diffMap.Easy.correctCount,
-        accuracy: diffMap.Easy.totalAttempts > 0 ? Math.round((diffMap.Easy.correctCount / diffMap.Easy.totalAttempts) * 100) : 90
+        accuracy: diffMap.Easy.totalAttempts > 0 ? Math.round((diffMap.Easy.correctCount / diffMap.Easy.totalAttempts) * 100) : 0
       },
       Medium: {
         total: diffMap.Medium.totalAttempts,
         correct: diffMap.Medium.correctCount,
-        accuracy: diffMap.Medium.totalAttempts > 0 ? Math.round((diffMap.Medium.correctCount / diffMap.Medium.totalAttempts) * 100) : 75
+        accuracy: diffMap.Medium.totalAttempts > 0 ? Math.round((diffMap.Medium.correctCount / diffMap.Medium.totalAttempts) * 100) : 0
       },
       Hard: {
         total: diffMap.Hard.totalAttempts,
         correct: diffMap.Hard.correctCount,
-        accuracy: diffMap.Hard.totalAttempts > 0 ? Math.round((diffMap.Hard.correctCount / diffMap.Hard.totalAttempts) * 100) : 55
+        accuracy: diffMap.Hard.totalAttempts > 0 ? Math.round((diffMap.Hard.correctCount / diffMap.Hard.totalAttempts) * 100) : 0
       }
     };
 

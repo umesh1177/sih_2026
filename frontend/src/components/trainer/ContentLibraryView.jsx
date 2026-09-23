@@ -65,7 +65,7 @@ export const cleanTopic = (str) => {
 };
 
 export const formatVideoEmbedUrl = (url) => {
-  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/NRE2up9GxAI";
+  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/iF_D2gnDJDU";
   let cleanUrl = url.trim();
   if (cleanUrl.includes("youtu.be/")) {
     const parts = cleanUrl.split("youtu.be/")[1];

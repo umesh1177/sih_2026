@@ -25,6 +25,9 @@ import { UserApprovalQueue } from "./components/admin/UserApprovalQueue";
 import { BroadcastManagerModal } from "./components/admin/BroadcastManagerModal";
 import { NationalBroadcastsView } from "./components/admin/NationalBroadcastsView";
 import { PlatformAnalyticsView } from "./components/admin/PlatformAnalyticsView";
+import { TraineeAnalyticsDashboard } from "./components/analytics/TraineeAnalyticsDashboard";
+import { TrainerAnalyticsDashboard } from "./components/analytics/TrainerAnalyticsDashboard";
+import { AdminAnalyticsDashboard } from "./components/analytics/AdminAnalyticsDashboard";
 import { TraineeDashboardView } from "./components/dashboard/TraineeDashboardView";
 import { TrainerDashboardView } from "./components/dashboard/TrainerDashboardView";
 import { AdminDashboardView } from "./components/dashboard/AdminDashboardView";
@@ -589,10 +592,16 @@ const navigateToTab = (tab) => {
             />
           )}
 
-          {/* 7. PLATFORM ANALYTICS & REPORTING */}
-          {activeTab === "analytics" && (
-            <PlatformAnalyticsView />
-          )}
+          {/* 7. DYNAMIC ROLE-BASED ASSESSMENT ANALYTICS */}
+          {activeTab === "analytics" && renderTabContent("analytics", (
+            currentUser?.role === "trainee" ? (
+              <TraineeAnalyticsDashboard currentUser={currentUser} />
+            ) : currentUser?.role === "trainer" ? (
+              <TrainerAnalyticsDashboard currentUser={currentUser} />
+            ) : (
+              <AdminAnalyticsDashboard currentUser={currentUser} />
+            )
+          ))}
 
           {/* 8. CERTIFICATIONS & CREDENTIALS SHOWCASE */}
           {activeTab === "certificates" && (

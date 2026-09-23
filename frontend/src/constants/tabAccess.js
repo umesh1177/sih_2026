@@ -15,7 +15,7 @@ export const TAB_ACCESS = {
   "practice-papers": ["trainee"],
   "trainee-performance": ["admin", "trainer", "trainee"],
   "learning-gaps": ["admin", "trainer", "trainee"],
-  analytics: ["admin", "trainer"],
+  analytics: ["admin", "trainer", "trainee"],
   certificates: ["admin", "trainer", "trainee"],
   profile: ["all"],
   helpdesk: ["all"], // new helpdesk tab accessible to all logged‑in users

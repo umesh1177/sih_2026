@@ -57,7 +57,7 @@ import {
 import { api } from "../../services/api";
 
 export const formatVideoEmbedUrl = (url) => {
-  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/NRE2up9GxAI";
+  if (!url || typeof url !== "string") return "https://www.youtube.com/embed/iF_D2gnDJDU";
   let cleanUrl = url.trim();
   if (cleanUrl.includes("youtu.be/")) {
     const parts = cleanUrl.split("youtu.be/")[1];
@@ -94,7 +94,7 @@ const DEFAULT_SUBJECTS = [
             duration: "45 mins",
             durationSeconds: 2700,
             allowDownload: false,
-            url: "https://www.youtube.com/embed/NRE2up9GxAI",
+            url: "https://www.youtube.com/embed/iF_D2gnDJDU",
             uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
             uploadedAt: "Uploaded on: Jan 15, 2025",
             prerequisiteConfig: {
@@ -153,7 +153,7 @@ const DEFAULT_SUBJECTS = [
             duration: "50 mins",
             durationSeconds: 3000,
             allowDownload: false,
-            url: "https://www.youtube.com/embed/NRE2up9GxAI",
+            url: "https://www.youtube.com/embed/iF_D2gnDJDU",
             uploadedBy: "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
             uploadedAt: "Uploaded on: Jan 16, 2025",
             prerequisiteConfig: {
@@ -270,7 +270,7 @@ const ensureRichMaterials = (subjList, leadTrainer) => {
               id: `mat_${sub.id || sIdx}_${mod.id || mIdx}_v1`,
               title: `Video ${mIdx + 1}: Recorded Masterclass — ${cleanTitle}`,
               type: "video",
-              url: "https://www.youtube.com/embed/NRE2up9GxAI",
+              url: "https://www.youtube.com/embed/iF_D2gnDJDU",
               duration: "45 mins",
               durationSeconds: 2700,
               allowDownload: false,
@@ -366,7 +366,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
     duration: "45 mins",
     durationSeconds: 2700,
     allowDownload: false,
-    url: "https://www.youtube.com/embed/NRE2up9GxAI",
+    url: "https://www.youtube.com/embed/iF_D2gnDJDU",
     uploadedBy: course?.leadTrainerName || "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
     uploadedAt: "Uploaded on: Jan 15, 2025"
   };
@@ -661,7 +661,7 @@ export const CourseLearningStudio = ({ course, currentUser, onBack, onEnrollSucc
       allowDownload: newResourceForm.type !== "quiz" && newResourceForm.type !== "video",
       uploadedBy: currentUser?.name ? `${currentUser.name} (Trainer)` : "Dr. Amit Sengupta (Lead Trainer, Scientist 'F')",
       uploadedAt: `Uploaded on: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
-      url: newResourceForm.url ? formatVideoEmbedUrl(newResourceForm.url) : (newResourceForm.type === "video" ? "https://www.youtube.com/embed/NRE2up9GxAI" : ""),
+      url: newResourceForm.url ? formatVideoEmbedUrl(newResourceForm.url) : (newResourceForm.type === "video" ? "https://www.youtube.com/embed/iF_D2gnDJDU" : ""),
       totalMarks: newResourceForm.type === "quiz" ? (newResourceForm.questions.length * 5) : undefined,
       passPercentage: newResourceForm.type === "quiz" ? newResourceForm.passPercentage : undefined,
       questions: newResourceForm.type === "quiz" ? newResourceForm.questions : undefined,

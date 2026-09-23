@@ -6,6 +6,7 @@ import * as competencyController from "../controllers/competencyController.js";
 import * as adminController from "../controllers/adminController.js";
 import * as aiController from "../controllers/aiController.js";
 import * as progressController from "../controllers/progressController.js";
+import * as analyticsController from "../controllers/analyticsController.js";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -36,7 +37,8 @@ router.get("/trainers/workload", requireAuth, requireRole("admin", "trainer"), c
 router.post("/courses/:courseId/subjects/:subjectId/modules", requireAuth, requireRole("trainer", "admin"), courseController.addModuleToSubject);
 router.delete("/courses/:courseId/subjects/:subjectId/modules/:moduleId", requireAuth, requireRole("trainer", "admin"), courseController.deleteModuleFromSubject);
 router.post("/courses/:courseId/subjects/:subjectId/modules/:moduleId/materials", requireAuth, requireRole("trainer", "admin"), courseController.uploadLearningMaterial);
-router.delete("/courses/:courseId/subjects/:subjectId/modules/:moduleId/materials/:materialId", requireAuth, requireRole("trainer", "admin"), courseController.deleteLearningMaterial);
+router.get("/courses/:id/enrolled-trainees", requireAuth, requireRole("trainer", "admin"), courseController.getCourseEnrolledTrainees);
+router.get("/courses/:id/trainer-performance", requireAuth, requireRole("trainer", "admin"), courseController.getCourseTrainerPerformance);
 router.get("/trainers/enrolled-trainees", requireAuth, requireRole("trainer", "admin"), courseController.getTrainerEnrolledTrainees);
 router.get("/trainers/content-library", requireAuth, requireRole("trainer", "admin"), courseController.getContentLibrary);
 router.post("/trainers/content-library", requireAuth, requireRole("trainer", "admin"), courseController.createContentLibraryItem);
@@ -75,7 +77,13 @@ router.post("/quizzes/:id/reset-disqualification", requireAuth, requireRole("tra
 router.post("/quizzes/:id/publish-results", requireAuth, requireRole("trainer", "admin"), quizController.publishQuizResults);
 router.put("/quizzes/submissions/:id/evaluate", requireAuth, requireRole("trainer", "admin"), quizController.evaluateSubmission);
 router.get("/quizzes/:id/analytics", requireAuth, quizController.getQuizAnalytics);
-router.get("/analytics/trainee/:traineeId", requireAuth, quizController.getTraineeAnalytics);
+
+// --- PROTECTED: Role-Based Assessment Analytics Engine ---
+router.get("/analytics/trainee/:traineeId", requireAuth, analyticsController.getTraineeAnalytics);
+router.get("/analytics/trainer/:trainerId", requireAuth, requireRole("trainer", "admin"), analyticsController.getTrainerAnalytics);
+router.get("/analytics/trainers", requireAuth, requireRole("trainer", "admin"), analyticsController.getAllTrainersAnalytics);
+router.get("/analytics/admin", requireAuth, requireRole("admin"), analyticsController.getAdminAnalytics);
+router.get("/analytics/assessment/:assessmentId", requireAuth, analyticsController.getAssessmentAnalytics);
 
 // --- PROTECTED: Competency Mapping Engine ---
 router.get("/competencies", requireAuth, competencyController.getCompetencyMatrix);

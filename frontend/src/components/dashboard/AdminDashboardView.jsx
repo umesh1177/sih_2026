@@ -81,11 +81,11 @@ export const AdminDashboardView = ({
 
   const totalEnrolled = courses.reduce((acc, c) => acc + (c.enrolledTraineeIds?.length || 0), 0);
   const totalCap = courses.reduce((acc, c) => acc + (c.maxEnrollment || 50), 0);
-  const capacityPct = totalCap > 0 ? Math.round((totalEnrolled / totalCap) * 100) : 74;
+  const capacityPct = totalCap > 0 ? Math.round((totalEnrolled / totalCap) * 100) : 0;
 
   const chartData = (stats?.deptDistribution || []).map(d => ({
     ...d,
-    percentage: Math.min(100, Math.round((d.count / (stats?.totalTrainees || 28)) * 100))
+    percentage: (stats?.totalTrainees && stats.totalTrainees > 0) ? Math.min(100, Math.round((d.count / stats.totalTrainees) * 100)) : 0
   }));
 
   if (loading) {

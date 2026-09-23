@@ -204,8 +204,34 @@ export const getTrainerEnrolledTrainees = (req, res) => {
       trainerName = req.user?.name;
       trainerId = req.user?.id;
     }
-    const trainees = db.getEnrolledTraineesForTrainer(trainerName, trainerId);
+    const { courseId } = req.query;
+    const trainees = db.getEnrolledTraineesForTrainer(trainerName, trainerId, courseId);
     return res.json({ success: true, count: trainees.length, trainees });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getCourseEnrolledTrainees = (req, res) => {
+  try {
+    const { id } = req.params;
+    let trainerName = req.user?.role === "trainer" ? req.user?.name : null;
+    let trainerId = req.user?.role === "trainer" ? req.user?.id : null;
+    const trainees = db.getEnrolledTraineesForTrainer(trainerName, trainerId, id);
+    return res.json({ success: true, count: trainees.length, trainees });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getCourseTrainerPerformance = (req, res) => {
+  try {
+    const { id } = req.params;
+    const analytics = db.getCoursePerformanceAndTrainerAnalytics(id);
+    if (!analytics) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    return res.json({ success: true, analytics });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

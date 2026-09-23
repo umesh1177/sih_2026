@@ -21,7 +21,7 @@ db.courses.forEach(c => {
             id: `mat_${c.id.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8)}_${sIdx + 1}_${mIdx + 1}_v1`,
             title: `Video ${mIdx + 1}: Recorded Masterclass — ${cleanTitle}`,
             type: "video",
-            url: "https://www.youtube.com/embed/NRE2up9GxAI",
+            url: "https://www.youtube.com/embed/iF_D2gnDJDU",
             duration: "45 mins",
             durationSeconds: 2700,
             allowDownload: false,

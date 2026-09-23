@@ -1122,116 +1122,62 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
         </div>
       )}
 
-      {/* ═════════ 1. TOP SECURE KIOSK HEADER ═════════ */}
+      {/* ═════════ 1. ENHANCED MINIMAL KIOSK HEADER ═════════ */}
       <header className="h-14 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
         
-        {/* Left: Exam Branding & Fullscreen Badge */}
+        {/* Left: Trainee Registration ID / Enrollment No */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[var(--radius)] bg-[#0B3475] text-white flex items-center justify-center font-medium text-xs shadow-xs">
-            CC
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-blue-50 text-[#0B3475] font-medium text-[10px] uppercase tracking-wider border border-blue-200">
-                PROCTORED KIOSK
-              </span>
-              <span className="text-xs font-medium text-slate-900 truncate max-w-xs sm:max-w-md">
-                {quiz?.title || "National Meteorological Assessment"}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 font-normal">
-              Candidate: <b className="text-slate-800 font-medium">{currentUser?.name || currentUser?.email || "Trainee"}</b> • Security Engine Active
-            </p>
+          <div className="px-3 py-1.5 rounded-[var(--radius)] bg-slate-100 border border-slate-200 text-slate-800 flex items-center gap-2">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Registration ID:</span>
+            <span className="text-xs font-mono font-bold text-slate-900">
+              {currentUser?.cadreId || "IMD-MET-2026-4491"}
+            </span>
           </div>
         </div>
 
-        {/* Center: Live Timer Banner */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)]">
-          <Clock className={`w-3.5 h-3.5 ${timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-[#0B3475]"}`} />
-          <span className="text-xs font-medium text-slate-600 hidden sm:inline">Remaining Time:</span>
-          <span className={`text-xs font-medium font-mono tracking-wider ${
+        {/* Center: Clean Live Exam Timer */}
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-50 border border-slate-200 rounded-[var(--radius)] shadow-2xs">
+          <Clock className={`w-4 h-4 ${timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-[#0B3475]"}`} />
+          <span className="text-xs font-medium text-slate-500 hidden sm:inline">Exam Timer:</span>
+          <span className={`text-sm font-bold font-mono tracking-wider ${
             timeLeftSeconds < 300 ? "text-rose-600 animate-pulse" : "text-slate-900"
           }`}>
             {formatTime(timeLeftSeconds)}
           </span>
         </div>
 
-        {/* Right: Security Status, Re-Lock & Submit buttons */}
-        <div className="flex items-center gap-2">
-          {!isFullscreenLocked ? (
+        {/* Right: Re-Lock & Submit Exam Button */}
+        <div className="flex items-center gap-2.5">
+          {!isFullscreenLocked && (
             <button
               onClick={requestKioskFullscreen}
               className="px-3 py-1.5 rounded-[var(--radius)] bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 animate-pulse"
               title="Click to restore full-screen kiosk lock"
             >
               <Maximize2 className="w-3.5 h-3.5" />
-              <span>Re-Lock Fullscreen</span>
+              <span>Full Screen</span>
             </button>
-          ) : (
-            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold">
-              <Maximize2 className="w-3 h-3 text-emerald-600" />
-              <span>Fullscreen Locked</span>
-            </div>
           )}
-
-          <div className={`hidden md:flex items-center gap-1 px-2.5 py-1 rounded-[var(--radius)] border text-[11px] font-semibold ${
-            tabSwitchCount > 0 
-              ? "bg-amber-50 text-amber-900 border-amber-300"
-              : "bg-emerald-50 text-emerald-800 border-emerald-200"
-          }`}>
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{tabSwitchCount === 0 ? "✓ Integrity 100%" : `⚠ ${tabSwitchCount} / 2 Warnings`}</span>
-          </div>
 
           <button
             onClick={() => setShowSubmitModal(true)}
-            className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-[var(--radius)] text-xs shadow-xs transition-colors flex items-center gap-1.5"
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-[var(--radius)] text-xs shadow-xs transition-colors flex items-center gap-1.5"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Submit Test</span>
+            <span>Submit Exam</span>
           </button>
         </div>
 
       </header>
 
-
-      {/* ─── PROCTORED EXAMINATION STATUS & SECURITY TELEMETRY BAR ─── */}
-      <div className="bg-slate-50 border-b border-slate-200/90 px-4 sm:px-6 py-2 flex items-center justify-between text-xs shrink-0 shadow-2xs flex-wrap gap-2">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 border border-blue-200 text-blue-800 flex items-center gap-1 shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-            Proctored Session
-          </span>
-          <span className="text-slate-600 font-semibold text-[11px]">
-            {quiz?.courseName || quiz?.title || "National Examination"}
-          </span>
-        </div>
-
-        {/* Security telemetry indicators */}
-        <div className="flex items-center gap-2 text-[10px] font-medium text-slate-500 flex-wrap">
-          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-emerald-700">
-            🛡️ Focus Locked
-          </span>
-          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
-            🚫 Clipboard & Context Menu Blocked
-          </span>
-          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-purple-700">
-            ⌨️ DevTools/Shortcuts Shielded
-          </span>
-          <span className="font-mono text-slate-600 pl-1 border-l border-slate-300">
-            Cadre ID: <b className="text-slate-800">{currentUser?.cadreId || "MOES-MET-2026"}</b>
-          </span>
-        </div>
-      </div>
-
       {/* ═════════ 2. MAIN PROCTORED VIEWPORT (LIGHT THEME) ═════════ */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
         {/* ─── LEFT: QUESTION PALETTE (GRID & STATUS) ─── */}
-        <aside className="w-full lg:w-80 bg-white border-r border-slate-200/90 p-4 sm:p-5 flex flex-col shrink-0 overflow-y-auto shadow-2xs order-2 lg:order-1 max-h-56 lg:max-h-none">
+        <aside className="w-full lg:w-72 bg-white border-r border-slate-200/90 p-4 sm:p-5 flex flex-col shrink-0 overflow-y-auto shadow-2xs order-2 lg:order-1 max-h-56 lg:max-h-none">
           
           <h3 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider mb-3">
-            Question Palette ({questions.length})
+            Questions ({questions.length})
           </h3>
 
           {/* Palette Status Badges */}
@@ -1246,7 +1192,7 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
             </div>
             <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-600">
               <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
-              <span>Not Answered ({notAnsweredCount})</span>
+              <span>Remaining ({notAnsweredCount})</span>
             </div>
             <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-[var(--radius)] border border-slate-200 text-slate-600">
               <span className="w-2.5 h-2.5 rounded-full bg-slate-200 border border-slate-400"></span>
@@ -1283,10 +1229,6 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
               );
             })}
           </div>
-
-          <div className="mt-auto pt-4 border-t border-slate-100 text-[11px] text-slate-400 font-medium hidden lg:block">
-            Proctored by MoES Automated Assessment Service
-          </div>
         </aside>
 
         {/* ─── RIGHT / CENTER: QUESTION STAGE & OPTION PICKER ─── */}
@@ -1295,13 +1237,10 @@ export const KioskExamMode = ({ quiz, currentUser, onClose, onFinish }) => {
           <div className="max-w-3xl w-full mx-auto space-y-4">
             
             {/* Top Question Info Banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-1 bg-[#0B3475] text-white rounded-[var(--radius)] text-xs font-medium shadow-xs">
+            <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-[#0B3475] text-white rounded-[var(--radius)] text-xs font-bold shadow-xs">
                   Question {currentIndex + 1} of {questions.length}
-                </span>
-                <span className="px-2.5 py-1 bg-white text-slate-700 rounded-[var(--radius)] text-xs font-medium border border-slate-200 shadow-xs">
-                  {currentQuestion.subjectName || "Meteorological Physics"}
                 </span>
               </div>
 

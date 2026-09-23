@@ -194,11 +194,26 @@ export const api = {
     return res.json();
   },
 
-  getTrainerEnrolledTrainees: async (trainerName, trainerId) => {
+  getTrainerEnrolledTrainees: async (trainerName, trainerId, courseId) => {
     const params = new URLSearchParams();
     if (trainerName) params.append("trainerName", trainerName);
     if (trainerId) params.append("trainerId", trainerId);
+    if (courseId) params.append("courseId", courseId);
     const res = await fetch(`${API_BASE_URL}/trainers/enrolled-trainees?${params.toString()}`, {
+      headers: authHeaders()
+    });
+    return res.json();
+  },
+
+  getCourseEnrolledTrainees: async (courseId) => {
+    const res = await fetch(`${API_BASE_URL}/courses/${courseId}/enrolled-trainees`, {
+      headers: authHeaders()
+    });
+    return res.json();
+  },
+
+  getCourseTrainerPerformance: async (courseId) => {
+    const res = await fetch(`${API_BASE_URL}/courses/${courseId}/trainer-performance`, {
       headers: authHeaders()
     });
     return res.json();
@@ -494,14 +509,63 @@ export const api = {
     }
   },
 
-  getTraineeAnalytics: async (traineeId) => {
+  // Dynamic Assessment Analytics System APIs
+  getTraineeAnalytics: async (traineeId, params = {}) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/analytics/trainee/${traineeId}`, {
+      const query = new URLSearchParams(params).toString();
+      const res = await fetch(`${API_BASE_URL}/analytics/trainee/${traineeId}${query ? `?${query}` : ""}`, {
         headers: getHeaders()
       });
       return await res.json();
     } catch (err) {
-      return { success: false, competencyRadar: [], submissions: [] };
+      return { success: false, hasData: false, message: err.message };
+    }
+  },
+
+  getTrainerAnalytics: async (trainerId, params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await fetch(`${API_BASE_URL}/analytics/trainer/${trainerId}${query ? `?${query}` : ""}`, {
+        headers: authHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, hasData: false, message: err.message };
+    }
+  },
+
+  getAllTrainersAnalytics: async (params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await fetch(`${API_BASE_URL}/analytics/trainers${query ? `?${query}` : ""}`, {
+        headers: authHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, hasData: false, message: err.message };
+    }
+  },
+
+  getAdminAssessmentAnalytics: async (params = {}) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await fetch(`${API_BASE_URL}/analytics/admin${query ? `?${query}` : ""}`, {
+        headers: authHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, hasData: false, message: err.message };
+    }
+  },
+
+  getAssessmentAnalytics: async (assessmentId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/analytics/assessment/${assessmentId}`, {
+        headers: getHeaders()
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: false, hasData: false, message: err.message };
     }
   },
 

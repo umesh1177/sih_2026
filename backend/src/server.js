@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.get("/api/health", (req, res) => {
   res.json({
     status: "healthy",
+    version: "2.1.0",
     portal: "CAPACITY CONNECT - MoES / IMD Learning Management Portal",
     timestamp: new Date().toISOString()
   });

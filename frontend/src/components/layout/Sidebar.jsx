@@ -37,6 +37,7 @@ export const Sidebar = ({
       return [
         { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
         { id: "courses", label: "Course Catalog", icon: BookOpen },
+        { id: "analytics", label: "Assessment Analytics", icon: BarChart3 },
         { id: "trainee-performance", label: "Learner Performance", icon: TrendingUp },
         { id: "learning-gaps", label: "Learning Gaps", icon: ShieldAlert },
         { id: "schedule-assessment", label: "Assessments", icon: ClipboardList },
@@ -68,6 +69,7 @@ export const Sidebar = ({
     return [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
       { id: "courses", label: "Course Catalog", icon: BookOpen },
+      { id: "analytics", label: "Assessment Analytics", icon: BarChart3 },
       { id: "learning-gaps", label: "Learning Gaps", icon: ShieldAlert },
       { id: "ai-course-advisor", label: "Course Advisor", icon: Sparkles, isModalTrigger: true },
       { id: "my-learning", label: "My Learning", icon: GraduationCap },
@@ -76,7 +78,6 @@ export const Sidebar = ({
       { id: "questions", label: "Question Bank", icon: Layers },
       { id: "certificates", label: "Certificates", icon: Award },
       { id: "profile", label: "Professional Profile", icon: FileText },
-      { id: "analytics", label: "Competency Passport", icon: BarChart3 },
       { id: "helpdesk", label: "Helpdesk", icon: ShieldCheck }
     ];
   };
